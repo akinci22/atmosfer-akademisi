@@ -11,7 +11,7 @@
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #0e1013; --surface: #171a1f; --ink: #eceef1; --ink2: #a4aab5; --line: #262a31; --acc: #a0c3ff; color-scheme: dark; } }
 :root[data-theme="dark"] { --bg: #0e1013; --surface: #171a1f; --ink: #eceef1; --ink2: #a4aab5; --line: #262a31; --acc: #a0c3ff; color-scheme: dark; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 16.5px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
-main { max-width: 1080px; margin: 0 auto; padding-block: 64px 80px; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+main { position: relative; max-width: 1080px; margin: 0 auto; padding-block: 64px 80px; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
 .k { color: var(--ink2); font-size: 14.5px; margin: 0; }
 h1 { font-size: clamp(2.2rem, 1.4rem + 3vw, 3.2rem); line-height: 1.05; letter-spacing: -0.03em; margin: 8px 0 10px; }
 .lede { color: var(--ink2); font-size: 1.15rem; max-width: 56ch; margin: 0; }
@@ -25,10 +25,14 @@ a.c b { font-size: 1.12rem; letter-spacing: -0.01em; }
 a.c span { color: var(--ink2); font-size: 15px; }
 a.c:hover b { color: var(--acc); }
 a.c:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
+a.folio { position: absolute; top: 18px; right: max(20px, env(safe-area-inset-right, 0px)); display: inline-flex; align-items: center; gap: 5px; height: 36px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink2); font-size: 14px; font-weight: 600; text-decoration: none; }
+a.folio:hover { border-color: var(--acc); color: var(--acc); }
+a.folio:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
 </style>
 </head>
 <body>
 <main>
+  <a class="folio" href="https://akinci22.github.io/hakkimda/" target="_blank" rel="noopener noreferrer" aria-label="Portföy sitem (yeni sekmede açılır)">Portföyüm<span aria-hidden="true">↗</span></a>
   <p class="k">İTÜ Meteoroloji Mühendisliği</p>
   <h1>Atmosfer Akademisi</h1>
   <p class="lede">Dersler ve dönem projeleri: önce resim, sonra tek cümle; ayrıntı tıklayınca açılır.</p>
@@ -44,7 +48,7 @@ a.c:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
   <section>
     <h2>MTO 229E · Bulut ve Yağış Fiziği</h2>
     <div class="row">
-      <a class="c" href="./bulut-fizigi-rehberi/"><img src="./bulut-fizigi-rehberi/rehber/pcp/gok_28.jpg" alt="Mavi gökte dağınık kümülüs bulutları" loading="lazy"><div><b>Proje rehberi</b><span>Gökyüzü gözleminden Skew-T’ye: Part I ve Part II adım adım.</span></div></a>
+      <a class="c" href="./bulut-fizigi-rehberi/"><img src="./bulut-fizigi-rehberi/rehber/pcp/gok_28.jpg" alt="Mavi gökte dağınık kümülüs bulutları" loading="lazy"><div><b>Proje rehberi</b><span>Gökyüzü fotoğrafından Skew-T’ye: Part I ve Part II’yi adım adım gösteriyorum.</span></div></a>
     </div>
   </section>
 </main>
