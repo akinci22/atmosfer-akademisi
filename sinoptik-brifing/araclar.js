@@ -29,9 +29,11 @@
     { g: '91106', ad: 'En yüksek hamle', r: [['911', 'Hamle grubu'], ['ff = 06', 'Son 6 saatte en yüksek hamle 6 knot']] },
   ];
   function synop(kap) {
-    const kod = h('div', 'syn-kod'); const sag = h('div', 'syn-sag'); kap.append(kod, sag);
-    const svgKap = h('div', 'syn-model'); const tablo = h('div', 'syn-tablo', '<p class="ipucu">Bir gruba dokun: anlamı burada, istasyon modelindeki yeri yanda yanar.</p>'); sag.append(svgKap, tablo);
-    const svg = el('svg', { viewBox: '0 0 240 200', class: 'syn-svg', role: 'img', 'aria-label': 'Kartal istasyon modeli' }, svgKap);
+    // sahne: model (görsel) · grup düğmeleri · açıklama ayrı kutular; yerleşimi site.css kurar
+    const kod = h('div', 'syn-kod');
+    const svgKap = h('div', 'syn-model'); const tablo = h('div', 'syn-tablo', '<p class="ipucu">Bir gruba dokun: anlamı burada, istasyon modelindeki yeri yanda yanar.</p>'); kap.append(kod, svgKap, tablo);
+    // viewBox çizimin sınırına kırpılmış: boş kenar yok, sahnede yer kazanır
+    const svg = el('svg', { viewBox: '22 30 182 122', class: 'syn-svg', role: 'img', 'aria-label': 'Kartal istasyon modeli' }, svgKap);
     const P = {};
     const parca = (ad, f) => { const g = el('g', { class: 'syn-p', 'data-p': ad }, svg); f(g); P[ad] = g; };
     parca('ok', (g) => { el('circle', { cx: 120, cy: 100, r: 15, fill: 'none', stroke: 'currentColor', 'stroke-width': 1.5 }, g); tx(g, 120, 140, 'SSW 2 kt (sakin sayılır)', { 'text-anchor': 'middle', class: 'syn-k' }); });
@@ -135,7 +137,8 @@
     const W = 720, x0 = 46, pw = W - x0 - 46, dx = pw / 71, X = (i) => x0 + i * dx;
     const pan = [['Bulut kapalılığı (%)', 70], ['Sıcaklık (°C) · basınç (hPa)', 120], ['Saatlik yağış (mm)', 70], ['Rüzgâr (km/sa) · yön', 80]];
     let y = 14; const yer = pan.map(([ad, hh]) => { const o = { ad, y: y + 16, h: hh }; y += hh + 34; return o; });
-    const svg = el('svg', { viewBox: `0 0 ${W} ${y}`, class: 'mg-svg', role: 'img', 'aria-label': 'Kartal WRF meteogramı' }); const kay = h('div', 'mg-kaydir'); kay.appendChild(svg); kap.append(kay, oku);
+    const svg = el('svg', { viewBox: `0 0 ${W} ${y}`, class: 'mg-svg', role: 'img', 'aria-label': 'Kartal WRF meteogramı' }); const kay = h('div', 'mg-kaydir'); kay.appendChild(svg);
+    const gorsel = h('div', 'mg-gorsel'); gorsel.append(kay, oku); kap.append(gorsel); // sahne: grafik + okuma birlikte (telefonda yapışkan)
     const vurgu = el('rect', { x: X(24) - dx / 2, width: dx * 10, y: 0, height: y, class: 'mg-yagisbant' }, svg);
     const an = el('line', { x1: X(30.75), x2: X(30.75), y1: 0, y2: y, class: 'mg-an' }, svg); tx(svg, X(30.75) + 4, 10, 'sunum anı', { class: 'mg-et mg-an-t' });
     const eksenG = el('g', {}, svg);

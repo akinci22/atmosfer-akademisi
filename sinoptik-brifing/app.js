@@ -10,6 +10,42 @@
   const bitti = new Set(depo.al('sb:bitti', []));
   const AZ = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // ───────── sahne: değişen görsel ile kontroller tek ekranda
+  // Geniş ekran (YAN): görsel solda, kontroller + açıklama sağda; sahne ekrana sığar, sağ panel kendi içinde kayar.
+  // Telefon: görsel üstte yapışkan; bir öğeye basınca açıklama görselin hemen altına gelecek kadar kaydırılır.
+  const YAN = matchMedia('(min-width: 900px), (orientation: landscape) and (min-width: 600px) and (max-height: 500px)');
+  const YAPISKAN = '.sahne-gorsel, .skt-sol, .syn-model, .mg-gorsel';
+  const ustYuk = () => { const u = $('#ust'); return u ? u.getBoundingClientRect().height : 0; };
+  function olc() { // üst çubuk ve başlık yüksekliği → CSS (sahne yüksekliği bunlarla hesaplanır)
+    document.documentElement.style.setProperty('--ust-h', ustYuk() + 'px');
+    document.querySelectorAll('.sahne > .harita-ust, .arac-kart > .harita-ust').forEach((c) => c.parentElement.style.setProperty('--cap', c.offsetHeight + 'px'));
+  }
+  function odakla(kap, el) { // kap: sahnenin kökü · el: değişen açıklama (yoksa yalnız görsel)
+    if (!kap) return;
+    requestAnimationFrame(() => {
+      const tam = kap.classList.contains('tam'), kay = AZ ? 'auto' : 'smooth', kr = kap.getBoundingClientRect();
+      const ust = tam ? kr.top : ustYuk(), alt = tam ? kr.bottom : innerHeight;
+      const yap = kap.querySelector(YAPISKAN), yapisik = yap && getComputedStyle(yap).position === 'sticky';
+      let d = 0;
+      if (!yapisik) {
+        // geniş ekran: sahnenin tamamı görünsün, açıklama sağ panelin içinde görünsün
+        if (!tam && (kr.top < ust - 1 || kr.bottom > alt + 1)) d = kr.top < ust || kr.height > alt - ust ? kr.top - ust - 12 : Math.min(kr.bottom - alt + 12, kr.top - ust - 12);
+        const p = el && el.closest('.sahne-panel, .skt-sag');
+        if (p && p.scrollHeight > p.clientHeight + 1) {
+          const pr = p.getBoundingClientRect(), r = el.getBoundingClientRect(); let e = 0;
+          if (r.top < pr.top) e = r.top - pr.top - 8; else if (r.bottom > pr.bottom) e = Math.min(r.bottom - pr.bottom + 8, r.top - pr.top - 8);
+          if (Math.abs(e) > 2) p.scrollBy({ top: e, behavior: kay });
+        } else if (el && !tam) { const r = el.getBoundingClientRect(), t = r.top - d, b = r.bottom - d; if (t < ust) d += t - ust - 12; else if (b > alt) d += Math.min(b - alt + 12, t - ust - 12); }
+      } else {
+        // telefon: görsel tepeye yapışık ve tam görünür; açıklama onun hemen altında
+        const yr = yap.getBoundingClientRect();
+        if (yr.top < ust - 1 || yr.bottom > alt + 1) { yap.style.position = 'static'; d = yap.getBoundingClientRect().top - ust; yap.style.position = ''; }
+        if (el && !yap.contains(el)) { const r = el.getBoundingClientRect(), t = r.top - d, b = r.bottom - d, s = ust + yr.height; if (t < s + 4) d += t - s - 8; else if (b > alt - 4) d += Math.min(b - alt + 12, t - s - 8); }
+      }
+      if (Math.abs(d) > 2) (tam ? kap : window).scrollBy({ top: d, behavior: kay });
+    });
+  }
+
   // ───────── seslendirme (tarayıcı destekliyorsa)
   const SES = 'speechSynthesis' in window;
   function oku(metin, dil, b) {
@@ -73,7 +109,11 @@
   function sekmeler(liste) {
     const kap = h('div', 'sekme'); const bar = h('div', 'sekme-bar'); bar.setAttribute('role', 'tablist'); const govde = h('div', 'sekme-govde');
     kap.append(bar, govde);
-    const sec = (i) => { bar.querySelectorAll('button').forEach((b, k) => { b.setAttribute('aria-selected', String(k === i)); b.tabIndex = k === i ? 0 : -1; }); govde.querySelectorAll('.sekme-panel').forEach((p, k) => (p.hidden = k !== i)); };
+    const sec = (i) => {
+      bar.querySelectorAll('button').forEach((b, k) => { b.setAttribute('aria-selected', String(k === i)); b.tabIndex = k === i ? 0 : -1; }); govde.querySelectorAll('.sekme-panel').forEach((p, k) => (p.hidden = k !== i));
+      // seçili sekme çubukta görünsün (haritadaki numaraya dokununca «Gördüklerim» seçilir)
+      const b = bar.children[i]; if (b) { const br = bar.getBoundingClientRect(), r = b.getBoundingClientRect(); if (r.left < br.left || r.right > br.right) bar.scrollBy({ left: r.left < br.left ? r.left - br.left - 8 : r.right - br.right + 8, behavior: AZ ? 'auto' : 'smooth' }); }
+    };
     liste.forEach(([ad, icerik], i) => {
       const b = btn('sekme-b', ad, () => sec(i)); b.setAttribute('role', 'tab'); bar.appendChild(b);
       const p = h('div', 'sekme-panel'); p.setAttribute('role', 'tabpanel'); p.appendChild(icerik); govde.appendChild(p);
@@ -85,7 +125,7 @@
   function soruPanel(arr) { const d = h('div', 'satirlar'); arr.forEach(([s, c]) => { const x = h('details', 'satir'); x.innerHTML = `<summary><span>${kac(s)}</span></summary><p>${kac(c)}</p>`; d.appendChild(x); }); return d; }
   function denePanel(q) {
     const d = h('div', 'dene'); d.appendChild(h('p', 'dene-s', kac(q.s))); const sec = h('div', 'dene-sec'); const geri = h('p', 'dene-geri'); geri.setAttribute('aria-live', 'polite');
-    q.c.forEach((c, i) => { const b = btn('dene-b', kac(c), () => { sec.querySelectorAll('button').forEach((x, k) => { x.disabled = true; x.classList.toggle('dogru', k === q.d); x.classList.toggle('yanlis', k === i && i !== q.d); }); geri.innerHTML = (i === q.d ? '<b>Doğru.</b> ' : '<b>Tam değil.</b> ') + kac(q.a); tekrar.hidden = false; }); sec.appendChild(b); });
+    q.c.forEach((c, i) => { const b = btn('dene-b', kac(c), () => { sec.querySelectorAll('button').forEach((x, k) => { x.disabled = true; x.classList.toggle('dogru', k === q.d); x.classList.toggle('yanlis', k === i && i !== q.d); }); geri.innerHTML = (i === q.d ? '<b>Doğru.</b> ' : '<b>Tam değil.</b> ') + kac(q.a); tekrar.hidden = false; odakla(d.closest('.sahne, .arac-kart'), tekrar); }); sec.appendChild(b); });
     const tekrar = btn('cip', 'Yeniden dene', () => { sec.querySelectorAll('button').forEach((x) => { x.disabled = false; x.classList.remove('dogru', 'yanlis'); }); geri.textContent = ''; tekrar.hidden = true; }); tekrar.hidden = true;
     d.append(sec, geri, tekrar); return d;
   }
@@ -96,21 +136,21 @@
     const v = V.H[id], m = HR[id], rol = V.ROL[v.rol]; m.id = id;
     const a = h('article', 'adim'); a.id = id; a.style.setProperty('--rol', rol.renk);
     a.innerHTML = `<header class="adim-bas"><p class="adim-etiket"><span class="rol-nokta"></span>${rol.ad} · ${rol.is} · ${v.sure}</p><h3>${kac(v.baslik)}</h3><p class="adim-kisa">${kac(v.kisa)}</p></header>`;
-    const govde = h('div', 'adim-govde'); a.appendChild(govde);
-    // harita kartı
-    const kart = h('figure', 'harita-kart');
+    // sahne: harita (telefonda üstte yapışkan) + panel (düğmeler, lejant, sekmeler)
+    const kart = h('figure', 'harita-kart sahne');
     kart.innerHTML = `<figcaption class="harita-ust"><b>${kac(v.ad)}</b><span>${kac(v.tur)} · ${kac(v.gecerli)}</span><span class="harita-kaynak">Kaynak: ${kac(v.kaynak)} · sadeleştirilmiş çizim</span></figcaption>`;
-    const alan = h('div', 'harita-alan'); kart.appendChild(alan);
-    const H = window.Motor.ciz(alan, m); HARITA_NESNE[id] = H;
-    const altyazi = h('div', 'sunum-alt'); altyazi.hidden = true; altyazi.setAttribute('aria-live', 'polite'); alan.appendChild(altyazi);
-    const arac = h('div', 'harita-arac'); kart.appendChild(arac);
+    const gorsel = h('div', 'sahne-gorsel'); const alan = h('div', 'harita-alan'); gorsel.appendChild(alan); kart.appendChild(gorsel);
+    const H = window.Motor.ciz(alan, m); HARITA_NESNE[id] = H; alan.style.setProperty('--ar', (H.g.w / H.g.h).toFixed(4));
+    const altyazi = h('div', 'sunum-alt'); altyazi.hidden = true; altyazi.setAttribute('aria-live', 'polite');
+    const panel = h('div', 'sahne-panel'); kart.appendChild(panel);
+    const arac = h('div', 'harita-arac'); panel.appendChild(arac);
     // katmanlar (lejant)
     const lej = h('div', 'lejant'); lej.setAttribute('aria-label', 'Katmanlar');
     const katlar = [...new Set((m.lejant || []).map((l) => l[0]))];
     (m.lejant || []).forEach(([k, tur, renk, ad]) => {
       const b = btn('lej', `<span class="lej-ornek lej-${tur === 'renk' ? 'renk' : tur === 'kesik' ? 'kesik' : tur === 'harf' ? 'harf' : tur === 'ist' || tur === 'ok' ? 'ist' : 'cizgi'}" style="--c:${renk}"></span><span>${kac(ad)}</span>`);
       b.setAttribute('aria-pressed', 'true'); b.dataset.k = k;
-      b.addEventListener('click', () => { const acik = b.getAttribute('aria-pressed') !== 'true'; lej.querySelectorAll(`[data-k="${k}"]`).forEach((x) => x.setAttribute('aria-pressed', String(acik))); const g = H.katman[k]; if (g) g.style.display = acik ? '' : 'none'; });
+      b.addEventListener('click', () => { const acik = b.getAttribute('aria-pressed') !== 'true'; lej.querySelectorAll(`[data-k="${k}"]`).forEach((x) => x.setAttribute('aria-pressed', String(acik))); const g = H.katman[k]; if (g) g.style.display = acik ? '' : 'none'; odakla(kart); });
       b.addEventListener('mouseenter', () => { if (!H.katman[k]) return; H.svg.classList.add('vurgu-kip'); Object.entries(H.katman).forEach(([ad, g]) => g.classList.toggle('one', ad === k)); });
       b.addEventListener('mouseleave', () => { H.svg.classList.remove('vurgu-kip'); Object.values(H.katman).forEach((g) => g.classList.remove('one')); });
       lej.appendChild(b);
@@ -122,30 +162,38 @@
     const goster = () => {
       const b = v.bolgeler[sira]; altyazi.hidden = false;
       altyazi.innerHTML = `<p class="sa-bas"><span class="sa-no">${sira + 1}/${v.bolgeler.length}</span>${kac(b.ad)}</p><ul>${b.m.map((x, i) => `<li class="${i < madde ? 'gor' : ''}">${kac(x)}</li>`).join('')}</ul>`;
+      // telefonda alt yazı sabit yükseklikte: son gelen madde görünsün
+      if (!YAN.matches) setTimeout(() => (altyazi.scrollTop = altyazi.scrollHeight), AZ ? 0 : 380);
     };
+    // sunum adımı sonrası: harita tam görünür, alt yazı (geniş ekran) ya da düğmeler (telefon) görünür
+    const sunumOdak = () => odakla(kart, YAN.matches ? altyazi : kontrol);
     const ileri = () => {
+      if (sira >= v.bolgeler.length) return false; // öz gösteriliyor: ileri yok
       if (sira < 0) { sira = 0; madde = 0; window.Motor.odak(H, 0); goster(); return true; }
       const b = v.bolgeler[sira];
       if (madde < b.m.length) { madde++; goster(); return true; }
       if (sira < v.bolgeler.length - 1) { sira++; madde = 0; window.Motor.odak(H, sira); goster(); return true; }
-      window.Motor.odak(H, -1); altyazi.innerHTML = `<p class="sa-bas"><span class="sa-no">ÖZ</span>${kac(v.oz)}</p>`; sira = v.bolgeler.length; return false;
+      window.Motor.odak(H, -1); altyazi.hidden = false; altyazi.innerHTML = `<p class="sa-bas"><span class="sa-no">ÖZ</span>${kac(v.oz)}</p>`; sira = v.bolgeler.length; return false;
     };
     const geri = () => { if (sira <= 0 && madde <= 1) { bitir(); return; } if (sira >= v.bolgeler.length) { sira = v.bolgeler.length - 1; madde = v.bolgeler[sira].m.length; window.Motor.odak(H, sira); goster(); return; } if (madde > 0) { madde--; goster(); } else { sira--; madde = v.bolgeler[sira].m.length; window.Motor.odak(H, sira); goster(); } };
     const adimla = () => { if (!oynuyor) return; const devam = ileri(); if (devam) zam = setTimeout(adimla, madde === 0 ? 1300 : 2400); else durdur(); };
     const bitir = () => { durdur(); sira = -1; madde = 0; window.Motor.odak(H, -1); altyazi.hidden = true; kontrol.hidden = true; kart.classList.remove('sunumda'); };
-    const oynat = btn('dugme', 'Sunum modu', () => { if (oynuyor) { durdur(); return; } kart.classList.add('sunumda'); kontrol.hidden = false; oynuyor = true; oynat.textContent = 'Duraklat'; if (sira >= v.bolgeler.length) { sira = -1; madde = 0; } adimla(); });
+    const oynat = btn('dugme', 'Sunum modu', () => { if (oynuyor) { durdur(); return; } kart.classList.add('sunumda'); kontrol.hidden = false; oynuyor = true; oynat.textContent = 'Duraklat'; if (sira >= v.bolgeler.length) { sira = -1; madde = 0; } adimla(); sunumOdak(); });
     const kontrol = h('div', 'sunum-kontrol'); kontrol.hidden = true;
-    kontrol.append(btn('cip', 'Önceki', () => { durdur(); geri(); }), btn('cip', 'Sonraki', () => { durdur(); kart.classList.add('sunumda'); ileri(); }), btn('cip', 'Bitir', bitir));
-    const tam = btn('dugme ikincil', 'Tam ekran', () => { const acik = kart.classList.toggle('tam'); tam.textContent = acik ? 'Küçült' : 'Tam ekran'; document.body.classList.toggle('kilit', acik); });
+    kontrol.append(btn('cip', 'Önceki', () => { durdur(); geri(); sunumOdak(); }), btn('cip', 'Sonraki', () => { durdur(); kart.classList.add('sunumda'); ileri(); sunumOdak(); }), btn('cip', 'Bitir', bitir));
+    const tam = btn('dugme ikincil', 'Tam ekran', () => { const acik = kart.classList.toggle('tam'); tam.textContent = acik ? 'Küçült' : 'Tam ekran'; document.body.classList.toggle('kilit', acik); olc(); });
     arac.append(oynat, kontrol, tam, lej);
-    kart.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (kart.classList.contains('tam')) tam.click(); else bitir(); } if (e.key === 'ArrowRight') { durdur(); kart.classList.add('sunumda'); kontrol.hidden = false; ileri(); } if (e.key === 'ArrowLeft') { durdur(); geri(); } });
+    // alt yazı: geniş ekranda paneldeki düğmelerin altında (harita örtülmez), telefonda haritanın hemen altında
+    const yerlestir = () => { if (YAN.matches) arac.insertBefore(altyazi, lej); else gorsel.appendChild(altyazi); };
+    yerlestir(); YAN.addEventListener('change', yerlestir);
+    kart.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (kart.classList.contains('tam')) tam.click(); else bitir(); return; } if (e.target.closest('.adim-yan')) return; if (e.key === 'ArrowRight') { durdur(); kart.classList.add('sunumda'); kontrol.hidden = false; ileri(); sunumOdak(); } if (e.key === 'ArrowLeft') { durdur(); geri(); sunumOdak(); } });
     kart.tabIndex = -1;
-    govde.appendChild(kart);
+    a.appendChild(kart);
     // sekmeler
     const gordum = h('div', 'bolge-liste');
     v.bolgeler.forEach((b, i) => {
       const d = h('details', 'bolge'); d.innerHTML = `<summary><span class="b-no">${i + 1}</span><span>${kac(b.ad)}</span></summary>`; d.appendChild(maddeler(b.m));
-      d.addEventListener('toggle', () => { if (d.open) { gordum.querySelectorAll('details').forEach((x) => x !== d && (x.open = false)); durdur(); sira = i; madde = b.m.length; window.Motor.odak(H, i); } else if (![...gordum.querySelectorAll('details')].some((x) => x.open)) { window.Motor.odak(H, -1); sira = -1; } });
+      d.addEventListener('toggle', () => { if (d.open) { gordum.querySelectorAll('details').forEach((x) => x !== d && (x.open = false)); durdur(); sira = i; madde = b.m.length; window.Motor.odak(H, i); odakla(kart, d); } else if (![...gordum.querySelectorAll('details')].some((x) => x.open)) { window.Motor.odak(H, -1); sira = -1; } });
       gordum.appendChild(d);
     });
     gordum.appendChild(h('p', 'ipucu', 'Haritadaki turuncu numaralara da dokunabilirsin.'));
@@ -155,7 +203,7 @@
     const nereden = h('div', 'nereden'); nereden.innerHTML = `<p class="site">${kac(v.nereden.site)}</p>` + (v.nereden.url ? `<p><a href="${v.nereden.url}" target="_blank" rel="noopener">${kac(v.nereden.url.replace('https://', ''))} ↗</a></p>` : ''); nereden.appendChild(maddeler(v.nereden.adim));
     const en = h('div', 'en'); en.appendChild(h('p', 'en-cumle', kac(v.en))); en.appendChild(dinleBtn(v.en, 'en-US', 'Listen'));
     const sk = sekmeler([['Gördüklerim', gordum], ['Söylediğim', soyle], ['Neden?', maddeler(v.neden)], ['Nasıl okunur', okuP], ['Soru gelirse', soruPanel(v.soru)], ['Nereden?', nereden], ['İngilizce', en], ['Kendini dene', denePanel(v.dene)]]);
-    const yan = h('div', 'adim-yan'); yan.appendChild(sk); govde.appendChild(yan);
+    const yan = h('div', 'adim-yan'); yan.appendChild(sk); panel.appendChild(yan);
     const alt = h('div', 'adim-alt'); alt.innerHTML = `<p class="oz"><b>ÖZ</b>${kac(v.oz)}</p>`; alt.appendChild(bittiDugme(id)); a.appendChild(alt);
     return a;
   }
@@ -168,6 +216,9 @@
     const kart = h('figure', 'arac-kart'); kart.innerHTML = `<figcaption class="harita-ust"><b>${kac(v.ad)}</b><span>${kac(v.tur)} · ${kac(v.gecerli)}</span><span class="harita-kaynak">Kaynak: ${kac(v.kaynak)}</span></figcaption>`;
     const ic = h('div', 'arac-ic arac-' + id); kart.appendChild(ic); a.appendChild(kart);
     window.Araclar[id](ic);
+    // araç sahnesi: bir düğmeye basınca görsel ve açıklaması aynı ekranda kalsın
+    const aciklama = { synop: '.syn-tablo', skewt: '.skt-aciklama' }[id];
+    ic.addEventListener('click', (e) => { if (e.target.closest('button, [role=button]')) odakla(kart, aciklama ? ic.querySelector(aciklama) : null); });
     const soyle = h('div', 'soyle'); soyle.appendChild(h('blockquote', 'konusma', kac(v.soyle))); soyle.appendChild(dinleBtn(v.soyle, 'tr-TR', 'Sesli dinle'));
     const en = h('div', 'en'); en.appendChild(h('p', 'en-cumle', kac(v.en))); en.appendChild(dinleBtn(v.en, 'en-US', 'Listen'));
     a.appendChild(sekmeler([['Söylediğim', soyle], ['Neden?', maddeler(v.neden)], ['Soru gelirse', soruPanel(v.soru)], ['İngilizce', en]]));
@@ -205,6 +256,7 @@
   function hazirlik(s) {
     const adim = (id, baslik, kisa, govde) => { const a = h('article', 'adim adim-duz'); a.id = id; a.innerHTML = `<header class="adim-bas"><p class="adim-etiket">Hazırlık</p><h3>${baslik}</h3><p class="adim-kisa">${kisa}</p></header>`; a.appendChild(govde); s.appendChild(a); };
     const saatK = h('div', 'arac-kart saat'); window.Araclar.saat(saatK);
+    saatK.querySelectorAll('input[type=date], input[type=time]').forEach((i) => i.addEventListener('change', () => odakla(saatK, saatK.querySelector('.saat-sonuc'))));
     adim('saat', 'Önce saati sabitledim', 'Bütün analiz haritaları aynı ana ait olmalı: sunumdan önceki günün 12 UTC’si. Tahmin sunum günü için.', saatK);
     // veri listesi
     const isaret = new Set(depo.al('sb:liste', []));
@@ -298,6 +350,7 @@
       else b.adim.forEach((id) => s.appendChild(haritaAdim(id)));
     }
     icindekiler();
+    olc(); addEventListener('resize', olc, { passive: true }); if (document.fonts) document.fonts.ready.then(olc);
     $('#alt').innerHTML = `<div class="alt-ic"><p><b>Sinoptik Brifing Atölyesi</b> · Atmosfer Akademisi · MTO 302E.</p><p>Haritalar gerçek analiz ve tahminlerin sadeleştirilmiş çizimleridir; sayılar örnek brifingde okunan değerlerdir. Kıyı ve sınır çizgileri: Natural Earth (kamu malı). Sondaj: University of Wyoming. SYNOP: Ogimet. Model haritaları: ECMWF Open Charts (CC BY 4.0), GFS (wetter3), DWD analizi. Yazı tipi: Inter (SIL OFL).</p><p><a href="../">Atmosfer Akademisi</a> · <a href="../harita-okulu/">Harita Okulu</a> · <a href="../hava-analizi-proje-rehberi/">Proje Rehberi</a></p></div>`;
     if (location.hash) { const t = document.getElementById(location.hash.slice(1)); if (t) setTimeout(() => t.scrollIntoView(), 60); }
     addEventListener('hashchange', () => { const t = document.getElementById(location.hash.slice(1)); if (t) { t.classList.remove('parla'); void t.offsetWidth; t.classList.add('parla'); } });
