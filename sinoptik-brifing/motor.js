@@ -248,13 +248,17 @@
     // zaman damgası (gerçek haritalardaki gibi köşede): «önce saati oku»
     if (m.damga) { const dg = kat('damga'); const w = 12 + m.damga.length * 8.6; el('rect', { x: 10, y: 10, width: w, height: 30, rx: 6, fill: 'rgba(255,255,255,.92)', stroke: '#1d1d1f', 'stroke-width': 1 }, dg); yazi(dg, 16, 30, m.damga, { class: 'm-damga' }); }
     // sıcak noktalar
-    const sk2 = el('g', { class: 'm-sicak' }, svg); const bolgeler = [];
+    // bölge çerçeveleri altta, numaralı işaretler hepsinin üstünde: üst üste binen bölgelerde işaret kendi bölgesini açsın
+    const sk2 = el('g', { class: 'm-sicak' }, svg); const pinK = el('g', { class: 'm-pinler' }, svg); const bolgeler = [];
     (m.bolgeler || []).forEach((b, i) => {
       const B = bolgePoly(g, b.kutu); const grp = el('g', { class: 'm-bolge', 'data-i': i, tabindex: 0, role: 'button', 'aria-label': (i + 1) + '. ' + b.ad }, sk2);
       el('path', { d: d(B.p) + 'Z', class: 'm-bolge-cer' }, grp);
-      const [px, py] = b.pin ? proj(g, b.pin[0], b.pin[1]) : [B.kutu[0] + 16, B.kutu[1] + 16];
-      el('circle', { cx: px, cy: py, r: 15, class: 'm-pin' }, grp); yazi(grp, px, py + 5.5, String(i + 1), { class: 'm-pin-t', 'text-anchor': 'middle' });
-      bolgeler.push({ el: grp, kutu: B.kutu, poly: B.p, ad: b.ad });
+      let [px, py] = b.pin ? proj(g, b.pin[0], b.pin[1]) : [B.kutu[0] + 16, B.kutu[1] + 16];
+      px = Math.min(Math.max(px, 18), g.w - 18); py = Math.min(Math.max(py, 18), g.h - 18); // işaret harita çerçevesinin dışına taşmasın
+      const pg = el('g', { class: 'm-bolge m-bolge-pin', 'data-i': i, 'aria-hidden': 'true' }, pinK);
+      el('circle', { cx: px, cy: py, r: 15, class: 'm-pin' }, pg); yazi(pg, px, py + 5.5, String(i + 1), { class: 'm-pin-t', 'text-anchor': 'middle' });
+      pg.addEventListener('click', (e) => { e.stopPropagation(); grp.dispatchEvent(new MouseEvent('click', { bubbles: true })); });
+      bolgeler.push({ el: grp, pin: pg, kutu: B.kutu, poly: B.p, ad: b.ad });
     });
     // karartma maskesi (sunum modu)
     const maske = el('path', { class: 'm-maske', d: '', 'fill-rule': 'evenodd' }, svg);
@@ -275,7 +279,7 @@
   function odak(H, i, anim) {
     const g = H.g, hedef = i < 0 ? H.tam : (() => { const k = H.bolgeler[i].kutu, pad = 26; let x0 = k[0] - pad, y0 = k[1] - pad, x1 = k[2] + pad, y1 = k[3] + pad; const asp = g.w / g.h; let w = x1 - x0, h = y1 - y0; if (w / h > asp) { const nh = w / asp; y0 -= (nh - h) / 2; h = nh; } else { const nw = h * asp; x0 -= (nw - w) / 2; w = nw; } if (w < g.w) x0 = Math.min(Math.max(0, x0), g.w - w); else x0 = (g.w - w) / 2; if (h < g.h) y0 = Math.min(Math.max(0, y0), g.h - h); else y0 = (g.h - h) / 2; return [x0, y0, w, h]; })();
     H.maske.setAttribute('d', i < 0 ? '' : `M-2000 -2000H${g.w + 2000}V${g.h + 2000}H-2000Z` + d(H.bolgeler[i].poly) + 'Z');
-    H.bolgeler.forEach((b, k) => b.el.classList.toggle('aktif', k === i));
+    H.bolgeler.forEach((b, k) => { b.el.classList.toggle('aktif', k === i); if (b.pin) b.pin.classList.toggle('aktif', k === i); });
     const bas = (H.svg.getAttribute('viewBox') || '').split(' ').map(Number), t0 = performance.now(), sure = anim === false || matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 650;
     cancelAnimationFrame(H._raf);
     const adim = (t) => { const u = sure ? Math.min(1, (t - t0) / sure) : 1, e = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2; H.svg.setAttribute('viewBox', bas.map((v, k) => (v + (hedef[k] - v) * e).toFixed(1)).join(' ')); if (u < 1) H._raf = requestAnimationFrame(adim); };
