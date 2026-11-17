@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ödev ve quiz hazırlığı</title>
+<meta name="description" content="HEC-HMS ödevlerinin ne-neden-ekranda ne tekrarı, haftalık quiz konuları, olası sorular ve tek sayfa formül kartı.">
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<style>
+:root{--bg:#f6f7f9;--surface:#fff;--ink:#15171c;--ink2:#565d6b;--line:#e1e4e9;--acc:#184f9a;--acc-bg:#eaf1fb;--mark:#ffe58a;--code:#f0f2f5}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1013;--surface:#171a1f;--ink:#eceef1;--ink2:#a4aab5;--line:#262a31;--acc:#a0c3ff;--acc-bg:#1b2533;--mark:#6b5a12;--code:#1f2329;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1013;--surface:#171a1f;--ink:#eceef1;--ink2:#a4aab5;--line:#262a31;--acc:#a0c3ff;--acc-bg:#1b2533;--mark:#6b5a12;--code:#1f2329;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:76px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16.5px/1.6 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--acc)}
+.ust{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);border-bottom:1px solid var(--line)}
+.ust-ic{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:10px;min-height:56px;padding:6px max(16px,env(safe-area-inset-right,0px)) 6px max(16px,env(safe-area-inset-left,0px))}
+.geri{font-weight:600;font-size:14.5px;text-decoration:none;white-space:nowrap}
+.ara{margin-left:auto;display:flex;align-items:center;gap:8px;flex:0 1 320px;min-width:0}
+.ara input{width:100%;height:36px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit;font-size:15px}
+.ara small{color:var(--ink2);font-size:13px;white-space:nowrap}
+.dugme{height:36px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:600 14px/1 inherit;font-family:inherit;cursor:pointer;white-space:nowrap}
+.dugme:hover{border-color:var(--acc);color:var(--acc)}
+.izgara{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:230px minmax(0,1fr);gap:48px;padding:40px max(16px,env(safe-area-inset-right,0px)) 80px max(16px,env(safe-area-inset-left,0px))}
+nav.toc{position:sticky;top:84px;align-self:start;max-height:calc(100dvh - 104px);overflow:auto;display:grid;gap:2px;font-size:14.5px}
+nav.toc b{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);margin-bottom:6px}
+nav.toc a{color:var(--ink2);text-decoration:none;padding:5px 10px;border-radius:8px;line-height:1.3}
+nav.toc a:hover,nav.toc a.etkin{color:var(--acc);background:var(--acc-bg)}
+main{min-width:0;max-width:780px}
+.k{color:var(--ink2);font-size:14.5px;margin:0}
+h1{font-size:clamp(2rem,1.3rem + 2.6vw,2.9rem);line-height:1.08;letter-spacing:-.03em;margin:8px 0 12px}
+.lede{color:var(--ink2);font-size:1.12rem;margin:0 0 18px;max-width:60ch}
+.giris{color:var(--ink);}
+section{margin-top:44px;padding-top:24px;border-top:1px solid var(--line)}
+h2{font-size:1.45rem;letter-spacing:-.02em;margin:0 0 14px}
+h4,.ara-b{font-size:1.02rem;margin:22px 0 8px}
+p{margin:.55em 0}
+ul,ol{padding-left:1.25em;margin:.5em 0}
+li{margin:.25em 0}
+code{background:var(--code);border-radius:5px;padding:.08em .35em;font:14px/1.4 ui-monospace,"SF Mono","Cascadia Code",Consolas,monospace}
+pre{background:var(--code);border-radius:12px;padding:14px 16px;overflow:auto}
+pre code{background:none;padding:0}
+blockquote{margin:12px 0;padding:10px 16px;border-left:3px solid var(--acc);background:var(--acc-bg);border-radius:0 10px 10px 0}
+.tablo{overflow-x:auto;margin:12px 0;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;vertical-align:top;padding:9px 12px;border-bottom:1px solid var(--line)}
+th{font-size:13px;letter-spacing:.02em;color:var(--ink2);background:color-mix(in srgb,var(--surface) 70%,var(--bg))}
+tr:last-child td{border-bottom:0}
+.tex{overflow-x:auto;margin:10px 0;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:12px;text-align:center}
+details.kart{background:var(--surface);border:1px solid var(--line);border-radius:14px;margin:10px 0;overflow:hidden}
+details.kart>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:14px 16px;font-weight:600;font-size:1.04rem}
+details.kart>summary::-webkit-details-marker,details.ic>summary::-webkit-details-marker{display:none}
+details.kart>summary:hover .kb{color:var(--acc)}
+.ok{margin-left:auto;width:9px;height:9px;border-right:2px solid var(--ink2);border-bottom:2px solid var(--ink2);transform:rotate(45deg);transition:transform .2s;flex:none}
+details[open]>summary .ok{transform:rotate(225deg)}
+.kg{padding:2px 18px 16px;border-top:1px solid var(--line)}
+details.ic{border-top:1px solid var(--line)}
+details.ic:first-child{border-top:0}
+.kg>details.ic:first-child,section>details.ic:first-of-type{border-top:1px solid var(--line)}
+details.ic>summary{list-style:none;cursor:pointer;padding:11px 0 11px 22px;position:relative;font-weight:600}
+details.ic>summary::before{content:"+";position:absolute;left:2px;top:9px;color:var(--acc);font:700 17px/1.4 ui-monospace,Consolas,monospace}
+details.ic[open]>summary::before{content:"−"}
+.ic-g{padding:0 0 12px 22px}
+section>details.ic{background:var(--surface);border:1px solid var(--line);border-radius:12px;margin:8px 0;padding:0 14px}
+section>details.ic>summary{padding-left:22px}
+mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
+footer{color:var(--ink2);font-size:13.5px;margin-top:56px;padding-top:18px;border-top:1px solid var(--line)}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+@media (max-width:900px){.izgara{grid-template-columns:minmax(0,1fr);gap:0;padding-top:24px}nav.toc{position:static;max-height:none;display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px}nav.toc b{display:none}nav.toc a{white-space:nowrap;border:1px solid var(--line);background:var(--surface)}.ara small{display:none}.ust .dugme{padding:0 10px}}
+@media (max-width:520px){.geri span{display:none}}
+</style>
+</head>
+<body>
+<header class="ust"><div class="ust-ic">
+  <a class="geri" href="../">‹<span> Atmosfer Akademisi</span></a>
+  <div class="ara"><input id="ara" type="search" placeholder="Bu sayfada ara" aria-label="Bu sayfada ara"><small id="say"></small></div>
+  <button class="dugme" id="hepsi" type="button">Hepsini aç</button>
+</div></header>
+<div class="izgara">
+  <nav class="toc" aria-label="İçindekiler"><b>İçindekiler</b><a href="#bölüm-a-hec-hms-ödevleri">BÖLÜM A — HEC-HMS Ödevleri</a><a href="#bölüm-b-quiz-konuları-haftalık">BÖLÜM B — Quiz Konuları (haftalık)</a><a href="#bölüm-c-olası-quiz-soruları">BÖLÜM C — Olası Quiz Soruları</a><a href="#bölüm-d-tek-sayfa-özet">BÖLÜM D — Tek Sayfa Özet</a></nav>
+  <main>
+    <p class="k">MTO 316 · Hidrometeoroloji · 1.–7. hafta</p>
+    <h1>Ödev ve quiz hazırlığı</h1>
+    <p class="lede">HEC-HMS ödevlerinin ne-neden-ekranda ne tekrarı, haftalık quiz konuları, olası sorular ve tek sayfa formül kartı.</p>
+    <div class="giris"><p>Bu not 1.–7. hafta için kısa quiz hazırlığı ve HEC-HMS ödevlerinin birlikte tekrarıdır. Türkçe, madde madde; her teknik terimin İngilizcesi ilk geçtiği yerde parantez içinde; her formülün altında terim-birim açıklaması ve en az bir çözülmüş mini örnek vardır. Quiz kökü İngilizce gelebileceğinden Bölüm C'deki sorular hem İngilizce hem Türkçe verilmiştir.</p><p>Bilinen slayt hataları, aşağıda doğrusu ile birlikte işlenir: hazne bütçesi örneğinde <strong>1,05 m/yıl</strong> yerine doğru değer <strong>1,150 m/yıl</strong> (dolma süresi ≈ 2,61 yıl); optimum ölçer örneğinde <strong>N ≈ 14</strong> yerine doğru değer <strong>N ≈ 52</strong> (yüzdenin karesi unutulduğu için).</p></div>
+    <section id="bölüm-a-hec-hms-ödevleri"><h2>BÖLÜM A — HEC-HMS Ödevleri</h2><details class="kart" id="hw1-creating-a-new-basin-model"><summary><span class="kb">HW1 — Creating a New Basin Model</span><span class="ok" aria-hidden="true"></span></summary><div class="kg"><p><strong>Havza elemanları (basin elements):</strong></p><ul>
+<li>Alt havzalar (subbasins): EB Mahoning Creek 41 mi², Stump Creek 29 mi², Mahoning Creek Local 88 mi²</li>
+<li>Reach: Reach-1 (Lag ile ötelenir)</li>
+<li>Junctionlar: Junction-1 (EB Mahoning + Stump birleşimi), Junction-2 = havza çıkışı (outlet) = Reach-1 çıkışı + Mahoning Creek Local</li>
+</ul><p>Her alt havza dört bileşenle tanımlanır: <strong>Loss</strong> (yağış kaybı) → <strong>Transform</strong> (fazla yağıştan direkt akış) → <strong>Baseflow</strong> (taban akışı) toplanır; <strong>Routing</strong> sadece Reach'tedir.</p><details class="ic"><summary><span>1) Loss — Initial and Constant</span></summary><div class="ic-g"><ul>
+<li>Ne yaptım? Başlangıç kaybı Ia = 1 in, sabit sızma hızı fc = 0,1 in/h, geçirimsiz alan %0.</li>
+<li>Neden? Ia, yüzey depolama ve ıslatma gibi akışa katılmayan ilk hacmi karşılar; fc toprağın uzun dönem kabul ettiği infiltrasyon hızıdır. Toplam yağış – (Ia + fc·t) = fazla yağış (excess precipitation).</li>
+<li>Ekranda ne? Subbasin editor › Loss sekmesi: Initial Abstraction (in), Constant Rate (in/hr), Impervious (%).</li>
+<li>Quiz: 'Which component fills before any runoff starts?' → Ia. 'Impervious %0 ne demek?' → geçirimsiz yüzey yok, tüm alan Ia + fc testine tabi.</li>
+</ul></div></details><details class="ic"><summary><span>2) Transform — Clark Unit Hydrograph</span></summary><div class="ic-g"><ul>
+<li>Değerler (Tc = concentration time, R = storage coefficient):</li>
+<li>EB Mahoning Creek: Tc = 7 h, R = 11 h</li>
+<li>Stump Creek: Tc = 9 h, R = 12 h</li>
+<li>Mahoning Creek Local: Tc = 10 h, R = 13 h</li>
+<li>Neden? Clark iki iş yapar: (a) zaman-alan eğrisiyle (time-area curve) fazla yağışı Tc boyunca havzaya yayar; (b) doğrusal hazne (linear reservoir) R ile tepeyi sönümler.</li>
+<li>Ekranda ne? Subbasin editor › Transform: Time of Concentration (hr), Storage Coefficient (hr).</li>
+<li>Quiz: 'If R increases, what happens to the peak?' → tepe düşer, hidrograf yayılır (daha uzun, daha geniş).</li>
+</ul></div></details><details class="ic"><summary><span>3) Baseflow — Linear Reservoir (2 layers)</span></summary><div class="ic-g"><ul>
+<li>Katman 1: k = 70 h, Katman 2: k = 100 h.</li>
+<li>Neden? Yüzeyaltı akış iki zaman ölçeklidir: hızlı interflow (küçük k) + yavaş groundwater (büyük k). Her katman Q(t) = Q₀·e^(−t/k) ile çekilir.</li>
+<li>Ekranda ne? Subbasin editor › Baseflow: Linear Reservoir, iki Layer, GW-1 Coefficient ve GW-2 Coefficient (hr).</li>
+<li>Quiz: 'Two-layer linear reservoir — k büyürse ne olur?' → boşalma yavaşlar, hidrografın kuyruğu uzar.</li>
+</ul></div></details><details class="ic"><summary><span>4) Routing — Lag (Reach-1 = 300 dk)</span></summary><div class="ic-g"><ul>
+<li>Ne yapar? Girişi 300 dk (= 5 saat) öteler, tepe büyüklüğü değişmez (no attenuation).</li>
+<li>Neden Lag? Kısa bir kanal parçası için sönümleme ihmal edilebildiğinde en basit seçimdir; HW2'de Reach-1 girişi ile çıkışı aynı yükseklikte ama 5 sa ötelenmiş görünür.</li>
+<li>Ekranda ne? Reach editor › Routing: Lag method, Lag (min).</li>
+<li>Quiz: 'Does Lag routing attenuate the peak?' → Hayır, sadece zamanda öteler.</li>
+</ul><p><strong>HW1'in HW2'ye katkısı:</strong> HW1 yalnızca havza modelini (basin model) kurar — henüz yağış/zaman/simülasyon yoktur. HW2 bu basin modeline bir meteorologic model, control specifications ve simulation run ekler.</p></div></details></div></details><details class="kart" id="hw2-creating-a-simple-model"><summary><span class="kb">HW2 — Creating a Simple Model</span><span class="ok" aria-hidden="true"></span></summary><div class="kg"><h4 class="ara-b">1) Meteorologic Model</h4><p><strong>Ne yaptım?</strong></p><ol>
+<li>Time-Series Data Manager › Precipitation Gages → üç ölçer oluşturdum: <strong>DUJP</strong>, <strong>PNXP</strong>, <strong>MFFP</strong>.</li>
+<li>Her ölçer için Data Source = <strong>Single Record HEC-DSS</strong>, DSS dosyası = data/observe.dss; pathname listesinde B-part süzüldü:
+   - /ALLEGHENY/DUJP/PRECIP-INC/…/1Hour/OBS/
+   - /ALLEGHENY/PNXP/PRECIP-INC/…/1Hour/OBS/ (PNXP'de iki satır var: PRECIP-INC yağış, FLOW akım — yağış ölçeri için <strong>PRECIP-INC</strong>)
+   - /SUSQUEHANA/MFFP/PRECIP-INC/…/1Hour/OBS/</li>
+<li>Zaman penceresi: 28 Nisan 1996 01:00 – 4 Mayıs 1996 00:00; Table/Graph sekmelerinde saatlik yağış incelendi.</li>
+<li>Meteorologic Model = <strong>'May 1996'</strong>, method = <strong>Specified Hyetograph</strong>. Basins sekmesinde <strong>Include Subbasins = Yes</strong>.</li>
+<li>Ölçer–altahavza ataması:
+   - EB Mahoning Creek → <strong>MFFP</strong>
+   - Mahoning Creek Local → <strong>PNXP</strong>
+   - Stump Creek → <strong>DUJP</strong></li>
+</ol><p><strong>Neden?</strong></p><ul>
+<li>Specified Hyetograph: her alt havzaya atanan ölçerin saatlik serisini doğrudan girdi kabul eder; alansal ortalama (Thiessen / izohyet) burada yapılmaz, o yoldan alınmış tek seri gerekir.</li>
+<li>PRECIP-INC = incremental precipitation (dönem başı ile sonu arasındaki yağış); FLOW = debi (cfs), yağış ölçer satırı değil.</li>
+<li>Include Subbasins = Yes olmazsa havzalarla ölçerler bağlanamaz.</li>
+</ul><p><strong>Ekranda ne?</strong></p><ul>
+<li>Components › Time-Series Data › Precipitation Gages ağacı; her ölçerin Time-Series sekmesinde pathname + Units (IN) + Type (INC-CUM).</li>
+<li>Meteorologic Model › Basins alt sekmesi: 3 alt havza satırı ve Gage sütunu.</li>
+</ul><p><strong>Quizde nasıl sorulur?</strong></p><ul>
+<li>'What does PRECIP-INC mean?' → Incremental precipitation.</li>
+<li>'Why pick PRECIP-INC rather than FLOW for a precipitation gage?' → FLOW is discharge in cfs, not rainfall.</li>
+<li>'Single Record HEC-DSS nedir?' → HEC-DSS dosyasından tek bir zaman serisi pathname'i okuma modu.</li>
+<li>'Specified Hyetograph yerine Gage Weights kullanılsaydı ne değişirdi?' → Birden fazla ölçer, alt havza başına alan ağırlığıyla ortalanırdı (Thiessen mantığı).</li>
+</ul><h4 class="ara-b">2) Control Specifications</h4><p><strong>Ne yaptım?</strong></p><ul>
+<li>Control Specifications = <strong>'May 1996'</strong>.</li>
+<li>Start Date/Time: 28Apr1996 01:00.</li>
+<li>End Date/Time: 04May1996 00:00.</li>
+<li>Time Interval (Δt) = <strong>15 dk</strong>.</li>
+</ul><p><strong>Neden 15 dk?</strong></p><ul>
+<li>Zaman adımı, hidrograf tepesini yakalayacak kadar küçük olmalı; kural olarak Δt ≤ Tc/5 veya tepe geliş süresinin \~1/5'i. Tc = 7–10 h için 15 dk rahatlıkla yeter.</li>
+<li>Çok küçük Δt sayısal maliyet artırır; çok büyük Δt tepeyi ıskalar.</li>
+</ul><p><strong>Saatlik yağış, 15 dk adımda nasıl kullanılır?</strong></p><ul>
+<li>Yağış PRECIP-INC/1Hour: her saat için bir toplam var.</li>
+<li>HEC-HMS bu saatlik toplamı <strong>sabit şiddetle</strong> 4 eşit çeyreğe böler.</li>
+<li>Mini örnek: saatlik yağış 0,8 in → her 15 dk 0,8/4 = <strong>0,2 in</strong> uygulanır.</li>
+<li>Mini örnek 2: 1,0 in/h → her 15 dk için 0,25 in; yağış şiddeti 1,0 in/h sabit kalır, hacim aynı.</li>
+</ul><p><strong>Ekranda ne?</strong></p><ul>
+<li>Components › Control Specifications › May 1996: Start/End ve Time Interval kutuları; Time Interval dropdown'da 15 Minutes.</li>
+</ul><p><strong>Quizde nasıl sorulur?</strong></p><ul>
+<li>'Hourly rainfall of 0.8 in is run at a 15-min step. What rainfall is applied every 15 min?' → 0,2 in.</li>
+<li>'Zaman adımı 60 dk seçilseydi tepe nasıl etkilenirdi?' → Tepe düşer ve zamanı sağa kayar (temporal smoothing).</li>
+<li>'Which three dates/times define a Control Specification?' → Start, End, Time Interval.</li>
+</ul><h4 class="ara-b">3) Simulation Run</h4><p><strong>Ne yaptım?</strong></p><ul>
+<li>Simulation Run = <strong>'May 1996'</strong>.</li>
+<li>Açılan sihirbazda üç bileşen eşleştirildi: <strong>Basin Model</strong> (HW1'de kurulan) + <strong>Meteorologic Model</strong> (May 1996) + <strong>Control Specifications</strong> (May 1996).</li>
+<li>Compute butonu.</li>
+</ul><p><strong>Neden bu üçlü?</strong></p><ul>
+<li>HEC-HMS bir simülasyon için <strong>nerede</strong> (basin), <strong>ne zaman ve ne kadar</strong> (meteorologic), <strong>hangi zaman penceresinde ve adımda</strong> (control) sorularının hepsine yanıt ister. Üçünden biri eksikse Compute refuse eder.</li>
+</ul><p><strong>Mor uyarılar (purple warnings)</strong></p><ul>
+<li>'...initial losses may have been included in baseflow...' tipi mesajlar hata değil, <strong>not</strong> (note) seviyesindedir.</li>
+<li>Anlamı: Linear Reservoir baseflow'un başlangıç değeri varsa, bir kısmı Ia'nın hesabıyla çakışıyor olabilir. Hidrograf üretildiyse geçilebilir; şüphelenilirse Ia'yı veya Initial Discharge'ı yeniden kontrol et.</li>
+</ul><p><strong>Ekranda ne?</strong></p><ul>
+<li>Compute › Simulation Runs › May 1996 › Compute butonu; Run log alt pencere.</li>
+<li>Çalışma biterse sol ağaçta elementlerin yanında <strong>yeşil onay</strong> işareti.</li>
+</ul><p><strong>Quizde nasıl sorulur?</strong></p><ul>
+<li>'Which three components does an HEC-HMS Simulation Run combine?' → Basin model + meteorologic model + control specifications.</li>
+<li>'A purple warning appears — is this a fatal error?' → Hayır, nottur; simülasyon tamamlanmıştır, dikkat et.</li>
+</ul><h4 class="ara-b">4) Viewing Model Results</h4><p><strong>Global Summary Results</strong></p><ul>
+<li>Mahoning Creek Local tepe debisi: <strong>1786,0 cfs</strong>.</li>
+<li>Junction-2 (havza çıkışı) tepe debisi: <strong>3082,9 cfs</strong>, saat <strong>30 Nisan 1996 18:45</strong>.</li>
+<li>Global Summary, tüm elemanların Peak Discharge, Time of Peak ve Volume özetini tek tabloda verir.</li>
+</ul><p><strong>Stump Creek — grafik ve özet</strong></p><ul>
+<li>Grafik: üstte precipitation (bar), precipitation loss (soluk bar), alt çerecde total flow (koyu çizgi) + baseflow (kesikli).</li>
+<li>Özet tabloda:</li>
+<li>Tepe: <strong>609,7 cfs</strong>, saat <strong>30 Nisan 15:45</strong>.</li>
+<li>Hacim (volume): <strong>1,53 in = 2359 acre-ft</strong> (öğretici ≈2350; küçük yuvarlama farkı).</li>
+<li>Birim dönüşümü: 29 mi² × 1 in = 29 mi²·in = 29 × 53,33 acre-ft/mi²·in = 1547 acre-ft; bu olay için 1,53 × 1547 ≈ 2367 acre-ft (tabloya yakın).</li>
+</ul><p><strong>EB Mahoning Creek — zaman serisi tablosu</strong></p><ul>
+<li>1 Mayıs 1996 12:00 satırı:</li>
+<li><strong>Baseflow = 333,1 cfs</strong></li>
+<li><strong>Direct runoff = 67,7 cfs</strong></li>
+<li><strong>Total = 400,8 cfs</strong></li>
+<li>Yorum: olayın tepesinden günler geçmiş, hidrografın uzun kuyruğundadır; baseflow domağın, Linear Reservoir yavaş çıkışını öngörüyor.</li>
+</ul><p><strong>Reach-1 — öteleme gözlemi</strong></p><ul>
+<li>Tepe: <strong>1501,1 cfs</strong>.</li>
+<li>Giriş (Junction-1'den) ile çıkış (Junction-2'ye) grafikte neredeyse aynı yükseklik; çıkış 5 saat (300 dk) sağa kaymış.</li>
+<li>Yorum: <strong>Lag</strong> sadece öteler, sönümlemez (no attenuation).</li>
+</ul><p><strong>Junction-2 — toplam akım</strong></p><ul>
+<li>Çıkış = Mahoning Creek Local çıkışı + Reach-1 çıkışı.</li>
+<li>Tepe 3082,9 cfs örneğin iki bileşenini 18:45'te bulduğu için oluşur; eğer Reach-1 5 saatlik lag yerine 2 saat geçseydi tepeler çakışması başka saate kayardı.</li>
+</ul><p><strong>Quizde nasıl sorulur?</strong></p><ul>
+<li>'Which element's peak equals the sum of its tributaries at an instant?' → Junction.</li>
+<li>'Reach-1 outflow peak equals its inflow peak but 5 hours later. Which method?' → Lag.</li>
+<li>'Stump Creek'in 1,53 in hacmini acre-ft'e çevir (A = 29 mi²).' → ≈2367 acre-ft (özet 2359 verir).</li>
+</ul><h4 class="ara-b">5) Viewing Observed Flow</h4><p><strong>Ne yaptım?</strong></p><ol>
+<li>Time-Series Data › <strong>Discharge Gages</strong> › yeni akım ölçeri <strong>PNXP</strong>.</li>
+<li>Data Source = Single Record HEC-DSS › observe.dss › pathname = <strong>/ALLEGHENY/PNXP/FLOW/…/1Hour/OBS/</strong> (aynı B-part'ta yağışın PRECIP-INC kardeşi olan FLOW satırı; bu sefer debi için).</li>
+<li>Basin Model › <strong>Junction-2</strong> › <strong>Options</strong> sekmesi › <strong>Observed Flow = PNXP</strong>.</li>
+<li>Simulation Run › <strong>Compute</strong> (yeniden).</li>
+</ol><p><strong>Sonuçlar — model vs. gözlem</strong></p><div class="tablo"><table>
+<thead>
+<tr>
+<th>Büyüklük</th>
+<th>Model</th>
+<th>Gözlem</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tepe debi</td>
+<td>3082,9 cfs @ 18:45</td>
+<td>2942,0 cfs @ 17:00</td>
+</tr>
+<tr>
+<td>Hacim</td>
+<td>1,62 in</td>
+<td>1,60 in</td>
+</tr>
+<tr>
+<td>Nash–Sutcliffe (NSE)</td>
+<td>0,952</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Percent Bias</td>
+<td>%1,39</td>
+<td>—</td>
+</tr>
+<tr>
+<td>KGE</td>
+<td>0,947</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div><p><strong>Ölçütler ne demek?</strong></p><ul>
+<li><strong>NSE = 1 − Σ(obs−sim)² / Σ(obs−ōbs)²</strong>; 1 mükemmel, 0 ortalama kadar, &lt;0 ortalamadan kötü. &gt;0,8 iyi, &gt;0,9 çok iyi, 0,952 mükemmel.</li>
+<li><strong>PBIAS = 100 · Σ(sim−obs) / Σ(obs)</strong>; +%1,39 = model toplam akışı gözlemden %1,39 fazla tahmin; |PBIAS| &lt; %10 iyi.</li>
+<li><strong>KGE = 1 − √((r−1)² + (α−1)² + (β−1)²)</strong>; r korelasyon, α = σsim/σobs, β = μsim/μobs. 1 mükemmel, 0,947 çok iyi.</li>
+</ul><p><strong>Yorum</strong></p><ul>
+<li>Model tepesi gözlemden ≈%4,8 <strong>büyük</strong> ve 1 saat 45 dakika <strong>geç</strong>.</li>
+<li>Hacim neredeyse eşit; sorun yüzey akışın zamanlaması ve tepe keskinliği.</li>
+</ul><p><strong>Kalibrasyon yönleri (hangi parametre, hangi yöne?)</strong></p><ul>
+<li>Tepeyi <strong>küçültmek</strong> için: Clark <strong>R ↑</strong> (daha fazla sönümleme) veya <strong>Ia ↑</strong>.</li>
+<li>Tepeyi <strong>öne almak</strong> için: Clark <strong>Tc ↓</strong> veya Reach <strong>Lag ↓</strong> (300 dk azaltılabilir).</li>
+<li>Hacmi <strong>azaltmak</strong> için: <strong>fc ↑</strong> veya <strong>Ia ↑</strong> (daha fazla kayıp).</li>
+<li>Hacmi <strong>arttırmak</strong> için: tersi.</li>
+</ul><p><strong>Quizde nasıl sorulur?</strong></p><ul>
+<li>'What does NSE = 0.952 mean?' → Model gözlenen varyansın %95,2'sini açıklıyor; mükemmele yakın uyum.</li>
+<li>'Positive PBIAS — over- or under-estimation?' → Over (model fazla tahmin ediyor).</li>
+<li>'Model peak is 5% high and arrives late. Name two parameter changes that fix both.' → R↑ (tepeyi küçültür, hafifçe yayar) + Tc↓ (tepe erken gelir). Lag↓ de zamanlamaya yardım eder.</li>
+<li>'KGE 1'e nereden uzaklaşır?' → r, α veya β'den herhangi biri 1'den uzaklaşırsa.</li>
+</ul></div></details></section><section id="bölüm-b-quiz-konuları-haftalık"><h2>BÖLÜM B — Quiz Konuları (haftalık)</h2><details class="kart" id="1-2-hafta-havza-ve-su-bütçesi"><summary><span class="kb">1.–2. hafta — Havza ve Su Bütçesi</span><span class="ok" aria-hidden="true"></span></summary><div class="kg"><p><strong>Havza ve ilgili tanımlar</strong></p><ul>
+<li><strong>Havza (drainage basin / watershed / catchment):</strong> Bir çıkış noktasına (outlet) akışı toplayan topoğrafik alan.</li>
+<li><strong>Su ayırım çizgisi (watershed divide):</strong> İki komşu havzayı ayıran en yüksek sırt hattı; harita üzerinde kontur çizgilerine dik olarak geçirilir.</li>
+<li><strong>Alt havza (subbasin):</strong> Büyük havzanın daha küçük parçalara ayrılmış hali; farklı eğim, zemin, bitki örtüsü için ayrı parametre set'i tutmak, model kalibrasyonu ve havza içi akış çalışmaları için bölünür.</li>
+</ul><p><strong>Hidrolojik döngü (hydrologic cycle)</strong></p><p>Sıra: Evaporation (E) + Transpiration (T) → Condensation → Precipitation (P) → havzada: Interception + Depression storage → Infiltration (F) → Percolation + Interflow + Groundwater flow → Runoff (R) → akarsu Q → tekrar E.</p><p><strong>Su bütçesi (water budget)</strong></p><ul>
+<li>Genel bilanço: <strong>ΔS/Δt = (P + I ± G) − (E + T + R)</strong></li>
+<li>P (mm veya m³): yağış</li>
+<li>I: yüzey girişi (başka havzadan)</li>
+<li>G: yeraltı suyu değişimi (±)</li>
+<li>E: buharlaşma, T: terleme</li>
+<li>R: havzadan çıkan yüzey akışı</li>
+<li>ΔS: depolama değişimi (toprak nemi + yeraltı + yüzey)</li>
+<li>Uzun dönem kapalı havza: <strong>P = Q + ET + ΔS</strong>.</li>
+<li>Uzun dönem ortalama (ΔS ≈ 0): <strong>ET ≈ P − Q</strong>; <strong>runoff coefficient c = Q/P</strong>.</li>
+</ul><p><strong>Mini örnek (çözümlü):</strong> Alan A = 500 km², yıllık P = 800 mm, Q = 300 mm, ΔS≈0. ET ve ortalama debiyi bul.</p><ul>
+<li>ET = P − Q = 800 − 300 = <strong>500 mm/yıl</strong>.</li>
+<li>c = Q/P = 300/800 = <strong>0,375</strong>.</li>
+<li>Ortalama Q (m³/s) = (0,300 m)(500·10⁶ m²)/(3,1536·10⁷ s) ≈ <strong>4,76 m³/s</strong>.</li>
+</ul><p><strong>Debiyi derinliğe çevirme</strong></p><ul>
+<li>Formül: <strong>d (mm) = 1000 · Q (m³/s) · T (s) / A (m²)</strong>.</li>
+<li>Mini örnek: Q = 50 m³/s, T = 6 h = 21600 s, A = 200 km² = 2·10⁸ m² → d = 1000·50·21600 / 2·10⁸ = <strong>5,4 mm</strong>.</li>
+</ul><p><strong>Terim karışıklıkları (sınavda tuzak)</strong></p><ul>
+<li><strong>Infiltration</strong> (yüzeyden zemine giriş) vs. <strong>percolation</strong> (doymamıştan doyuma zemin içi aşağı süzülüş).</li>
+<li><strong>Interception</strong> (yapraklar yakalayıp buharlaştırır) vs. <strong>depression storage</strong> (yüzey çukurlarında birikir, yavaşça infiltrasyon/buharlaşma).</li>
+<li><strong>Interflow</strong> (zemin içinde hızlı yanal, olay içinde akışa katılır) vs. <strong>baseflow</strong> (yeraltından uzun süreli, olaylar arasında da sürer).</li>
+<li><strong>Runoff</strong> (fazla yağışın akışa dönüşmüş hali, mm olarak) vs. <strong>discharge</strong> (debi, m³/s). İntegre edilince hidrografa dönüşür.</li>
+<li><strong>Catchment</strong> / <strong>watershed</strong> / <strong>basin</strong> eşanlamlıdır.</li>
+</ul><p><strong>Mini örnek 2 (çözümlü, debi→derinlik):</strong> A = 88 mi² (Mahoning Local), 24 saatte yuvarlak hesap toplam hacim = 150·10⁶ ft³. Derinliği bul (in).</p><ul>
+<li>1 mi² = 27,878·10⁶ ft²; A = 88·27,878·10⁶ = 2,453·10⁹ ft².</li>
+<li>d (ft) = V/A = 150·10⁶ / 2,453·10⁹ = 0,0612 ft = <strong>0,73 in</strong>.</li>
+</ul><p><strong>İngilizce anahtar terimler:</strong> drainage basin, watershed, catchment, divide, subbasin, hydrologic cycle, evaporation, transpiration, condensation, precipitation, interception, depression storage, infiltration, percolation, interflow, baseflow, runoff, discharge, water budget, runoff coefficient.</p></div></details><details class="kart" id="3-hafta-yağış"><summary><span class="kb">3. hafta — Yağış</span><span class="ok" aria-hidden="true"></span></summary><div class="kg"><p><strong>Yağış türleri (precipitation types)</strong></p><ul>
+<li>Yağmur damlası ≥ <strong>0,5 mm</strong> (daha küçük = çiseleme / drizzle).</li>
+<li><strong>Virga:</strong> yağmur yere ulaşmadan buharlaşır.</li>
+<li><strong>Sleet:</strong> donmuş yağmur taneleri (küre buz).</li>
+<li><strong>Freezing rain:</strong> sıvı olarak düşer, zemine değinde buzlanır.</li>
+<li>Diğerleri: snow, hail, graupel.</li>
+</ul><p><strong>Şiddet sınıfları (rainfall intensity)</strong> [kaynakta açık değerler yoksa genel kabul]</p><ul>
+<li>Light: &lt; 2,5 mm/h</li>
+<li>Moderate: 2,5–7,6 mm/h</li>
+<li>Heavy: 7,6–50 mm/h</li>
+<li>Violent: &gt; 50 mm/h</li>
+</ul><p><strong>Marshall–Palmer damla çap dağılımı</strong></p><div class="tex">N(D) = N_{0} \, e^{-\Lambda D}
+</div><ul>
+<li>N(D): birim hacim ve birim çap aralığındaki damla sayısı (m⁻³·mm⁻¹)</li>
+<li>N₀ ≈ 8000 m⁻³·mm⁻¹</li>
+<li>Λ = 4,1 · RR^(−0,21) mm⁻¹ (RR mm/h)</li>
+<li>D: damla çapı (mm)</li>
+</ul><p><strong>Radar: reflektivite → yağış şiddeti</strong></p><ul>
+<li>Z = Σ Nᵢ·Dᵢ⁶ (mm⁶/m³), 'sayının altıncı momenti' — az sayıda büyük damla, çok sayıda küçük damladan daha fazla Z verir.</li>
+<li><strong>dBZ = 10 · log₁₀(Z / Z₀)</strong>, Z₀ = 1 mm⁶/m³.</li>
+<li>Z–R (Marshall–Palmer): Z = 200 · RR^(1,6).</li>
+<li>Pratik form: <strong>RR = 0,036 · 10^(0,0625·dBZ)</strong> mm/h.</li>
+</ul><p><strong>Mini örnek (dBZ→RR):</strong></p><ul>
+<li>dBZ = 43 → RR = 0,036·10^(0,0625·43) = 0,036·10^2,6875 = 0,036·486,97 ≈ <strong>17,5 mm/h</strong> (heavy).</li>
+<li>dBZ = 30 → RR = 0,036·10^1,875 = 0,036·74,99 ≈ <strong>2,7 mm/h</strong> (moderate).</li>
+</ul><p><strong>Yağışa geçebilir su (precipitable water)</strong></p><div class="tex">W = \frac{1}{\rho_{w} g} \int_{p_{top}}^{p_{sfc}} q \, dp
+</div><ul>
+<li>q: spesifik nem (kg/kg)</li>
+<li>p: basınç (Pa)</li>
+<li>ρ_w: su yoğunluğu (1000 kg/m³), g: 9,81 m/s²</li>
+<li>Birim: kg/m² ↔ mm (1 kg/m² = 1 mm su sütunu)</li>
+<li>W bir <strong>olası üst sınırdır</strong>; gerçek yağış mikrofizik ve dinamiğe bağlı, W'den çok daha küçük olur. <strong>W = yağış değildir.</strong></li>
+</ul><p><strong>Konvektif vs. stratiform</strong></p><ul>
+<li><strong>Convective:</strong> dar alan (km mertebesi), yüksek şiddet, kısa süre, tek keskin tepeli hidrograf; Cb bulutu, dikey gelişim.</li>
+<li><strong>Stratiform:</strong> geniş alan (yüz km), orta/düşük şiddet, uzun süre; Ns/As bulutu, yatay gelişim.</li>
+</ul><p><strong>Tuzak:</strong> dBZ doğrudan Z değil, logaritmasıdır; 10 dBZ artış Z'yi 10 kat büyütür. 60 dBZ'den yüksek değerler yağmur yerine dolu göstergesidir.</p><p><strong>İngilizce anahtar terimler:</strong> precipitation, drizzle, virga, sleet, freezing rain, hail, drop size distribution, Marshall–Palmer, reflectivity factor Z, dBZ, Z–R relation, precipitable water, convective, stratiform.</p></div></details><details class="kart" id="4-hafta-ölçüm-ağı-ve-alansal-ortalama"><summary><span class="kb">4. hafta — Ölçüm Ağı ve Alansal Ortalama</span><span class="ok" aria-hidden="true"></span></summary><div class="kg"><p><strong>Hyetograf ve seri türleri</strong></p><ul>
+<li><strong>Hyetograph:</strong> zaman-yağış şiddeti (ya da birim zaman yağışı) bar grafiği.</li>
+<li>Veri PRECIP-INC (her adımda eklenen) ya da PRECIP-CUM (kumülatif) olabilir; HEC-HMS'de ikisi arası çevrim otomatik.</li>
+</ul><p><strong>Alansal ortalama (areal average) — üç yöntem</strong></p><details class="ic"><summary><span>1) Aritmetik ortalama (arithmetic mean)</span></summary><div class="ic-g"><div class="tex">\bar{P} = \frac{1}{n} \sum_{i=1}^{n} P_{i}
+</div><ul>
+<li>Koşullar: ölçerler <strong>havzanın içinde</strong> ve homojen dağılmış, topografya düz.</li>
+<li>Tuzak: havza dışındaki bir ölçeri ekleme (yanlıştır).</li>
+</ul></div></details><details class="ic"><summary><span>2) Thiessen poligonu</span></summary><div class="ic-g"><ul>
+<li>Komşu ölçerler arasında dik ortay (perpendicular bisector) çizilerek her ölçerin 'etki alanı' (Ai) bulunur.</li>
+<li>Ağırlıklı ortalama:</li>
+</ul><div class="tex">\bar{P} = \frac{\sum A_{i} P_{i}}{\sum A_{i}}
+</div><ul>
+<li>Avantaj: ölçer yoğunluğu dengesizse iyidir, havza dışı ölçeri dahil edilebilir (çokgen havza kestiği sürece).</li>
+<li>Dezavantaj: topografyayı (yükseklikle yağış ilişkisini) görmez; ağ değişinceda yeniden çizilmelidir.</li>
+</ul></div></details><details class="ic"><summary><span>3) İzohiyet (isohyetal method)</span></summary><div class="ic-g"><ul>
+<li>Eşyağış çizgileri çizilir (manuel veya GIS).</li>
+<li>İki eşyağış arasındaki şeritin ortalaması = (Pᵢ + Pᵢ₊₁)/2; o şeridin alanı Aᵢ ile ağırlıklandırılır.</li>
+</ul><div class="tex">\bar{P} = \frac{\sum A_{i} (P_{i} + P_{i+1}) / 2}{\sum A_{i}}
+</div><ul>
+<li>Avantaj: topografyayı ve yükselti etkisini yansıtır; en doğru.</li>
+<li>Dezavantaj: çizim işçiliği, subjektif.</li>
+</ul><p><strong>Mini örnek (Thiessen):</strong> Üç ölçer; P₁=60, P₂=40, P₃=80 mm; A₁=20, A₂=30, A₃=10 km².</p><ul>
+<li>Toplam A = 60 km².</li>
+<li>P̄ = (20·60 + 30·40 + 10·80)/60 = (1200 + 1200 + 800)/60 = 3200/60 ≈ <strong>53,3 mm</strong>.</li>
+<li>Aritmetik ortalama yanıltıcı: (60+40+80)/3 = <strong>60 mm</strong> (farkını gör).</li>
+</ul><p><strong>WMO ölçer yoğunluğu önerileri</strong> [kaynakta değer verilmediyse genel]</p><ul>
+<li>Düzlük: 1 ölçer / \~575 km²</li>
+<li>Dağlık: 1 ölçer / \~250 km²</li>
+<li>Çöl: 1 ölçer / \~10.000 km²</li>
+</ul><p><strong>Optimum ölçer sayısı</strong></p><div class="tex">N = \left( \frac{C_{v}}{\varepsilon} \right)^{2} , \quad C_{v} = \frac{100 \, \sigma}{\bar{x}}
+</div><ul>
+<li>ε: izin verilen yüzde hata (örn. 10, 5).</li>
+<li>σ: standart sapma (n−1 bölenle).</li>
+<li>x̄: ortalama.</li>
+<li>Cv ve ε <strong>aynı birimde</strong> (yüzde olarak) girilir; Cv'yi 0,72 yazıp ε'yu 10 yazarsan 0,0072 çıkar — yanlış.</li>
+</ul><p><strong>Mini örnek (slayt hatası düzeltmeli):</strong> Ölçer yıllıkları = 290, 125, 90, 475 cm; ε = %10.</p><ul>
+<li>x̄ = (290+125+90+475)/4 = 980/4 = <strong>245 cm</strong>.</li>
+<li>Sapmalar (xᵢ − x̄): 45, −120, −155, 230.</li>
+<li>Kareler toplamı: 2025 + 14.400 + 24.025 + 52.900 = <strong>93.350</strong>.</li>
+<li>σ² = 93.350 / (4−1) = 31.116,67 → σ ≈ <strong>176,4 cm</strong>.</li>
+<li>Cv = 100·176,4/245 ≈ <strong>72,0 (yüzde)</strong>.</li>
+<li><strong>N = (72,0 / 10)² = 51,84 ≈ 52 ölçer.</strong></li>
+<li><strong>Slaytta 14</strong> yazıyor: yüzdenin karesi yerine oran alınmış ya da sadece iki değer kullanılmış olabilir — <strong>doğrusu 52</strong>. Sınavda formulü kesin kare-ile yaz.</li>
+</ul><p><strong>Yeni ölçerlerin dağıtımı</strong></p><ul>
+<li>Havza A alt-bölgelere bölünür (Aj). Eksik sayı ΔN = N − n_mevcut. Her bölgeye ΔN·(Aj/A) oranında yeni ölçer düşer.</li>
+<li>Mini: ΔN = 48; iki bölge 3000 ve 7000 km² → 48·(3/10) = <strong>14 ölçer</strong>, 48·(7/10) = <strong>34 ölçer</strong>.</li>
+</ul><p><strong>İngilizce anahtar terimler:</strong> hyetograph, arithmetic mean, Thiessen polygon, isohyet, WMO gauge density, coefficient of variation Cv, optimum gauge number.</p></div></details></div></details><details class="kart" id="5-hafta-akış-üretimi-ve-model-ödev-haftası"><summary><span class="kb">5. hafta — Akış Üretimi ve Model (ödev haftası)</span><span class="ok" aria-hidden="true"></span></summary><div class="kg"><p><strong>Akış oluşum mekanizmaları</strong></p><ul>
+<li><strong>Hortonian overland flow (infiltration-excess):</strong> yağış şiddeti &gt; infiltrasyon kapasitesi; fazlası yüzeyde akar. Kurak/yarı-kurak, kentsel, geçirimsiz yüzeyler.</li>
+<li><strong>Dunne (saturation-excess):</strong> zemin doyar, sonraki yağış doymuş yüzeyde akar. Nemli iklim, vadi dibi, orman altı.</li>
+<li><strong>Interflow:</strong> zemin içi, yanal, doyma zonunun üstünde; hidrografa Hortonian'dan geliş, baseflow'dan erken katılır.</li>
+<li><strong>Baseflow (taban akışı):</strong> yeraltı suyundan uzun süreli, olaylar arasında da sürer; iniş kolu üstel.</li>
+</ul><p><strong>Hidrograf parçaları</strong></p><ul>
+<li><strong>Rising limb</strong> (yükseliş) → <strong>peak</strong> (tepe) → <strong>recession limb</strong> (iniş, üstel).</li>
+<li>Direct runoff + baseflow = total flow; baseflow ayrılışı için <strong>constant discharge</strong>, <strong>constant slope</strong>, <strong>master depletion curve</strong> gibi grafik yöntemler.</li>
+</ul><p><strong>Model türleri</strong></p><ul>
+<li><strong>Lumped:</strong> tüm havza tek birim; parametreler havza ortalaması (örn. rasyonel yöntem).</li>
+<li><strong>Semi-distributed:</strong> alt havzalara bölünür, her biri lumped — HEC-HMS böyle çalışır (Punxsutawney ödevi).</li>
+<li><strong>Distributed:</strong> grid hücre bazında, her hücre için ayrı parametre (örn. MIKE SHE, VIC). Çok veri ister, en pahalı.</li>
+</ul><p><strong>Rasyonel yöntem (rational method)</strong></p><div class="tex">Q_{p} = \frac{C \, I \, A}{360}
+</div><ul>
+<li>Qp: tepe debi (m³/s)</li>
+<li>C: akış katsayısı (runoff coefficient, 0–1)</li>
+<li>I: yağış şiddeti (mm/h), <strong>t = tc</strong> için IDF'den okunur</li>
+<li>A: alan (ha)</li>
+<li>360 = birim dönüşüm sabiti (mm/h·ha→m³/s)</li>
+<li>Koşullar: küçük havza (&lt; \~80 ha), homojen yüzey, kısa tc, sabit yağış şiddeti.</li>
+<li><strong>Mini örnek:</strong> A = 50 ha, C = 0,6, I = 36 mm/h → Qp = 0,6·36·50/360 = <strong>3,0 m³/s</strong>.</li>
+<li><strong>Tuzak:</strong> A'yı km² girmek. 1 km² = 100 ha; km² ile formül Qp = C·I·A/3,6 olur.</li>
+</ul><p><strong>Initial &amp; Constant ile fazla yağış</strong></p><ul>
+<li>Adım adım: P kumülasyonu Ia'yı geçene kadar hiç akış yok. Sonrasında her Δt'de kayıp = fc·Δt; <strong>excess = max(0, P_Δt − fc·Δt)</strong>.</li>
+<li><strong>Mini:</strong> Ia = 1 in, fc = 0,1 in/h; saatlik P = [0,6 · 0,8 · 0,5 · 0,2] in.</li>
+<li>Saat 1: 0,6 in → Ia'ya git (kalan Ia = 0,4). Excess = 0.</li>
+<li>Saat 2: 0,8 in; önce 0,4 in Ia'yı doldurur, kalan 0,4 in; bundan 0,1 fc kaybı düşer → excess 0,3 in.</li>
+<li>Saat 3: 0,5 in; fc = 0,1 → excess 0,4 in.</li>
+<li>Saat 4: 0,2 in; fc = 0,1 → excess 0,1 in.</li>
+</ul><p><strong>Clark Unit Hydrograph (HEC-HMS Transform)</strong></p><ul>
+<li>Zaman-alan eğrisi (time-area curve) ile fazla yağış Tc boyunca yayılır; sonrasında doğrusal hazneden geçer.</li>
+<li>R büyürse: tepe küçülür, kuyruk uzar. R→0 iken: hidrograf zaman-alan eğrisine eşitlenir, tepe en keskindir.</li>
+<li>Quiz: 'If R increases, the hydrograph becomes ...' → flatter and longer.</li>
+</ul><p><strong>Doğrusal hazne (Linear Reservoir)</strong></p><ul>
+<li>Yasa: S = k·Q; dS/dt = I − Q.</li>
+<li>Giriş kesildikten sonra: <strong>Q(t) = Q₀·e^(−t/k)</strong>.</li>
+<li>Mini: Q₀ = 100 m³/s, k = 10 h; 24 saat sonra Q = 100·e^(−2,4) = 100·0,0907 ≈ <strong>9,1 m³/s</strong>.</li>
+<li>HEC-HMS'de Linear Reservoir <strong>Baseflow</strong>'da (iki katmanlı, k₁=70 h, k₂=100 h) ve Clark'ın içinde (R) kullanılır.</li>
+</ul><p><strong>Lag routing (HEC-HMS Reach)</strong></p><ul>
+<li>Q_out(t) = Q_in(t − L); L = 300 dk örneği. <strong>Sönümleme yok.</strong></li>
+</ul><p><strong>Standart ek yöntemler (kaynaklarda geçiyorsa):</strong></p><ul>
+<li><strong>SCS Curve Number (CN):</strong> Ia = 0,2·S; S (mm) = 25400/CN − 254; Pe = (P−Ia)² / (P−Ia+S). CN = 100 geçirimsiz, CN = 30 çok geçirgen. [kaynakta adı verilirse]</li>
+<li><strong>φ-indeksi (phi-index):</strong> Homojen sabit kayıp; Σ(Pᵢ−φ)+ = toplam fazla yağış; deneme-yanılma ile φ bulunur.</li>
+<li><strong>Muskingum:</strong> O₂ = C₀·I₂ + C₁·I₁ + C₂·O₁; C'ler K ve X ile hesaplanır; Lag'den farklı olarak hem öteler hem sönümler.</li>
+</ul><p><strong>İngilizce anahtar terimler:</strong> Hortonian flow, saturation-excess (Dunne) flow, interflow, baseflow, hydrograph rising/recession limb, lumped/semi-distributed/distributed, rational method, time of concentration, runoff coefficient, Clark unit hydrograph, linear reservoir, Lag routing, SCS curve number, phi-index, Muskingum.</p></div></details><details class="kart" id="6-hafta-veri-kalitesi-ve-ekstremler"><summary><span class="kb">6. hafta — Veri Kalitesi ve Ekstremler</span><span class="ok" aria-hidden="true"></span></summary><div class="kg"><p><strong>Çift kütle eğrisi (double-mass curve)</strong></p><ul>
+<li>Amacı: Bir ölçerin verisinin <strong>tutarlılığını</strong> test etmek (homogeneity test).</li>
+<li>Çizim: x = komşu/şahit ölçerlerin kümülatif ortalaması (Ma); y = test edilen ölçerin kümülatif değeri (Mx). Düz çizgi = tutarlı; <strong>kırılma</strong> = o tarihte ölçüm koşulu değişti (tapa taşındı, binayı kapıyor, alet değişti).</li>
+<li>Düzeltme: yeni dönemi eski dönemin eğimine çek.</li>
+</ul><div class="tex">P_{cx} = P_{x} \cdot \frac{M_{c}}{M_{a}}
+</div><ul>
+<li>Px: ölçülen (yeni) değer</li>
+<li>Ma: eski dönem eğimi, Mc: yeni dönem eğimi</li>
+<li>Pcx: düzeltilmiş değer</li>
+<li><strong>Not:</strong> çift kütle eğrisi <strong>eksik veriyi doldurmaz</strong>; sadece hatalı veriyi ayarlar.</li>
+</ul><p><strong>Mini örnek:</strong> Eski dönem eğim 1,2; yeni dönem eğim 1,0; yeni dönemde Px = 50 mm.</p><ul>
+<li>Pcx = 50·(1,2/1,0) = <strong>60 mm</strong> (yeni dönem değerleri sistematik düşük olmuş, düzelt).</li>
+</ul><p><strong>IDF (Intensity–Duration–Frequency) eğrileri</strong></p><ul>
+<li>Kısa süreler (dk–saat): <strong>i = a / (t + b)</strong> mm/h, t dk.</li>
+<li>Uzun süreler (saat–gün): <strong>i = C / tⁿ</strong> mm/h, t h.</li>
+<li>İki (t, i) noktasından sabitler bulunur. i = C/tⁿ → log i = log C − n·log t.</li>
+</ul><p><strong>Mini örnek:</strong> (t₁, i₁) = (1 h, 60 mm/h); (t₂, i₂) = (4 h, 20 mm/h). n ve C bul.</p><ul>
+<li>n = (log 60 − log 20)/(log 4 − log 1) = (1,778 − 1,301)/(0,602 − 0) = 0,477/0,602 = <strong>0,792</strong>.</li>
+<li>C = i·tⁿ = 60·1^0,792 = <strong>60</strong> (öyleyse i = 60/t^0,792 mm/h, t h).</li>
+<li>Kontrol: t = 4 h → i = 60/4^0,792 = 60/2,995 = 20,0 ✓</li>
+</ul><p><strong>Dönüş aralığı (T) ve risk</strong></p><ul>
+<li>p = 1/T (yıllık aşılma olasılığı).</li>
+<li>n yıl içinde <strong>en az bir kez</strong> aşılma riski:</li>
+</ul><div class="tex">R = 1 - \left( 1 - \frac{1}{T} \right)^{n}
+</div><ul>
+<li>Mini: T = 50 yıl, n = 25 yıl → R = 1 − (0,98)²⁵ = 1 − 0,6035 = <strong>0,397 ≈ %40</strong>. Yani 50 yıllık olayı, 25 yıllık bir yapının ömründe yaşama olasılığı %40.</li>
+</ul><p><strong>Horton derinlik–alan bağıntısı</strong></p><div class="tex">P = P_{m} \, e^{-k A^{n}}
+</div><ul>
+<li>Pm: noktasal yağış, A: alan (km²), k ve n sabitler.</li>
+<li>Alan büyüdükçe ortalama yağış düşer (storm cells sonlu, büyük alanda seyrelir).</li>
+<li>Doğrusallaştırma: <strong>ln(P/Pm) = −k·Aⁿ</strong> → <strong>ln(−ln(P/Pm)) = ln k + n·ln A</strong>. <strong>ln ln</strong> gereklidir, log değil.</li>
+<li><strong>Tuzak:</strong> P = Pm satırını (A = 0'da) kullanma — ln(−ln(1)) = ln(0) = −∞, doğruyu bozar.</li>
+</ul><p><strong>Mini örnek:</strong> (A, P/Pm) = (100 km², 0,9) ve (1000 km², 0,7).</p><ul>
+<li>ln(−ln 0,9) = ln(0,10536) = −2,2504.</li>
+<li>ln(−ln 0,7) = ln(0,35667) = −1,0311.</li>
+<li>ln 100 = 4,605; ln 1000 = 6,908.</li>
+<li>n = (−1,0311 − (−2,2504))/(6,908 − 4,605) = 1,2193/2,303 = <strong>0,530</strong>.</li>
+<li>ln k = −2,2504 − 0,530·4,605 = −2,2504 − 2,441 = −4,691 → k = e^(−4,691) = <strong>0,00917</strong>.</li>
+</ul><p><strong>PMP'ye giriş</strong></p><ul>
+<li>Belirli bir süre ve havza için meteorolojik olarak mümkün en büyük yağış. İstatistiksel (Hershfield, 7. haftada) veya fiziksel (maksimizasyon) yöntemlerle bulunur.</li>
+</ul><p><strong>İngilizce anahtar terimler:</strong> double-mass curve, homogeneity, record adjustment, IDF curve, intensity, duration, return period, exceedance probability, risk of failure, areal reduction, Horton depth–area, PMP.</p></div></details><details class="kart" id="7-hafta-depolama-pmp-buharlaşma"><summary><span class="kb">7. hafta — Depolama, PMP, Buharlaşma</span><span class="ok" aria-hidden="true"></span></summary><div class="kg"><p><strong>Hazne bütçesi (reservoir / lake water balance)</strong></p><div class="tex">\frac{dh}{dt} = P - E + \frac{Q_{in} - Q_{out}}{A}
+</div><ul>
+<li>h: su seviyesi (m)</li>
+<li>P: yağış (m/yıl) — göl yüzeyine düşen</li>
+<li>E: buharlaşma (m/yıl)</li>
+<li>A: göl yüzey alanı (m²)</li>
+<li>Qin, Qout: giriş ve çıkış debileri (m³/yıl ölçeğinde)</li>
+<li>dh/dt &gt; 0: göl doluyor; &lt; 0: boşalıyor.</li>
+</ul><p><strong>Mini örnek (slayt hatası düzeltmeli)</strong></p><ul>
+<li>Verilen: P = 1,0 m/yıl, E = 0,4015 m/yıl, (Qin − Qout)/A = <strong>+0,552 m/yıl</strong> (net giriş).</li>
+<li>Doldurma hızı: dh/dt = 1,0 − 0,4015 + 0,552 = <strong>1,150 m/yıl</strong>. <strong>Slaytta 1,05 yazar — yanlış; yukarıda 1,150 doğrudur.</strong></li>
+<li>3 m dolma süresi: t = 3 / 1,150 ≈ <strong>2,61 yıl</strong> (slayta göre 2,86 yıl; doğrusu 2,61).</li>
+<li>Kararlı durum (dh/dt = 0): Qout 'un dengelendiği değer; verilen kabullerle Qout <strong>≈ 3,65 m³/s</strong> (slayt sonucuyla aynı; hata sadece doldurma hızındadır).</li>
+</ul><p><strong>Birim çevrimi sık tuzak</strong></p><ul>
+<li>1 yıl ≈ 3,1536·10⁷ s; A·(m/yıl) → m³/s için bölen.</li>
+<li>0,552 m/yıl × A (m²) = m³/yıl; /yıldan /s'ye: /3,1536·10⁷.</li>
+</ul><p><strong>PMP — Hershfield istatistiksel yöntemi</strong></p><div class="tex">K_{m} = \frac{X_{m} - \bar{X}_{n-1}}{\sigma_{n-1}}, \quad PMP = \bar{X}_{n} + K_{m} \cdot \sigma_{n}
+</div><ul>
+<li>Xm: seri içindeki <strong>en büyük</strong> yıllık değer.</li>
+<li>X̄n−1, σn−1: <strong>Xm çıkarılmış</strong> seri üzerinden (yani n−1 eleman). <strong>Serileri karıştırma tuzağı.</strong></li>
+<li>X̄n, σn: tüm n elemanlı seri.</li>
+<li>Km istasyon başına hesaplanır; bir bölgenin PMP'si için istasyonlardan alınan en büyük Km zarf çizilerek elde edilir.</li>
+</ul><p><strong>Mini örnek:</strong> X = {80, 95, 100, 110, 150} mm (yıllık max yağış); Xm = 150.</p><ul>
+<li>n−1 serisi {80, 95, 100, 110}: X̄ = 96,25; σ (n−1−1 = 3 ile) ≈ <strong>12,5</strong>.</li>
+<li>Km = (150 − 96,25)/12,5 = <strong>4,30</strong>.</li>
+<li>Tüm seri (n = 5): X̄ = 535/5 = <strong>107</strong>; σ (n−1 = 4 ile) ≈ <strong>26,36</strong>.</li>
+<li>PMP = 107 + 4,30·26,36 ≈ <strong>220 mm</strong>.</li>
+</ul><p><strong>Türkiye il PMP sıralaması:</strong> Hatay <strong>en yüksek</strong> sıraya yerleşir (Akdeniz'in hava kaynaklı doygun kolu); ardından Antalya, Rize gibi kıyı illeri gelir. [kaynakta tablo verilmişse onu kullan]</p><p><strong>Buharlaşma ölçümleri</strong></p><ul>
+<li><strong>Class A pan (ABD):</strong> çapı 1,21 m, derinlik 25,4 cm, zeminden 15 cm yükseklikte.</li>
+<li>Göl buharlaşması: <strong>E_göl = Kp · E_tava</strong>; <strong>Kp ≈ 0,7</strong> (0,6–0,8 aralığı, yerel ayarlı).</li>
+<li><strong>Tuzak:</strong> Tava değerini doğrudan göl değeri olarak alma; küçük tavanın sınır etkisi gölden büyük buharlaşma gösterir.</li>
+</ul><p><strong>Dalton kanunu (aerodinamik yaklaşım)</strong></p><div class="tex">E = f(u) \, (e_{s} - e_{a})
+</div><ul>
+<li>E: buharlaşma hızı</li>
+<li>es: su yüzeyi sıcaklığında doygun su buhar basıncı (hPa, kPa)</li>
+<li>ea: havadaki gerçek buhar basıncı</li>
+<li>f(u): rüzgar hızının ampirik fonksiyonu</li>
+<li>Fiziksel sezgi: buhar basıncı açığı (VPD) ve rüzgar E'yi sürükler.</li>
+</ul><p><strong>Harbeck–Meyers bağıntısı (göller için)</strong></p><div class="tex">E = b \, u_{2} \, (e_{s} - e_{2})
+</div><ul>
+<li>u₂: 2 m yükseklikteki rüzgar hızı (m/s)</li>
+<li>e₂: 2 m'deki havanın buhar basıncı</li>
+<li>b: göle, boyuta, zaman ölçeğine bağlı deneysel sabit</li>
+<li>Dalton'un göl bazında kalibre edilmiş özel halidir.</li>
+</ul><p><strong>Mini örnek (Dalton-benzeri):</strong> es = 25 hPa, ea = 15 hPa, u = 3 m/s, f(u) = 0,35·(1+0,1·u) mm/gün/hPa.</p><ul>
+<li>f(u) = 0,35·1,3 = 0,455 mm/gün/hPa.</li>
+<li>E = 0,455·(25−15) = <strong>4,55 mm/gün</strong>.</li>
+</ul><p><strong>İngilizce anahtar terimler:</strong> reservoir water balance, steady state, probable maximum precipitation (PMP), Hershfield method, Km factor, Class A pan, pan coefficient Kp, Dalton's law, Harbeck–Meyers, vapor pressure deficit.</p></div></details></section><section id="bölüm-c-olası-quiz-soruları"><h2>BÖLÜM C — Olası Quiz Soruları</h2><p>Her sorunun altında önce boş <strong>Kendi çözümün:</strong> satırı var — denemeden aşağıya bakma. Sonrasında adım adım çözüm ve tek satırlık <strong>Sınavda yaz:</strong> kalıbı gelir.</p><hr/><p><strong>Q1 (hesap, su bütçesi).</strong> <em>Over a 1200 km² basin, mean annual P = 950 mm and Q = 420 mm. Assuming ΔS ≈ 0, find ET and the runoff coefficient c.</em></p><p>1200 km² havzada yıllık ortalama P = 950 mm, Q = 420 mm. ΔS ≈ 0 iken ET ve akış katsayısı c?</p><ul>
+<li><strong>Kendi çözümün:</strong></li>
+<li>ET = P − Q = 950 − 420 = <strong>530 mm/yıl</strong>.</li>
+<li>c = Q/P = 420/950 ≈ <strong>0,442</strong>.</li>
+<li><strong>Sınavda yaz:</strong> ET ≈ 530 mm/yıl; c ≈ 0,44.</li>
+</ul><hr/><p><strong>Q2 (hesap, dBZ → RR).</strong> <em>Radar reflectivity at a storm cell is 48 dBZ. With RR = 0.036 · 10^(0.0625·dBZ) mm/h, find the rainfall rate.</em></p><p>Bir fırtına hücresinde radar reflektivitesi 48 dBZ. RR = 0,036·10^(0,0625·dBZ) ile yağış şiddeti?</p><ul>
+<li><strong>Kendi çözümün:</strong></li>
+<li>0,0625·48 = 3,0 → 10³ = 1000.</li>
+<li>RR = 0,036·1000 = <strong>36 mm/h</strong> (heavy).</li>
+<li><strong>Sınavda yaz:</strong> RR ≈ 36 mm/h.</li>
+</ul><hr/><p><strong>Q3 (hesap, Thiessen vs. aritmetik).</strong> <em>Three gages: P = 20, 50, 35 mm; Thiessen areas 10, 15, 25 km². Compute the areal mean by (a) arithmetic average, (b) Thiessen.</em></p><p>Üç ölçer P = 20, 50, 35 mm; Thiessen alanları 10, 15, 25 km². Aritmetik ve Thiessen ortalaması?</p><ul>
+<li><strong>Kendi çözümün:</strong></li>
+<li>Aritmetik: (20+50+35)/3 = <strong>35 mm</strong>.</li>
+<li>Thiessen: (10·20 + 15·50 + 25·35)/50 = (200+750+875)/50 = 1825/50 = <strong>36,5 mm</strong>.</li>
+<li><strong>Sınavda yaz:</strong> Aritmetik 35 mm; Thiessen 36,5 mm.</li>
+</ul><hr/><p><strong>Q4 (hesap, optimum ölçer).</strong> <em>Annual records at four gages: 290, 125, 90, 475 cm; allowable error ε = 10%. Find optimum number of gages N.</em></p><p>Dört ölçer: 290, 125, 90, 475 cm; ε = %10. Optimum N?</p><ul>
+<li><strong>Kendi çözümün:</strong></li>
+<li>x̄ = 245 cm; sapmaların kare toplamı = 93.350; σ = √(93.350/3) ≈ <strong>176,4 cm</strong>.</li>
+<li>Cv = 100·176,4/245 ≈ <strong>72,0 (%)</strong>.</li>
+<li>N = (72,0/10)² = <strong>51,84 ≈ 52 ölçer</strong>. (Slaytta 14, doğrusu 52.)</li>
+<li><strong>Sınavda yaz:</strong> N ≈ 52.</li>
+</ul><hr/><p><strong>Q5 (hesap, rasyonel yöntem).</strong> <em>A 40-ha catchment, runoff coefficient C = 0.55, design intensity I = 48 mm/h at t = tc. Compute Qp (m³/s).</em></p><p>40 ha havza, C = 0,55; I = 48 mm/h (tc'de). Qp?</p><ul>
+<li><strong>Kendi çözümün:</strong></li>
+<li>Qp = C·I·A/360 = 0,55·48·40/360 = 1056/360 = <strong>2,93 m³/s</strong>.</li>
+<li><strong>Tuzak:</strong> A'yı km² koyma; 40 ha = 0,40 km² ile formül 0,55·48·0,40/3,6 = 2,93 m³/s.</li>
+<li><strong>Sınavda yaz:</strong> Qp ≈ 2,93 m³/s.</li>
+</ul><hr/><p><strong>Q6 (hesap, IDF sabitleri).</strong> <em>IDF has the form i = C/t^n. Given i = 80 mm/h at t = 0.5 h and i = 25 mm/h at t = 3 h, find n and C.</em></p><p>i = C/tⁿ; t = 0,5 h → i = 80 mm/h, t = 3 h → i = 25 mm/h. n ve C?</p><ul>
+<li><strong>Kendi çözümün:</strong></li>
+<li>n = (log 80 − log 25)/(log 3 − log 0,5) = (1,903 − 1,398)/(0,477 − (−0,301)) = 0,505/0,778 ≈ <strong>0,649</strong>.</li>
+<li>C = i·tⁿ = 80·0,5^0,649 = 80·0,638 ≈ <strong>51 (mm/h·h^n)</strong>.</li>
+<li>Kontrol t = 3: C/tⁿ = 51/3^0,649 = 51/2,04 ≈ 25 ✓</li>
+<li><strong>Sınavda yaz:</strong> n ≈ 0,65; C ≈ 51.</li>
+</ul><hr/><p><strong>Q7 (hesap, çift kütle düzeltmesi).</strong> <em>Double-mass plot shows old-period slope 1.15 and new-period slope 0.90. A new-period reading is 42 mm. Give the corrected value.</em></p><p>Eski dönem eğim 1,15; yeni dönem eğim 0,90. Yeni dönem Px = 42 mm; düzeltilmiş değer?</p><ul>
+<li><strong>Kendi çözümün:</strong></li>
+<li>Pcx = Px·(Mc/Ma) = 42·(1,15/0,90) = 42·1,2778 ≈ <strong>53,7 mm</strong>.</li>
+<li>Yorum: yeni dönem sistematik düşük okumuş → yukarı düzeltildi.</li>
+<li><strong>Sınavda yaz:</strong> Pcx ≈ 53,7 mm.</li>
+</ul><hr/><p><strong>Q8 (hesap, hazne doldurma).</strong> <em>A lake: P = 1.0 m/yr, E = 0.40 m/yr, (Qin−Qout)/A = 0.55 m/yr. Fill rate and time to raise 3 m?</em></p><p>Göl: P = 1,0 m/yıl, E = 0,40 m/yıl, (Qin−Qout)/A = 0,55 m/yıl. Doldurma hızı ve 3 m için süre?</p><ul>
+<li><strong>Kendi çözümün:</strong></li>
+<li>dh/dt = 1,0 − 0,40 + 0,55 = <strong>1,15 m/yıl</strong>.</li>
+<li>t = 3/1,15 ≈ <strong>2,61 yıl</strong>.</li>
+<li><strong>Sınavda yaz:</strong> 1,15 m/yıl; 2,61 yıl.</li>
+</ul><hr/><p><strong>Q9 (kavram, NSE/PBIAS).</strong> <em>A run gives NSE = 0.84 and PBIAS = −8%. Is the fit acceptable, and what does the sign of PBIAS mean?</em></p><p>NSE = 0,84 ve PBIAS = −%8. Uyum iyi mi? PBIAS işareti neyi anlatır?</p><ul>
+<li><strong>Kendi çözümün:</strong></li>
+<li>NSE &gt; 0,8 iyi sayılır; 0,84 kabul edilebilir.</li>
+<li>PBIAS &lt; 0 → model <strong>gözlemden az</strong> tahmin ediyor (underestimate).</li>
+<li><strong>Sınavda yaz:</strong> NSE 0,84 iyi; negatif PBIAS = underestimation.</li>
+</ul><hr/><p><strong>Q10 (kavram, terim ayırımı).</strong> <em>Distinguish (a) infiltration vs. percolation and (b) interflow vs. baseflow.</em></p><p>(a) Infiltrasyon ile perkolasyon, (b) interflow ile baseflow farkı?</p><ul>
+<li><strong>Kendi çözümün:</strong></li>
+<li>(a) <strong>Infiltration</strong> yüzeyden toprağa su girişi; <strong>percolation</strong> toprağın içinde yer çekimiyle doyma zonuna süzülüş.</li>
+<li>(b) <strong>Interflow</strong> toprak içi yanal, olay içinde hızlı katkı; <strong>baseflow</strong> yeraltı suyundan uzun süreli, olaylar arasında da sürer.</li>
+<li><strong>Sınavda yaz:</strong> Infiltrasyon yüzeyde başlar, perkolasyon derinde sürer; interflow olay-içi yanal, baseflow olay-dışı sürekli.</li>
+</ul><hr/><p><strong>Q11 (kavram, model türleri).</strong> <em>What is the trade-off between a lumped and a distributed hydrologic model?</em></p><p>Lumped ve distributed model arasındaki ödünleşim?</p><ul>
+<li><strong>Kendi çözümün:</strong></li>
+<li>Lumped: havza tek birim; az veri, hızlı, kalibrasyonu kolay; ama iç heterojenliği göremez.</li>
+<li>Distributed: her grid için parametre; iç değişimi görür; çok veri ve hesap gerek.</li>
+<li>HEC-HMS <strong>semi-distributed</strong> uzlaşmasıdır: alt havzalar lumped ama farklı parametreli.</li>
+<li><strong>Sınavda yaz:</strong> Doğruluk ↔ veri/hesap maliyeti; HEC-HMS semi-distributed.</li>
+</ul><hr/><p><strong>Q12 (kavram, precipitable water).</strong> <em>A sounding gives W = 40 mm, yet the next 24 h brings 65 mm of rain. Any contradiction?</em></p><p>Sondaj W = 40 mm veriyor; 24 saatte 65 mm yağış olur mu?</p><ul>
+<li><strong>Kendi çözümün:</strong></li>
+<li>Çelişki yok. W anlık sütun suyudur; yağış, sürekli <strong>nem akışı (moisture flux convergence)</strong> ile beslenir. Yağış, W'yi rahatlıkla aşabilir. <strong>W ≠ yağış.</strong></li>
+<li><strong>Sınavda yaz:</strong> W olası üst sınır değildir; rüzgarla taze nem gelir.</li>
+</ul><hr/><p><strong>Q13 (HEC-HMS, Simulation Run).</strong> <em>Which three objects must be selected for an HEC-HMS Simulation Run?</em></p><p>HEC-HMS Simulation Run'ı kuran üç nesne?</p><ul>
+<li><strong>Kendi çözümün:</strong></li>
+<li>Basin Model (havza elemanları ve yöntemleri), Meteorologic Model (yağış girdisi), Control Specifications (başlangıç/bitiş/zaman adımı).</li>
+<li><strong>Sınavda yaz:</strong> Basin + Meteorologic + Control.</li>
+</ul><hr/><p><strong>Q14 (HEC-HMS, 15 dk adım ve observed flow).</strong> <em>Hourly rainfall 1.0 in runs at a 15-min step. (a) What rainfall per 15 min? (b) How to attach observed flow at Junction-2 and what does NSE &gt; 0.9 imply?</em></p><p>Saatlik 1,0 in yağış 15 dk adımda. (a) Her 15 dk uygulanan yağış? (b) Junction-2'ye gozlenen akım nasıl eklenir; NSE &gt; 0,9 ne gösterir?</p><ul>
+<li><strong>Kendi çözümün:</strong></li>
+<li>(a) 1,0/4 = <strong>0,25 in / 15 dk</strong> (sabit şiddet).</li>
+<li>(b) Discharge Gages altında FLOW akım ölçerini tanımla (observe.dss, FLOW pathname). Junction-2 › Options › Observed Flow = o ölçer; Simulation Run yeniden Compute.</li>
+<li>NSE &gt; 0,9: model gözlenen varyansın %90'ından çoğunu açıklıyor — çok iyi uyum.</li>
+<li><strong>Sınavda yaz:</strong> 0,25 in/15 dk; Junction › Options › Observed Flow; NSE &gt; 0,9 = çok iyi.</li>
+</ul><hr/><p><strong>Q15 (HEC-HMS, R ve Lag etkisi).</strong> <em>(a) If Clark R increases, how does the peak change? (b) If Reach-1 Lag increases, how does the outflow hydrograph change?</em></p><p>(a) Clark R artarsa tepe; (b) Reach-1 Lag artarsa çıkış hidrografı?</p><ul>
+<li><strong>Kendi çözümün:</strong></li>
+<li>(a) R ↑ → tepe <strong>düşer</strong>, hidrograf <strong>yayılır</strong> (daha büyük domağın depolama).</li>
+<li>(b) Lag ↑ → hidrograf sadece <strong>sağa kayar</strong> (gecikme), tepe büyüklüğü <strong>aynı kalır</strong> (no attenuation). Junction-2'de Mahoning Creek Local ile tepelerin çakışma zamanı değişir.</li>
+<li><strong>Sınavda yaz:</strong> R↑ tepeyi küçültür/yayar; Lag↑ yalnız öteler.</li>
+</ul></section><section id="bölüm-d-tek-sayfa-özet"><h2>BÖLÜM D — Tek Sayfa Özet</h2><details class="kart" id="formül-kartı"><summary><span class="kb">Formül kartı</span><span class="ok" aria-hidden="true"></span></summary><div class="kg"><div class="tablo"><table>
+<thead>
+<tr>
+<th>Formül</th>
+<th>Birim / girdi</th>
+<th>Ne zaman kullanılır</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ET = P − Q (ΔS≈0)</td>
+<td>mm/yıl</td>
+<td>Uzun dönem su bütçesi</td>
+</tr>
+<tr>
+<td>c = Q/P</td>
+<td>—</td>
+<td>Akış katsayısı</td>
+</tr>
+<tr>
+<td>d = 1000·Q·T/A</td>
+<td>mm (Q m³/s, T s, A m²)</td>
+<td>Debi → derinlik</td>
+</tr>
+<tr>
+<td>RR = 0,036·10^(0,0625·dBZ)</td>
+<td>mm/h</td>
+<td>Radar dBZ → yağış şiddeti</td>
+</tr>
+<tr>
+<td>Z = 200·RR^1,6</td>
+<td>mm⁶/m³</td>
+<td>Marshall–Palmer Z–R</td>
+</tr>
+<tr>
+<td>W = (1/ρ_w g)∫q dp</td>
+<td>kg/m² ≡ mm</td>
+<td>Yağışa geçebilir su</td>
+</tr>
+<tr>
+<td>P̄ = ΣAiPi / ΣAi</td>
+<td>mm</td>
+<td>Thiessen alansal ortalama</td>
+</tr>
+<tr>
+<td>P̄ = ΣAi(Pi+Pi₊₁)/2 / ΣAi</td>
+<td>mm</td>
+<td>İzohiyet alansal ortalama</td>
+</tr>
+<tr>
+<td>Cv = 100·σ/x̄</td>
+<td>%</td>
+<td>Varyans katsayısı</td>
+</tr>
+<tr>
+<td>N = (Cv/ε)²</td>
+<td>—</td>
+<td>Optimum ölçer sayısı</td>
+</tr>
+<tr>
+<td>Qp = C·I·A/360</td>
+<td>m³/s (I mm/h, A ha)</td>
+<td>Rasyonel yöntem</td>
+</tr>
+<tr>
+<td>Pe = (P−Ia)²/(P−Ia+S); Ia=0,2S</td>
+<td>mm</td>
+<td>SCS Curve Number</td>
+</tr>
+<tr>
+<td>Q(t) = Q₀·e^(−t/k)</td>
+<td>m³/s</td>
+<td>Linear reservoir çekilmesi</td>
+</tr>
+<tr>
+<td>i = a/(t+b)</td>
+<td>mm/h (t dk)</td>
+<td>Kısa süre IDF</td>
+</tr>
+<tr>
+<td>i = C/tⁿ</td>
+<td>mm/h</td>
+<td>Uzun süre IDF</td>
+</tr>
+<tr>
+<td>Pcx = Px·(Mc/Ma)</td>
+<td>mm</td>
+<td>Çift kütle düzeltmesi</td>
+</tr>
+<tr>
+<td>R = 1 − (1−1/T)ⁿ</td>
+<td>—</td>
+<td>n yılda aşılma riski</td>
+</tr>
+<tr>
+<td>P = Pm·e^(−k·Aⁿ)</td>
+<td>mm</td>
+<td>Horton derinlik–alan</td>
+</tr>
+<tr>
+<td>dh/dt = P − E + (Qin−Qout)/A</td>
+<td>m/yıl</td>
+<td>Hazne bütçesi</td>
+</tr>
+<tr>
+<td>Km = (Xm−X̄_(n−1))/σ_(n−1); PMP = X̄_n + Km·σ_n</td>
+<td>mm</td>
+<td>Hershfield PMP</td>
+</tr>
+<tr>
+<td>E_göl = Kp·E_tava, Kp≈0,7</td>
+<td>mm/gün</td>
+<td>Class A tava → göl</td>
+</tr>
+<tr>
+<td>E = f(u)·(es−ea)</td>
+<td>mm/gün</td>
+<td>Dalton yaklaşımı</td>
+</tr>
+<tr>
+<td>NSE = 1 − Σ(o−s)²/Σ(o−ō)²</td>
+<td>—</td>
+<td>Model–gözlem uyumu</td>
+</tr>
+<tr>
+<td>PBIAS = 100·Σ(s−o)/Σo</td>
+<td>%</td>
+<td>Sistematik yanlılık</td>
+</tr>
+</tbody>
+</table></div></div></details><details class="kart" id="10-tuzak"><summary><span class="kb">10 tuzak</span><span class="ok" aria-hidden="true"></span></summary><div class="kg"><ol>
+<li>Rasyonel yöntemde A'yı ha yerine km² yazmak (1 km² = 100 ha; km² ile bölen 3,6 olur).</li>
+<li>Dış ölçeri aritmetik ortalamaya katmak (Thiessen gerekir).</li>
+<li>N = Cv/ε yazmak — kare unutmak; <strong>N = (Cv/ε)²</strong>.</li>
+<li>Horton derinlik–alan'da log kullanmak; <strong>ln ln</strong> doğruslallar.</li>
+<li>1 yıl ≈ 3,1536·10⁷ s'yi yanlış çevirmek (3,1536 × 10⁷, 3,1×10⁶ değil).</li>
+<li>1 kg/m² = 1 mm eşitliğini unutmak (su yoğunluğu 1000 kg/m³ için direkt çıkar).</li>
+<li>dBZ'yi Z sanmak; <strong>dBZ = 10 log₁₀(Z/Z₀)</strong>.</li>
+<li>Precipitable water W'yi 'olası yağış' sanmak; W <strong>anlık sütun suyu</strong>, yağışın sınırı değil.</li>
+<li>Hershfield'da X̄_(n−1)/σ_(n−1) ile X̄_n/σ_n serilerini karıştırmak.</li>
+<li>Class A tava değerini doğrudan göl buharlaşması almak (Kp ≈ 0,7 çarpımı unutulmaz).</li>
+</ol></div></details><details class="kart" id="3-kavram-bağı-1-sık-yanılgı"><summary><span class="kb">3 kavram bağı + 1 sık yanılgı</span><span class="ok" aria-hidden="true"></span></summary><div class="kg"><details class="ic"><summary><span>1. Loss → Excess → Transform → (+ Baseflow) → Routing</span></summary><div class="ic-g"><p>. HEC-HMS'de bir alt havzadan çıkışa kadar tam zincir: Loss (Ia, fc) fazla yağışı verir → Transform (Clark Tc, R) direct runoff hidrografını üretir → Baseflow (linear reservoir k) eklenir → Reach'te Routing (Lag) öteler. Loss büyürse excess küçülür; R büyürse tepe düşer.</p></div></details><details class="ic"><summary><span>2. Cv, ε ve N</span></summary><div class="ic-g"><p>. Veri dağınıklığı (Cv) <strong>artarsa</strong> veya tolerans (ε) <strong>düşerse</strong> gereken ölçer sayısı <strong>karesel</strong> büyür. WMO'nun dağ çöl farklı yoğunluklar önermesinin altında bu yatıyor.</p></div></details><details class="ic"><summary><span>3. Tc ve R, zamanlama vs. büyüklük</span></summary><div class="ic-g"><p>. Tc tepe geliş <strong>zamanını</strong> belirler; R tepe <strong>boyunu</strong> yayar. Model tepe hem geç hem yüksekse: Tc↓ zamanlamayı öne alır, R↑ tepeyi küçültür.</p><p><strong>Sık yanılgı:</strong> 'NSE 0,85 ile 0,95 arası fark küçük' — aslında 0,95 tepe ve zamanlama hatalarına çok duyarlıdır. PBIAS küçük ama NSE düşükse model <strong>dinamiği</strong> yakalayamaz (tepe saatinde değil); PBIAS büyük ama NSE yüksekse model şekli yakalar ama <strong>ölçek</strong> kaymıştır — kalibrasyonda hangisine baktığın fark eder.</p></div></details></div></details></section>
+    <footer>Atmosfer Akademisi · dokununca açılan kartlar; «Hepsini aç» ile tümü. <a href="../">Tüm dersler</a></footer>
+  </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script>
+(function(){
+  const $$=(s,e=document)=>Array.from(e.querySelectorAll(s));
+  function tex(){ if(!window.katex) return; $$('.tex').forEach(d=>{ if(d.dataset.ok) return; const t=d.textContent; try{ katex.render(t,d,{displayMode:true,throwOnError:false}); d.dataset.ok=1; }catch(e){} }); }
+  if (window.katex) tex(); else window.addEventListener('load', tex);
+  const hepsi=document.getElementById('hepsi');
+  const tum=()=>$$('details');
+  const guncelle=()=>{ hepsi.textContent = tum().every(d=>d.open) ? 'Hepsini kapat' : 'Hepsini aç'; };
+  hepsi.onclick=()=>{ const ac=!tum().every(d=>d.open); tum().forEach(d=>d.open=ac); guncelle(); };
+  document.addEventListener('toggle', e=>{ guncelle(); const d=e.target; if(d.open && d.classList && d.classList.contains('kart')){ const r=d.getBoundingClientRect(); if(r.top<64||r.top>innerHeight*.6) window.scrollBy({top:r.top-76,behavior:'smooth'}); } }, true);
+  // içindekiler: görünür bölüm
+  const linkler=$$('nav.toc a'); const io=new IntersectionObserver(es=>{ es.forEach(x=>{ if(x.isIntersecting){ linkler.forEach(a=>a.classList.toggle('etkin', a.getAttribute('href')==='#'+x.target.id)); } }); },{rootMargin:'-80px 0px -70% 0px'});
+  $$('main section').forEach(s=>io.observe(s));
+  // arama: eşleşmeleri işaretle, bulunduğu kartları aç
+  const girdi=document.getElementById('ara'), say=document.getElementById('say'); let zaman;
+  function temizle(){ $$('mark.bul').forEach(m=>{ m.replaceWith(document.createTextNode(m.textContent)); }); document.querySelector('main').normalize(); }
+  function ara(){
+    temizle(); const q=girdi.value.trim().toLocaleLowerCase('tr'); if(q.length<2){ say.textContent=''; return; }
+    const w=document.createTreeWalker(document.querySelector('main'), NodeFilter.SHOW_TEXT, { acceptNode:n=> n.parentElement.closest('.katex,script,style') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
+    const dugumler=[]; while(w.nextNode()) dugumler.push(w.currentNode);
+    let n=0, ilk=null;
+    dugumler.forEach(t=>{ const s=t.nodeValue, k=s.toLocaleLowerCase('tr'); let i=k.indexOf(q); if(i<0) return;
+      const f=document.createDocumentFragment(); let j=0;
+      while(i>=0){ f.append(s.slice(j,i)); const m=document.createElement('mark'); m.className='bul'; m.textContent=s.slice(i,i+q.length); f.append(m); if(!ilk) ilk=m; n++; j=i+q.length; i=k.indexOf(q,j); }
+      f.append(s.slice(j)); t.replaceWith(f); });
+    $$('mark.bul').forEach(m=>{ let d=m.parentElement.closest('details'); while(d){ d.open=true; d=d.parentElement.closest('details'); } });
+    say.textContent = n ? n+' sonuç' : 'yok'; if(ilk) ilk.scrollIntoView({block:'center',behavior:'smooth'});
+  }
+  girdi.addEventListener('input', ()=>{ clearTimeout(zaman); zaman=setTimeout(ara,250); });
+})();
+</script>
+</body>
+</html>

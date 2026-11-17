@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="Kapaklı kare kutu akışı: üst kapak sağa kayar, kutuda ana girdap ve köşe girdapları">
+  <rect width="800" height="500" fill="#f4f6fa"/>
+  <g fill="none" stroke="#c9d2df" stroke-width="1">
+    <path d="M0 50H800M0 100H800M0 150H800M0 200H800M0 250H800M0 300H800M0 350H800M0 400H800M0 450H800"/>
+    <path d="M50 0V500M100 0V500M150 0V500M200 0V500M250 0V500M300 0V500M350 0V500M400 0V500M450 0V500M500 0V500M550 0V500M600 0V500M650 0V500M700 0V500M750 0V500"/>
+  </g>
+  <rect x="210" y="70" width="380" height="380" fill="#fff" stroke="#15171c" stroke-width="4"/>
+  <g fill="none" stroke="#184f9a" stroke-width="3" stroke-linecap="round">
+    <ellipse cx="420" cy="215" rx="150" ry="125"/>
+    <ellipse cx="425" cy="205" rx="112" ry="92" opacity=".85"/>
+    <ellipse cx="430" cy="196" rx="76" ry="62" opacity=".7"/>
+    <ellipse cx="434" cy="190" rx="42" ry="34" opacity=".55"/>
+  </g>
+  <g fill="none" stroke="#e8731c" stroke-width="2.5">
+    <path d="M214 446c8-34 30-52 62-52s36 34 22 52z"/>
+    <path d="M586 446c-6-30-24-46-50-46s-30 30-18 46z"/>
+  </g>
+  <g fill="#15171c">
+    <rect x="210" y="52" width="380" height="10" rx="5"/>
+    <path d="M600 57l-22-12v24z"/>
+  </g>
+  <text x="400" y="38" text-anchor="middle" font-family="-apple-system,Segoe UI,sans-serif" font-size="20" font-weight="600" fill="#15171c">kapak U hızıyla kayar</text>
+</svg>
