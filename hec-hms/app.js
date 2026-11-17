@@ -12,34 +12,28 @@
   const KOGE = [];
   KESIF.forEach((c, ci) => c.ogeler.forEach((o) => { o.kat = ci; o.i = KOGE.length; KOGE.push(o); }));
 
-  /* ---------------------------------------------------------------- tema */
-  const TEMA = ['sistem', 'acik', 'koyu'];
-  let tema = 'sistem';
-  try { tema = localStorage.getItem('hms-tema') || 'sistem'; } catch (e) { /* depolama kapalı */ }
+  /* ---------------------------------------------------------------- tema: varsayılan her zaman açık (sistem koyu olsa da); koyu yalnız düğmeyle */
+  let tema = 'acik';
+  try { if (localStorage.getItem('hms-tema') === 'koyu') tema = 'koyu'; } catch (e) { /* depolama kapalı */ }
+  const GUNES = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="3.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M10 1.8v2.4M10 15.8v2.4M1.8 10h2.4M15.8 10h2.4M4.2 4.2l1.7 1.7M14.1 14.1l1.7 1.7M4.2 15.8l1.7-1.7M14.1 5.9l1.7-1.7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>';
+  const AY = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M15.6 12.6A6.6 6.6 0 0 1 7.4 4.4a6.6 6.6 0 1 0 8.2 8.2z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>';
   function temaUygula() {
-    const r = document.documentElement;
-    if (tema === 'acik') r.setAttribute('data-theme', 'light'); else if (tema === 'koyu') r.setAttribute('data-theme', 'dark'); else r.removeAttribute('data-theme');
-    const b = $('#tema'); if (b) b.textContent = { sistem: 'Tema: sistem', acik: 'Tema: açık', koyu: 'Tema: koyu' }[tema];
+    document.documentElement.setAttribute('data-theme', tema === 'koyu' ? 'dark' : 'light');
+    const b = $('#tema'); if (!b) return;
+    b.innerHTML = `${tema === 'koyu' ? AY : GUNES}<span>${tema === 'koyu' ? 'Koyu' : 'Açık'}</span>`;
+    b.setAttribute('aria-pressed', String(tema === 'koyu')); b.setAttribute('aria-label', `Tema: ${tema === 'koyu' ? 'koyu' : 'açık'}. Değiştirmek için bas.`);
   }
 
   /* ---------------------------------------------------------------- iskelet */
   const IMLEC = '<svg viewBox="0 0 20 24" aria-hidden="true"><path d="M2.5 1.8v17.6l4.3-4.1 3 6.6 3.1-1.4-3-6.5h6z" fill="#fff" stroke="#111" stroke-width="1.4" stroke-linejoin="round"/></svg>';
   function iskelet() {
-    $('#ust').innerHTML = `<div class="ust-ic"><a class="ust-marka" href="../">Atmosfer Akademisi</a><span class="ust-ayrac">/</span><span class="ust-ders">MTO 316 · HEC-HMS Okulu</span><nav class="ust-nav" aria-label="Bölümler"><a href="#benzetim">Benzetim</a><a href="#odevler">Ödevler</a></nav><button type="button" class="ust-tema" id="tema"></button><a class="ust-don" href="../">Atmosfer Akademisi'ne dön</a></div>`;
-    $('#tema').addEventListener('click', () => { tema = TEMA[(TEMA.indexOf(tema) + 1) % 3]; try { localStorage.setItem('hms-tema', tema); } catch (e) { /* yok */ } temaUygula(); });
+    /* sayfa başlığı üst çubukta: program sahnesi açılışta çubuğun hemen altında, tümüyle ekranda; giriş içeriği sahnenin altında («Nasıl çalışır») */
+    $('#ust').innerHTML = `<div class="ust-ic"><a class="ust-marka" href="../">Atmosfer Akademisi</a><span class="ust-ayrac" aria-hidden="true">/</span><h1 class="ust-baslik">HEC-HMS Okulu <span>MTO 316</span></h1><nav class="ust-nav" aria-label="Bu sayfada"><a href="#benzetim">Benzetim</a><a href="#nasil">Nasıl çalışır</a><a href="#odevler">Ödevler</a></nav><button type="button" class="ust-tema" id="tema"></button><a class="ust-don" href="../"><span class="ust-don-u">Atmosfer Akademisi'ne dön</span><span class="ust-don-k">‹ Akademi</span></a></div>`;
+    $('#tema').addEventListener('click', () => { tema = tema === 'koyu' ? 'acik' : 'koyu'; try { localStorage.setItem('hms-tema', tema); } catch (e) { /* yok */ } temaUygula(); });
     temaUygula();
+    const t1 = ODEV[0].adimlar, t2 = ODEV[1].adimlar, tikSay = (o) => o.adimlar.reduce((n, a) => n + a.mikro.length, 0);
+    const modKart = (no, ad, alt, mad, dugme, deger) => `<article class="mk"><div class="mk-ust"><span class="mk-no">${no}</span><div><h3>${ad}</h3><p>${alt}</p></div></div><ul class="pn-m">${mad.map((x) => `<li>${x}</li>`).join('')}</ul><button type="button" class="dugme" data-mod="${deger}">${dugme}</button></article>`;
     $('#ana').innerHTML = `
-      <section class="hero">
-        <div class="hero-ic">
-          <div class="hero-sol">
-            <p class="hero-ust">MTO 316 · Hidrometeoroloji</p>
-            <h1>HEC-HMS Okulu</h1>
-            <p class="hero-alt">Programı burada tıklayarak tanı, ödevi kendin yap ya da programın adım adım yapışını izle. Her adım Türkçe açıklamalı.</p>
-            <div class="hero-d"><button type="button" class="dugme" data-gir>Programı aç</button><a class="dugme ikincil" href="#odevler">Ödevler, Türkçe</a></div>
-          </div>
-          <dl class="hero-kunye"><div><dt>Program</dt><dd>HEC-HMS 4.14</dd></div><div><dt>Örnek havza</dt><dd>Punxsutawney, ABD · 158 mi²</dd></div><div><dt>Fırtına</dt><dd>28 Nisan – 4 Mayıs 1996</dd></div><div><dt>Ödevler</dt><dd>HW#1 · HW#2</dd></div></dl>
-        </div>
-      </section>
       <section id="benzetim" class="sim-bolum" aria-label="HEC-HMS benzetimi">
         <div class="sim-alan">
           <div class="sim-sahne">
@@ -50,8 +44,19 @@
         </div>
         <p class="gizli" id="iz-duyuru" aria-live="polite"></p>
       </section>
-      <section id="odevler" class="odevler" aria-label="Ödevler"></section>`;
-    $('#alt').innerHTML = `<p>Öğretici içeriği: HEC-HMS kılavuzları (U.S. Army Corps of Engineers, Hydrologic Engineering Center). Ekranlar HEC-HMS 4.14; grafiklerdeki sayılar programın bu projedeki gerçek çıktısı.</p><p><a href="../">Atmosfer Akademisi'ne dön</a></p>`;
+      <section id="nasil" class="bolum nasil" aria-labelledby="nasil-h">
+        <header class="bolum-bas"><p class="ust-eti">MTO 316 · Hidrometeoroloji</p><h2 id="nasil-h">HEC-HMS Okulu'nda ne yaparsın?</h2><p class="bolum-alt">HEC-HMS 4.14'ü tarayıcıda tıklayarak öğren. Dört yol var; her biri programı yukarıda açar.</p></header>
+        <div class="mod-kartlar">
+          ${modKart(1, 'Keşif', 'Programı tanı', [`<b>${KOGE.length} parça, ${KESIF.length} kategori:</b> menüler, araçlar, ağaç, harita, pencereler.`, '<b>Seç ya da bas:</b> program parçayı açar, işaretler ve anlatır.', '<b>Proje hazır:</b> iki ödevin son hâli yüklü.'], 'Keşfe başla', 'kesif')}
+          ${modKart(2, 'HW#1 rehberli', 'Havza modelini sen kur', [`<b>${t1.length} adım, ${tikSay(ODEV[0])} tık:</b> sıradaki yer mavi çerçeveyle işaretli.`, '<b>Takılırsan:</b> «Bu tıklamayı göster» ya da «Adımı benim yerime bitir».', '<b>Sonunda:</b> 3 alt havza, 1 kanal, 2 birleşim bağlı.'], 'HW#1\'e başla', 'hw1')}
+          ${modKart(3, 'HW#2 rehberli', 'Meteoroloji, koşu, sonuç', [`<b>${t2.length} adım, ${tikSay(ODEV[1])} tık:</b> HW#1'in bittiği projeden başlar.`, '<b>Gerçek sonuç:</b> Junction-2 tepe 3082,9 cfs.', '<b>Gözlemle kıyas:</b> Nash-Sutcliffe 0,952.'], 'HW#2\'ye başla', 'hw2')}
+          ${modKart(4, 'İzle', 'Program kendisi yapar', ['<b>Her tıkta:</b> imleç hedefe gider; ekranda ne değiştiği ve nedeni yazar.', '<b>Kontrol:</b> Geri · Oynat · İleri; klavyede ← → ve boşluk.', '<b>Atla:</b> aşama ve adım listesinden istediğin yere.'], 'HW#1\'i izle', 'izle-hw1')}
+        </div>
+        <dl class="kunye"><div><dt>Program</dt><dd>HEC-HMS 4.14</dd></div><div><dt>Örnek havza</dt><dd>Punxsutawney, ABD · 158 mi²</dd></div><div><dt>Fırtına</dt><dd>28 Nisan – 4 Mayıs 1996</dd></div><div><dt>Ödevler</dt><dd>HW#1 · HW#2</dd></div></dl>
+      </section>
+      <section id="odevler" class="bolum odevler" aria-labelledby="odevler-h"></section>
+      <div class="isik" id="isik" hidden role="dialog" aria-modal="true" aria-label="Ekran görüntüsü"><figure><img alt=""><figcaption></figcaption></figure><button type="button" class="dugme ikincil isik-kapat">Kapat</button></div>`;
+    $('#alt').innerHTML = `<div class="alt-ic"><ul class="pn-m"><li><b>Öğretici içeriği:</b> HEC-HMS kılavuzları (U.S. Army Corps of Engineers, Hydrologic Engineering Center).</li><li><b>Ekranlar:</b> HEC-HMS 4.14; grafiklerdeki sayılar programın bu projedeki gerçek çıktısı.</li></ul><a class="dugme ikincil" href="../">Atmosfer Akademisi'ne dön</a></div>`;
   }
 
   /* ---------------------------------------------------------------- ölçek
@@ -81,7 +86,7 @@
       if (s > 1 && kh / s < 600) s = Math.max(1, kh / 600);
       G.W = Math.round(cw / s); G.H = Math.round(kh / s); G.fit = s; G.odakVar = false;
     } else {
-      const oran = mod === 'izle' ? 0.35 : mod === 'odev' ? 0.41 : 0.44; // izlemede panelin «şimdi + ekranda» kısmı da sığsın
+      const oran = mod === 'izle' ? 0.33 : mod === 'odev' ? 0.41 : 0.44; // izlemede panelin «şimdi + ekranda» kısmı da sığsın
       const kh = Math.round((window.visualViewport ? window.visualViewport.height : window.innerHeight) * oran);
       kap.style.height = kh + 'px';
       G.W = Math.max(TEL_W, cw); G.fit = cw / G.W; G.H = Math.round(kh / G.fit);
@@ -182,7 +187,7 @@
     const simdi = mod === 'izle' ? (iz.kareler[iz.f].t === 'son' ? N : iz.kareler[iz.f].adim) : adim;
     const fs = o.fazlar, aktif = simdi >= N ? fs.length - 1 : o.adimlar[simdi].faz;
     const gf = fazGor != null && fs[fazGor] ? fazGor : aktif;
-    const kat = fs.map((f, i) => `<button type="button" class="sk${i === gf ? ' secik' : ''}${i === aktif ? ' aktif' : ''}" data-faz="${i}" aria-pressed="${i === gf}">${kac(f.ad)}<span>${f.son - f.bas}</span></button>`).join('');
+    const kat = fs.map((f, i) => `<button type="button" class="sk${i === gf ? ' secik' : ''}${i === aktif ? ' aktif' : ''}" data-faz="${i}" aria-pressed="${i === gf}" title="${kac(f.ad)}">${kac(f.kisa)}<span>${f.son - f.bas}</span></button>`).join('');
     let oge = '';
     for (let i = fs[gf].bas; i < fs[gf].son; i++) {
       const a = o.adimlar[i], d = i < simdi ? ' bitti' : i === simdi ? ' simdi' : '';
@@ -222,25 +227,31 @@
   /* ---------------------------------------------------------------- panel */
   function modSecici() {
     const b = (id, et, sec, ek) => `<button type="button" class="pn-mod${sec ? ' secik' : ''}" data-mod="${id}" aria-pressed="${sec}"${ek || ''}>${et}</button>`;
-    return `<div class="pn-ust"><div class="pn-mods" role="group" aria-label="Benzetim modu">${b('kesif', 'Keşif', mod === 'kesif')}${b('hw1', 'HW#1 rehberli', mod === 'odev' && odev.id === 'hw1')}${b('hw2', 'HW#2 rehberli', mod === 'odev' && odev.id === 'hw2')}${b('izle', 'İzle', mod === 'izle', ' title="Adım adım izle: program ödevi kendisi yapar"')}</div></div>`;
+    return `<div class="pn-ust"><div class="pn-mods" role="group" aria-label="Benzetim modu">${b('kesif', 'Keşif', mod === 'kesif', ' title="Keşif: programı tanı"')}${b('hw1', 'HW#1', mod === 'odev' && odev.id === 'hw1', ' title="HW#1 rehberli: ödevi kendin yap" aria-label="HW#1 rehberli"')}${b('hw2', 'HW#2', mod === 'odev' && odev.id === 'hw2', ' title="HW#2 rehberli: ödevi kendin yap" aria-label="HW#2 rehberli"')}${b('izle', 'İzle', mod === 'izle', ' title="Adım adım izle: program ödevi kendisi yapar"')}</div></div>`;
   }
   const satir = (eti, deger) => `<div class="pn-satir"><p class="pn-eti">${eti}</p><button type="button" class="pn-bas" data-mod="${deger}">Baştan</button></div>`;
-  const liste = (a, cls) => (a && a.length ? `<ul class="pn-m${cls ? ' ' + cls : ''}">${a.map((x) => `<li>${kac(x)}</li>`).join('')}</ul>` : '');
+  /* madde: «Anahtar: açıklama» biçimindeyse anahtar kalın (göz tarasın) */
+  const madde = (x) => { const t = String(x), i = t.indexOf(': '); return i > 0 && i <= 34 && !/[.!?]/.test(t.slice(0, i)) ? `<b>${kac(t.slice(0, i + 1))}</b>${kac(t.slice(i + 1))}` : kac(t); };
+  const liste = (a, cls) => (a && a.length ? `<ul class="pn-m${cls ? ' ' + cls : ''}">${a.map((x) => `<li>${madde(x)}</li>`).join('')}</ul>` : '');
   function degerTablo(t) { return t ? `<table class="deger"><tbody>${t.map(([a, b]) => `<tr><th>${kac(a)}</th><td>${kac(b)}</td></tr>`).join('')}</tbody></table>` : ''; }
-  function katman(a, idk) {
-    return `<div class="katman" data-k="${idk}"><button type="button" class="kt-b" aria-expanded="false">Ne yapıyorum?</button><div class="kt-ic" hidden>${liste(a.ne)}<button type="button" class="kt-b" aria-expanded="false">Programda nerede?</button><div class="kt-ic" hidden>${liste(a.nerede)}<button type="button" class="kt-b" aria-expanded="false">Neden bu değer?</button><div class="kt-ic" hidden>${liste(a.neden)}</div></div></div></div>`;
+  /* katmanlı ayrıntı: önce kısa madde, «+ Ayrıntı» ile «Ne yapıyorum / Programda nerede / Neden» grupları */
+  const grup = (et, a) => (a && a.length ? `<p class="ay-et">${et}</p>${liste(a)}` : '');
+  function katman(a, idk, nedensiz, ilkGorunur) {
+    const ne = ilkGorunur ? (a.ne || []).slice(1) : a.ne;
+    return `<div class="katman" data-k="${idk}"><button type="button" class="kt-b" aria-expanded="false">Ayrıntı: ${ne && ne.length ? 'ne, ' : ''}nerede${nedensiz ? '' : ', neden'}</button><div class="kt-ic" hidden>${grup(ilkGorunur ? 'Ayrıca' : 'Ne yapıyorum?', ne)}${grup('Programda nerede?', a.nerede)}${nedensiz ? '' : grup('Neden bu değer?', a.neden)}</div></div>`;
   }
-  const soruHTML = (a) => (a.soru ? `<div class="soru"><b>Öğreticinin sorusu</b><p>${kac(a.soru[0])}</p><button type="button" class="kt-b" aria-expanded="false">Cevap</button><div class="kt-ic" hidden><p>${kac(a.soru[1])}</p></div></div>` : '');
+  /* «Kendini dene»: önce düşün, sonra aç — öğreticinin sorusu */
+  const soruHTML = (a) => (a.soru ? `<div class="soru"><p class="soru-et">Kendini dene · öğreticinin sorusu</p><p class="soru-s">${kac(a.soru[0])}</p><button type="button" class="kt-b" aria-expanded="false">Önce düşün, sonra cevabı aç</button><div class="kt-ic" hidden><p>${kac(a.soru[1])}</p></div></div>` : '');
   const panelKabuk = (ic, kontrol) => `${modSecici()}<div class="pn-sec" id="pnsec"></div><div class="pn-ic"${kontrol ? '' : ' aria-live="polite"'}>${ic}</div>${kontrol || ''}`;
   function kesifIc() {
     if (!sonAc || !AC[sonAc]) {
-      return `${satir('Keşif', 'kesif')}<h2 class="pn-h">Bir parça seç.</h2><p class="pn-t">${genis() ? 'Yukarıdaki' : 'Programın altındaki'} kategorilerden seç ya da programda istediğin yere bas: program o parçayı açıp işaretler, ne işe yaradığı burada yazar.</p><p class="pn-not">Proje hazır: iki ödevin son hâli yüklü. Sağ tık (telefonda basılı tut) eleman menüsünü açar.${genis() ? '' : ' «Tümü» programın bütününü gösterir.'}</p><p class="pn-eti2">Ödevi izle</p><p class="pn-t">Program ödevi kendisi yapar; her tıkta ne olduğunu ve nedenini anlatır.</p><div class="pn-dugmeler"><button type="button" class="dugme ikincil" data-mod="izle-hw1">HW#1'i adım adım izle</button></div>`;
+      return `${satir('Keşif · programı tanı', 'kesif')}<h2 class="pn-h">Bir parça seç.</h2><ul class="pn-m"><li><b>Seç:</b> ${genis() ? 'yukarıdaki' : 'programın altındaki'} kategorilerden bir parça; program onu açar ve işaretler.</li><li><b>Bas:</b> programda istediğin yere; ne işe yaradığı burada yazar.</li><li><b>Sağ tık:</b> eleman menüsü (telefonda basılı tut).</li>${genis() ? '' : '<li><b>Tümü:</b> programın bütününü gösterir.</li>'}<li><b>Proje hazır:</b> iki ödevin son hâli yüklü.</li></ul><p class="pn-eti2">Ödevi izle ya da kendin yap</p><div class="pn-dugmeler"><button type="button" class="dugme" data-mod="izle-hw1">HW#1'i adım adım izle</button><button type="button" class="dugme ikincil" data-mod="hw1">HW#1'i kendin yap</button></div>`;
     }
     const a = AC[sonAc], o = kesSec != null ? KOGE[kesSec] : null;
     const ust = o
       ? `<div class="kes-ust"><button type="button" class="kes-y" data-kes-yon="-1" aria-label="Önceki parça">‹ Önceki</button><p class="kes-yer">${kac(KESIF[o.kat].ad)} · ${KESIF[o.kat].ogeler.indexOf(o) + 1}/${KESIF[o.kat].ogeler.length}</p><button type="button" class="kes-y" data-kes-yon="1" aria-label="Sonraki parça">Sonraki ›</button></div>`
       : satir('Bu ne işe yarar?', 'kesif');
-    return `${ust}<h2 class="pn-h">${kac(a.b)}</h2><p class="pn-t">${kac(a.t)}</p>${liste(a.m)}${a.d ? `<button type="button" class="kt-b pn-daha" aria-expanded="false">Daha fazla</button><div class="kt-ic" hidden>${liste(a.d)}</div>` : ''}`;
+    return `${ust}<h2 class="pn-h">${kac(a.b)}</h2><p class="pn-t">${kac(a.t)}</p>${liste(a.m)}${a.d ? `<button type="button" class="kt-b pn-daha" aria-expanded="false">Ayrıntı</button><div class="kt-ic" hidden>${liste(a.d)}</div>` : ''}`;
   }
   function panelCiz() {
     const p = $('#panel');
@@ -256,8 +267,8 @@
         const bol = odev.bolumler && a.bolum ? `<p class="pn-bol">${a.bolum} · ${kac(odev.bolumler[a.bolum - 1])}</p>` : '';
         ic = `${satir(`${odev.ad} · adım ${adim + 1}/${toplam}`, odev.id)}<div class="pn-ilerleme" aria-hidden="true"><i style="width:${Math.round((adim / toplam) * 100)}%"></i></div>${bol}<h2 class="pn-h">${kac(a.baslik)}</h2>
           <div class="pn-simdi"><span>Şimdi${a.mikro.length > 1 ? ` · ${mik + 1}/${a.mikro.length}` : ''}</span><b>${kac(m.ip)}</b>${m.oto ? '<button type="button" class="dugme" data-hd="oto:olcerler">İki ölçeri de ekle</button>' : ''}</div>
-          <p class="pn-ipucu" id="ipucu"></p>${degerTablo(a.tablo)}${katman(a, 'p')}${soruHTML(a)}
-          <div class="pn-dugmeler"><button type="button" class="dugme" id="goster">Bu tıklamayı göster</button><button type="button" class="dugme ikincil" id="atla">Adımı benim yerime bitir</button></div>`;
+          <p class="pn-ipucu" id="ipucu"></p>
+          <div class="pn-dugmeler pn-yardim"><button type="button" class="dugme ikincil" id="goster">Bu tıklamayı göster</button><button type="button" class="dugme ikincil" id="atla">Adımı benim yerime bitir</button></div>${degerTablo(a.tablo)}${katman(a, 'p')}${soruHTML(a)}`;
       }
     }
     p.innerHTML = panelKabuk(ic);
@@ -675,7 +686,8 @@
       if (!iz.parca[iz.f]) iz.parca[iz.f] = izAnahtar(m.hd);
       govde = `<div class="pn-simdi iz-simdi"><span>Şimdi ne yapıyorum${m.sag ? ' · sağ tık' : ''}</span><b>${kac(m.iz || m.ip)}</b>${m.oto ? '<p class="iz-alt" id="iz-alt"></p>' : ''}</div><div class="iz-degisti${bekliyor ? ' bekliyor' : ''}"><span>Ekranda ne değişti</span><p>${kac(m.sonra || '')}</p></div>${m.dikkat ? `<p class="iz-mdikkat">${kac(m.dikkat)}</p>` : ''}${izKatmanlar(a, z, iz.parca[iz.f], false)}${kr.mik === a.mikro.length - 1 ? soruHTML(a) : ''}`;
     }
-    return ust(konum) + izSerit() + not + bol + `<h2 class="pn-h iz-h${giris ? '' : ' tikte'}">${kac(a.baslik)}</h2>` + govde;
+    const yuzde = Math.round((100 * iz.f) / (K.length - 1));
+    return ust(konum) + izSerit() + `<div class="iz-ilerleme" aria-hidden="true"><i style="width:${yuzde}%"></i></div>` + not + bol + `<h2 class="pn-h iz-h${giris ? '' : ' tikte'}">${kac(a.baslik)}</h2>` + govde;
   }
   function izKontrolHTML() {
     return `<div class="iz-kontrol"><button type="button" class="iz-b" data-iz="geri" aria-label="Geri (sol ok)">${IK.geri}<span>Geri</span></button><button type="button" class="iz-b ana" data-iz="oynat" aria-pressed="false"></button><button type="button" class="iz-b" data-iz="ileri" aria-label="İleri (sağ ok)"><span>İleri</span>${IK.ileri}</button><button type="button" class="iz-hiz" data-iz="hiz"></button></div>`;
@@ -698,26 +710,79 @@
     secimCiz();
   }
 
-  /* ---------------------------------------------------------------- ödevler bölümü */
+  /* ---------------------------------------------------------------- ödevler bölümü
+     Geniş düzen: ödev başlığı + bilgi kartları, sonra aşama aşama adım kartları (ızgara). Her kartta: değerler, ekranlar (büyütülür),
+     «Ayrıntı» katmanı, «Kendini dene» (önce düşün → aç), «Benzetimde yap» (rehberli), «Bu adımı izle», «Bitirdim» (bu tarayıcıda). */
+  let BITTI = new Set();
+  try { BITTI = new Set(JSON.parse(localStorage.getItem('hms-bitti') || '[]')); } catch (e) { BITTI = new Set(); }
+  const bittiYaz = () => { try { localStorage.setItem('hms-bitti', JSON.stringify([...BITTI])); } catch (e) { /* depolama kapalı */ } };
+  const bitSay = (o, bas, son) => { let n = 0; for (let i = bas; i < son; i++) if (BITTI.has(`${o.id}:${i}`)) n++; return n; };
+  function ilerlemeGuncelle() {
+    ODEV.forEach((o) => {
+      const N = o.adimlar.length, n = bitSay(o, 0, N), e = $(`#${o.id} .od-ilerleme`);
+      if (e) { $('b', e).textContent = `${n}/${N}`; $('i', e).style.width = `${Math.round((100 * n) / N)}%`; }
+      o.fazlar.forEach((f, fi) => {
+        const t = `${bitSay(o, f.bas, f.son)}/${f.son - f.bas}`, c = $(`.bs-c[data-hedef="${o.id}-f${fi + 1}"] span`), h = $(`#${o.id}-f${fi + 1} .faz-say`);
+        if (c) c.textContent = t; if (h) h.textContent = `${t} bitti`;
+      });
+    });
+  }
+  function adimKart(o, a, i) {
+    const resim = [].concat(a.img || []), an = `${o.id}:${i}`, bitti = BITTI.has(an);
+    const res = resim.length ? `<div class="ak-res r${Math.min(resim.length, 2)}">${resim.map((r) => `<figure><button type="button" class="ak-buyut" data-isik="${r}" aria-label="Büyüt: ${kac(IMG[r])}"><img src="img/${r}.webp" alt="${kac(IMG[r])}" loading="lazy" decoding="async"></button><figcaption>${kac(IMG[r])} · ${RESMI.has(r) ? 'öğreticideki ekran' : 'HEC-HMS 4.14 ekranı'}</figcaption></figure>`).join('')}</div>` : '';
+    const dene = a.soru ? soruHTML(a) : `<div class="soru"><p class="soru-et">Kendini dene</p><p class="soru-s">Bu adım neden gerekli? Önce kendin düşün.</p><button type="button" class="kt-b" aria-expanded="false">Cevabı aç</button><div class="kt-ic" hidden>${liste(a.neden)}</div></div>`;
+    return `<li class="ak${bitti ? ' bitti' : ''}" id="${o.id}-${i + 1}"><div class="ak-ust"><span class="ak-no">${i + 1}</span><h5>${kac(a.baslik)}</h5></div>${a.ne && a.ne.length ? `<p class="ak-ne"><b>Ne:</b> ${kac(a.ne[0])}</p>` : ''}${degerTablo(a.tablo)}${res}${katman(a, o.id + i, !a.soru, true)}${dene}<div class="ak-d"><button type="button" class="dugme adim-git" data-git="${o.id}:${i}">Benzetimde yap</button><button type="button" class="dugme ikincil adim-izle" data-git="izle:${o.id}:${i}">Bu adımı izle</button><button type="button" class="ak-bitti" data-bitti="${an}" aria-pressed="${bitti}">${bitti ? 'Bitti' : 'Bitirdim'}</button></div></li>`;
+  }
   function odevlerCiz() {
     const k = $('#odevler');
-    k.innerHTML = `<header class="odev-bas"><p class="hero-ust">Ninova · MTO 316</p><h2>Ödevler, Türkçe</h2><p class="hero-alt">Hocanın istediği ve öğreticinin her adımı. Değerler tabloda, program alan adları İngilizce.</p></header>` + ODEV.map((o) => {
-      let adimlar = '', sonBol = 0;
-      o.adimlar.forEach((a, i) => {
-        if (o.bolumler && a.bolum !== sonBol) { sonBol = a.bolum; adimlar += `<li class="odev-bol"><h3>${a.bolum} · ${kac(o.bolumler[a.bolum - 1])}</h3></li>`; }
-        const resim = [].concat(a.img || []);
-        adimlar += `<li class="adim" id="${o.id}-${i + 1}"><span class="adim-no">${i + 1}</span><div class="adim-ic"><h4>${kac(a.baslik)}</h4>${degerTablo(a.tablo)}${resim.length ? `<div class="adim-res r${Math.min(resim.length, 3)}">${resim.map((r) => `<figure title="Büyütmek için bas"><img src="img/${r}.webp" alt="${kac(IMG[r])}" loading="lazy" decoding="async"><figcaption>${kac(IMG[r])} · ${RESMI.has(r) ? 'öğreticideki ekran' : 'HEC-HMS 4.14 ekranı'}</figcaption></figure>`).join('')}</div>` : ''}${katman(a, o.id + i)}${soruHTML(a)}<button type="button" class="adim-git" data-git="${o.id}:${i}">Benzetimde bu adıma git</button><button type="button" class="adim-izle" data-git="izle:${o.id}:${i}">Bu adımı izle</button></div></li>`;
-      });
-      return `<article class="odev" id="${o.id}"><header class="odev-ust"><p class="odev-eti">${o.ad} · teslim ${kac(o.teslim)}</p><h3 class="odev-h">${kac(o.konu)}</h3><div class="odev-iki"><div><p class="odev-k">Hoca ne istiyor?</p><ol class="istenen">${o.istenen.map((x) => `<li>${kac(x)}</li>`).join('')}</ol></div><div><p class="odev-k">Resmî öğretici (İngilizce)</p><ul class="baglar">${o.bag.map(([a, u]) => `<li><a href="${u}" target="_blank" rel="noopener">${kac(a)} ↗</a></li>`).join('')}</ul>${o.tuzak ? `<p class="odev-k">Labda görülen tuzaklar</p><ul class="tuzak">${o.tuzak.map((x) => `<li>${kac(x)}</li>`).join('')}</ul>` : ''}</div></div><div class="pn-dugmeler"><button type="button" class="dugme" data-git="${o.id}:0">${o.ad} rehberli benzetimi başlat</button><button type="button" class="dugme ikincil" data-git="izle:${o.id}:0">${o.ad}'i adım adım izle</button></div></header><ol class="adimlar">${adimlar}</ol></article>`;
+    const nav = ODEV.map((o) => `<a class="bs-c ana" href="#${o.id}" data-hedef="${o.id}">${o.ad}</a>` + o.fazlar.map((f, fi) => `<a class="bs-c" href="#${o.id}-f${fi + 1}" data-hedef="${o.id}-f${fi + 1}">${kac(f.kisa)} <span>0/${f.son - f.bas}</span></a>`).join('')).join('');
+    k.innerHTML = `<header class="bolum-bas"><p class="ust-eti">Ninova · MTO 316</p><h2 id="odevler-h">Ödevler, Türkçe</h2><p class="bolum-alt">Hocanın istediği ve öğreticinin her adımı. Değerler tabloda, program alan adları İngilizce.</p></header>
+      <nav class="bu-sayfada" aria-label="Ödevlerde git"><span class="bs-et">Bu sayfada</span>${nav}</nav>` + ODEV.map((o) => {
+      const kartlar = `<section class="od-k"><h4>Hoca ne istiyor?</h4><ol class="istenen">${o.istenen.map((x) => `<li>${kac(x)}</li>`).join('')}</ol></section><section class="od-k"><h4>Resmî öğretici (İngilizce)</h4><ul class="baglar">${o.bag.map(([a, u]) => `<li><a href="${u}" target="_blank" rel="noopener">${kac(a)} ↗</a></li>`).join('')}</ul></section>${o.tuzak ? `<section class="od-k uyari"><h4>Labda görülen tuzaklar</h4>${liste(o.tuzak, 'dikkat')}</section>` : ''}`;
+      const fazlar = o.fazlar.map((f, fi) => {
+        const bol = o.bolumler ? [...new Set(o.adimlar.slice(f.bas, f.son).map((a) => a.bolum))].map((b) => `${b} · ${o.bolumler[b - 1]}`).join(' / ') : '';
+        const ad = `${o.id}-f${fi + 1}`;
+        return `<section class="faz" id="${ad}" aria-labelledby="${ad}-h"><header class="faz-bas"><h4 id="${ad}-h"><span class="faz-no">${fi + 1}</span>${kac(f.ad)}</h4><p class="faz-alt"><span>${f.son - f.bas} adım</span><span class="faz-say"></span>${bol ? `<span>Öğretici: ${kac(bol)}</span>` : ''}</p></header><ol class="ak-izgara">${o.adimlar.slice(f.bas, f.son).map((a, j) => adimKart(o, a, f.bas + j)).join('')}</ol></section>`;
+      }).join('');
+      return `<article class="odev" id="${o.id}" aria-labelledby="${o.id}-h"><header class="od-bas"><div class="od-sol"><p class="ust-eti">${o.ad} · teslim ${kac(o.teslim)}</p><h3 class="odev-h" id="${o.id}-h">${kac(o.konu)}</h3><div class="od-ilerleme"><span>Bitirdim</span><b>0/${o.adimlar.length}</b><span class="od-bar" aria-hidden="true"><i></i></span></div></div><div class="pn-dugmeler od-d"><button type="button" class="dugme" data-git="${o.id}:0">${o.ad} rehberli benzetimi başlat</button><button type="button" class="dugme ikincil" data-git="izle:${o.id}:0">${o.ad}'i adım adım izle</button></div></header><div class="od-kartlar">${kartlar}</div>${fazlar}</article>`;
     }).join('');
+    ilerlemeGuncelle();
   }
+  /* «Bu sayfada»: okunan aşamanın çipi vurgulanır ve şeritte görünür */
+  function gezintiIzle() {
+    const nav = $('.bu-sayfada'); if (!nav) return;
+    const alt = ustH() + nav.offsetHeight + 24;
+    let simdi = null;
+    document.querySelectorAll('#odevler .odev, #odevler .faz').forEach((e) => { if (e.getBoundingClientRect().top <= alt) simdi = e.id; });
+    if ($('#odevler').getBoundingClientRect().bottom < alt) simdi = null;
+    nav.querySelectorAll('.bs-c').forEach((c) => { const ac = c.dataset.hedef === simdi; c.classList.toggle('simdi', ac); if (ac) c.setAttribute('aria-current', 'location'); else c.removeAttribute('aria-current'); });
+    const c = simdi && nav.querySelector(`.bs-c[data-hedef="${simdi}"]`);
+    if (c && (c.offsetLeft < nav.scrollLeft || c.offsetLeft + c.offsetWidth > nav.scrollLeft + nav.clientWidth)) nav.scrollLeft = c.offsetLeft - 80;
+  }
+  /* ekran görüntüsü büyütücü */
+  let isikDonus = null;
+  function isikAc(r, kaynak) {
+    const k = $('#isik'); isikDonus = kaynak || null;
+    $('img', k).src = `img/${r}.webp`; $('img', k).alt = IMG[r] || ''; $('figcaption', k).textContent = `${IMG[r] || ''} · ${RESMI.has(r) ? 'öğreticideki ekran' : 'HEC-HMS 4.14 ekranı'}`;
+    k.hidden = false; $('.isik-kapat', k).focus();
+  }
+  function isikKapat() { const k = $('#isik'); if (!k || k.hidden) return; k.hidden = true; $('img', k).removeAttribute('src'); if (isikDonus) isikDonus.focus(); }
 
   /* ---------------------------------------------------------------- olaylar */
   const sahneEkranda = () => { const r = $('#benzetim').getBoundingClientRect(); return r.bottom >= ustH() + 40 && r.top <= window.innerHeight - 40; };
   function olaylar() {
     document.addEventListener('click', (e) => {
-      const fg = e.target.closest('.adim-res figure');
-      if (fg) { fg.classList.toggle('buyuk'); return; }
+      const ib0 = e.target.closest('[data-isik]');
+      if (ib0) { isikAc(ib0.dataset.isik, ib0); return; }
+      if (e.target.closest('.isik-kapat') || e.target.id === 'isik' || e.target.closest('#isik figure')) { isikKapat(); return; }
+      const bt = e.target.closest('[data-bitti]');
+      if (bt) {
+        const an = bt.dataset.bitti, ac = !BITTI.has(an);
+        if (ac) BITTI.add(an); else BITTI.delete(an);
+        bittiYaz(); bt.setAttribute('aria-pressed', String(ac)); bt.textContent = ac ? 'Bitti' : 'Bitirdim';
+        const kart = bt.closest('.ak'); if (kart) kart.classList.toggle('bitti', ac);
+        ilerlemeGuncelle(); return;
+      }
       const kb = e.target.closest('.kt-b');
       if (kb) { const ic = kb.nextElementSibling; const ac = kb.getAttribute('aria-expanded') !== 'true'; kb.setAttribute('aria-expanded', String(ac)); if (ic) ic.hidden = !ac; if (kb.dataset.izKat) izAcik[kb.dataset.izKat] = ac; return; }
       if (e.target.closest('[data-gir], #ust a[href="#benzetim"]')) { e.preventDefault(); benzetimeIn(); return; }
@@ -784,6 +849,8 @@
       else if (e.key === ' ' && !(t && t.closest && t.closest('button, a'))) { e.preventDefault(); if (iz.oynuyor) izDur(); else izOynat(); }
     });
     document.addEventListener('visibilitychange', () => { if (document.hidden && iz && iz.oynuyor) izDur(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') isikKapat(); });
+    let gz = 0; window.addEventListener('scroll', () => { if (gz) return; gz = requestAnimationFrame(() => { gz = 0; gezintiIzle(); }); }, { passive: true });
     /* telefonda «Tümü» ↔ «Yakınlaş» */
     $('#buyut').addEventListener('click', () => {
       tumu = !tumu;

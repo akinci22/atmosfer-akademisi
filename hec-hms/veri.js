@@ -571,10 +571,10 @@
 
   /* ======================================================================== KATEGORİ KATEGORİ SEÇİM (17 Kas)
      Rehberli ve izle: adımlar ödevin aşamalarına (faz) ayrılır; her adımın seçim listesindeki kısa adı (kisa).
-     fazlar: [ad, adım sayısı] sırayla; toplam ödevin adım sayısına eşit olmalı (değilse konsola hata: test yakalar). */
+     fazlar: [ad, adım sayısı, (seçim çipindeki kısa ad)] sırayla; toplam ödevin adım sayısına eşit olmalı (değilse konsola hata: test yakalar). */
   const FAZ = {
     hw1: [['Proje kur', 4], ['Havza ağı', 5], ['Parametreler', 5], ['Teslim', 1]],
-    hw2: [['Yağış ölçerleri', 4], ['Meteoroloji modeli', 3], ['Kontrol ve zaman', 2], ['Çalıştır', 2], ['Sonuçlar', 3], ['Gözlenen akım', 3]],
+    hw2: [['Yağış ölçerleri', 4, 'Ölçerler'], ['Meteoroloji modeli', 3, 'Meteoroloji'], ['Kontrol ve zaman', 2, 'Kontrol'], ['Çalıştır', 2], ['Sonuçlar', 3], ['Gözlenen akım', 3, 'Gözlem']],
   };
   const KISA = {
     hw1: ['Programı aç', 'Proje yarat', 'Havza modeli yarat', 'Varsayılan yöntemler', 'Haritayı aç', '3 alt havza', 'Kanal ve birleşimler', 'Elemanları bağla', 'Adlandır, Save', 'Alanlar', 'Taban akışı', 'Kayıp', 'Clark: Tc ve R', 'Reach-1 Lag', 'Save, PDF'],
@@ -585,7 +585,7 @@
     if (k.length !== o.adimlar.length) console.error(`${o.ad}: kısa ad sayısı ${k.length} ≠ ${o.adimlar.length}`);
     if (f.reduce((t, x) => t + x[1], 0) !== o.adimlar.length) console.error(`${o.ad}: faz adımları toplamı ≠ ${o.adimlar.length}`);
     o.fazlar = []; let i = 0;
-    f.forEach(([ad, n], fi) => { o.fazlar.push({ ad, bas: i, son: i + n }); for (let j = 0; j < n; j++, i++) if (o.adimlar[i]) o.adimlar[i].faz = fi; });
+    f.forEach(([ad, n, kisa], fi) => { o.fazlar.push({ ad, kisa: kisa || ad, bas: i, son: i + n }); for (let j = 0; j < n; j++, i++) if (o.adimlar[i]) o.adimlar[i].faz = fi; });
     o.adimlar.forEach((a, j) => { a.kisa = k[j] || a.baslik; });
   });
 
