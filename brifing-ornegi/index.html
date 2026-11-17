@@ -121,7 +121,25 @@ details.ic[open]>summary::before{transform:rotate(90deg)}
 .vt{font-family:var(--mono);font-size:12.5px;font-weight:600;border-radius:6px;padding:3px 8px;background:var(--amber);color:#2a1d00;white-space:nowrap}
 .vt.f{background:var(--orange);color:#fff}
 .src{font-size:13px;color:var(--muted)}
-.viewer{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:12px;background:var(--navy);border-radius:12px;padding:12px;outline:none}
+.viewer{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:12px;background:var(--navy);border-radius:12px;padding:12px;outline:none}
+.side{display:flex;flex-direction:column;gap:10px;min-width:0;color:var(--on-navy)}
+.side .panel{flex:1 1 auto}
+.viewer .slide-head{flex-wrap:wrap;margin:0;color:var(--on-navy)}
+.viewer .slide-head h3{white-space:normal;flex-basis:100%;order:1;font-size:19px}
+.viewer .slide-head .no,.viewer .src{color:#b9c4d6}
+.viewer .src{order:2;flex-basis:100%;white-space:normal}
+.bsec{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;flex:0 0 auto}
+.bsec::-webkit-scrollbar{display:none}
+.bsec button{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;max-width:240px;min-height:36px;font:600 13.5px/1.2 var(--sans);color:var(--on-navy);background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:6px 12px 6px 6px;cursor:pointer}
+.bsec button b{flex:0 0 22px;height:22px;border-radius:50%;background:var(--amber);color:#0b1f3a;font:700 12px/22px var(--mono);text-align:center}
+.bsec button span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.bsec button small{font:500 12px var(--mono);color:#b9c4d6}
+.bsec button[aria-current="true"]{background:var(--amber);border-color:var(--amber);color:#0b1f3a}
+.bsec button[aria-current="true"] b{background:#0b1f3a;color:var(--amber)}
+.bsec button[aria-current="true"] small{color:#3a2a00}
+.bsec button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.side .ctrl .uz{display:none}
+.side .bsec{flex-wrap:wrap;overflow:visible}
 .viewer:focus-visible{box-shadow:0 0 0 3px var(--amber)}
 .sbox{display:flex;flex-direction:column;gap:10px;min-width:0}
 .stage{--r:1.333;position:relative;overflow:hidden;border-radius:8px;background:#fff;aspect-ratio:var(--r);width:min(100%,calc(var(--hmax,62vh) * var(--r)));margin-inline:auto;flex:0 0 auto;cursor:pointer}
@@ -217,13 +235,21 @@ footer{color:var(--muted);font-size:13px;padding-block:20px 40px}
   .slide-head{flex-wrap:nowrap}
   .slide-head h3{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:0 1 auto}
   .slide-head .src{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:0 1 auto}
-  .sbox{min-height:min(430px,calc(var(--hmax,62vh) + 70px))}
-  .ctrl{margin-top:auto}
+  .hblok{--W:min(calc(100vw - 32px),1600px);width:var(--W);margin-left:calc((100% - var(--W)) / 2)}
+  .sbox{justify-content:center}
 }
 @media (max-width:899px){
-  .viewer{grid-template-columns:minmax(0,1fr);padding:10px;gap:10px}
-  .sbox{position:sticky;top:calc(env(safe-area-inset-top,0px) + var(--tabs-h));z-index:6;background:var(--navy);margin:-10px -10px 0;padding:10px 10px 6px;border-radius:12px 12px 0 0;box-shadow:0 12px 14px -14px rgba(0,0,0,.9);gap:6px}
-  .stage{width:min(100%,calc(40svh * var(--r)))}
+  .viewer{grid-template-columns:minmax(0,1fr);padding:6px;gap:10px;margin-inline:-16px;border-radius:0}
+  .sbox{position:sticky;top:calc(env(safe-area-inset-top,0px) + var(--tabs-h) + var(--sx-h,0px));z-index:6;background:var(--navy);margin:-6px -6px 0;padding:6px 6px 6px;box-shadow:0 12px 14px -14px rgba(0,0,0,.9);gap:6px}
+  .stage{width:min(100%,calc(48svh * var(--r)))}
+  .viewer .slide-head{padding:2px 6px 0}
+  .side{padding:0 6px 6px}
+  .sbox .adimlar{display:none}
+  .secici{position:sticky;top:calc(env(safe-area-inset-top,0px) + var(--tabs-h));z-index:7;background:var(--bg);margin-inline:-16px;padding:6px 16px;gap:6px;scrollbar-width:none}
+  .secici::-webkit-scrollbar{display:none}
+  .secici button{width:auto;max-width:230px;min-height:38px;padding:6px 12px;gap:6px}
+  .secici img,.secici .tbl{display:none}
+  .secici .tt{-webkit-line-clamp:1;white-space:nowrap;text-overflow:ellipsis;display:block}
   .panel{min-height:0}
   .pin-in{position:static;overflow:visible}
   .ctrl>button{padding:8px 12px}
@@ -331,13 +357,23 @@ function goster(id, inis){
   if (location.hash.slice(1)!==id) history.replaceState(null,'','#'+id);
   store.set('g12-sekme', id);
   fitAll();
-  if (inis) window.scrollTo({top: $('.hero').offsetHeight, behavior: kb()});
+  // konuşmacı sekmesi = harita sahnesine in (slayt şeridi üst çubuğun hemen altında, harita tümüyle ekranda)
+  if (inis){ if (HBLOK[id]) sahneyeIn(id, kb()); else window.scrollTo({top: $('.hero').offsetHeight, behavior: kb()}); }
+}
+function sahneyeIn(id, davranis){
+  const sx = HBLOK[id]; if (!sx || !sx.offsetParent) return;
+  fitAll();
+  const y = Math.max(0, sx.getBoundingClientRect().top + scrollY - tabsH() - 8);
+  if (Math.abs(y - scrollY) > 2) window.scrollTo({top: y, behavior: davranis});
 }
 
 // ---------- spot + zoom oynatıcı ----------
 const FITLER = new Set();
+// telefonda slayt şeridi de yapışkan: yüksekliği haritanın yapışma noktasına eklenir
+const sxH = () => { if (MASA.matches) return 0; const e = [...document.querySelectorAll('.secici')].find(x => x.offsetParent); return e ? e.offsetHeight : 0; };
 function fitAll(){
   document.documentElement.style.setProperty('--tabs-h', tabsH() + 'px');
+  document.documentElement.style.setProperty('--sx-h', sxH() + 'px');
   FITLER.forEach(f => f());
 }
 function oynatici(sl, opt){
@@ -351,12 +387,31 @@ function oynatici(sl, opt){
   const ct = h('div','ctrl'), ad = h('div','adimlar');
   const bG = btn('geri', '◂<span class="uz"> Geri</span>'), bI = btn('ileri', 'Tık ▸'), bB = btn('bastan', '↺<span class="uz"> Baştan</span>'), say = h('span','say');
   bG.setAttribute('aria-label','Geri'); bB.setAttribute('aria-label','Baştan');
-  ct.append(ad, bG, bI, bB, say); sb.append(st, ct);
+  ct.append(ad, bG, bI, bB, say); sb.append(st);
   const pn = h('div','panel'), pi = h('div','pin-in');
   const et = h('div','etiket bos'), liste = h('div','liste'), oz = h('div','oz'), ne = h('div','ne');
   oz.hidden = true; oz.textContent = 'ÖZ ▸ ' + sl.oz; ne.setAttribute('aria-live','polite');
   pi.append(et, liste, oz, ne); pn.append(pi);
-  v.append(sb, pn);
+  // bölge seçici: haritadaki bölgeler = kategoriler, maddeler = öğeler
+  const bs = h('div','bsec'); bs.setAttribute('role','group'); bs.setAttribute('aria-label','Haritadaki bölgeler');
+  const bBtn = sl.bolgeler.map((b, ri) => {
+    const x = btn(null, `<b>${ri+1}</b><span>${esc(b.e)}</span><small>${b.m.length}</small>`, () => git(adim.findIndex(a => a.t==='bolge' && a.ri===ri)));
+    x.title = `${ri+1}. bölge: ${b.e} · ${b.m.length} madde`; bs.append(x); return x;
+  });
+  const side = h('div','side');
+  side.append(bs, pn, ct);
+  v.append(sb, side);
+  // masaüstü: başlık + bölgeler + maddeler + düğmeler sağ sütunda; telefon: bölgeler + düğmeler yapışkan haritanın altında
+  function yerlestir(){
+    if (MASA.matches){
+      if (opt.hd && side.firstChild !== opt.hd) side.prepend(opt.hd);
+      if (bs.parentNode !== side){ if (opt.hd) opt.hd.after(bs); else side.prepend(bs); }
+      if (ct.parentNode !== side) side.append(ct);
+    } else {
+      if (opt.hd && v.parentNode && v.previousSibling !== opt.hd) v.before(opt.hd);
+      if (bs.parentNode !== sb) sb.append(bs, ct);
+    }
+  }
 
   const adim = [{t:'bas'}];
   sl.bolgeler.forEach((b,ri) => { adim.push({t:'bolge', ri}); b.m.forEach((m,mi) => adim.push({t:'madde', ri, mi})); });
@@ -410,13 +465,17 @@ function oynatici(sl, opt){
     }
     say.textContent = `tık ${i} / ${adim.length-1}`;
     segler.forEach((b,k) => { if (b){ b.classList.toggle('on', k <= i); b.classList.toggle('cur', k === i); } });
-    const s = adim[i+1], son = !s;
-    ne.innerHTML = son ? (opt.sonraki ? 'Bitti. <b>Sonraki slayt ▸</b> ile devam et.' : 'Bitti. Sıradaki slayta geç.') :
+    const s = adim[i+1], son = !s, sAd = opt.sonrakiAd || 'Sonraki slayt ▸';
+    const ari = (a.t === 'bolge' || a.t === 'madde') ? a.ri : -1;
+    bBtn.forEach((x, ri) => x.setAttribute('aria-current', ri === ari));
+    if (ari >= 0){ const x = bBtn[ari], l = x.offsetLeft - bs.offsetLeft - 8, r = l + x.offsetWidth + 16 - bs.clientWidth;
+      if (bs.scrollLeft > l) bs.scrollLeft = l; else if (bs.scrollLeft < r) bs.scrollLeft = r; }
+    ne.innerHTML = son ? (opt.sonraki ? `Bitti. <b>${sAd}</b> ile devam et.` : 'Bitti. Sıradaki slayta geç.') :
       s.t==='bolge' ? `Sonraki tık: <b>${esc(sl.bolgeler[s.ri].e)}</b> bölgesi kararır ve büyür.` :
       s.t==='madde' ? `Sonraki tık: <b>${s.mi+1}. madde</b> gelir — onu söyle.` : 'Sonraki tık: <b>ÖZ</b> şeridi.';
     bG.disabled = i === 0;
     bI.disabled = son && !opt.sonraki;
-    bI.textContent = son && opt.sonraki ? 'Sonraki slayt ▸' : 'Tık ▸';
+    bI.textContent = son && opt.sonraki ? sAd : 'Tık ▸';
   }
   function hedefEl(){ const a = adim[i]; return a.t==='madde' ? liste.children[a.mi] : a.t==='oz' ? oz : et; }
   function odakla(){
@@ -429,7 +488,7 @@ function oynatici(sl, opt){
       else if (q.top < p.top) pi.scrollTop -= p.top - q.top + 8;
     } else {
       // telefon: harita yapışkan dursun, yeni madde haritanın hemen altında görünsün
-      const ust = tabsH(), sbH = sb.offsetHeight;
+      const ust = tabsH() + sxH(), sbH = sb.offsetHeight;
       const vTop = v.getBoundingClientRect().top + scrollY;
       const r = t.getBoundingClientRect(), tTop = r.top + scrollY, tBot = r.bottom + scrollY;
       let Y = Math.max(scrollY, vTop - ust);
@@ -448,13 +507,16 @@ function oynatici(sl, opt){
     if (e.key === 'ArrowLeft' || e.key === 'PageUp'){ e.preventDefault(); bG.click(); }
   });
   function fit(){
+    yerlestir();
     if (!v.isConnected || !v.offsetParent) return;
     if (!MASA.matches){ v.style.removeProperty('--hmax'); return; }
+    // masaüstü: harita sahnesi ekranın kalan yüksekliğinin tamamı (kontroller sağ sütunda)
     const ust = v.getBoundingClientRect().top - opt.capa().getBoundingClientRect().top;
-    const hm = innerHeight - tabsH() - 8 - ust - 24 - 10 - ct.offsetHeight - 8;
-    v.style.setProperty('--hmax', Math.max(260, Math.floor(hm)) + 'px');
+    const hm = innerHeight - tabsH() - 8 - ust - 24 - 8;
+    v.style.setProperty('--hmax', Math.max(300, Math.floor(hm)) + 'px');
   }
   FITLER.add(fit);
+  yerlestir();
   ciz();
   return v;
 }
@@ -468,7 +530,7 @@ function slaytKart(sl, no, opt={}){
   if (sl.kaynak) hd.append(h('span','src', 'Kaynak: ' + esc(sl.kaynak)));
   hd.title = [sl.baslik, sl.gecerli, sl.kaynak].filter(Boolean).join(' · ');
   w.append(hd);
-  if (sl.tip === 'harita') w.append(oynatici(sl, opt));
+  if (sl.tip === 'harita'){ opt.hd = hd; w.append(oynatici(sl, opt)); }
   else {
     const kutu = h('div','acc-list tablo');
     sl.satirlar.forEach(([a,b]) => kutu.append(acc('satir', `<span class="lbl">${esc(a)}</span><span class="tz">${esc(b)}</span>`, `<p>${esc(b)}</p>`)));
@@ -491,7 +553,7 @@ function slaytKart(sl, no, opt={}){
 }
 
 // ---------- slayta atlama (kurallardan, sorulardan) ----------
-const SECICI = {};
+const SECICI = {}, HBLOK = {};
 function slaytaGit(gi){
   const s = D.slaytlar[gi]; const k = D.kisiler.find(x => x.ad === s.sunan); if (!k) return;
   goster(k.id, false);
@@ -650,7 +712,10 @@ D.kisiler.forEach((k, ki) => {
   function slaytSec(j, otoKay){
     j = Math.max(0, Math.min(benim.length-1, j|0));
     if (!kartlar[j]){
-      kartlar[j] = slaytKart(benim[j], j+1, {capa: () => sx, sonraki: j < benim.length-1 ? () => slaytSec(j+1, true) : null});
+      const nk = D.kisiler[ki+1], son = j === benim.length-1;
+      kartlar[j] = slaytKart(benim[j], j+1, {capa: () => sx,
+        sonraki: !son ? () => slaytSec(j+1, true) : nk ? () => { goster(nk.id, false); SECICI[nk.id](0, true); } : null,
+        sonrakiAd: son && nk ? 'Sonraki konuşmacı ▸' : 'Sonraki slayt ▸'});
       slot.append(kartlar[j]);
     }
     kartlar.forEach((c, n) => { if (c) c.hidden = n !== j; });
@@ -658,10 +723,11 @@ D.kisiler.forEach((k, ki) => {
     store.set('g12-' + k.id + '-slayt', j);
     const bb = btns[j]; sx.scrollTo({left: Math.max(0, bb.offsetLeft - 16), behavior: otoKay ? kb() : 'auto'});
     fitAll();
-    if (otoKay){ basaGetir(sx); const vw = $('.viewer', kartlar[j]); if (vw) vw.focus({preventScroll:true}); }
+    if (otoKay){ basaGetir(hb); const vw = $('.viewer', kartlar[j]); if (vw) vw.focus({preventScroll:true}); }
   }
   SECICI[k.id] = slaytSec;
-  P.append(sx, slot);
+  const hb = h('div','hblok'); hb.append(sx, slot); HBLOK[k.id] = hb;
+  P.append(hb);
   slaytSec(+store.get('g12-' + k.id + '-slayt') || 0, false);
 
   // kendini dene
@@ -726,6 +792,12 @@ D.kisiler.forEach((k, ki) => {
 
 const ilk = location.hash.slice(1) || store.get('g12-sekme') || 'genel';
 goster(ilk, false);
+// çapa ile bir konuşmacıya gelindiyse doğrudan harita sahnesi açılsın
+if (HBLOK[location.hash.slice(1)]){
+  const inis = () => sahneyeIn(location.hash.slice(1), 'auto');
+  requestAnimationFrame(inis);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(inis);
+}
 window.addEventListener('hashchange', () => goster(location.hash.slice(1), false));
 let rzT = 0;
 window.addEventListener('resize', () => { clearTimeout(rzT); rzT = setTimeout(fitAll, 120); });
