@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Atmosfer Akademisi</title>
-<meta name="description" content="İTÜ Meteoroloji Mühendisliği dersleri ve dönem projeleri: görsellerle, adım adım.">
+<meta name="description" content="İTÜ Meteoroloji Mühendisliği dersleri ve dönem projeleri: müfredat, ders kartları, laboratuvar, ansiklopedi, kod atölyesi; görsellerle, adım adım.">
 <meta name="color-scheme" content="light">
 <link rel="icon" href="data:,">
 <style>
 :root { --bg: #ffffff; --surface: #f5f7fa; --ink: #111827; --ink2: #4b5563; --line: #e2e7ee; --acc: #1d5fd6; --acc-bg: #eaf1fd;
-  --c302: #1d5fd6; --c229: #0f766e; --c316: #b45309; --c303: #7c3aed; --gut: clamp(16px, 4vw, 48px); }
+  --c302: #1d5fd6; --c229: #0f766e; --c316: #b45309; --c303: #7c3aed; --cak: #0e7490; --gut: clamp(16px, 4vw, 48px); }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html { scroll-padding-top: 88px; }
@@ -59,6 +59,11 @@ a.c ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
 a.c li { position: relative; padding-left: 20px; font-size: 17px; line-height: 1.65; color: var(--ink2); }
 a.c li::before { content: ""; position: absolute; left: 2px; top: .62em; width: 7px; height: 7px; border-radius: 50%; background: var(--renk); }
 a.c .git { margin-top: 4px; font-size: 16px; font-weight: 650; color: var(--renk); }
+/* akademi kapıları: görselsiz kart, büyük sayı */
+a.c .sayi { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; padding: 20px 20px 0; }
+a.c .sayi b { font-size: 2.4rem; line-height: 1; letter-spacing: -0.03em; color: var(--renk); }
+a.c .sayi span { font-size: 16px; font-weight: 600; color: var(--ink2); }
+.alt { color: var(--ink2); font-size: 17px; margin: -10px 0 24px; }
 .bos { padding: 28px; border: 1px dashed var(--line); border-radius: 14px; color: var(--ink2); font-size: 18px; }
 @media (prefers-reduced-motion: reduce) { a.c { transition: none; } a.c:hover { transform: none; } }
 @media (max-width: 640px) {
@@ -77,7 +82,7 @@ a.c .git { margin-top: 4px; font-size: 16px; font-weight: 650; color: var(--renk
 <div class="bar"><div class="kap">
   <a class="marka" href="./">Atmosfer Akademisi</a>
   <label class="ara"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-    <input id="ara" type="search" placeholder="Ara: SYNOP, Skew-T, HEC-HMS, cephe…" aria-label="Bölümlerde ara" autocomplete="off"></label>
+    <input id="ara" type="search" placeholder="Ara: SYNOP, Skew-T, METAR, GrADS, cephe…" aria-label="Bölümlerde ara" autocomplete="off"></label>
   <a class="folio" href="https://akinci22.github.io/hakkimda/" target="_blank" rel="noopener noreferrer" aria-label="Portföy sitem (yeni sekmede açılır)"><span class="uz">Portföyüm</span><span aria-hidden="true">↗</span></a>
 </div></div>
 
@@ -95,6 +100,33 @@ a.c .git { margin-top: 4px; font-size: 16px; font-weight: 650; color: var(--renk
 <nav class="cipler" aria-label="Derse göre süz"><div class="kap" id="cipler"></div></nav>
 
 <main class="kap" id="liste">
+  <section id="akademi" data-ders="Akademi" style="--renk: var(--cak)">
+    <div class="sb"><span class="kod">AKADEMİ</span><h2>Müfredatın tamamı</h2></div>
+    <p class="alt">Bütün dersler, laboratuvar, ansiklopedi, kod ve havacılık: tek uygulamada, kapı kapı.</p>
+    <div class="row">
+      <a class="c" href="./akademi/#/mufredat" data-ara="müfredat ders plan önşart katalog yarıyıl"><div class="sayi"><b>64</b><span>ders · 8 yarıyıl</span></div><div class="g"><b>Müfredat haritası</b>
+        <ul><li>İki öğretim planı ve seçmeliler tek haritada</li><li>Bir derse dokun: önşart zinciri ve açtığı dersler parlar</li><li>Her ders sayfasında haftalık konular, kitaplar, köprüler</li></ul><span class="git">Aç →</span></div></a>
+      <a class="c" href="./akademi/#/konular" data-ara="konu omurga köprü"><div class="sayi"><b>5</b><span>omurga · 6 köprü</span></div><div class="g"><b>Konular</b>
+        <ul><li>Aynı fikrin dersten derse yolculuğu</li><li>Her omurgada ders zinciri sırayla</li></ul><span class="git">Aç →</span></div></a>
+      <a class="c" href="./akademi/#/ogren" data-dersler="MTO 337E|MTO 340" data-ara="dinamik coriolis jeostrofik termal rüzgâr vortisite rossby ekman hidrostatik"><div class="sayi"><b>20</b><span>ders kartı · 4 bölüm</span></div><div class="g"><b>Dersler: Atmosfer Dinamiği</b>
+        <ul><li>Her kartta denklem ve terimler tek tek</li><li>13 kartta kaydırıcılı etkileşimli şekil</li><li>«Terim değişseydi?» soruları</li></ul><span class="git">Aç →</span></div></a>
+      <a class="c" href="./akademi/#/lab" data-dersler="MTO 214|MTO 229E|MTO 337E|MTO 340" data-ara="simülasyon ispat türetme skew-t 3b kesit denklem"><div class="sayi"><b>19</b><span>simülasyon · 15 kavram · 59 ispat</span></div><div class="g"><b>Laboratuvar</b>
+        <ul><li>Oynanabilir kavramlar: Skew-T, sınır tabaka, termodinamik</li><li>Adım adım ispatlar, her adımda simülasyon</li><li>Atmosfer 3B, dikey kesit, denklem laboratuvarı</li></ul><span class="git">Aç →</span></div></a>
+      <a class="c" href="./akademi/#/ansiklopedi" data-ara="sözlük terim formül tanım"><div class="sayi"><b>356</b><span>terim · 113 formül</span></div><div class="g"><b>Ansiklopedi</b>
+        <ul><li>Her terimde sembol, birim, İngilizce, tipik değer</li><li>Her formülde türetim ve çözülmüş örnek</li><li>16 üç boyutlu şekil, hepsi birbirine bağlı</li></ul><span class="git">Aç →</span></div></a>
+      <a class="c" href="./akademi/#/kod" data-dersler="MTO 223|MTO 463" data-ara="kod programlama grads ncl fortran python matlab linux nwp sayısal model"><div class="sayi"><b>44</b><span>kod örneği · 8 dil</span></div><div class="g"><b>Kod atölyesi</b>
+        <ul><li>36 kuram bölümü: sayısal hava tahmini, görselleştirme, Linux</li><li>GrADS, NCL, Ferret, Fortran, MATLAB, R, Python</li><li>Tarayıcıda küçük kabuk ve GrADS konsolu</li></ul><span class="git">Aç →</span></div></a>
+      <a class="c" href="./akademi/#/havacilik" data-dersler="MTO 304" data-ara="havacılık metar taf sigmet pilot uçuş meydan"><div class="sayi"><b>15</b><span>ders · 6 örnek rapor</span></div><div class="g"><b>Havacılık meteorolojisi</b>
+        <ul><li>METAR, TAF, SIGMET, SWC kartı</li><li>Kod çözücü: raporu grup grup aç</li><li>Buzlanma, türbülans, oraj, sis</li></ul><span class="git">Aç →</span></div></a>
+      <a class="c" href="./akademi/#/kaynaklar" data-ara="veri kaynak era5 open-meteo radyosonda sonda lisans"><div class="sayi"><b>41</b><span>site · 11 rehber</span></div><div class="g"><b>Kaynaklar ve veri</b>
+        <ul><li>Veriyi nereden, nasıl alacağın</li><li>Skew-T, METAR arşivi, Open-Meteo, ERA5 araçları</li><li>Her sitede lisans notu</li></ul><span class="git">Aç →</span></div></a>
+      <a class="c" href="./akademi/#/canli" data-ara="radar uydu canlı"><div class="sayi"><b>2</b><span>canlı katman</span></div><div class="g"><b>Canlı atmosfer</b>
+        <ul><li>Radar: son 2 saat</li><li>Uydu: dünkü gerçek renk</li><li>Ders gözüyle okuma notları</li></ul><span class="git">Aç →</span></div></a>
+      <a class="c" href="./akademi/#/kariyer" data-ara="kariyer iş sektör meslek"><div class="sayi"><b>9</b><span>sektör</span></div><div class="g"><b>Kariyer</b>
+        <ul><li>Hangi bilgi hangi işte değerli</li><li>Kamu, havacılık, enerji, su, yurt dışı</li><li>Temsilcilik raporları</li></ul><span class="git">Aç →</span></div></a>
+    </div>
+  </section>
+
   <section id="mto302e" data-ders="MTO 302E" style="--renk: var(--c302)">
     <div class="sb"><span class="kod">MTO 302E</span><h2>Hava Analizi ve Öngörü</h2></div>
     <div class="row">
@@ -145,13 +177,19 @@ a.c .git { margin-top: 4px; font-size: 16px; font-weight: 650; color: var(--renk
   const ara = document.getElementById('ara');
   let ders = 'hepsi';
   const kucuk = (s) => s.toLocaleLowerCase('tr');
-  const cipler = [{ id: 'hepsi', ad: 'Tümü', n: kartlar.length }].concat(bolumler.map((s) => ({ id: s.id, ad: s.dataset.ders, n: s.querySelectorAll('a.c').length })));
+  const etiket = (a) => (a.dataset.dersler || '').split('|').filter(Boolean);
+  const bolumKod = new Set(bolumler.map((s) => s.dataset.ders));
+  const ekKod = [...new Set(kartlar.flatMap(etiket))].filter((k) => !bolumKod.has(k)).sort();
+  const eslesir = (a, s, id) => id === 'hepsi' || s.id === id || etiket(a).some((k) => 'k-' + k === id || bolumler.some((b) => b.id === id && b.dataset.ders === k));
+  const cipler = [{ id: 'hepsi', ad: 'Tümü', n: kartlar.length }]
+    .concat(bolumler.map((s) => ({ id: s.id, ad: s.dataset.ders, n: kartlar.filter((a) => eslesir(a, a.closest('section'), s.id)).length })))
+    .concat(ekKod.map((k) => ({ id: 'k-' + k, ad: k, n: kartlar.filter((a) => etiket(a).includes(k)).length })));
   cipler.forEach((c) => {
     const b = document.createElement('button');
     b.type = 'button'; b.className = 'cip'; b.dataset.id = c.id;
     b.innerHTML = `${c.ad}<i>${c.n}</i>`;
     b.setAttribute('aria-pressed', c.id === ders);
-    b.onclick = () => { ders = c.id; uygula(); if (c.id !== 'hepsi') { const s = document.getElementById(c.id); window.scrollTo({ top: s.getBoundingClientRect().top + scrollY - document.querySelector('.cipler').getBoundingClientRect().bottom - 8, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); } };
+    b.onclick = () => { ders = c.id; uygula(); if (c.id !== 'hepsi') { const s = [...document.querySelectorAll('main section')].find((x) => !x.hidden); if (!s) return; window.scrollTo({ top: s.getBoundingClientRect().top + scrollY - document.querySelector('.cipler').getBoundingClientRect().bottom - 8, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); } };
     kutu.append(b);
   });
   function uygula() {
@@ -159,7 +197,7 @@ a.c .git { margin-top: 4px; font-size: 16px; font-weight: 650; color: var(--renk
     let gorunen = 0;
     bolumler.forEach((s) => {
       let n = 0;
-      s.querySelectorAll('a.c').forEach((a) => { const ok = (ders === 'hepsi' || s.id === ders) && (!q || kucuk(a.textContent + ' ' + s.dataset.ders + ' ' + s.querySelector('h2').textContent).includes(q)); a.hidden = !ok; if (ok) n++; });
+      s.querySelectorAll('a.c').forEach((a) => { const ok = eslesir(a, s, ders) && (!q || kucuk(a.textContent + ' ' + (a.dataset.ara || '') + ' ' + etiket(a).join(' ') + ' ' + s.dataset.ders + ' ' + s.querySelector('h2').textContent).includes(q)); a.hidden = !ok; if (ok) n++; });
       s.hidden = n === 0; gorunen += n;
     });
     document.getElementById('bos').hidden = gorunen > 0;
