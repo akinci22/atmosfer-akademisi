@@ -1,6 +1,8 @@
 /* HEC-HMS Okulu — içerik. AC: keşif modunda «Bu ne işe yarar?» açıklamaları (anahtar = arayüz parçası).
    ODEV: Ninova'daki iki ödev; her adım hem «Ödevler» bölümünde hem rehberli benzetimde kullanılır.
-   mikro: [tıklanacak parça (data-hd), tek satır yönerge, ek] — ek.yap: başka eylem, ek.sag: sağ tık. */
+   mikro: [tıklanacak parça (data-hd), tek satır yönerge, ek] — ek.yap: başka eylem, ek.sag: sağ tık.
+   Adım adım izle: IZ1/IZ2 (dosyanın sonunda) ödev adımlarıyla aynı sırada; yüklenince her adıma a.izle
+   {giris, sonunda, neden, dikkat, teori:{b,m}}, her mikroya m.sonra (+ m.dikkat, m.iz) eklenir. */
 (function () {
   'use strict';
   const AC = {
@@ -128,6 +130,9 @@
     'dlg:ozet': { b: 'Summary Table', t: 'Elemanın özet sonuçları', m: ['Peak Discharge: tepe debi · Volume: toplam hacim (inç).', 'Gözlenen akım bağlıysa Nash-Sutcliffe ve Kling-Gupta da yazılır.'] },
     'dlg:gozet': { b: 'Global Summary Results', t: 'Bütün elemanların özeti', m: ['Junction-2: havza çıkışının tepe debisi.'] },
     'dlg:tablo': { b: 'Time-Series Results', t: 'Adım adım sonuçlar', m: ['Program her 15 dk için satır verir; burada saatlik gösteriliyor.'] },
+    'bm:Graph': { b: 'Graph', t: 'Elemanın sonuç grafiği', m: ['Alt havzada üstte yağış ve kayıp, altta akım.', 'Kanal ve birleşimde giriş akımları kesikli, çıkış düz çizgi.'] },
+    'bm:Summary Table': { b: 'Summary Table', t: 'Elemanın özet sonuçları', m: ['Tepe debi, tepe zamanı ve hacimler.', 'Gözlenen akım bağlıysa Nash-Sutcliffe, Kling-Gupta ve Percent Bias da yazılır.'] },
+    'oto:olcerler': { b: 'İki ölçer birden', t: 'PNXP ve MFFP', m: ['DUJP için yapılan 14 tık iki kez tekrarlanır.', 'Rehberli modda bu adım tek düğmeyle yapılır.'] },
   };
 
   /* her açıklama en az iki madde olsun */
@@ -190,7 +195,8 @@
   /* yardımcı: mikro adım */
   const k = (hd, ip, ek) => Object.assign({ hd, ip }, ek || {});
   const bagla = (a, b) => [k('harita:el:' + a, `${a} simgesine sağ tıkla (telefonda: dokun).`, { sag: true }), k('bm:Connect Downstream', 'Açılan menüde Connect Downstream.'), k('harita:el:' + b, `Aşağı akıştaki ${b} simgesine bas.`)];
-  const olcerOto = (ad, a) => [k('m:Components', ''), k('mi:Components/Time-Series Data Manager', ''), k('dlg:New...', ''), k('f:dlg.ad', ''), k('dlg:Create', ''), k('dlg:Close', ''), k(`cb:pg.${ad}.kaynak`, ''), k('cbo:Single Record HEC-DSS', ''), k(`f:pg.${ad}.dss`, ''), k('ce:yol', ''), k(`dlg:yol:/${a}/${ad}/PRECIP-INC/01Apr1994/1Hour/OBS/`, ''), k('dlg:Set Pathname', ''), k('ce:sekme:Time Window', ''), k(`f:pg.${ad}.bas`, '')];
+  /* olcerOto: rehberli modda tek düğmeyle, izleme modunda tık tık oynatılır (et: ölçer adı, ip: kısa etiket) */
+  const olcerOto = (ad, a) => [k('m:Components', 'Components menüsü'), k('mi:Components/Time-Series Data Manager', 'Time-Series Data Manager'), k('dlg:New...', 'New...'), k('f:dlg.ad', `Name: ${ad}`), k('dlg:Create', 'Create'), k('dlg:Close', 'Yöneticiyi kapat'), k(`cb:pg.${ad}.kaynak`, 'Data Source listesi'), k('cbo:Single Record HEC-DSS', 'Single Record HEC-DSS'), k(`f:pg.${ad}.dss`, 'DSS Filename: observe.dss'), k('ce:yol', 'Pathname düğmesi'), k(`dlg:yol:/${a}/${ad}/PRECIP-INC/01Apr1994/1Hour/OBS/`, 'PRECIP-INC satırı'), k('dlg:Set Pathname', 'Set Pathname'), k('ce:sekme:Time Window', 'Time Window sekmesi'), k(`f:pg.${ad}.bas`, 'Tarihler: 28Apr1996 01:00 → 04May1996 00:00')].map((x) => Object.assign(x, { et: ad }));
   const tablo3 = (ed, yol) => ['Stump Creek', 'EB Mahoning Creek', 'Mahoning Creek Local'].map((a) => k(`satir:${ed}.${a}`, `${a} satırına bas: değerler yazılır.`));
 
   const HW1 = [
@@ -226,7 +232,7 @@
       ne: ['Her alt havzanın drenaj alanını giriyorum.', 'Alan, yağış derinliğini debiye çevirir.'], nerede: ['Parameters › Subbasin Area: bütün alt havzalar tek tabloda (global editör).'], neden: ['1 mi² ≈ 2,59 km²; toplam 158 mi² ≈ 409 km².', 'Alan büyüdükçe aynı yağış daha büyük debi üretir.'] },
     { baslik: 'Parameters › Baseflow › Linear Reservoir: taban akışını gir.', tablo: [['Number of Layers', '2'], ['Initial Type', 'Discharge Per Area'], ['GW 1: Initial / Fraction / Coef. / Res.', '1 / 0.5 / 70 / 1'], ['GW 2: Initial / Fraction / Coef. / Res.', '1 / 0.5 / 100 / 1']], img: ['hw1-baseflow-menu', 'hw1-baseflow'],
       mikro: [k('m:Parameters', 'Parameters menüsünü aç.'), k('mi:Parameters/Baseflow', 'Baseflow.'), k('mi:Parameters/Baseflow/Linear Reservoir', 'Linear Reservoir.')].concat(tablo3('taban'), [k('dlg:Close', 'Close.')]),
-      ne: ['Toprağa sızan suyu iki yeraltı haznesine bölüyorum.', 'Her hazne suyu yavaşça dereye bırakır.'], nerede: ['Parameters › Baseflow › Linear Reservoir (global editör).'], neden: ['Initial 1 cfs/mi²: fırtınadan önce de dere akıyor (alan × 1 cfs).', 'Fraction 0.5 + 0.5: sızan suyun yarısı bir katmana, yarısı diğerine.', 'Coefficient 70 sa ve 100 sa: büyük katsayı = daha yavaş boşalma.'] },
+      ne: ['Toprağa sızan suyu iki yeraltı haznesine bölüyorum.', 'Her hazne suyu yavaşça dereye bırakır.'], nerede: ['Parameters › Baseflow › Linear Reservoir (global editör).'], neden: ['Initial 1 cfs/mi² (iki katmanda da): fırtınadan önce de dere akıyor; başlangıç akımı alan × 2 cfs (Stump Creek 58 cfs).', 'Fraction 0.5 + 0.5: sızan suyun yarısı bir katmana, yarısı diğerine.', 'Coefficient 70 sa ve 100 sa: büyük katsayı = daha yavaş boşalma.'] },
     { baslik: 'Parameters › Loss › Initial and Constant: kayıpları gir.', tablo: [['Initial Loss', '1 in'], ['Constant Rate', '0.1 in/hr'], ['Impervious', '0 %']], img: ['hw1-loss-menu', 'hw1-loss'],
       mikro: [k('m:Parameters', 'Parameters menüsünü aç.'), k('mi:Parameters/Loss', 'Loss.'), k('mi:Parameters/Loss/Initial and Constant', 'Initial and Constant.')].concat(tablo3('kayip'), [k('dlg:Close', 'Close.')]),
       ne: ['Yağışın ne kadarının akışa geçmeyeceğini söylüyorum.'], nerede: ['Parameters › Loss › Initial and Constant.'], neden: ['Initial Loss 1 in: yağışın ilk 1 inçi toprakta, bitkide, çukurlarda kalır.', 'Constant Rate 0.1 in/hr: sonra toprak saatte 0,1 in emer; fazlası akışa geçer.', 'Impervious %0: beton/asfalt payı yok; kırsal havza.'] },
@@ -319,6 +325,249 @@
     'hw2-stump-graph': 'Stump Creek sonuç grafiği', 'hw2-stump-summary': 'Stump Creek özet tablosu', 'hw2-reach-graph': 'Reach-1: giriş ve çıkış', 'hw2-junction-options': 'Junction-2 › Options › Observed Flow',
     'hw2-observed-graph': 'Junction-2: model ve gözlem', 'hw2-observed-summary': 'Junction-2 özeti: Nash-Sutcliffe 0.952',
   };
+
+  /* ======================================================================== ADIM ADIM İZLE
+     Her öğe bir ödev adımına karşılık gelir (aynı sıra). sonra: mikro başına «Ekranda ne değişti»;
+     öğe metin ya da { s: metin, dikkat: bu tıkın uyarısı, iz: izleme modunda yönerge }. */
+  const bs = (a, b, son) => [`${a} seçildi; yanında sağ tık menüsü açıldı: Edit, View Results, Connect Downstream, Delete Element…`, 'Menü kapandı. Haritanın altında «Connect Downstream: click the downstream element» yazıyor; imleç artıya döndü.', son || `İnce siyah bağlantı çizgisi çizildi: ${a} artık suyunu ${b}${/2$/.test(b) ? "'ye" : "'e"} gönderiyor.`];
+
+  const IZ1 = [
+    { // 1 HEC-HMS'i aç
+      giris: ['Programı başlatıyorum: masaüstündeki HEC-HMS 4.14 simgesi.', 'Açılan pencerenin dört parçasını tanıyorum: Watershed Explorer (ağaç), Component Editor (ayarlar), harita masası, Message Log (iletiler).'],
+      sonunda: 'Boş ama çalışan bir HEC-HMS penceresi.',
+      neden: ["HEC-HMS'te her iş bir projenin içinde yapılır; önce program açık olmalı.", 'Taşınabilir sürüm kurulum istemez: klasördeki HEC-HMS.exe yeter.'],
+      dikkat: ['Ödev 4.14 beta 2 ya da daha yeni bir sürüm istiyor; 4.14 uygun.', 'Bilgisayarın dil ve bölge ayarı İngilizce olsun; Türkçe ayarda tarih ve birim hataları çıkabiliyor.'],
+      teori: { b: 'HEC-HMS ne hesaplar?', m: ['Girdi yağış: hangi saatte ne kadar yağdı (inç).', 'Alt havzada yağışın bir kısmı kayıp olur (toprak, bitki, çukur); kalanı etkili yağış.', 'Etkili yağış birim hidrografla çıkışta akıma (cfs) döner; üstüne taban akışı eklenir.', 'Kanal (reach) akımı aşağı taşır, birleşim (junction) kolları toplar.', 'Çıktı: havza çıkışında hidrograf, yani debinin zamana göre grafiği.'] },
+      sonra: ['Program açıldı. Başlıkta yalnız «HEC-HMS 4.14» yazıyor; ağaç, Component Editor ve harita masası boş, çünkü henüz proje yok.'] },
+    { // 2 File › New
+      giris: ['File › New ile yeni bir proje açıyorum.', 'Projeye ad veriyorum ve birim sistemini seçiyorum.'],
+      sonunda: 'Ağaçta Punxsutawney adlı boş bir proje.',
+      neden: ['Proje, bütün modellerin (havza, meteoroloji, zaman ayarı) ve sonuçların durduğu klasör.', 'Birim sistemi gireceğim her sayının birimini belirler: inç mi mm mi, mi² mi km² mi.'],
+      dikkat: ['Varsayılan birim Metric gelir; öğreticinin değerleri inç, mi² ve cfs olduğu için U.S. Customary seçilmeli.', 'Birim sistemi sonradan değişirse girilmiş değerler bozulur; baştan doğru seç.'],
+      teori: { b: 'Birimler', m: ['1 in = 25,4 mm.', '1 mi² ≈ 2,59 km²; bütün havza 158 mi² ≈ 409 km².', '1 cfs (ft³/s) ≈ 0,0283 m³/s; çıkıştaki tepe 3082,9 cfs ≈ 87 m³/s.'] },
+      sonra: ['File menüsü açıldı: New..., Open..., Save, Save As… alt alta.', '«Create a New Project» penceresi açıldı: Name boş, birim listesinde Metric yazıyor.', 'Name: Punxsutawney.', { s: 'Liste açıldı: Metric ve U.S. Customary.', dikkat: 'Öğreticinin bütün değerleri inç, mi² ve cfs: U.S. Customary şart.' }, 'Liste kapandı; Default Unit System alanında U.S. Customary yazıyor.', "Pencere kapandı. Başlık çubuğunda proje dosyasının yolu belirdi; ağaçta Punxsutawney proje düğümü, Component Editor'da proje bilgisi var."] },
+    { // 3 Basin Model Manager
+      giris: ['Components › Basin Model Manager ile havza modeli yaratıyorum.', 'Adı Punxsutawney, açıklaması öğreticiden.'],
+      sonunda: 'Ağaçta Basin Models › Punxsutawney (henüz elemansız).',
+      neden: ['Havza modeli suyun yolunu tarif eden ağ: alt havzalar, kanallar, birleşimler.', 'Bir projede birden çok havza modeli (senaryo) olabilir: «bugünkü durum», «baraj sonrası» gibi.'],
+      dikkat: ['Ad ve açıklama hesaba girmez, ama sonuç pencerelerinde bu adı görürsün; öğreticideki adı aynen yaz.', "Create'ten sonra yönetici açık kalır; Close ile kapat."],
+      teori: { b: 'Havza (watershed)', m: ['Havza: yağan suyu tek bir çıkış noktasına toplayan alan.', 'Sınırı su bölümü çizgisi: sırtın iki yanına düşen yağmur ayrı derelere gider.', 'Bu havzanın çıkışı Punxsutawney kenti; drenaj alanı 158 mi².'] },
+      sonra: ['Components menüsü açıldı: en üstte Create Component, altında yedi Manager.', 'Basin Model Manager penceresi açıldı; «Current basin models» listesi boş.', 'Üstüne «Create A New Basin Model» penceresi geldi: Name ve Description boş.', 'Name: Punxsutawney.', 'Description: «Headwaters to the City of Punxsutawney - Existing Conditions.»', 'Yaratma penceresi kapandı; yöneticinin listesinde Punxsutawney seçili duruyor. Ağaçta Basin Models klasörü belirdi.', 'Yönetici kapandı. Ağaçta Basin Models › Punxsutawney duruyor.'] },
+    { // 4 Defaults
+      giris: ['Tools › Program Settings › Defaults sekmesini açıyorum.', 'Yeni alt havza ve kanalların hangi yöntemle doğacağını seçiyorum: kayıp, dönüşüm, taban akışı, öteleme.'],
+      sonunda: 'Bundan sonra eklenen her alt havza Initial and Constant + Clark + Linear Reservoir, her kanal Lag ile doğar.',
+      neden: ['Alt havza üç hesabı arka arkaya yapar: kayıp → dönüşüm → taban akışı. Kanal öteleme yapar.', 'Varsayılanı baştan seçersem her elemanda yöntemi tek tek değiştirmem gerekmez.'],
+      dikkat: ['Bu ayar yalnız sonradan eklenen elemanlara uygulanır; elemanları koyduktan sonra değiştirirsen eskileri tek tek değiştirmen gerekir.', 'OK yerine Cancel ya da ✕ ile kapatırsan seçimler uygulanmaz.'],
+      teori: { b: 'Dört yöntem, birer cümle', m: ['Kayıp (Initial and Constant): yağışın ilk kısmını toprak ve bitki tutar, sonra toprak sabit bir hızla emer; kalanı etkili yağış.', 'Dönüşüm (Clark): etkili yağışı çıkıştaki akıma çevirir; suyun yol alması (Tc) ve havzada birikip yavaş bırakılması (R).', 'Taban akışı (Linear Reservoir): sızan su yeraltı haznelerine gider, oradan dereye yavaşça döner.', 'Öteleme (Lag): kanal akımı yalnız geciktirir; hidrografın şekli değişmez.', 'Her biri sonraki adımlarda ayrıca açılıyor.'] },
+      sonra: ['Tools menüsü açıldı; en altta Program Settings satırı.', 'Program Settings penceresi General sekmesinde açıldı; üstte altı sekme.', 'Defaults sekmesi: birim U.S. Customary; dört yöntem listesi --None-- gösteriyor.', 'Subbasin loss listesi açıldı: 13 kayıp yöntemi.', 'Subbasin loss: Initial and Constant.', 'Subbasin transform listesi açıldı: 8 dönüşüm yöntemi.', 'Subbasin transform: Clark Unit Hydrograph.', 'Subbasin baseflow listesi açıldı: 5 taban akışı yöntemi.', 'Subbasin baseflow: Linear Reservoir.', 'Reach routing listesi açıldı: 8 öteleme yöntemi.', 'Reach routing: Lag. Dört varsayılan da seçildi.', 'Pencere kapandı. Ekranda görünür değişiklik yok: seçimler bundan sonra eklenecek elemanlara uygulanacak.'] },
+    { // 5 Havza haritasını aç
+      giris: ['Ağaçta havza modeline basıp haritasını açıyorum.'],
+      sonunda: 'Masada elemanları koyacağım boş havza haritası.',
+      neden: ['Alt havza, kanal ve birleşimler bu haritaya konur; harita açılmadan eleman koyamazsın.'],
+      dikkat: ["Component Editor'daki Unit System satırına bak: U.S. Customary yazmalı. Metric yazıyorsa 2. adıma dön."],
+      sonra: ['Masada boş «Basin Model [Punxsutawney]» haritası açıldı. Component Editor havza modelini gösteriyor: Unit System U.S. Customary.'] },
+    { // 6 Üç alt havza
+      giris: ['Subbasin aracını seçip haritada üç yere tıklıyorum.', 'Her tıklamada gelen ad penceresinde varsayılan adı onaylıyorum.'],
+      sonunda: 'Haritada Subbasin-1, -2 ve -3 (henüz bağlantısız).',
+      neden: ["Punxsutawney'e kadar olan havza üç parçaya bölünmüş: Stump Creek, EB Mahoning Creek ve aradaki yerel alan.", 'Her parça kendi yağışını, kaybını ve akışını ayrı hesaplar; havzanın farklı yerleri farklı davranabilir.'],
+      dikkat: ["Haritadaki konum hesaba girmez, yalnız görüntü; yine de öğreticinin Şekil 1'ine benzet, ekran görüntülerini karşılaştırmak kolaylaşır.", 'Araç seçiliyken haritada boş yere her tıklama yeni bir eleman yaratır.'],
+      teori: { b: 'Alt havza ne yapar?', m: ['Her alt havza kendi yağışını alır ve sırayla üç hesap yapar: kayıp → dönüşüm → taban akışı.', 'Büyük havzayı parçalara bölmek, yağışın ve zeminin yerden yere değişmesini hesaba katar (yarı dağılımlı model).', 'Çıktısı tek bir hidrograf: aşağı akıştaki elemana giden toplam akım.'] },
+      sonra: ['Subbasin Creation Tool basılı görünüyor; harita üzerinde imleç artıya döndü.', 'Tıklanan yerde «Create A New Subbasin Element» penceresi açıldı; Name hazır: Subbasin-1.', "Subbasin-1 haritaya düştü ve seçildi; ağaçta havza modelinin altında listelendi. Subbasin sekmesinde Loss, Transform, Baseflow yöntemleri Defaults'taki seçimler.", 'Ad penceresi yine açıldı: Subbasin-2.', 'Subbasin-2 haritada, sağda.', 'Ad penceresi: Subbasin-3.', 'Üç alt havza haritada: üstte, sağda ve solda. Henüz birbirine bağlı değiller.'] },
+    { // 7 Kanal ve birleşimler
+      giris: ['Reach aracıyla bir kanal, Junction aracıyla iki birleşim koyuyorum.', "Yerleşim öğreticinin Şekil 1'i gibi: Junction-1 ortada, Junction-2 sol altta, Reach-1 ikisinin arasında."],
+      sonunda: 'Ağın bütün parçaları haritada.',
+      neden: ["Junction-1: Stump Creek ile EB Mahoning Creek'in buluştuğu nokta.", "Reach-1: bu birleşik akımı aşağıya, Junction-2'ye taşıyan dere parçası.", 'Junction-2: havzanın çıkışı (Punxsutawney); bütün akım burada toplanır.'],
+      dikkat: ["Junction'ın parametresi yoktur; yalnız gelenleri toplar.", "Reach'in iki ucu bağlantıyla anlam kazanır; bir sonraki adımda bağlanacak."],
+      teori: { b: 'Birleşim ve kanal', m: ['Birleşimde akımlar aynı anda toplanır: Q çıkış = Q1 + Q2.', 'Kanalda su yol alırken zaman geçer; öteleme (routing) bu gecikmeyi, gerekirse tepedeki basıklaşmayı hesaplar.'] },
+      sonra: ['Reach Creation Tool basılı.', 'Ad penceresi: Reach-1.', 'Reach-1 haritada kalın mavi çizgi; iki ucu şimdilik boşta.', 'Junction Creation Tool basılı.', 'Ad penceresi: Junction-1.', 'Junction-1 ortada: iki kolun buluşacağı nokta.', 'Ad penceresi: Junction-2.', 'Altı eleman haritada: 3 alt havza, 1 kanal, 2 birleşim. Bağlantı çizgisi henüz yok.'] },
+    { // 8 Connect Downstream
+      giris: ['Her elemanın suyunu nereye akıttığını söylüyorum: sağ tık › Connect Downstream › aşağıdaki elemana tık.', "Beş bağlantı: iki kol Junction-1'e, Junction-1 kanala, kanal Junction-2'ye, yerel alan Junction-2'ye."],
+      sonunda: "Yukarıdan aşağıya bağlı bir ağ; bütün su Junction-2'de toplanıyor.",
+      neden: ['HEC-HMS ağı yukarıdan aşağı hesaplar; bir elemanın sonucu aşağıdakinin girdisi olur.', "Bağlantısız bir alt havzanın akımı çıkışa ulaşmaz; Junction-2'nin debisi eksik çıkar."],
+      dikkat: ["Önce Arrow Tool: araç Subbasin ya da Junction'da kalırsa tıklama yeni eleman yaratır.", 'Alt havza aşağı akış hedefi olamaz; hedef bir junction ya da reach olmalı.', "Bağlamanın ikinci yolu: Component Editor'daki Downstream listesi."],
+      teori: { b: 'Akış ağı', m: ['Her elemanın tek bir aşağı akış elemanı vardır; bir elemana ise birden çok kol gelebilir.', 'Bu yüzden ağ bir ağaç gibi: dallar yukarıda, gövde (çıkış) aşağıda.', 'Hesap yukarıdan aşağı yürür: önce alt havzalar, en son çıkış.'] },
+      sonra: ['Arrow Tool seçildi: tıklama artık eleman seçer, yeni eleman yaratmaz.'].concat(bs('Subbasin-1', 'Junction-1'), bs('Subbasin-2', 'Junction-1'), bs('Junction-1', 'Reach-1', "Reach-1'in üst ucu Junction-1'e oturdu: iki kolun toplamı artık kanala giriyor."), bs('Reach-1', 'Junction-2', "Reach-1'in alt ucu Junction-2'ye oturdu: kanal iki birleşimi bağlıyor."), bs('Subbasin-3', 'Junction-2', "Bağlantı çizildi: Subbasin-3 suyunu doğrudan Junction-2'ye gönderiyor. Ağ tamam; bütün su Junction-2'de toplanıyor.")) },
+    { // 9 Yeniden adlandır + Save
+      giris: ['Alt havzalara gerçek dere adlarını veriyorum.', 'Sonra projeyi diske yazıyorum (Save).'],
+      sonunda: 'Stump Creek, EB Mahoning Creek, Mahoning Creek Local; proje diskte.',
+      neden: ['Sonuç tablolarında hangi satırın hangi dere olduğu addan okunur.', "HW#2'de her alt havzaya bir yağış ölçeri atanacak; eşleme bu adlarla yapılır."],
+      dikkat: ['Gerçek programda: ağaçta elemana bas, kısa bir aradan sonra bir kez daha bas (çift tık değil); ad alanı açılır, yeni adı yaz, Enter.', 'Adı öğreticideki gibi birebir yaz; sonraki ödevlerde bu adları arayacaksın.', 'Programda geri alma (Undo) sınırlı; sık sık Save.'],
+      sonra: ["Subbasin-1 artık Stump Creek: haritada, ağaçta ve Component Editor'da yeni ad. Bağlantısı aynen duruyor.", 'Subbasin-2 artık EB Mahoning Creek.', 'Subbasin-3 artık Mahoning Creek Local. Üç dere de gerçek adında.', 'Proje diske yazıldı. Benzetimde görünür bir değişiklik olmaz.'] },
+    { // 10 Subbasin Area
+      giris: ['Parameters › Subbasin Area tablosunu açıyorum.', 'Üç alt havzanın alanını tek tabloda giriyorum.'],
+      sonunda: 'Stump 29, EB Mahoning 41, Mahoning Local 88 mi² (toplam 158 mi²).',
+      neden: ['Model yağışı derinlik (inç) olarak hesaplar; alan bu derinliği debiye (cfs) çevirir.', "Aynı yağış büyük alanda daha büyük debi üretir: en büyük katkı 88 mi²'lik yerel alandan gelir."],
+      dikkat: ['Birim MI2 (mil kare). km² girersen alan ≈ 2,6 kat büyük olur, debiler de o kadar şişer.', 'Area kırmızı yıldızlı, zorunlu alan; boş bırakma.'],
+      teori: { b: 'Derinlikten debiye', m: ["1 mi²'ye 1 in yağış ≈ 2,32 milyon ft³ su eder.", 'Bu su bir saatte akıp gitseydi ortalama ≈ 645 cfs olurdu: 1 in/sa · 1 mi² ≈ 645 cfs.', 'Aynı yağış ve aynı Tc, R ile alan iki katına çıkarsa debi de iki katına çıkar.'] },
+      sonra: ['Parameters menüsü açıldı; havza modeli olduğu için satırlar etkin.', '«Subbasin Area [Punxsutawney]» tablosu açıldı: üç alt havza, Area (MI2) sütunu boş.', 'Stump Creek: 29 mi².', 'EB Mahoning Creek: 41 mi².', 'Mahoning Creek Local: 88 mi². Toplam 158 mi² ≈ 409 km².', 'Tablo kapandı; alanlar alt havzalara işlendi (Subbasin sekmesinin Area alanında da görünür).'] },
+    { // 11 Baseflow
+      giris: ['Parameters › Baseflow › Linear Reservoir tablosunu açıyorum.', 'Üç alt havzaya aynı taban akışı ayarını giriyorum: iki yeraltı katmanı.'],
+      sonunda: 'Fırtınadan önce de akan, yağıştan sonra yavaşça boşalan bir taban akışı.',
+      neden: ['Derede yağmur yokken de su akar; bu su yeraltından gelir (taban akışı).', "İki katmanın her biri başlangıçta 1 cfs/mi² verir; toplam alan × 2. Stump Creek 58 cfs, bütün havza 316 cfs ile başlar (PNXP'de ölçülen: 312 cfs).", 'Toprağa sızan suyun yarısı (Fraction 0.5) bir katmana, yarısı diğerine gider.'],
+      dikkat: ['Initial Type «Discharge Per Area»: Initial değeri cfs/mi² okunur, alanla çarpılır.', "İki Fraction'ın toplamı 1 (0.5 + 0.5): sızan suyun hepsi katmanlara paylaşılıyor.", 'GW Coefficient birimi saat (HR): 70 ve 100.'],
+      teori: { b: 'Doğrusal hazne (Linear Reservoir)', m: ['Hazneden çıkan debi içindeki suyla orantılı: Q = S / k.', 'k (GW Coefficient) büyükse hazne yavaş boşalır: 100 saatlik katman 70 saatlikten uzun akar.', 'Yağış bitince taban akışı üstel azalır: Q(t) = Q0 · e^(−t/k).', 'Reservoirs 1: her katman tek hazne; sayı artarsa su art arda haznelerden geçer, çıkış daha yayvan olur.', "Kayıp olarak toprağa giren su buradan dereye döner. Message Log'daki «Initial losses may have been included in baseflow» uyarısı bunu söyler.", 'Karşılaştırma: Recession yöntemi başlangıç akımını sabit bir oranla azaltır, bir eşikten sonra çekilme eğrisine geçer; bu ödevde kullanılmıyor.'] },
+      sonra: ['Parameters menüsü açıldı.', 'Baseflow alt menüsü açıldı: kullanılan Linear Reservoir koyu, diğerleri soluk.', '«Linear Reservoir [Punxsutawney]» tablosu açıldı: on sütun, hepsi boş.', 'Stump Creek satırı doldu: 2 katman, Discharge Per Area; GW 1: 1 · 0.5 · 70 · 1; GW 2: 1 · 0.5 · 100 · 1.', 'EB Mahoning Creek: aynı değerler.', 'Mahoning Creek Local: aynı değerler. Üç alt havza da aynı taban akışı ayarında.', 'Tablo kapandı; değerler alt havzaların Baseflow sekmelerinde de görünür.'] },
+    { // 12 Loss
+      giris: ['Parameters › Loss › Initial and Constant tablosunu açıyorum.', 'Üç alt havzaya aynı kayıp değerlerini giriyorum.'],
+      sonunda: 'Yağışın ilk 1 inçi, sonra saatte 0,1 inçi toprağa gidiyor; fazlası akışa geçiyor.',
+      neden: ['Yağışın hepsi dereye ulaşmaz: bitki tutar, çukurlarda kalır, toprağa sızar. Buna kayıp diyoruz.', 'Etkili yağış = yağış − kayıp; yalnız etkili yağış doğrudan akışa döner.', 'Impervious 0 %: beton, asfalt gibi geçirimsiz yüzey yok; kırsal havza.'],
+      dikkat: ['Birimler: Initial Loss inç (IN), Constant Rate inç/saat (IN/HR). mm girersen kayıp 25 kat büyür, neredeyse hiç akış çıkmaz.', 'Impervious yüzde: 0.5 yazarsan %0,5 olur, %50 değil.', 'Hesap adımı 15 dk olunca sabit hız her adımda 0,025 in düşer (0,1 ÷ 4).'],
+      teori: { b: 'Initial and Constant kaybı', m: ['Başlangıç kaybı (1 in): yağışın ilk 1 inçi tutulur; dolana kadar etkili yağış olmaz.', 'Sabit hız (0,1 in/sa): sonra toprak saatte en çok 0,1 in emer; yağış bundan azsa hepsi sızar.', "Stump Creek'te (HW#2 sonucu): 29 Nisan sabahki ilk dalga (0,68 in) tamamen kayıp.", '30 Nisan 08:00 satırı: 0,42 in yağış → 0,10 in kayıp, 0,32 in etkili yağış.', 'Bütün fırtına: 1,76 in yağış = 1,37 in kayıp + 0,39 in etkili yağış.'] },
+      sonra: ['Parameters menüsü açıldı.', 'Loss alt menüsü: kullanılan Initial and Constant koyu.', '«Initial and Constant [Punxsutawney]» tablosu: Initial Loss, Constant Rate, Impervious sütunları boş.', 'Stump Creek: Initial Loss 1 · Constant Rate 0.1 · Impervious 0.', 'EB Mahoning Creek: aynı değerler.', 'Mahoning Creek Local: aynı değerler.', 'Tablo kapandı; değerler alt havzaların Loss sekmelerinde de görünür.'] },
+    { // 13 Clark
+      giris: ['Parameters › Transform › Clark Unit Hydrograph tablosunu açıyorum.', 'Her alt havzaya iki süre giriyorum: Tc (yoğunlaşma süresi) ve R (depolama katsayısı).'],
+      sonunda: 'Etkili yağışın çıkışa ne kadar sürede ve ne kadar yayılarak varacağı tanımlı.',
+      neden: ['Etkili yağış bir anda çıkışa gelmez; havzanın her yerinden farklı sürede yol alır.', 'Tc ve R hidrografın ne zaman yükseleceğini ve tepesinin ne kadar sivri olacağını belirler.', 'En büyük alt havza (Mahoning Creek Local, 88 mi²) en uzun süreleri alıyor: Tc 10, R 13 saat.'],
+      dikkat: ['İkisi de saat (HR). Dakika girersen hidrograf 60 kat yayılır.', 'Sırayı karıştırma: tabloda önce Time of Concentration, sonra Storage Coefficient.'],
+      teori: { b: 'Clark birim hidrografı', m: ['Birim hidrograf: havzaya 1 in etkili yağış düşerse çıkışta görülen akım grafiği.', 'Öteleme: su en uzak noktadan çıkışa Tc sürede varır; arada alan-zaman eğrisine göre dağılır.', 'Depolama: ötelenen akım R katsayılı doğrusal bir hazneden geçer; tepe alçalır, çekilme uzar.', 'Tc büyürse tepe gecikir; R büyürse tepe basıklaşır.', "Message Log'daki «Unit hydrograph volume … is 1.0000 in» notu birim hidrografın hacminin tam 1 in olduğunu doğrular."] },
+      sonra: ['Parameters menüsü açıldı.', 'Transform alt menüsü: kullanılan Clark Unit Hydrograph koyu.', '«Clark Unit Hydrograph [Punxsutawney]» tablosu: Clark Method «Standard», Tc ve R sütunları boş.', 'Stump Creek: Tc 9 sa, R 12 sa.', 'EB Mahoning Creek: Tc 7 sa, R 11 sa.', 'Mahoning Creek Local: Tc 10 sa, R 13 sa.', 'Tablo kapandı. Alt havzaların bütün yöntem değerleri girildi.'] },
+    { // 14 Lag
+      giris: ["Haritada Reach-1'i seçip Routing sekmesini açıyorum.", 'Gecikme süresini (Lag) 300 dakika giriyorum.'],
+      sonunda: "Junction-1'deki akım Junction-2'ye 5 saat gecikmeyle varacak; HW#1'in bütün değerleri girildi.",
+      neden: ['Su kanalda yol alırken zaman geçer; Lag bu gecikmeyi verir.', '300 dk = 5 saat.'],
+      dikkat: ['Birim dakika (MIN): «5» yazarsan 5 dakika olur.', "Lag şekli değiştirmez: HW#2'de Reach-1'in tepesi girişle aynı çıkacak (1501,1 cfs), yalnız 5 saat sonra."],
+      teori: { b: 'Öteleme: Lag ve Muskingum', m: ['Lag: çıkış, girişin 300 dk önceki hâli: O(t) = I(t − 300 dk). Şekil değişmez.', 'Muskingum: kanalı bir depo gibi düşünür, S = K·[x·I + (1 − x)·O]; hem geciktirir hem tepeyi basıklaştırır.', 'K kabaca geçiş süresi, x (0–0,5) girişin ağırlığı.', 'Doğal derelerde tepe biraz basıklaşır; Lag bunu yok sayan en basit yöntem.'] },
+      sonra: ["Reach-1 seçildi (çizginin çevresi gri); Component Editor'da Reach sekmesi: Routing Method Lag.", 'Routing sekmesi: Initial Type «Discharge = Inflow», Lag (MIN) boş.', { s: 'Lag (MIN): 300. Kanal akımı 5 saat geciktirecek.', dikkat: 'Birim dakika: 300 dk = 5 saat.' }] },
+    { // 15 Save + PDF
+      giris: ['Projeyi son kez diske yazıyorum.', "Gerçek programda her adımın ekran görüntüsünü sırayla tek PDF'e koyuyorum."],
+      sonunda: "HW#1 teslime hazır; HW#2 bu projeden devam eder.",
+      neden: ['Ödev, her adımı kendi bilgisayarında yaptığını görmek istiyor; ekran görüntüleri bunun kanıtı.'],
+      dikkat: ['Ninova yalnız .pdf kabul ediyor.', 'Pencerenin tamamını (başlık çubuğu dahil) al; hangi projede çalıştığın görünsün.'],
+      sonra: ['Proje diske yazıldı. HW#1 benzetimde tamam.'] },
+  ];
+
+  const IZ2 = [
+    { // 1 DUJP yağış ölçeri
+      giris: ['Yağış verisini tutacak ilk ölçeri (gage) yaratıyorum: DUJP.', 'Ölçer şimdilik boş; veriyi bir sonraki adımda dosyadan bağlayacağım.'],
+      sonunda: 'Ağaçta Time-Series Data › Precipitation Gages › DUJP.',
+      neden: ['Model yağışı ölçerlerden alır; ölçer bir istasyonun zaman serisi (saat saat yağış).', 'Havzayı üç yağış istasyonu temsil ediyor: DUJP, PNXP, MFFP.'],
+      dikkat: ['Data Type «Precipitation Gages» olsun; akım ölçeri (Discharge Gages) 5. bölümde.', 'Adı DSS dosyasındaki istasyon adıyla aynı yaz (DUJP); dosyada aradığında kolay bulursun.'],
+      teori: { b: 'Havza ve meteoroloji ayrı', m: ['HEC-HMS iki şeyi ayrı tutar: havza (su nereden nereye akar) ve meteoroloji (ne zaman ne kadar yağar).', 'Yağış ölçeri saatlik artımlı yağış verir: PRECIP-INC, o saatte düşen inç.', 'Böylece aynı havza başka fırtınalarla da denenebilir.'] },
+      sonra: ['Components menüsü açıldı.', 'Time-Series Data Manager açıldı: Data Type «Precipitation Gages», liste boş.', '«Create A New Time-Series Data» penceresi: Data Type Precipitation Gages, Name boş.', 'Name: DUJP.', 'DUJP yaratıldı. Ağaçta Time-Series Data › Precipitation Gages › DUJP belirdi; Component Editor ölçerin sekmelerini gösteriyor.', "Yönetici kapandı. DUJP'nin Time-Series Gage sekmesi açık: Data Source «Manual Entry»."] },
+    { // 2 DSS'ten bağla
+      giris: ["DUJP'nin verisini elle yazmıyorum; observe.dss dosyasından okutuyorum.", 'Dosyadaki doğru seriyi (pathname) listeden seçiyorum.'],
+      sonunda: 'DUJP, dosyadaki saatlik yağış serisine bağlı (1994–1996).',
+      neden: ["HEC-DSS, HEC programlarının zaman serisi dosyası; bir dosyada yüzlerce seri durabilir.", 'Her serinin adresi bir pathname: /A/B/C/D/E/F/.'],
+      dikkat: ["Pathname'i elle yazma; Select Pathname listesinden seç. Elle yazınca eğik çizgiler karışıp «Units are not valid» hatası çıkabiliyor.", 'Bilgisayarın dil ve bölge ayarı İngilizce olsun; Türkçe ayarda DSS okuma hataları görülebiliyor.'],
+      teori: { b: "Pathname'i okumak", m: ['/ALLEGHENY/DUJP/PRECIP-INC/01Apr1994/1Hour/OBS/', 'A: ALLEGHENY, nehir havzası · B: DUJP, istasyon · C: PRECIP-INC, artımlı yağış.', 'D: 01Apr1994, serinin başı · E: 1Hour, saatlik · F: OBS, gözlem.'] },
+      sonra: ['Data Source listesi açıldı: Manual Entry ve Single Record HEC-DSS.', 'Single Record HEC-DSS seçildi; altında DSS Filename ve DSS Pathname alanları belirdi.', 'DSS Filename: projenin data klasöründeki observe.dss.', { s: '«Select Pathname From HEC-DSS File» penceresi açıldı: B filtresi DUJP, tek satır var (PRECIP-INC).', dikkat: "Pathname'i elle yazma; listeden seç." }, 'PRECIP-INC satırı seçildi (mavi).', 'Pencere kapandı; DSS Pathname alanında /ALLEGHENY/DUJP/PRECIP-INC/01Apr1994/1Hour/OBS/ yazıyor. Units: Incremental Inches.'] },
+    { // 3 Time Window
+      giris: ["DUJP'nin gösterileceği tarih aralığını giriyorum.", 'Grafiğe bakıp verinin geldiğini doğruluyorum.'],
+      sonunda: "DUJP grafiğinde fırtına görünüyor: 29 ve 30 Nisan'da iki yağış dalgası.",
+      neden: ["Time Window yalnız gösterimi sınırlar; hesabın süresi Control Specifications'ta.", 'Grafik, verinin doğru bağlandığının en hızlı kanıtı: boşsa pathname ya da tarih yanlış.'],
+      dikkat: ['Tarih biçimi ddMMMyyyy: 28Apr1996, ay İngilizce kısaltma. «28.04.1996» olmaz.', 'Saat 24 saat biçiminde: 01:00, 00:00.'],
+      teori: { b: 'Fırtına, sayılarla', m: ["DUJP'de en yoğun saat ≈ 0,42 in (≈ 10,7 mm).", "Fırtına boyunca Stump Creek'e 1,76 in (≈ 45 mm) yağdı.", 'Pencere 28 Nisan 01:00 – 4 Mayıs 00:00: yağıştan sonra akımın inişi de görünsün diye uzun.'] },
+      sonra: ['Time Window sekmesi: dört alan boş.', 'Dört alan birden doldu: 28Apr1996 01:00 → 04May1996 00:00.', "Graph sekmesi: DUJP'nin saatlik yağışı kırmızı çubuklar; yoğun saatler 29 ve 30 Nisan."] },
+    { // 4 PNXP ve MFFP
+      giris: ["DUJP'de yaptığımın aynısını PNXP ve MFFP için tekrarlıyorum: her biri 14 tık.", 'İzlerken imleç hızlanır; adımlar DUJP ile birebir aynı.'],
+      sonunda: 'Üç yağış ölçeri de dosyaya bağlı: DUJP, PNXP, MFFP.',
+      neden: ['Her alt havza kendisini temsil eden istasyonun yağışını alacak; üç ölçer de lazım.'],
+      dikkat: ["PNXP'de iki satır çıkar: FLOW (akım) ve PRECIP-INC (yağış). Burada yağış ölçeri yaratıyoruz → PRECIP-INC.", 'MFFP başka bir havza kodunda (SUSQUEHANA); B filtresi MFFP iken tek satır gelir.'],
+      sonra: [{ s: "PNXP ve MFFP yaratıldı, ikisi de observe.dss'e bağlandı, zaman aralıkları girildi. Ağaçta üç yağış ölçeri var.", iz: "PNXP ve MFFP için DUJP'deki 14 tıkı arka arkaya yapıyorum." }] },
+    { // 5 Meteorologic Model Manager
+      giris: ['Meteorolojik modeli yaratıyorum: May 1996.', 'Bu bileşen yağışın modele hangi yöntemle verileceğini tutacak.'],
+      sonunda: 'Ağaçta Meteorologic Models › May 1996 (yöntemi henüz seçilmedi).',
+      neden: ['Havza ile meteoroloji ayrı tutulur: aynı havzayı başka bir fırtınayla denemek için yalnız meteorolojik modeli değiştirmek yeter.'],
+      dikkat: ['Ad «May 1996»: koşu sihirbazında bu adı seçeceksin.', 'Açıklama hesaba girmez; öğreticideki gibi yaz.'],
+      sonra: ['Components menüsü açıldı.', 'Meteorologic Model Manager açıldı; liste boş.', '«Create A New Meteorologic Model» penceresi.', 'Name: May 1996.', 'Description: «Precipitation for the Storm of May 1st, 1996».', "May 1996 yaratıldı: ağaçta Meteorologic Models › May 1996; Component Editor'da Meteorologic Model sekmesi.", 'Yönetici kapandı. Precipitation alanı şimdilik --None--.'] },
+    { // 6 Specified Hyetograph + Include Subbasins
+      giris: ['Yağış yöntemini Specified Hyetograph seçiyorum.', 'Basins sekmesinde bu meteorolojik modeli Punxsutawney havzasına bağlıyorum.'],
+      sonunda: "May 1996, ölçer yağışını alt havzalara verecek ve Punxsutawney'e uygulanacak.",
+      neden: ['Specified Hyetograph: her alt havzaya bir ölçer atanır; o ölçerin yağışı alt havzanın tamamına aynen düşer.', 'Include Subbasins = Yes olmazsa meteorolojik model bu havzanın alt havzalarına yağış vermez.'],
+      dikkat: ['Diğer girdiler (Shortwave, Temperature, Evapotranspiration…) --None-- kalsın; bu kısa fırtına hesabında gerekmiyor.'],
+      teori: { b: 'Yağışı alana yaymak', m: ['Specified Hyetograph: bir ölçer → bir alt havza, aynen.', 'Gage Weights: birden çok ölçerin ağırlıklı ortalaması (ör. Thiessen poligonları).', 'Inverse Distance: ölçerlere uzaklığın tersiyle ağırlık; yakın ölçer daha etkili.'] },
+      sonra: ['Precipitation listesi açıldı: Frequency Storm, Gage Weights, Inverse Distance, SCS Storm, Specified Hyetograph…', "Precipitation: Specified Hyetograph. Ağaçta May 1996'nın altında «Specified Hyetograph» düğümü belirdi.", 'Basins sekmesi: Punxsutawney satırı, Include Subbasins «No».', 'Liste açıldı: No ve Yes.', "Include Subbasins: Yes. Meteorolojik model artık Punxsutawney'in alt havzalarına yağış verebilir."] },
+    { // 7 Ölçer ataması
+      giris: ['Specified Hyetograph düğümünü açıyorum.', 'Her alt havzaya yağışını alacağı ölçeri atıyorum.'],
+      sonunda: 'Stump → DUJP, EB Mahoning → MFFP, Mahoning Local → PNXP.',
+      neden: ['Her alt havza kendisini en iyi temsil eden istasyonu alır; öğretici bu eşlemeyi veriyor.', 'Eşleme yanlış olursa alt havzalar başka yerin yağışını alır; tepe debiler değişir.'],
+      dikkat: ['Satır sırası ödev tablosundan farklı olabilir; sıraya değil ada bakarak ata.'],
+      teori: { b: 'İstasyon farkı sonuçta', m: ['Toplam yağış (HW#2 sonucu): EB Mahoning 2,06 in (MFFP), Mahoning Local 1,93 in (PNXP), Stump 1,76 in (DUJP).', 'Aynı fırtınada en çok ile en az arasında 0,30 in fark var.'] },
+      sonra: ["Component Editor'da atama tablosu: üç alt havza, Gage sütunu --None--.", 'Stump Creek → DUJP.', 'EB Mahoning Creek → MFFP.', 'Mahoning Creek Local → PNXP. Üç alt havzanın da yağış kaynağı belli.'] },
+    { // 8 Control Specifications Manager
+      giris: ['Hesabın zaman ayarını (Control Specifications) yaratıyorum: May 1996.'],
+      sonunda: 'Ağaçta Control Specifications › May 1996; tarih alanları henüz boş.',
+      neden: ['Kontrol ayarı modelin hangi zaman aralığında ve hangi adımla hesaplanacağını söyler.', 'Aynı havza ve yağış, farklı dönemler ya da adımlarla ayrı ayarlarla koşturulabilir.'],
+      dikkat: ['Açıklama «Storm of May 1st 1996»: hesaba girmez, öğreticideki gibi yaz.'],
+      sonra: ['Components menüsü açıldı.', 'Control Specifications Manager açıldı; liste boş.', '«Create A New Control Specifications» penceresi.', 'Name: May 1996.', 'Description: «Storm of May 1st 1996».', "May 1996 yaratıldı; Component Editor'da tarih alanları boş, Time Interval 1 Hour.", 'Yönetici kapandı; ağaçta Control Specifications › May 1996.'] },
+    { // 9 Tarihler ve adım
+      giris: ['Başlangıç, bitiş ve hesap adımını giriyorum.', 'Adım 15 dakika: program her 15 dakikada bir hesap yapacak.'],
+      sonunda: '28Apr1996 01:00 → 04May1996 00:00, 15 dakikalık adımla 572 hesap adımı.',
+      neden: ['Başlangıç fırtınadan önce (28 Nisan 01:00); bitiş, akımın fırtınadan sonra yeniden inmesine yetecek kadar geç (4 Mayıs).', "Adım, Tc ve R'den (7–13 saat) çok küçük olmalı; 15 dk yeterince ince."],
+      dikkat: ['Tarih ddMMMyyyy (28Apr1996), saat HH:mm (01:00).', 'Bitiş başlangıçtan önce olamaz; veri bu aralığı kapsamazsa koşu durur (meteorolojik modelde Replace Missing: Abort Compute).'],
+      teori: { b: 'Hesap adımı ve saatlik yağış', m: ['Yağış saatlik, adım 15 dk: HEC-HMS her saatin toplamını dört eşit parçaya böler (0,4 in/sa → her 15 dk 0,1 in).', 'Sonuçlar da 15 dakikalık; tepe zamanları bu yüzden 18:45 gibi çeyrek saatlere düşer.'] },
+      sonra: ['Start Date: 28Apr1996.', 'Start Time: 01:00.', 'End Date: 04May1996.', 'End Time: 00:00.', 'Time Interval listesi açıldı: 1 Minute … 1 Day, yedi seçenek.', "Time Interval: 15 Minutes. Hesap 28 Nisan 01:00'den 4 Mayıs 00:00'a 572 adımda yürüyecek."] },
+    { // 10 Simulation Run sihirbazı
+      giris: ['Havza modeli + meteorolojik model + kontrol ayarını tek bir koşuda (simulation run) birleştiriyorum.', 'Dört adımlı sihirbaz: ad, havza, meteoroloji, zaman.'],
+      sonunda: '«Run: May 1996» hesaplanmaya hazır.',
+      neden: ['Koşu, hangi üç bileşenin birlikte hesaplanacağını söyler; biri eksikse hesap yapılamaz.'],
+      dikkat: ["Finish'e basmadan Cancel ya da ✕ ile çıkarsan koşu yaratılmaz.", 'Her listede tek seçenek var; projede başka modeller olsaydı doğrusunu seçmek önemli olurdu.'],
+      teori: { b: 'Koşu = havza + meteoroloji + kontrol', m: ['Havza modeli: suyun yolu ve parametreler (HW#1).', 'Meteorolojik model: ne zaman ne kadar yağdı.', 'Kontrol ayarı: hangi aralıkta, hangi adımla.', 'Bir bileşeni değiştirip (ör. başka fırtına) yeni bir koşu kurmak böylece kolay.'] },
+      sonra: ['Compute menüsü açıldı; en alttaki Compute satırı soluk, çünkü seçili koşu yok.', 'Create Compute alt menüsü: yalnız Simulation Run... etkin.', 'Sihirbaz açıldı: «Create a Simulation Run [Step 1 of 4]», Name boş.', 'Name: May 1996.', 'Adım 2/4: havza modeli listesi (Punxsutawney).', 'Punxsutawney seçildi (mavi).', 'Adım 3/4: meteorolojik model listesi (May 1996).', 'May 1996 meteorolojik modeli seçildi.', 'Adım 4/4: kontrol ayarı listesi; Next yerine Finish geldi.', 'May 1996 kontrol ayarı seçildi.', "Sihirbaz kapandı. Koşu yaratıldı: Watershed Explorer'ın Compute sekmesinde Simulation Runs › May 1996."] },
+    { // 11 Compute
+      giris: ['Koşuyu araç çubuğundan seçip Compute ile hesaplatıyorum.', "Message Log'daki satırları okuyorum: NOTE bilgi, WARNING uyarı."],
+      sonunda: 'Hesap bitti; sonuç pencereleri artık açılabilir.',
+      neden: ['Compute ağı yukarıdan aşağı yürütür: önce alt havzalar, sonra Junction-1, Reach-1, en son Junction-2.'],
+      dikkat: ['Mor WARNING 41862 («Initial losses may have been included in baseflow») hata değil; taban akışı yöntemi kaybı yeraltına aldığı için uyarıyor.', 'Kırmızı ERROR görürsen dur: çoğu zaman tarih biçimi, eksik ölçer ataması ya da pathname hatasıdır.'],
+      teori: { b: 'Hesap sırası', m: ['1. Alt havza: yağış − kayıp = etkili yağış → Clark ile doğrudan akış → + taban akışı.', '2. Junction-1: Stump Creek + EB Mahoning Creek toplanır.', '3. Reach-1: Lag ile 5 saat ötelenir.', '4. Junction-2: Reach-1 + Mahoning Creek Local → havza çıkışı.', '«Unit hydrograph volume … is 1.0000 in» notları: üç alt havzanın birim hidrografı doğru hacimde.'] },
+      sonra: ['Araç çubuğundaki koşu listesi açıldı: --None-- ve Run: May 1996.', 'Seçili koşu Run: May 1996. Haritanın başlığında «Current Run [May 1996]» yazıyor.', "Compute Progress penceresi: yeşil çubuk doldu, «Compute completed.» Message Log'a NOTE ve mor WARNING satırları düştü.", "İlerleme penceresi kapandı. Message Log'un son satırlarında «Finished computing simulation run» var."] },
+    { // 12 Global Summary
+      giris: ['Bütün elemanların sonucunu tek tabloda açıyorum.', 'Tepe debinin akış aşağı nasıl büyüdüğüne bakıyorum.'],
+      sonunda: 'Havza çıkışı Junction-2: tepe 3082,9 cfs, 30 Nisan 18:45.',
+      neden: ['Global Summary modelin büyük resmini tek bakışta verir: hangi kol ne kadar su getiriyor.'],
+      dikkat: ["Junction-1 ile Reach-1'in tepesi aynı (1501,1 cfs), saatleri 5 saat farklı (14:30 → 19:30): Lag'in etkisi.", "Junction-2'nin tepesi kollarının tepeleri toplamı değil (1786,0 + 1501,1 = 3287,1 > 3082,9): tepeler aynı saatte gelmiyor."],
+      teori: { b: 'Tablo nasıl okunur?', m: ['Drainage Area: o noktaya su gönderen toplam alan (Junction-2: 158 mi²).', 'Peak Discharge ve Time of Peak: en büyük debi ve zamanı.', 'Volume (IN): akışın toplam hacmi, alana yayılmış derinlik olarak (Junction-2: 1,62 in).'] },
+      sonra: ['Results menüsü açıldı; hesap yapıldığı için satırlar etkin.', '«Global Summary Results» tablosu: altı eleman; alan, tepe debi, tepe zamanı, hacim. En altta Junction-2: 3082,9 cfs.', 'Tablo kapandı.'] },
+    { // 13 Stump Creek grafiği
+      giris: ['Stump Creek alt havzasının sonuç grafiğini açıyorum.', 'Yağışın ne kadarının kayba gittiğini, ne kadarının akışa geçtiğini görüyorum.'],
+      sonunda: 'Stump Creek tepesi 609,7 cfs (30 Nisan 15:45); akış hacmi 1,53 in.',
+      neden: ["Alt havza grafiği HW#1'de girdiğim kayıp, dönüşüm ve taban akışı ayarlarının sonucunu bir arada gösterir."],
+      dikkat: ["29 Nisan'daki ilk dalgada çubukların hepsi kırmızı: başlangıç kaybı (1 in) önce dolmalı.", 'Kesikli kırmızı çizgi taban akışı; toplam akış onun üstüne biner.'],
+      teori: { b: 'Hacim dengesi (Stump Creek)', m: ['Yağış 1,76 in = kayıp 1,37 in + etkili yağış 0,39 in.', 'Akış hacmi 1,53 in = doğrudan akış 0,39 in + taban akışı 1,14 in.', 'Taban akışının büyük payı: başlangıçtaki akım ve kaybın yeraltından dereye dönmesi.'] },
+      sonra: ['Stump Creek seçildi; sağ tık menüsü açıldı. Hesap yapıldığı için View Results [May 1996] artık etkin.', 'Alt menü açıldı: Graph, Summary Table, Time-Series Table.', '«Graph for Subbasin Stump Creek» açıldı: üstte yağış (mavi) ve kayıp (kırmızı) çubukları; altta toplam akış (mavi) ve taban akışı (kesikli kırmızı).', 'Grafik kapandı.'] },
+    { // 14 Reach-1 grafiği
+      giris: ["Reach-1'in giriş ve çıkış akımını aynı grafikte görüyorum."],
+      sonunda: 'Çıkış, girişin 5 saat gecikmiş kopyası: iki tepe de 1501,1 cfs.',
+      neden: ['Lag yönteminin ne yaptığını gözle görmek: şekil aynı, zaman ileride.'],
+      dikkat: ["Reach-1'in tepesi 19:30, Junction-1'inki 14:30: fark tam 300 dk."],
+      teori: { b: 'Lag yerine Muskingum olsaydı', m: ['Çıkış tepesi girişten biraz alçak ve daha yayvan olurdu.', 'Hacim yine korunurdu: kanal suyu yok etmez, yalnız zamana yayar.'] },
+      sonra: ['Reach-1 seçildi; sağ tık menüsü açıldı.', 'Alt menü: Graph, Summary Table, Time-Series Table.', '«Graph for Reach Reach-1» açıldı: kesikli çizgi giriş (Combined Inflow), düz çizgi çıkış (Outflow); çıkış 5 saat sonra, aynı yükseklikte.', 'Grafik kapandı.'] },
+    { // 15 PNXP akım ölçeri
+      giris: ['Havza çıkışında ölçülen akımı tutacak bir akım ölçeri (Discharge Gage) yaratıyorum: PNXP.'],
+      sonunda: 'Ağaçta Discharge Gages › PNXP (veri henüz bağlı değil).',
+      neden: ['Modelin ne kadar iyi olduğunu ancak gerçekte ölçülen akımla karşılaştırarak bilebiliriz.'],
+      dikkat: ["Aynı adı taşıyan bir yağış ölçeri zaten var; Data Type'ı Discharge Gages yapmadan New... dersen ikinci bir yağış ölçeri yaratırsın."],
+      teori: { b: 'Gözlem ve model', m: ['Kalibrasyon: parametreleri gözleme uyacak biçimde ayarlamak.', 'Doğrulama: ayarlanmış modelin başka bir olayda da tutup tutmadığına bakmak.', 'Bu ödev yalnız karşılaştırıyor; parametreler öğreticiden, kalibrasyon yok.'] },
+      sonra: ['Components menüsü açıldı.', 'Time-Series Data Manager: Data Type Precipitation Gages; listede DUJP, PNXP, MFFP.', 'Data Type listesi açıldı: Precipitation, Discharge, Stage, Temperature Gages.', 'Data Type: Discharge Gages; liste boş, henüz akım ölçeri yok.', '«Create A New Time-Series Data» penceresi: Data Type Discharge Gages.', 'Name: PNXP.', 'PNXP akım ölçeri yaratıldı; ağaçta Time-Series Data › Discharge Gages › PNXP.', "Yönetici kapandı; PNXP'nin Time-Series Gage sekmesi açık, Units: Cubic Feet Per Second."] },
+    { // 16 PNXP FLOW + Junction-2 Options
+      giris: ["PNXP'nin akım verisini observe.dss'ten bağlıyorum (FLOW).", "Sonra bu ölçeri havza çıkışı Junction-2'ye «gözlenen akım» olarak takıyorum."],
+      sonunda: 'Junction-2 sonuçlarında model ile gözlem yan yana çıkacak.',
+      neden: ["PNXP istasyonu Punxsutawney'de, yani havzanın tam çıkışında: Junction-2 ile aynı nokta.", 'Gözlemi yanlış elemana bağlarsan karşılaştırma anlamsız olur.'],
+      dikkat: ['Bu kez FLOW satırını seç (PRECIP-INC değil); birim cfs.', 'Ölçer bağlamak hesabı değiştirmez, sonuç pencerelerine gözlemi ekler; ama görünmesi için koşuyu yeniden hesaplamak gerekir.'],
+      sonra: ['Data Source listesi açıldı.', 'Single Record HEC-DSS seçildi; DSS Filename ve Pathname alanları belirdi.', 'DSS Filename: observe.dss.', 'Select Pathname penceresi: FLOW satırı listede.', 'FLOW satırı seçildi.', 'DSS Pathname: /ALLEGHENY/PNXP/FLOW/01Apr1994/1Hour/OBS/.', "Junction-2 seçildi; Component Editor'da Junction sekmesi.", 'Options sekmesi: Observed Flow --None--.', 'Observed Flow listesi: --None-- ve PNXP.', 'Observed Flow: PNXP. Havza çıkışı artık gözlemle eşleşti.'] },
+    { // 17 Yeniden hesap + Junction-2
+      giris: ['Gözlem bağlıyken koşuyu yeniden hesaplıyorum.', "Junction-2'nin grafiğinde model ile gözlemi karşılaştırıyorum; özet tablosunda uyum ölçülerini okuyorum."],
+      sonunda: 'Nash-Sutcliffe 0,952: model ölçülen akımı çok iyi yakalıyor.',
+      neden: ['Ödevin son sorusu bu: model gerçeğe ne kadar yakın?'],
+      dikkat: ['Model tepeyi ≈ %5 büyük (3082,9 / 2942,0 cfs) ve 1 sa 45 dk geç veriyor; hacimler neredeyse aynı (1,62 / 1,60 in).', 'Yeniden hesaplamadan grafiğe bakarsan siyah gözlem çizgisi görünmez.'],
+      teori: { b: 'Nash–Sutcliffe neyi ölçer?', m: ['NSE = 1 − Σ(gözlem − model)² / Σ(gözlem − gözlem ortalaması)².', '1: kusursuz · 0: model, gözlemin ortalamasını söylemekten iyi değil · negatif: daha kötü.', '0,952: hataların karesi, gözlemin kendi değişkenliğinin yalnız ≈ %5\'i kadar.', 'Kling-Gupta (0,947) zamanlama uyumuna, değişkenliğe ve ortalamaya ayrı ayrı bakar; 1 kusursuz.', 'Percent Bias 1,39 %: model toplam hacmi gözlemden ≈ %1,4 fazla veriyor.'] },
+      sonra: ["Compute Progress yeniden açıldı: hesap tamam. Message Log'a yeni satırlar eklendi.", 'İlerleme penceresi kapandı.', 'Junction-2 seçildi; sağ tık menüsü açıldı.', 'Alt menü: Graph, Summary Table, Time-Series Table.', "«Graph for Junction Junction-2» açıldı: siyah noktalı çizgi gözlenen akım (PNXP), düz mavi çizgi model; kesikliler Mahoning Creek Local ve Reach-1'den gelen akımlar.", 'Grafik kapandı.', 'Sağ tık menüsü yeniden açıldı.', 'Alt menü açıldı.', '«Summary Results for Junction Junction-2»: model tepe 3082,9 cfs (18:45), gözlem 2942,0 cfs (17:00); Nash-Sutcliffe 0,952, Modified Kling-Gupta 0,947, Percent Bias 1,39 %.'] },
+  ];
+
+  /* içerik → ödev adımlarına bağla (sayı uyuşmazsa konsola hata: test yakalar) */
+  function izleBagla(adimlar, iz, ad) {
+    if (iz.length !== adimlar.length) console.error(`${ad}: izle adım sayısı ${iz.length} ≠ ${adimlar.length}`);
+    adimlar.forEach((a, i) => {
+      const z = iz[i] || {}, s = z.sonra || [];
+      if (s.length !== a.mikro.length) console.error(`${ad} adım ${i + 1}: sonra ${s.length} ≠ mikro ${a.mikro.length}`);
+      a.mikro.forEach((m, j) => { const x = s[j]; if (typeof x === 'string') m.sonra = x; else if (x) { m.sonra = x.s; if (x.dikkat) m.dikkat = x.dikkat; if (x.iz) m.iz = x.iz; } });
+      a.izle = { giris: z.giris, sonunda: z.sonunda, neden: z.neden, dikkat: z.dikkat, teori: z.teori };
+    });
+  }
+  izleBagla(HW1, IZ1, 'HW#1');
+  izleBagla(HW2, IZ2, 'HW#2');
+  ODEV[0].izleSon = ["3 alt havza, 1 kanal, 2 birleşim; bütün su Junction-2'de toplanıyor.", 'Yöntemler: Initial and Constant · Clark Unit Hydrograph · Linear Reservoir · Lag.', 'Alanlar 29 + 41 + 88 = 158 mi²; Reach-1 Lag 300 dk.', 'Gerçek programda her adımın ekran görüntüsünü al, hepsini tek PDF yap.'];
+  ODEV[1].izleSon = ['Üç yağış ölçeri (DUJP, PNXP, MFFP), May 1996 meteorolojik modeli, 15 dakikalık kontrol ayarı.', "Koşu hesaplandı: havza çıkışı Junction-2'de tepe 3082,9 cfs (30 Nisan 18:45).", 'Gözlenen akım PNXP: tepe 2942,0 cfs (17:00); Nash-Sutcliffe 0,952.', 'Gerçek programda her adımın ekran görüntüsünü al, hepsini tek PDF yap.'];
 
   window.OKUL = { AC, ODEV, IMG };
 })();
