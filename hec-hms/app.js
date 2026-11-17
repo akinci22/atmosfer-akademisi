@@ -1,12 +1,16 @@
-/* HEC-HMS Okulu — sayfa: üst çubuk, benzetim + açıklama paneli (keşif / rehberli ödev / adım adım izle), Türkçe ödev adımları. */
+/* HEC-HMS Okulu — sayfa: üst çubuk, büyük sahne (benzetim) + panel (keşif / rehberli ödev / adım adım izle),
+   kategori kategori seçim (keşif: programın bölümleri; ödevler: aşamalar), telefonda odak yakınlaştırma, Türkçe ödev adımları. */
 (function () {
   'use strict';
-  const { AC, ODEV, IMG } = window.OKUL;
+  const { AC, ODEV, IMG, KESIF } = window.OKUL;
   const $ = (s, k) => (k || document).querySelector(s);
   const kac = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const RESMI = new Set(['hw1-fig1', 'hw1-fig2', 'hw1-fig3', 'hw1-area', 'hw1-area-menu', 'hw1-baseflow-menu', 'hw1-loss-menu', 'hw1-loss', 'hw1-transform-menu', 'hw1-clark', 'hw1-loss-tab']);
   const genis = () => window.innerWidth >= 900;
   const ustH = () => { const u = $('#ust'); return u ? u.getBoundingClientRect().height : 0; };
+  /* keşif öğeleri düz liste: «‹ Önceki · Sonraki ›» kategoriler arasında da geçer */
+  const KOGE = [];
+  KESIF.forEach((c, ci) => c.ogeler.forEach((o) => { o.kat = ci; o.i = KOGE.length; KOGE.push(o); }));
 
   /* ---------------------------------------------------------------- tema */
   const TEMA = ['sistem', 'acik', 'koyu'];
@@ -26,15 +30,23 @@
     temaUygula();
     $('#ana').innerHTML = `
       <section class="hero">
-        <p class="hero-ust">MTO 316 · Hidrometeoroloji</p>
-        <h1>HEC-HMS Okulu</h1>
-        <p class="hero-alt">Programı burada tıklayarak tanı, ödevi kendin yap ya da programın adım adım yapışını izle. Her adım Türkçe açıklamalı.</p>
-        <dl class="hero-kunye"><div><dt>Program</dt><dd>HEC-HMS 4.14</dd></div><div><dt>Örnek havza</dt><dd>Punxsutawney, ABD · 158 mi²</dd></div><div><dt>Fırtına</dt><dd>28 Nisan – 4 Mayıs 1996</dd></div><div><dt>Ödevler</dt><dd>HW#1 · HW#2</dd></div></dl>
+        <div class="hero-ic">
+          <div class="hero-sol">
+            <p class="hero-ust">MTO 316 · Hidrometeoroloji</p>
+            <h1>HEC-HMS Okulu</h1>
+            <p class="hero-alt">Programı burada tıklayarak tanı, ödevi kendin yap ya da programın adım adım yapışını izle. Her adım Türkçe açıklamalı.</p>
+            <div class="hero-d"><button type="button" class="dugme" data-gir>Programı aç</button><a class="dugme ikincil" href="#odevler">Ödevler, Türkçe</a></div>
+          </div>
+          <dl class="hero-kunye"><div><dt>Program</dt><dd>HEC-HMS 4.14</dd></div><div><dt>Örnek havza</dt><dd>Punxsutawney, ABD · 158 mi²</dd></div><div><dt>Fırtına</dt><dd>28 Nisan – 4 Mayıs 1996</dd></div><div><dt>Ödevler</dt><dd>HW#1 · HW#2</dd></div></dl>
+        </div>
       </section>
       <section id="benzetim" class="sim-bolum" aria-label="HEC-HMS benzetimi">
         <div class="sim-alan">
-          <div class="sim-sahne"><div class="sim-kap"><div class="hms" id="hms"></div><div class="iz-imlec" id="imlec" hidden aria-hidden="true">${IMLEC}<span class="iz-sag">sağ tık</span></div></div><button type="button" class="sim-buyut" id="buyut">1:1 büyüt</button></div>
-          <aside class="sim-panel" id="panel" aria-live="polite"></aside>
+          <div class="sim-sahne">
+            <div class="sim-kap"><div class="sim-ic" id="simic"><div class="hms" id="hms"></div><div class="iz-imlec" id="imlec" hidden aria-hidden="true">${IMLEC}<span class="iz-sag">sağ tık</span></div></div></div>
+            <div class="sim-serit" id="serit"><div class="srt-r1"><button type="button" class="srt-tumu" id="buyut" aria-pressed="false">Tümü</button><div class="srt-kat" id="srtKat" role="group" aria-label="Kategoriler"></div></div><div class="srt-oge" id="srtOge" role="group" aria-label="Seçenekler"></div></div>
+          </div>
+          <aside class="sim-panel" id="panel"></aside>
         </div>
         <p class="gizli" id="iz-duyuru" aria-live="polite"></p>
       </section>
@@ -42,45 +54,77 @@
     $('#alt').innerHTML = `<p>Öğretici içeriği: HEC-HMS kılavuzları (U.S. Army Corps of Engineers, Hydrologic Engineering Center). Ekranlar HEC-HMS 4.14; grafiklerdeki sayılar programın bu projedeki gerçek çıktısı.</p><p><a href="../">Atmosfer Akademisi'ne dön</a></p>`;
   }
 
-  /* ---------------------------------------------------------------- ölçek */
-  let buyut = false;
+  /* ---------------------------------------------------------------- ölçek
+     Masaüstü: program penceresi sahne kutusunu tam doldurur; geniş ekranda büyütülür (mantıksal genişlik ≈ 920 px).
+     Telefon: mantıksal 780 px genişlik, «Tümü» görünümü kutuya sığar (okunmaz); odak yakınlaştırma etkin parçaya ≥ 0,72 ölçekle yaklaşır. */
+  const MASA_W = 920, MIN_W = 780, TEL_W = 780, ZMIN = 0.72, ZMAX = 0.95, ZADIM = [0.72, 0.8, 0.88, 0.95];
+  const G = { W: 0, H: 0, s: 1, fit: 1, odakVar: false };
+  let tumu = false; // telefonda kullanıcı «Tümü» dedi: listeden yeni seçim yapılana dek bütün görünüm
+  function olcekUygula(s) {
+    const h = $('#hms'), ic = $('#simic'), kap = $('.sim-kap');
+    G.s = s;
+    h.style.transform = s === 1 ? 'none' : `scale(${s})`;
+    ic.style.width = Math.round(G.W * s) + 'px'; ic.style.height = Math.round(G.H * s) + 'px';
+    kap.classList.toggle('odak', s > G.fit + 0.001);
+    window.HMS.olcek(s);
+    tumuGuncelle();
+    if (mod === 'izle' && iz) imlecYerlestir();
+  }
   function olcekle() {
     const kap = $('.sim-kap'), h = $('#hms'); if (!kap) return;
     const cw = kap.clientWidth;
-    let W, H, s;
+    let s;
     if (genis()) {
-      W = Math.max(cw, 660); s = cw / W; H = Math.round(kap.clientHeight / s);
-      kap.style.height = ''; kap.classList.remove('buyuk');
+      kap.style.height = '';
+      const kh = kap.clientHeight;
+      s = Math.min(1.4, Math.max(1, cw / MASA_W)); if (cw / s < MIN_W) s = cw / MIN_W;
+      if (s > 1 && kh / s < 600) s = Math.max(1, kh / 600);
+      G.W = Math.round(cw / s); G.H = Math.round(kh / s); G.fit = s; G.odakVar = false;
     } else {
-      const oran = mod === 'izle' ? 0.4 : 0.5; // izlemede panelin «şimdi + ekranda» kısmı da sığsın
-      const maxH = Math.round((window.visualViewport ? window.visualViewport.height : window.innerHeight) * oran) - 36;
-      if (buyut) { W = 600; s = 1; H = Math.max(maxH, 520); kap.style.height = maxH + 'px'; kap.classList.add('buyuk'); }
-      else { W = Math.max(600, cw); s = cw / W; H = Math.round(maxH / s); kap.style.height = Math.round(H * s) + 'px'; kap.classList.remove('buyuk'); }
+      const oran = mod === 'izle' ? 0.35 : mod === 'odev' ? 0.41 : 0.44; // izlemede panelin «şimdi + ekranda» kısmı da sığsın
+      const kh = Math.round((window.visualViewport ? window.visualViewport.height : window.innerHeight) * oran);
+      kap.style.height = kh + 'px';
+      G.W = Math.max(TEL_W, cw); G.fit = cw / G.W; G.H = Math.round(kh / G.fit);
+      G.odakVar = G.fit < 0.8;
+      s = G.fit;
     }
-    h.style.width = W + 'px'; h.style.height = H + 'px'; h.style.transform = s === 1 ? 'none' : `scale(${s})`;
-    h.classList.toggle('dar', W < 760); h.classList.toggle('alcak', H < 620); h.style.setProperty('--hms-h', H + 'px');
-    window.HMS.olcek(s);
+    h.style.width = G.W + 'px'; h.style.height = G.H + 'px';
+    h.classList.toggle('dar', G.W < 760); h.classList.toggle('alcak', G.H < 620); h.style.setProperty('--hms-h', G.H + 'px');
+    olcekUygula(s);
     document.documentElement.style.setProperty('--ust-h', ustH() + 'px');
     window.HMS.ciz();
     if (mod === 'izle' && iz) imlecYerlestir();
+    secimCiz();
+    odakGuncelle();
+  }
+  function tumuGuncelle() {
+    const b = $('#buyut'); if (!b) return;
+    b.hidden = !G.odakVar;
+    b.textContent = tumu ? 'Yakınlaş' : 'Tümü';
+    b.setAttribute('aria-pressed', String(tumu));
+    b.setAttribute('aria-label', tumu ? 'Etkin parçaya yakınlaş' : 'Programın tamamını göster');
+    b.disabled = !tumu && G.s <= G.fit + 0.001;
   }
 
   /* ---------------------------------------------------------------- mod ve durum */
   let mod = 'kesif', odev = null, adim = 0, mik = 0, sonAc = null;
+  let kesKat = 0, kesSec = null, odakHd = null, fazGor = null; // seçim listesi durumu
   const HMS = () => window.HMS;
   function ileriSar(liste) { liste.forEach((m) => { if (m.oto) m.oto.forEach((x) => HMS().yap(x.yap || x.hd, { doldur: true, sag: x.sag, cizme: true })); else HMS().yap(m.yap || m.hd, { doldur: true, sag: m.sag, cizme: true }); }); }
   const tumMikro = (o, kadar) => o.adimlar.slice(0, kadar == null ? o.adimlar.length : kadar).flatMap((a) => a.mikro);
   function sadele() { const S = HMS().durum(); HMS().temizle(); S.secili = null; S.ce = null; S.arac = 'arrow'; S.xsekme = 'Components'; S.log = []; HMS().projeAcikLog(); }
+  /* keşif tabanı: iki ödevin son hâli, hesap yapılmış, pencereler kapalı */
+  function kesifTaban() { HMS().bosalt(true); ileriSar(tumMikro(ODEV[0])); ileriSar(tumMikro(ODEV[1])); sadele(); HMS().yap('tb:compute', { cizme: true }); HMS().temizle(); }
   function kur(yeniMod, odevId, baslangicAdim) {
-    const izdeydi = mod === 'izle';
+    const izdeydi = mod === 'izle', eskiMod = mod;
     if (iz) izKapat();
     mod = yeniMod; odev = odevId ? ODEV.find((o) => o.id === odevId) : null; adim = baslangicAdim || 0; mik = 0; sonAc = null;
-    if (izdeydi) olcekle();
+    fazGor = null; tumu = false;
+    if (mod === 'kesif') { kesSec = null; odakHd = null; }
+    if (izdeydi || eskiMod !== mod) olcekle();
     HMS().bosalt(true);
-    if (mod === 'kesif') {
-      ileriSar(tumMikro(ODEV[0])); ileriSar(tumMikro(ODEV[1])); sadele();
-      HMS().yap('tb:compute', { cizme: true }); HMS().temizle();
-    } else if (odev.id === 'hw1') {
+    if (mod === 'kesif') kesifTaban();
+    else if (odev.id === 'hw1') {
       if (adim === 0) HMS().bosalt(false); else { ileriSar(tumMikro(odev, adim)); HMS().temizle(); }
     } else {
       ileriSar(tumMikro(ODEV[0])); sadele();
@@ -121,11 +165,61 @@
   }
   const adi = (hd) => { const k = acAnahtar(hd); return k && AC[k] ? AC[k].b : 'bu parça'; };
 
+  /* ---------------------------------------------------------------- seçim listesi: kategori satırı + o kategorinin öğeleri
+     Masaüstü: panelin üstünde (.pn-sec; kategori satırı yapışkan). Telefon: yapışkan sahnenin altındaki şerit (iki yatay satır). */
+  function secimVeri() {
+    if (mod === 'kesif') {
+      const kat = KESIF.map((c, i) => `<button type="button" class="sk${i === kesKat ? ' secik' : ''}" data-kat="${c.id}" aria-pressed="${i === kesKat}">${kac(c.ad)}<span>${c.ogeler.length}</span></button>`).join('');
+      let g0 = null, oge = '';
+      KESIF[kesKat].ogeler.forEach((o) => {
+        if (o.g && o.g !== g0) { g0 = o.g; oge += `<span class="so-g">${kac(o.g)}</span>`; }
+        oge += `<button type="button" class="so${o.i === kesSec ? ' secik' : ''}" data-oge="${o.i}" data-k="${kac(o.k)}" aria-pressed="${o.i === kesSec}">${kac(o.et)}</button>`;
+      });
+      return { kat, oge, et: 'Programın bölümleri' };
+    }
+    const o = mod === 'izle' ? (iz && iz.o) : odev; if (!o) return null;
+    const N = o.adimlar.length;
+    const simdi = mod === 'izle' ? (iz.kareler[iz.f].t === 'son' ? N : iz.kareler[iz.f].adim) : adim;
+    const fs = o.fazlar, aktif = simdi >= N ? fs.length - 1 : o.adimlar[simdi].faz;
+    const gf = fazGor != null && fs[fazGor] ? fazGor : aktif;
+    const kat = fs.map((f, i) => `<button type="button" class="sk${i === gf ? ' secik' : ''}${i === aktif ? ' aktif' : ''}" data-faz="${i}" aria-pressed="${i === gf}">${kac(f.ad)}<span>${f.son - f.bas}</span></button>`).join('');
+    let oge = '';
+    for (let i = fs[gf].bas; i < fs[gf].son; i++) {
+      const a = o.adimlar[i], d = i < simdi ? ' bitti' : i === simdi ? ' simdi' : '';
+      oge += `<button type="button" class="so so-adim${d}" data-faz-adim="${i}" title="${i + 1}. ${kac(a.baslik)}" aria-label="Adım ${i + 1}: ${kac(a.baslik)}"${i === simdi ? ' aria-current="step"' : ''}><b>${i + 1}</b>${kac(a.kisa)}</button>`;
+    }
+    return { kat, oge, et: `${o.ad} aşamaları` };
+  }
+  function yatayOrtala(kutu, el) {
+    if (!kutu) return;
+    if (!el) { kutu.scrollLeft = 0; return; }
+    kutu.scrollLeft = el.offsetLeft - kutu.offsetLeft - (kutu.clientWidth - el.offsetWidth) / 2;
+  }
+  function secimCiz() {
+    const v = secimVeri(), ps = $('#pnsec'), sk = $('#srtKat'), so = $('#srtOge');
+    if (!sk) return;
+    if (genis()) {
+      sk.innerHTML = ''; so.innerHTML = '';
+      if (!ps) return;
+      ps.innerHTML = v ? `<div class="sec-kat" role="group" aria-label="${kac(v.et)}">${v.kat}</div><div class="sec-oge" role="group" aria-label="Seçenekler">${v.oge}</div>` : '';
+      const s = ps.querySelector('.so.secik, .so.simdi');
+      if (s) {
+        /* seçili öğe görünsün; mümkünse üstündeki grup adıyla birlikte (yapışkan kategori satırının altında yarım kalmasın) */
+        const kh = ps.querySelector('.sec-kat').offsetHeight, gor = ps.clientHeight - kh;
+        let g = s.previousElementSibling; while (g && !g.classList.contains('so-g')) g = g.previousElementSibling;
+        const ust = g && s.offsetTop + s.offsetHeight - g.offsetTop < gor - 8 ? g.offsetTop - 4 : s.offsetTop - 6;
+        if (ust - kh < ps.scrollTop) ps.scrollTop = ust - kh;
+        else if (s.offsetTop + s.offsetHeight > ps.scrollTop + ps.clientHeight) ps.scrollTop = Math.min(ust - kh, s.offsetTop + s.offsetHeight - ps.clientHeight + 8);
+      }
+    } else {
+      if (ps) ps.innerHTML = '';
+      sk.innerHTML = v ? v.kat : ''; so.innerHTML = v ? v.oge : '';
+      sk.setAttribute('aria-label', v ? v.et : 'Kategoriler');
+      yatayOrtala(sk, sk.querySelector('.secik')); yatayOrtala(so, so.querySelector('.secik, .simdi'));
+    }
+  }
+
   /* ---------------------------------------------------------------- panel */
-  const ONERI = [
-    ['Components menüsü', ['m:Components']], ['Subbasin aracı', ['tb:subbasin']], ['Watershed Explorer', ['bolge:agac']],
-    ['Loss sekmesi', ['harita:el:Stump Creek', 'ce:sekme:Loss']], ['Compute düğmesi', ['tb:compute']], ['Junction-2 grafiği', ['harita:el:Junction-2', 'tb:graph']], ['Message Log', ['bolge:log']],
-  ];
   function modSecici() {
     const b = (id, et, sec, ek) => `<button type="button" class="pn-mod${sec ? ' secik' : ''}" data-mod="${id}" aria-pressed="${sec}"${ek || ''}>${et}</button>`;
     return `<div class="pn-ust"><div class="pn-mods" role="group" aria-label="Benzetim modu">${b('kesif', 'Keşif', mod === 'kesif')}${b('hw1', 'HW#1 rehberli', mod === 'odev' && odev.id === 'hw1')}${b('hw2', 'HW#2 rehberli', mod === 'odev' && odev.id === 'hw2')}${b('izle', 'İzle', mod === 'izle', ' title="Adım adım izle: program ödevi kendisi yapar"')}</div></div>`;
@@ -137,19 +231,23 @@
     return `<div class="katman" data-k="${idk}"><button type="button" class="kt-b" aria-expanded="false">Ne yapıyorum?</button><div class="kt-ic" hidden>${liste(a.ne)}<button type="button" class="kt-b" aria-expanded="false">Programda nerede?</button><div class="kt-ic" hidden>${liste(a.nerede)}<button type="button" class="kt-b" aria-expanded="false">Neden bu değer?</button><div class="kt-ic" hidden>${liste(a.neden)}</div></div></div></div>`;
   }
   const soruHTML = (a) => (a.soru ? `<div class="soru"><b>Öğreticinin sorusu</b><p>${kac(a.soru[0])}</p><button type="button" class="kt-b" aria-expanded="false">Cevap</button><div class="kt-ic" hidden><p>${kac(a.soru[1])}</p></div></div>` : '');
+  const panelKabuk = (ic, kontrol) => `${modSecici()}<div class="pn-sec" id="pnsec"></div><div class="pn-ic"${kontrol ? '' : ' aria-live="polite"'}>${ic}</div>${kontrol || ''}`;
+  function kesifIc() {
+    if (!sonAc || !AC[sonAc]) {
+      return `${satir('Keşif', 'kesif')}<h2 class="pn-h">Bir parça seç.</h2><p class="pn-t">${genis() ? 'Yukarıdaki' : 'Programın altındaki'} kategorilerden seç ya da programda istediğin yere bas: program o parçayı açıp işaretler, ne işe yaradığı burada yazar.</p><p class="pn-not">Proje hazır: iki ödevin son hâli yüklü. Sağ tık (telefonda basılı tut) eleman menüsünü açar.${genis() ? '' : ' «Tümü» programın bütününü gösterir.'}</p><p class="pn-eti2">Ödevi izle</p><p class="pn-t">Program ödevi kendisi yapar; her tıkta ne olduğunu ve nedenini anlatır.</p><div class="pn-dugmeler"><button type="button" class="dugme ikincil" data-mod="izle-hw1">HW#1'i adım adım izle</button></div>`;
+    }
+    const a = AC[sonAc], o = kesSec != null ? KOGE[kesSec] : null;
+    const ust = o
+      ? `<div class="kes-ust"><button type="button" class="kes-y" data-kes-yon="-1" aria-label="Önceki parça">‹ Önceki</button><p class="kes-yer">${kac(KESIF[o.kat].ad)} · ${KESIF[o.kat].ogeler.indexOf(o) + 1}/${KESIF[o.kat].ogeler.length}</p><button type="button" class="kes-y" data-kes-yon="1" aria-label="Sonraki parça">Sonraki ›</button></div>`
+      : satir('Bu ne işe yarar?', 'kesif');
+    return `${ust}<h2 class="pn-h">${kac(a.b)}</h2><p class="pn-t">${kac(a.t)}</p>${liste(a.m)}${a.d ? `<button type="button" class="kt-b pn-daha" aria-expanded="false">Daha fazla</button><div class="kt-ic" hidden>${liste(a.d)}</div>` : ''}`;
+  }
   function panelCiz() {
     const p = $('#panel');
-    p.setAttribute('aria-live', mod === 'izle' ? 'off' : 'polite');
-    if (mod === 'izle') { p.innerHTML = modSecici() + '<div class="pn-ic"></div>' + izKontrolHTML(); izPanel(false); return; }
+    if (mod === 'izle') { p.innerHTML = panelKabuk('', izKontrolHTML()); izPanel(false); return; }
     let ic = '';
-    if (mod === 'kesif') {
-      if (!sonAc || !AC[sonAc]) {
-        ic = `${satir('Keşif', 'kesif')}<h2 class="pn-h">Bir parçaya bas.</h2><p class="pn-t">Program gibi açılır; ne işe yaradığı burada yazar.</p><p class="pn-eti2">Buradan başla</p><div class="pn-oneri">${ONERI.map(([a], i) => `<button type="button" class="cip" data-oneri="${i}">${kac(a)}</button>`).join('')}</div><p class="pn-not">Proje hazır: iki ödevin son hâli yüklü. Sağ tık (telefonda basılı tut) eleman menüsünü açar.</p><p class="pn-eti2">Ödevi izle</p><p class="pn-t">Program ödevi kendisi yapar; her tıkta ne olduğunu ve nedenini anlatır.</p><div class="pn-dugmeler"><button type="button" class="dugme ikincil" data-mod="izle-hw1">HW#1'i adım adım izle</button></div>`;
-      } else {
-        const a = AC[sonAc];
-        ic = `${satir('Bu ne işe yarar?', 'kesif')}<h2 class="pn-h">${kac(a.b)}</h2><p class="pn-t">${kac(a.t)}</p>${liste(a.m)}${a.d ? `<button type="button" class="kt-b pn-daha" aria-expanded="false">Daha fazla</button><div class="kt-ic" hidden>${liste(a.d)}</div>` : ''}<p class="pn-eti2">Başka bir yere bak</p><div class="pn-oneri">${ONERI.map(([x], i) => `<button type="button" class="cip" data-oneri="${i}">${kac(x)}</button>`).join('')}</div>`;
-      }
-    } else {
+    if (mod === 'kesif') ic = kesifIc();
+    else {
       const toplam = odev.adimlar.length;
       if (adim >= toplam) {
         ic = `${satir(`${odev.ad} · bitti`, odev.id)}<h2 class="pn-h">${odev.ad} tamam.</h2><p class="pn-t">Benzetimdeki proje öğreticinin son hâliyle aynı.</p>${liste(odev.id === 'hw1' ? ['3 alt havza, 1 kanal, 2 birleşim bağlı.', 'Bütün parametreler girildi; proje diske yazıldı.', 'Gerçek programda her adımın ekran görüntüsünü tek PDF yap.'] : ['Koşu hesaplandı; gözlenen akım bağlı.', 'Nash-Sutcliffe 0,952: model gözlemi çok iyi yakalıyor.', 'Gerçek programda her adımın ekran görüntüsünü tek PDF yap.'])}<div class="pn-dugmeler">${odev.id === 'hw1' ? '<button type="button" class="dugme" data-mod="hw2">HW#2\'ye geç</button>' : ''}<button type="button" class="dugme ikincil" data-mod="kesif">Keşfe dön</button></div>`;
@@ -162,15 +260,39 @@
           <div class="pn-dugmeler"><button type="button" class="dugme" id="goster">Bu tıklamayı göster</button><button type="button" class="dugme ikincil" id="atla">Adımı benim yerime bitir</button></div>`;
       }
     }
-    p.innerHTML = modSecici() + `<div class="pn-ic">${ic}</div>`;
+    p.innerHTML = panelKabuk(ic);
+    secimCiz();
+  }
+
+  /* ---------------------------------------------------------------- keşif: listeden seçim = programda o parçaya basmak */
+  function uygula(x) {
+    let hd = x; const o = { cizme: true };
+    if (typeof x === 'object') { hd = x.hd; Object.assign(o, x.o); }
+    else if (x.endsWith('|sag')) {
+      hd = x.slice(0, -4); o.sag = true;
+      HMS().ciz(); const he = HMS().hedefEl(hd); if (he) { icGetir(he); Object.assign(o, izMerkez(he)); }
+    }
+    HMS().yap(hd, o);
+  }
+  function kesifSec(gi) {
+    const o = KOGE[gi]; if (!o || mod !== 'kesif') return;
+    HMS().hedef(null);
+    kesifTaban();
+    o.yol.forEach(uygula);
+    HMS().hedef(o.hd); HMS().ciz();
+    kesSec = gi; kesKat = o.kat; sonAc = o.k; odakHd = o.hd; tumu = false;
+    panelCiz();
+    odakla();
   }
 
   /* ---------------------------------------------------------------- tıklama */
   function tik(hd, o, girdi) {
     if (mod === 'izle') { izNot('İzleme modunda program kendisi tıklıyor. Kendin denemek için «HW#1 rehberli» ya da «HW#2 rehberli»ye geç.'); return; }
     if (mod === 'kesif') {
+      HMS().hedef(null);
       if (!girdi && !/^(satir|f):/.test(hd)) HMS().yap(hd, o);
-      const k = acAnahtar(hd); if (k && AC[k]) { sonAc = k; panelCiz(); }
+      const k = acAnahtar(hd);
+      if (k && AC[k]) { sonAc = k; const i = KOGE.findIndex((x) => x.k === k); kesSec = i >= 0 ? i : null; if (i >= 0) kesKat = KOGE[i].kat; odakHd = hd; panelCiz(); }
       odakla(); return;
     }
     const m = simdiki(); if (!m) return;
@@ -184,7 +306,7 @@
     if (m.oto) ileriSar(m.oto);
     else HMS().yap(m.yap || m.hd, Object.assign({}, o, { doldur: true, sag: m.sag || o.sag, cizme: true }));
     mik++;
-    if (mik >= odev.adimlar[adim].mikro.length) { adim++; mik = 0; }
+    if (mik >= odev.adimlar[adim].mikro.length) { adim++; mik = 0; fazGor = null; }
     hedefAyarla(); HMS().ciz(); panelCiz(); odakla();
   }
   function ipucu(hd, m) {
@@ -205,19 +327,102 @@
   }
   function atla() { const n = odev.adimlar[adim].mikro.length; while (mik < n && adim < odev.adimlar.length) { const a0 = adim; goster(); if (adim !== a0) break; } }
 
-  /* hedef ve açıklama görünür kalsın */
-  function odakla() {
+  /* hedef ve açıklama görünür kalsın: masaüstünde sahnenin üstü çubuğun hemen altına; telefonda panelin başı yapışkan bloğun altına
+     (izlemede panel içeriğinin başı: mod sekmeleri yukarıda kalır, «şimdi + ekranda» kısmına yer açılır) */
+  function odakla() { sayfaHizala(); odakGuncelle(); }
+  function sayfaHizala() {
     const alan = $('.sim-alan'), panel = $('#panel'), u = ustH();
     if (genis()) {
       const r = alan.getBoundingClientRect();
-      if (r.top < u - 2 || r.bottom > window.innerHeight + 2) window.scrollTo(0, window.scrollY + r.top - u - 12);
+      if (Math.abs(r.top - (u + 8)) > 3) window.scrollTo(0, Math.max(0, window.scrollY + r.top - u - 8));
       const pi = $('.pn-ic', panel); if (pi) pi.scrollTop = 0;
     } else {
-      const sahne = $('.sim-sahne');
-      const hedef = window.scrollY + panel.getBoundingClientRect().top - (u + sahne.offsetHeight) - 6;
-      if (Math.abs(panel.getBoundingClientRect().top - (u + sahne.offsetHeight)) > 8) window.scrollTo(0, Math.max(0, hedef));
+      const sahne = $('.sim-sahne'), bas = (mod === 'izle' && $('.pn-ic', panel)) || panel, pt = bas.getBoundingClientRect().top, alt = u + sahne.offsetHeight;
+      if (Math.abs(pt - alt) > 8) window.scrollTo(0, Math.max(0, window.scrollY + pt - alt - (bas === panel ? 6 : 0)));
     }
-    if (buyut && !genis() && HMS().durum()) { const m = mod === 'odev' && simdiki(); const he = m && HMS().hedefEl(m.hd); if (he) he.scrollIntoView({ block: 'nearest', inline: 'nearest' }); }
+  }
+  function benzetimeIn() {
+    const r = $('.sim-alan').getBoundingClientRect();
+    window.scrollTo(0, Math.max(0, window.scrollY + r.top - ustH() - (genis() ? 8 : 0)));
+  }
+
+  /* ---------------------------------------------------------------- odak yakınlaştırma (telefon)
+     Etkin parça (rehberli hedef, izlemede tıklanacak yer, keşifte seçilen parça) ve içinde durduğu açılır katman
+     (pencere, menü, sağ tık menüsü, açılır liste) okunur ölçekte (0,72–0,95) sahneye getirilir. */
+  function birlesim(els) {
+    let L = Infinity, T = Infinity, R = -Infinity, B = -Infinity;
+    els.forEach((e) => { if (!e) return; const r = e.getBoundingClientRect(); if (!r.width && !r.height) return; L = Math.min(L, r.left); T = Math.min(T, r.top); R = Math.max(R, r.right); B = Math.max(B, r.bottom); });
+    return L === Infinity ? null : { left: L, top: T, right: R, bottom: B, width: R - L, height: B - T };
+  }
+  /* el'in içinde durduğu açılır katman(lar); el yoksa açık olan katman */
+  function katmanEl(el) {
+    const K = $('#hms'), out = [];
+    const cl = K.querySelector('.h-cl'), kaynak = cl && cl.dataset.kaynak ? K.querySelector(`[data-hd="${CSS.escape(cl.dataset.kaynak)}"]`) : null;
+    const x = cl && el && cl.contains(el) ? kaynak || el : el; // listedeki seçenek = kendi kutusu
+    const dk = x ? x.closest('.h-dk') : K.querySelector('.h-dk.ust');
+    if (dk) out.push(dk.querySelector('.h-dlg') || dk);
+    else {
+      let mk = x ? x.closest('.h-mk') : null;
+      if (!mk && !x) { const d = K.querySelector('.h-mk > .h-dd'); mk = d && d.parentElement; }
+      if (mk && mk.querySelector('.h-dd')) out.push(mk.querySelector('.h-mb'), ...mk.querySelectorAll('.h-dd'));
+      else { const bm = x ? x.closest('.h-bm') : K.querySelector('.h-bm'); if (bm) out.push(bm, ...bm.querySelectorAll('.h-dd')); }
+    }
+    if (cl && (!el || cl.contains(el) || el === kaynak)) out.push(cl, kaynak);
+    return out.length ? out : null;
+  }
+  /* opt.katman: el bir katmanda değilse açık katmanı (sonuç penceresini) göster · opt.nokta: bu mantıksal nokta (imleç) görünür kalsın
+     opt.kalsin: katman yoksa görünümü değiştirme */
+  function odakYap(el, opt) {
+    opt = opt || {};
+    if (genis() || !G.odakVar || tumu) return;
+    const kap = $('.sim-kap'), hr = $('#hms').getBoundingClientRect(), s0 = G.s;
+    let ac = el && el.isConnected ? el : null;
+    let kat = katmanEl(ac);
+    if (!kat && opt.katman) kat = katmanEl(null); // parça başka yerde bir pencere açtıysa: ikisi birden (sığmazsa parça ortada, pencere kenarda)
+    if (!kat && opt.kalsin) return;
+    const kw = kap.clientWidth, kh = kap.clientHeight, pay = 14;
+    /* katman yoksa bağlam = parçanın bölgesi (Explorer, Component Editor, Message Log) okunur ölçekte sığıyorsa; ör. sekme + yönettiği ağaç */
+    let bolge = null;
+    if (!kat && ac) { const b = ac.closest('.h-exp, .h-ce, .h-log'); const r = b && b.getBoundingClientRect(); if (r && (r.width / s0) * ZMIN + 2 * pay <= kw && (r.height / s0) * ZMIN + 2 * pay <= kh) bolge = b; }
+    const C0 = birlesim((kat || []).concat(bolge ? [bolge] : []).concat(ac ? [ac] : []));
+    const nokta = opt.nokta;
+    if (!C0 && !nokta) { if (G.s !== G.fit) { olcekUygula(G.fit); kap.scrollLeft = 0; kap.scrollTop = 0; } return; }
+    const log = (r) => ({ x: (r.left - hr.left) / s0, y: (r.top - hr.top) / s0, w: r.width / s0, h: r.height / s0 });
+    let C = C0 ? log(C0) : { x: nokta.x - 10, y: nokta.y - 10, w: 20, h: 20 };
+    if (nokta) { const x1 = Math.min(C.x, nokta.x - 12), y1 = Math.min(C.y, nokta.y - 12), x2 = Math.max(C.x + C.w, nokta.x + 24), y2 = Math.max(C.y + C.h, nokta.y + 28); C = { x: x1, y: y1, w: x2 - x1, h: y2 - y1 }; }
+    const T = ac ? log(ac.getBoundingClientRect()) : nokta ? { x: nokta.x - 10, y: nokta.y - 10, w: 20, h: 28 } : C;
+    let z = Math.min(kw / (C.w + 2 * pay), kh / (C.h + 2 * pay));
+    z = Math.max(ZMIN, Math.min(ZMAX, z));
+    z = ZADIM.filter((x) => x <= z + 0.001).pop() || ZMIN;
+    z = Math.max(z, G.fit);
+    if (Math.abs(z - s0) > 0.001) olcekUygula(z);
+    let left = (T.x + T.w / 2) * z - kw / 2, top = (T.y + T.h / 2) * z - kh / 2;
+    if (C.w * z + 2 * pay <= kw) left = Math.min(Math.max(left, (C.x + C.w) * z + pay - kw), C.x * z - pay);
+    if (C.h * z + 2 * pay <= kh) top = Math.min(Math.max(top, (C.y + C.h) * z + pay - kh), C.y * z - pay);
+    kap.scrollLeft = Math.round(left); kap.scrollTop = Math.round(top);
+  }
+  /* moda göre etkin parça */
+  function odakGuncelle() {
+    if (genis() || !G.odakVar || tumu) {
+      /* masaüstünde de: hedef kayan bir kutudaysa (ağaç, tablo) kutu hedefe gelsin */
+      const el = mod === 'kesif' ? odakHd && HMS().hedefEl(odakHd) : mod === 'odev' ? simdiki() && !simdiki().oto && HMS().hedefEl(simdiki().hd) : null;
+      if (el) icGetir(el);
+      return;
+    }
+    if (mod === 'kesif') {
+      const el = odakHd ? HMS().hedefEl(odakHd) : null;
+      if (el) icGetir(el);
+      odakYap(el, { katman: true });
+    } else if (mod === 'odev') {
+      const m = simdiki(), el = m && !m.oto ? HMS().hedefEl(m.hd) : null;
+      if (el) icGetir(el);
+      odakYap(el, { katman: !el });
+    } else if (iz && !iz.anim) {
+      const kr = iz.kareler[iz.f];
+      if (kr.t === 'giris') { const m = iz.o.adimlar[kr.adim].mikro[0]; const el = m.oto ? null : HMS().hedefEl(m.hd); if (el) icGetir(el); odakYap(el, { katman: !el }); }
+      else if (iz.imlec) odakYap(null, { katman: true, nokta: iz.imlec });
+      else odakYap(null, { katman: true });
+    }
   }
 
   /* ======================================================================== ADIM ADIM İZLE
@@ -266,8 +471,8 @@
     }
     return { L, T, R, B, var: R - L >= 2 && B - T >= 2 };
   }
-  /* hedef kendi içinde kayan bir kutudaysa (ağaç, tablo, liste) o kutuyu hedefe getir; 1:1 büyütmede sahneyi de */
-  function gorunurYap(el) {
+  /* hedef kendi içinde kayan bir kutudaysa (ağaç, tablo, liste) o kutuyu hedefe getir */
+  function icGetir(el) {
     const s = olcekS(), kap = $('.sim-kap');
     for (let a = el.parentElement; a && a !== kap; a = a.parentElement) {
       if (a.scrollHeight <= a.clientHeight + 1 && a.scrollWidth <= a.clientWidth + 1) continue;
@@ -276,12 +481,9 @@
       if (r.top < q.top) a.scrollTop -= (q.top - r.top) / s + 4; else if (r.bottom > q.bottom) a.scrollTop += Math.min(r.top - q.top, r.bottom - q.bottom) / s + 4;
       if (r.left < q.left) a.scrollLeft -= (q.left - r.left) / s + 4; else if (r.right > q.right) a.scrollLeft += Math.min(r.left - q.left, r.right - q.right) / s + 4;
     }
-    if (kap.classList.contains('buyuk')) {
-      const q = kap.getBoundingClientRect(), r = el.getBoundingClientRect(), pay = 28;
-      if (r.left < q.left + pay || r.right > q.right - pay) kap.scrollLeft += r.left + Math.min(r.width, q.width) / 2 - (q.left + q.width / 2);
-      if (r.top < q.top + pay || r.bottom > q.bottom - pay) kap.scrollTop += r.top + r.height / 2 - (q.top + q.height / 2);
-    }
   }
+  /* ve telefonda sahneyi hedefe yaklaştır */
+  function gorunurYap(el) { icGetir(el); odakYap(el); }
   function izMerkez(el) {
     const g = gorunurDortgen(el), h = $('#hms').getBoundingClientRect(), s = olcekS();
     let cx, cy;
@@ -295,7 +497,7 @@
     if (izOlcum.length > 4000) izOlcum.shift();
   }
 
-  /* imleç */
+  /* imleç: #simic içinde, mantıksal konum × ölçek (sahne odakta gezinince birlikte gider) */
   function imlecKoy(c, ms) {
     const im = $('#imlec'); if (!im || !c) return;
     const s = olcekS();
@@ -355,7 +557,7 @@
       }
       HMS().yap(x.yap || x.hd, Object.assign({ doldur: true, sag: x.sag, cizme: true }, c || {}));
       HMS().hedef(null); HMS().ciz();
-      if (c) iz.imlec = c;
+      if (c) { iz.imlec = c; odakYap(null, { katman: true, nokta: c, kalsin: true }); } // açılan pencere/menü de görünsün, imleç sahnede kalsın
     }
     return true;
   }
@@ -377,6 +579,7 @@
       const d = $('#panel .iz-degisti'); if (d) d.classList.remove('bekliyor');
       izKontrolGuncelle();
     } else {
+      fazGor = null;
       izOnizle(); HMS().ciz(); izPanel(false); odakla(); izDuyur();
     }
   }
@@ -411,7 +614,7 @@
     const izdeydi = mod === 'izle';
     if (iz) izKapat(true);
     const o = ODEV.find((x) => x.id === id) || ODEV[0];
-    mod = 'izle'; odev = o; adim = 0; mik = 0; sonAc = null;
+    mod = 'izle'; odev = o; adim = 0; mik = 0; sonAc = null; fazGor = null; tumu = false;
     iz = { o, kareler: izKareler(o), f: 0, tok: 0, anim: false, acele: false, oynuyor: false, oyunNo: 0, hizAd: izHiz, imlec: null, parca: {}, uyan: null, oyunUyan: null };
     $('.sim-alan').classList.add('izle');
     if (!izdeydi) olcekle(); // panel genişliği ve telefondaki sahne yüksekliği değişti
@@ -445,10 +648,11 @@
     if (z.teori) h += izKatman('teori', `Teori köprüsü · ${kac(z.teori.b)}`, liste(z.teori.m), giris);
     return h;
   }
+  /* şerit: her bölüm bir büyük adım; dolu = bitti, çerçeveli = şimdi; aşama sınırında boşluk */
   function izSerit() {
     const o = iz.o, kr = iz.kareler[iz.f], aktif = kr.t === 'son' ? o.adimlar.length : kr.adim;
     return `<div class="iz-serit" role="group" aria-label="Büyük adımlar">${o.adimlar.map((a, i) => {
-      const cls = (i < aktif ? 'bitti' : i === aktif ? 'simdi' : '') + (o.bolumler && i > 0 && a.bolum !== o.adimlar[i - 1].bolum ? ' bol' : '');
+      const cls = (i < aktif ? 'bitti' : i === aktif ? 'simdi' : '') + (i > 0 && a.faz !== o.adimlar[i - 1].faz ? ' bol' : '');
       const dol = i === aktif && kr.t === 'tik' ? Math.round(((kr.mik + 1) / a.mikro.length) * 100) : 0;
       return `<button type="button" class="${cls.trim()}" data-iz-adim="${i}" title="${i + 1}. ${kac(a.baslik)}" aria-label="Adım ${i + 1}: ${kac(a.baslik)}"${i === aktif ? ' aria-current="step"' : ''}>${i + 1}${dol ? `<i style="width:${dol}%"></i>` : ''}</button>`;
     }).join('')}</div>`;
@@ -471,8 +675,7 @@
       if (!iz.parca[iz.f]) iz.parca[iz.f] = izAnahtar(m.hd);
       govde = `<div class="pn-simdi iz-simdi"><span>Şimdi ne yapıyorum${m.sag ? ' · sağ tık' : ''}</span><b>${kac(m.iz || m.ip)}</b>${m.oto ? '<p class="iz-alt" id="iz-alt"></p>' : ''}</div><div class="iz-degisti${bekliyor ? ' bekliyor' : ''}"><span>Ekranda ne değişti</span><p>${kac(m.sonra || '')}</p></div>${m.dikkat ? `<p class="iz-mdikkat">${kac(m.dikkat)}</p>` : ''}${izKatmanlar(a, z, iz.parca[iz.f], false)}${kr.mik === a.mikro.length - 1 ? soruHTML(a) : ''}`;
     }
-    const tum = izKatman('liste', `Bütün adımlar (${N})`, `<ol class="iz-liste">${o.adimlar.map((x, i) => `<li><button type="button" data-iz-adim="${i}"${i === kr.adim ? ' aria-current="step"' : ''}><span>${i + 1}</span>${kac(x.baslik)}</button></li>`).join('')}</ol>`, false);
-    return ust(konum) + izSerit() + not + bol + `<h2 class="pn-h iz-h${giris ? '' : ' tikte'}">${kac(a.baslik)}</h2>` + govde + tum;
+    return ust(konum) + izSerit() + not + bol + `<h2 class="pn-h iz-h${giris ? '' : ' tikte'}">${kac(a.baslik)}</h2>` + govde;
   }
   function izKontrolHTML() {
     return `<div class="iz-kontrol"><button type="button" class="iz-b" data-iz="geri" aria-label="Geri (sol ok)">${IK.geri}<span>Geri</span></button><button type="button" class="iz-b ana" data-iz="oynat" aria-pressed="false"></button><button type="button" class="iz-b" data-iz="ileri" aria-label="İleri (sağ ok)"><span>İleri</span>${IK.ileri}</button><button type="button" class="iz-hiz" data-iz="hiz"></button></div>`;
@@ -489,9 +692,10 @@
   }
   function izPanel(bekliyor) {
     const p = $('#panel'); if (!iz) return;
-    if (!$('.iz-kontrol', p)) { p.innerHTML = modSecici() + '<div class="pn-ic"></div>' + izKontrolHTML(); }
+    if (!$('.iz-kontrol', p)) p.innerHTML = panelKabuk('', izKontrolHTML());
     const ic = $('.pn-ic', p); ic.innerHTML = izIc(bekliyor); ic.scrollTop = 0;
     izKontrolGuncelle();
+    secimCiz();
   }
 
   /* ---------------------------------------------------------------- ödevler bölümü */
@@ -509,13 +713,14 @@
   }
 
   /* ---------------------------------------------------------------- olaylar */
-  function benzetimeIn() { const b = $('#benzetim'); window.scrollTo(0, window.scrollY + b.getBoundingClientRect().top - ustH() - 4); }
+  const sahneEkranda = () => { const r = $('#benzetim').getBoundingClientRect(); return r.bottom >= ustH() + 40 && r.top <= window.innerHeight - 40; };
   function olaylar() {
     document.addEventListener('click', (e) => {
       const fg = e.target.closest('.adim-res figure');
       if (fg) { fg.classList.toggle('buyuk'); return; }
       const kb = e.target.closest('.kt-b');
       if (kb) { const ic = kb.nextElementSibling; const ac = kb.getAttribute('aria-expanded') !== 'true'; kb.setAttribute('aria-expanded', String(ac)); if (ic) ic.hidden = !ac; if (kb.dataset.izKat) izAcik[kb.dataset.izKat] = ac; return; }
+      if (e.target.closest('[data-gir], #ust a[href="#benzetim"]')) { e.preventDefault(); benzetimeIn(); return; }
       const md = e.target.closest('[data-mod]');
       if (md) {
         const v = md.dataset.mod;
@@ -524,6 +729,21 @@
         else if (v.startsWith('izle-')) izBasla(v.slice(5), 0);
         else kur('odev', v, 0);
         odakla(); return;
+      }
+      /* seçim listesi */
+      const kt = e.target.closest('[data-kat]');
+      if (kt) { const i = KESIF.findIndex((c) => c.id === kt.dataset.kat); if (i >= 0 && i !== kesKat) { kesKat = i; secimCiz(); } if (genis()) sayfaHizala(); return; }
+      const og = e.target.closest('[data-oge]');
+      if (og) { kesifSec(+og.dataset.oge); return; }
+      const ky = e.target.closest('[data-kes-yon]');
+      if (ky) { kesifSec(((kesSec == null ? -1 : kesSec) + +ky.dataset.kesYon + KOGE.length) % KOGE.length); return; }
+      const fz = e.target.closest('[data-faz]');
+      if (fz) { fazGor = +fz.dataset.faz; secimCiz(); if (genis()) sayfaHizala(); return; }
+      const fa = e.target.closest('[data-faz-adim]');
+      if (fa) {
+        const i = +fa.dataset.fazAdim; fazGor = null; tumu = false;
+        if (mod === 'izle' && iz) { izDur(); izGit(izAdimKare(iz.o, i)); } else if (odev) { kur('odev', odev.id, i); odakla(); }
+        return;
       }
       const ib = e.target.closest('[data-iz]');
       if (ib && iz) {
@@ -536,9 +756,7 @@
         return;
       }
       const ia = e.target.closest('[data-iz-adim]');
-      if (ia && iz) { izDur(); izGit(izAdimKare(iz.o, +ia.dataset.izAdim)); return; }
-      const on = e.target.closest('[data-oneri]');
-      if (on) { const [, dizi] = ONERI[+on.dataset.oneri]; HMS().temizle(); dizi.forEach((hd) => { if (!hd.startsWith('bolge:')) HMS().yap(hd, { cizme: true }); }); HMS().ciz(); const son = dizi[dizi.length - 1]; sonAc = acAnahtar(son === 'tb:graph' ? 'dlg:x' : son) || acAnahtar(son); if (son === 'tb:graph') sonAc = 'dlg:grafik'; panelCiz(); odakla(); return; }
+      if (ia && iz) { izDur(); fazGor = null; izGit(izAdimKare(iz.o, +ia.dataset.izAdim)); return; }
       const git = e.target.closest('[data-git]');
       if (git) {
         const p = git.dataset.git.split(':');
@@ -551,19 +769,29 @@
       const ot = e.target.closest('#panel [data-hd]');
       if (ot && mod === 'odev') { tik(ot.dataset.hd, { el: ot }); }
     });
-    /* izleme klavyesi: ← geri, → ileri, boşluk oynat/durdur (benzetim ekrandayken) */
+    /* klavye (benzetim ekrandayken): izlemede ← geri, → ileri, boşluk oynat/durdur; keşifte ←/→ önceki/sonraki parça */
     document.addEventListener('keydown', (e) => {
-      if (mod !== 'izle' || !iz || e.altKey || e.ctrlKey || e.metaKey) return;
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
       const t = e.target;
       if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
-      const r = $('#benzetim').getBoundingClientRect(); if (r.bottom < ustH() + 40 || r.top > window.innerHeight - 40) return;
+      if (mod === 'kesif' && kesSec != null && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
+        if (!sahneEkranda()) return;
+        e.preventDefault(); kesifSec((kesSec + (e.key === 'ArrowRight' ? 1 : -1) + KOGE.length) % KOGE.length); return;
+      }
+      if (mod !== 'izle' || !iz || !sahneEkranda()) return;
       if (e.key === 'ArrowRight') { e.preventDefault(); izIleri(true); }
       else if (e.key === 'ArrowLeft') { e.preventDefault(); izGeri(); }
       else if (e.key === ' ' && !(t && t.closest && t.closest('button, a'))) { e.preventDefault(); if (iz.oynuyor) izDur(); else izOynat(); }
     });
     document.addEventListener('visibilitychange', () => { if (document.hidden && iz && iz.oynuyor) izDur(); });
-    $('#buyut').addEventListener('click', () => { buyut = !buyut; $('#buyut').textContent = buyut ? 'Sığdır' : '1:1 büyüt'; olcekle(); if (mod === 'izle' && iz && !iz.anim) izGit(iz.f); odakla(); });
-    let z; window.addEventListener('resize', () => { clearTimeout(z); z = setTimeout(olcekle, 80); });
+    /* telefonda «Tümü» ↔ «Yakınlaş» */
+    $('#buyut').addEventListener('click', () => {
+      tumu = !tumu;
+      if (tumu) { olcekUygula(G.fit); const k = $('.sim-kap'); k.scrollLeft = 0; k.scrollTop = 0; } else odakGuncelle();
+      tumuGuncelle();
+    });
+    let z, sonGenis = genis();
+    window.addEventListener('resize', () => { clearTimeout(z); z = setTimeout(() => { if (sonGenis !== genis()) { sonGenis = genis(); if (mod === 'kesif' && !sonAc) panelCiz(); } olcekle(); }, 80); });
   }
 
   /* ---------------------------------------------------------------- başlat */
@@ -573,8 +801,15 @@
   olaylar();
   kur('kesif');
   olcekle();
+  if (location.hash === '#benzetim') setTimeout(benzetimeIn, 60);
   window.OKUL_SAYFA = {
     kur, goster, atla, durum: () => ({ mod, odev: odev && odev.id, adim, mik }), simdiki, acAnahtar, odakla,
+    kesif: {
+      sec: kesifSec, liste: () => KOGE.map((o) => ({ i: o.i, k: o.k, et: o.et, kat: KESIF[o.kat].id, hd: o.hd })),
+      /* test: seçili parçanın vurgusu benzetimde görünüyor mu (kayan kutular ve sahne kırpması düşülür) */
+      gorunur: () => { const o = KOGE[kesSec]; if (!o) return null; const el = o.hd ? HMS().hedefEl(o.hd) : $('#hms .h-dk.ust .h-dlg'); if (!el) return { var: false, yok: true }; const g = gorunurDortgen(el); return { var: g.var, w: Math.round(g.R - g.L), h: Math.round(g.B - g.T), baslik: ($('#panel .pn-h') || {}).textContent }; },
+    },
+    gorus: () => ({ s: G.s, fit: G.fit, W: G.W, H: G.H, odakVar: G.odakVar, tumu }),
     iz: {
       basla: izBasla, git: izGit, ileri: () => izIleri(true), geri: izGeri, oynat: izOynat, dur: izDur, hiz: izHizDegis,
       durum: () => (iz ? { odev: iz.o.id, f: iz.f, toplam: iz.kareler.length, kare: iz.kareler[iz.f], anim: iz.anim, oynuyor: iz.oynuyor, hiz: iz.hizAd } : null),

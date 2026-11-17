@@ -569,5 +569,86 @@
   ODEV[0].izleSon = ["3 alt havza, 1 kanal, 2 birleşim; bütün su Junction-2'de toplanıyor.", 'Yöntemler: Initial and Constant · Clark Unit Hydrograph · Linear Reservoir · Lag.', 'Alanlar 29 + 41 + 88 = 158 mi²; Reach-1 Lag 300 dk.', 'Gerçek programda her adımın ekran görüntüsünü al, hepsini tek PDF yap.'];
   ODEV[1].izleSon = ['Üç yağış ölçeri (DUJP, PNXP, MFFP), May 1996 meteorolojik modeli, 15 dakikalık kontrol ayarı.', "Koşu hesaplandı: havza çıkışı Junction-2'de tepe 3082,9 cfs (30 Nisan 18:45).", 'Gözlenen akım PNXP: tepe 2942,0 cfs (17:00); Nash-Sutcliffe 0,952.', 'Gerçek programda her adımın ekran görüntüsünü al, hepsini tek PDF yap.'];
 
-  window.OKUL = { AC, ODEV, IMG };
+  /* ======================================================================== KATEGORİ KATEGORİ SEÇİM (17 Kas)
+     Rehberli ve izle: adımlar ödevin aşamalarına (faz) ayrılır; her adımın seçim listesindeki kısa adı (kisa).
+     fazlar: [ad, adım sayısı] sırayla; toplam ödevin adım sayısına eşit olmalı (değilse konsola hata: test yakalar). */
+  const FAZ = {
+    hw1: [['Proje kur', 4], ['Havza ağı', 5], ['Parametreler', 5], ['Teslim', 1]],
+    hw2: [['Yağış ölçerleri', 4], ['Meteoroloji modeli', 3], ['Kontrol ve zaman', 2], ['Çalıştır', 2], ['Sonuçlar', 3], ['Gözlenen akım', 3]],
+  };
+  const KISA = {
+    hw1: ['Programı aç', 'Proje yarat', 'Havza modeli yarat', 'Varsayılan yöntemler', 'Haritayı aç', '3 alt havza', 'Kanal ve birleşimler', 'Elemanları bağla', 'Adlandır, Save', 'Alanlar', 'Taban akışı', 'Kayıp', 'Clark: Tc ve R', 'Reach-1 Lag', 'Save, PDF'],
+    hw2: ['DUJP ölçeri', 'DUJP verisi (DSS)', 'Time Window', 'PNXP ve MFFP', 'Met modeli yarat', 'Yağış yöntemi', 'Ölçer ataması', 'Kontrol yarat', 'Tarih ve adım', 'Koşu sihirbazı', 'Compute', 'Global özet', 'Stump Creek grafiği', 'Reach-1 grafiği', 'PNXP akım ölçeri', 'Akım verisi, Options', 'Yeniden hesap, kıyas'],
+  };
+  ODEV.forEach((o) => {
+    const f = FAZ[o.id], k = KISA[o.id];
+    if (k.length !== o.adimlar.length) console.error(`${o.ad}: kısa ad sayısı ${k.length} ≠ ${o.adimlar.length}`);
+    if (f.reduce((t, x) => t + x[1], 0) !== o.adimlar.length) console.error(`${o.ad}: faz adımları toplamı ≠ ${o.adimlar.length}`);
+    o.fazlar = []; let i = 0;
+    f.forEach(([ad, n], fi) => { o.fazlar.push({ ad, bas: i, son: i + n }); for (let j = 0; j < n; j++, i++) if (o.adimlar[i]) o.adimlar[i].faz = fi; });
+    o.adimlar.forEach((a, j) => { a.kisa = k[j] || a.baslik; });
+  });
+
+  /* Keşif: programın bütün parçaları, programın kendi bölümlerine göre. Öğe: [etiket, AC anahtarı, yol, vurgu, grup]
+     yol: kesif tabanından (iki ödevin son hâli) sırayla yapılacak tıklar; «hd|sag» sağ tık (eleman ortasından),
+     {hd, o} ek seçenekle. vurgu: benzetimde nabızla işaretlenecek parça (null: açılan pencerenin kendisi). */
+  const T = (et, k, yol, hd, g) => ({ et, k, yol: yol || [], hd: hd === undefined ? k : hd, g });
+  const menuOge = (yol, et, ac) => T(et, 'mi:' + yol, [ 'm:' + yol.split('/')[0] ].concat(ac ? ['mi:' + yol] : []), 'mi:' + yol);
+  const sekme = (et, sec, s, k) => T(et, k || 'ce:' + s, [].concat(sec, ['ce:sekme:' + s]), 'ce:sekme:' + s);
+  const ayar = (et, k) => T(et, 'cb:' + k, ['m:Tools', 'mi:Tools/Program Settings...', 'dlg:sekme:Defaults', 'cb:vars.' + k], 'cb:vars.' + k);
+  const KESIF = [
+    { id: 'bolgeler', ad: 'Bölgeler', ogeler: [
+      T('Başlık çubuğu', 'bolge:baslik'), T('Menü çubuğu', 'bolge:menu'), T('Araç çubukları', 'bolge:arac'), T('Zaman çubuğu', 'bolge:arac2'),
+      T('Watershed Explorer', 'bolge:agac'), T('Component Editor', 'bolge:ce', ['harita:el:Stump Creek']), T('Harita masası', 'bolge:masa'), T('Message Log', 'bolge:log')] },
+    { id: 'menuler', ad: 'Menüler', ogeler: ['File', 'Edit', 'View', 'Components', 'GIS', 'Parameters', 'Compute', 'Results', 'Tools', 'Help'].map((m) => T(m, 'm:' + m, ['m:' + m])) },
+    { id: 'komutlar', ad: 'Komutlar', ogeler: [
+      menuOge('File/New...', 'File › New...'), menuOge('File/Save', 'File › Save'),
+      menuOge('Components/Create Component', 'Create Component', true), menuOge('Components/Basin Model Manager', 'Basin Model Manager'), menuOge('Components/Meteorologic Model Manager', 'Meteorologic Model Manager'),
+      menuOge('Components/Control Specifications Manager', 'Control Specifications Manager'), menuOge('Components/Time-Series Data Manager', 'Time-Series Data Manager'),
+      menuOge('Parameters/Subbasin Area', 'Subbasin Area'), menuOge('Parameters/Loss', 'Parameters › Loss', true), menuOge('Parameters/Transform', 'Parameters › Transform', true),
+      menuOge('Parameters/Baseflow', 'Parameters › Baseflow', true), menuOge('Parameters/Routing', 'Parameters › Routing', true),
+      menuOge('Compute/Create Compute', 'Compute › Create Compute', true), menuOge('Results/Global Summary Table', 'Results › Global Summary'), menuOge('Tools/Program Settings...', 'Tools › Program Settings')] },
+    { id: 'araclar', ad: 'Araçlar', ogeler: [
+      T('New Project', 'tb:new', ['tb:new'], 'tb:new', 'File'), T('Open Project', 'tb:open', ['tb:open'], 'tb:open', 'File'), T('Save Project', 'tb:save', ['tb:save'], 'tb:save', 'File'), T('Print', 'tb:print', [], 'tb:print', 'File')]
+      .concat([['arrow', 'Arrow'], ['zoom', 'Zoom'], ['subbasin', 'Subbasin'], ['reach', 'Reach'], ['reservoir', 'Reservoir'], ['junction', 'Junction'], ['diversion', 'Diversion'], ['source', 'Source'], ['sink', 'Sink'], ['breakpoint', 'Break Point']].map(([a, et]) => T(et, 'tb:' + a, ['tb:' + a], 'tb:' + a, 'Components')))
+      .concat([T('Koşu seçimi', 'tb:secKosu', ['tb:secKosu'], 'tb:secKosu', 'Compute'), T('Compute', 'tb:compute', ['tb:compute'], 'tb:compute', 'Compute'), T('Global Summary', 'tb:gsum', ['tb:gsum'], 'tb:gsum', 'Compute'),
+        T('Element Graph', 'tb:graph', ['harita:el:Junction-2', 'tb:graph'], 'tb:graph', 'Compute'), T('Element Summary', 'tb:esum', ['harita:el:Junction-2', 'tb:esum'], 'tb:esum', 'Compute'), T('Time-Series Table', 'tb:tstable', ['harita:el:Stump Creek', 'tb:tstable'], 'tb:tstable', 'Compute')]) },
+    { id: 'explorer', ad: 'Explorer', ogeler: [
+      T('Components sekmesi', 'xt:Components', ['xt:Components'], 'xt:Components', 'Sekmeler'), T('Compute sekmesi', 'xt:Compute', ['xt:Compute'], 'xt:Compute', 'Sekmeler'), T('Results sekmesi', 'xt:Results', ['xt:Results'], 'xt:Results', 'Sekmeler')]
+      .concat([['Proje: Punxsutawney', 'agac:proje', 'p'], ['Basin Models', 'agac:k:basin', 'k:basin'], ['Havza modeli', 'agac:havza', 'h:Punxsutawney'], ['Subbasin: Stump Creek', 'agac:subbasin', 'e:Stump Creek'],
+        ['Reach: Reach-1', 'agac:reach', 'e:Reach-1'], ['Junction: Junction-2', 'agac:junction', 'e:Junction-2'], ['Meteorologic Models', 'agac:k:met', 'k:met'], ['Met modeli: May 1996', 'agac:met', 'm'],
+        ['Specified Hyetograph', 'agac:hy', 'hy'], ['Control Specifications', 'agac:k:kontrol', 'k:kontrol'], ['Kontrol: May 1996', 'agac:kontrol', 'c'], ['Time-Series Data', 'agac:k:ts', 'k:ts'],
+        ['Yağış ölçeri: DUJP', 'agac:pg', 'pg:DUJP'], ['Akım ölçeri: PNXP', 'agac:dg', 'dg:PNXP']].map(([et, k, id]) => T(et, k, ['xt:Components', 'agac:sec:' + id], 'agac:sec:' + id, 'Components sekmesi')))
+      .concat([T('Koşu: May 1996', 'agac:kosu', ['xt:Compute', 'agac:sec:r'], 'agac:sec:r', 'Compute ve Results'), T('Sonuç düğümü', 'agac:sonuc', ['xt:Results', 'agac:ac:rs:Junction-2', 'agac:sec:rs:Junction-2'], 'agac:sec:rs:Junction-2', 'Compute ve Results')]) },
+    { id: 'harita', ad: 'Harita', ogeler: [
+      T('Subbasin: Stump Creek', 'harita:subbasin', ['harita:el:Stump Creek'], 'harita:el:Stump Creek', 'Elemanlar'), T('Reach: Reach-1', 'harita:reach', ['harita:el:Reach-1'], 'harita:el:Reach-1', 'Elemanlar'),
+      T('Junction: Junction-2', 'harita:junction', ['harita:el:Junction-2'], 'harita:el:Junction-2', 'Elemanlar'),
+      T('Connect Downstream', 'bm:Connect Downstream', ['harita:el:EB Mahoning Creek|sag'], 'bm:Connect Downstream', 'Sağ tık menüsü'), T('View Results', 'bm:View Results', ['harita:el:Junction-2|sag', 'bm:View Results'], 'bm:View Results', 'Sağ tık menüsü'),
+      T('Graph', 'bm:Graph', ['harita:el:Junction-2|sag', 'bm:View Results'], 'bm:Graph', 'Sağ tık menüsü'), T('Summary Table', 'bm:Summary Table', ['harita:el:Junction-2|sag', 'bm:View Results'], 'bm:Summary Table', 'Sağ tık menüsü')] },
+    { id: 'editor', ad: 'Editör', ogeler: [
+      T('Project', 'ce:Project', ['xt:Components', 'agac:sec:p'], 'bolge:ce', 'Proje ve havza'), sekme('Basin Model', ['xt:Components', 'agac:sec:h:Punxsutawney'], 'Basin Model'),
+      sekme('Subbasin', ['harita:el:Stump Creek'], 'Subbasin'), sekme('Loss', ['harita:el:Stump Creek'], 'Loss'), sekme('Transform', ['harita:el:Stump Creek'], 'Transform'), sekme('Baseflow', ['harita:el:Stump Creek'], 'Baseflow'),
+      sekme('Reach', ['harita:el:Reach-1'], 'Reach'), sekme('Routing', ['harita:el:Reach-1'], 'Routing'), sekme('Junction', ['harita:el:Junction-2'], 'Junction'), sekme('Options', ['harita:el:Junction-2'], 'Options')].map((x, i) => Object.assign(x, { g: i < 2 ? 'Proje ve havza' : 'Havza elemanları' }))
+      .concat([sekme('Time-Series Gage', ['xt:Components', 'agac:sec:pg:DUJP'], 'Time-Series Gage'), T('Select Pathname', 'ce:yol', ['xt:Components', 'agac:sec:pg:DUJP'], 'ce:yol'), sekme('Time Window', ['xt:Components', 'agac:sec:pg:DUJP'], 'Time Window'),
+        sekme('Table', ['xt:Components', 'agac:sec:pg:DUJP'], 'Table'), sekme('Graph', ['xt:Components', 'agac:sec:pg:DUJP'], 'Graph')].map((x) => Object.assign(x, { g: 'Ölçerler' })))
+      .concat([sekme('Meteorologic Model', ['xt:Components', 'agac:sec:m'], 'Meteorologic Model'), sekme('Basins', ['xt:Components', 'agac:sec:m'], 'Basins'), sekme('Specified Hyetograph', ['xt:Components', 'agac:sec:hy'], 'Specified Hyetograph'),
+        sekme('Control Specifications', ['xt:Components', 'agac:sec:c'], 'Control Specifications'), sekme('Simulation Run', ['xt:Compute', 'agac:sec:r'], 'Simulation Run')].map((x) => Object.assign(x, { g: 'Meteoroloji ve koşu' }))) },
+    { id: 'listeler', ad: 'Listeler', ogeler: [
+      T('Default Unit System', 'cb:birim', ['m:File', 'mi:File/New...', 'cb:dlg.birim'], 'cb:dlg.birim', 'Proje'),
+      ayar('Subbasin loss', 'loss'), ayar('Subbasin transform', 'transform'), ayar('Subbasin baseflow', 'baseflow'), ayar('Reach routing', 'routing')].map((x, i) => Object.assign(x, { g: i ? 'Program Settings › Defaults' : 'Proje' }))
+      .concat([T('Downstream', 'cb:asagi', ['harita:el:Stump Creek', 'ce:sekme:Subbasin', 'cb:el.Stump Creek.asagi'], 'cb:el.Stump Creek.asagi'), T('Data Type', 'cb:tsTur', ['m:Components', 'mi:Components/Time-Series Data Manager', 'cb:dlg.tsTur'], 'cb:dlg.tsTur'),
+        T('Data Source', 'cb:kaynak', ['xt:Components', 'agac:sec:pg:DUJP', 'cb:pg.DUJP.kaynak'], 'cb:pg.DUJP.kaynak'), T('Precipitation', 'cb:yagis', ['xt:Components', 'agac:sec:m', 'cb:met.yagis'], 'cb:met.yagis'),
+        T('Include Subbasins', 'cb:dahil', ['xt:Components', 'agac:sec:m', 'ce:sekme:Basins', 'cb:met.dahil'], 'cb:met.dahil'), T('Time Interval', 'cb:aralik', ['xt:Components', 'agac:sec:c', 'cb:kontrol.aralik'], 'cb:kontrol.aralik'),
+        T('Observed Flow', 'cb:goz', ['harita:el:Junction-2', 'ce:sekme:Options', 'cb:el.Junction-2.goz'], 'cb:el.Junction-2.goz')].map((x) => Object.assign(x, { g: 'Component Editor' }))) },
+    { id: 'pencereler', ad: 'Pencereler', ogeler: [
+      T('Create a New Project', 'dlg:yeniProje', ['m:File', 'mi:File/New...'], null), T('Manager penceresi', 'dlg:yonetici', ['m:Components', 'mi:Components/Basin Model Manager'], null),
+      T('Create A New …', 'dlg:yeniBilesen', ['m:Components', 'mi:Components/Meteorologic Model Manager', 'dlg:New...'], null), T('Create A New … Element', 'dlg:adVer', ['tb:subbasin', { hd: 'harita:bos', o: { hx: 560, hy: 250 } }], null),
+      T('Program Settings', 'dlg:ayarlar', ['m:Tools', 'mi:Tools/Program Settings...', 'dlg:sekme:Defaults'], null), T('Global editör', 'dlg:global', ['m:Parameters', 'mi:Parameters/Loss', 'mi:Parameters/Loss/Initial and Constant'], null),
+      T('Select Pathname', 'dlg:yolSec', ['xt:Components', 'agac:sec:pg:DUJP', 'ce:yol'], null), T('Simulation Run sihirbazı', 'dlg:sihirbaz', ['m:Compute', 'mi:Compute/Create Compute', 'mi:Compute/Create Compute/Simulation Run...'], null)].map((x) => Object.assign(x, { g: 'Yaratma ve ayar' }))
+      .concat([T('Compute Progress', 'dlg:ilerleme', ['tb:compute'], null), T('Global Summary Results', 'dlg:gozet', ['tb:gsum'], null), T('Element Graph', 'dlg:grafik', ['harita:el:Junction-2', 'tb:graph'], null),
+        T('Summary Table', 'dlg:ozet', ['harita:el:Junction-2', 'tb:esum'], null), T('Time-Series Results', 'dlg:tablo', ['harita:el:Stump Creek', 'tb:tstable'], null)].map((x) => Object.assign(x, { g: 'Sonuç' }))) },
+  ];
+  KESIF.forEach((c) => c.ogeler.forEach((o) => { if (!AC[o.k]) console.error(`Keşif: açıklaması olmayan parça ${o.k}`); }));
+
+  window.OKUL = { AC, ODEV, IMG, KESIF };
 })();
