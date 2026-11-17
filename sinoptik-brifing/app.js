@@ -14,12 +14,17 @@
   // Geniş ekran (YAN): görsel solda, kontroller + açıklama sağda; sahne ekrana sığar, sağ panel kendi içinde kayar.
   // Telefon: görsel üstte yapışkan; bir öğeye basınca açıklama görselin hemen altına gelecek kadar kaydırılır.
   const YAN = matchMedia('(min-width: 900px), (orientation: landscape) and (min-width: 600px) and (max-height: 500px)');
-  const YAPISKAN = '.sahne-gorsel, .skt-sol, .syn-model, .mg-gorsel';
+  const YAPISKAN = '.sahne-gorsel';
   const ustYuk = () => { const u = $('#ust'); return u ? u.getBoundingClientRect().height : 0; };
-  function olc() { // üst çubuk ve başlık yüksekliği → CSS (sahne yüksekliği bunlarla hesaplanır)
-    document.documentElement.style.setProperty('--ust-h', ustYuk() + 'px');
-    document.querySelectorAll('.sahne > .harita-ust, .arac-kart > .harita-ust').forEach((c) => c.parentElement.style.setProperty('--cap', c.offsetHeight + 'px'));
+  function olc() { // üst çubuk yüksekliği + sahnenin metin sütunundan taşma payı → CSS
+    const kok = document.documentElement;
+    kok.style.setProperty('--ust-h', ustYuk() + 'px');
+    // geniş ekranda sahne metin sütunundan taşar: genişlik min(sayfa − 32, 1600), ortada (yan İçindekiler sütununun üstüne biner)
+    const ana = $('#ana');
+    if (ana) { const cw = kok.clientWidth, W = Math.min(cw - 32, 1600), sol = (cw - W) / 2, r = ana.getBoundingClientRect(); kok.style.setProperty('--tas-sol', Math.max(0, Math.round(r.left - sol)) + 'px'); kok.style.setProperty('--tas-sag', Math.max(0, Math.round(sol + W - r.right)) + 'px'); }
   }
+  // panel içinde yapışkan şerit (üstte) ve adım düğmeleri (altta) içeriği örter: görünür bant onların arası
+  const yapisikYuk = (el) => (el && el.offsetParent && getComputedStyle(el).position === 'sticky' ? el.offsetHeight : 0);
   function odakla(kap, el) { // kap: sahnenin kökü · el: değişen açıklama (yoksa yalnız görsel)
     if (!kap) return;
     requestAnimationFrame(() => {
@@ -28,22 +33,41 @@
       const yap = kap.querySelector(YAPISKAN), yapisik = yap && getComputedStyle(yap).position === 'sticky';
       let d = 0;
       if (!yapisik) {
-        // geniş ekran: sahnenin tamamı görünsün, açıklama sağ panelin içinde görünsün
-        if (!tam && (kr.top < ust - 1 || kr.bottom > alt + 1)) d = kr.top < ust || kr.height > alt - ust ? kr.top - ust - 12 : Math.min(kr.bottom - alt + 12, kr.top - ust - 12);
-        const p = el && el.closest('.sahne-panel, .skt-sag');
+        // geniş ekran: sahnenin tamamı görünsün (üstü çubuğun hemen altında), açıklama sağ panelin içinde görünsün
+        if (!tam && (kr.top < ust - 1 || kr.bottom > alt + 1)) d = kr.height > alt - ust - 8 ? kr.top - ust : kr.top - ust - 8;
+        const p = el && el.closest('.sahne-panel');
         if (p && p.scrollHeight > p.clientHeight + 1) {
-          const pr = p.getBoundingClientRect(), r = el.getBoundingClientRect(); let e = 0;
-          if (r.top < pr.top) e = r.top - pr.top - 8; else if (r.bottom > pr.bottom) e = Math.min(r.bottom - pr.bottom + 8, r.top - pr.top - 8);
+          const pr = p.getBoundingClientRect(), r = el.getBoundingClientRect(), bas = p.querySelector('.secim-serit');
+          const ust2 = pr.top + (bas && !bas.contains(el) && bas.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING ? yapisikYuk(bas) : 0);
+          const alt2 = pr.bottom - yapisikYuk(p.querySelector('.adim-gez'));
+          let e = 0;
+          if (r.top < ust2) e = r.top - ust2 - 8; else if (r.bottom > alt2) e = Math.min(r.bottom - alt2 + 8, r.top - ust2 - 8);
           if (Math.abs(e) > 2) p.scrollBy({ top: e, behavior: kay });
-        } else if (el && !tam) { const r = el.getBoundingClientRect(), t = r.top - d, b = r.bottom - d; if (t < ust) d += t - ust - 12; else if (b > alt) d += Math.min(b - alt + 12, t - ust - 12); }
+        } else if (el && !tam && !kap.contains(el)) { const r = el.getBoundingClientRect(), t = r.top - d, b = r.bottom - d; if (t < ust) d += t - ust - 12; else if (b > alt) d += Math.min(b - alt + 12, t - ust - 12); }
       } else {
         // telefon: görsel tepeye yapışık ve tam görünür; açıklama onun hemen altında
         const yr = yap.getBoundingClientRect();
         if (yr.top < ust - 1 || yr.bottom > alt + 1) { yap.style.position = 'static'; d = yap.getBoundingClientRect().top - ust; yap.style.position = ''; }
         if (el && !yap.contains(el)) { const r = el.getBoundingClientRect(), t = r.top - d, b = r.bottom - d, s = ust + yr.height; if (t < s + 4) d += t - s - 8; else if (b > alt - 4) d += Math.min(b - alt + 12, t - s - 8); }
       }
-      if (Math.abs(d) > 2) (tam ? kap : window).scrollBy({ top: d, behavior: kay });
+      // mutlak hedef: üst üste gelen iki odaklama (ya da yarıda kesilen yumuşak kaydırma) aynı yere varır
+      if (Math.abs(d) > 2) { if (tam) kap.scrollBy({ top: d, behavior: kay }); else scrollTo({ top: Math.round(scrollY + d), behavior: kay }); }
     });
+  }
+  // sahneye git: sahnenin üstü çubuğun hemen altına gelir (çapa, İçindekiler, ‹ önceki · sonraki › harita)
+  function sahneyeGit(id, anlik) {
+    const a = document.getElementById(id), s = a && a.querySelector('.sahne'); if (!s) return false;
+    const y = scrollY + s.getBoundingClientRect().top - ustYuk() - (YAN.matches ? 8 : 0);
+    scrollTo({ top: Math.max(0, Math.round(y)), behavior: anlik || AZ ? 'instant' : 'smooth' });
+    return true;
+  }
+  const parla = (t) => { t.classList.remove('parla'); void t.offsetWidth; t.classList.add('parla'); };
+  // telefonda kategori/öğe şeridi yapışkan sahnenin içine (görselin hemen altına) taşınır; geniş ekranda panelin üstünde durur
+  function seritKur(kart, gorsel) {
+    const s = kart.querySelector('.sahne-panel .secim-serit'); if (!s) return;
+    const yer = document.createComment('şerit'); s.parentNode.insertBefore(yer, s);
+    const f = () => { if (YAN.matches) yer.parentNode.insertBefore(s, yer.nextSibling); else gorsel.appendChild(s); };
+    f(); YAN.addEventListener('change', f);
   }
 
   // ───────── seslendirme (tarayıcı destekliyorsa)
@@ -73,6 +97,21 @@
     { id: 'sss', no: '?', ad: 'Sık sorulanlar' },
   ];
   const ADIM_AD = {}; Object.entries(V.H).forEach(([k, v]) => (ADIM_AD[k] = v.ad)); Object.entries(V.ARAC).forEach(([k, v]) => (ADIM_AD[k] = v.ad));
+  // sahne sırası: 15 harita + 3 araç; kategoriler = İçindekiler bölümleri
+  const SIRA = BOLUM.filter((b) => b.adim).flatMap((b) => b.adim.map((id) => ({ id, b })));
+  function gezinti(id) { // sahne içinde «‹ önceki harita · seçici · sonraki harita ›»
+    const i = SIRA.findIndex((x) => x.id === id), o = SIRA[i - 1], s = SIRA[i + 1];
+    const kap = h('div', 'sahne-gez'); kap.setAttribute('role', 'group'); kap.setAttribute('aria-label', 'Haritalar arasında gez');
+    const git = (x) => () => { history.replaceState(null, '', '#' + x.id); sahneyeGit(x.id); if (YAN.matches) { const k = document.querySelector(`#${x.id} .sahne`); if (k) k.focus({ preventScroll: true }); } };
+    const b1 = btn('gez-b', '‹', o && git(o)), b2 = btn('gez-b', '›', s && git(s));
+    const etk = (b, x, ad) => { if (x) { b.title = ad + ': ' + ADIM_AD[x.id]; b.setAttribute('aria-label', b.title); } else b.disabled = true; };
+    etk(b1, o, 'Önceki harita'); etk(b2, s, 'Sonraki harita');
+    const et = h('label', 'gez-et'); et.innerHTML = `<span class="gez-ust">Harita ${i + 1} / ${SIRA.length} · ${kac(SIRA[i].b.ad)}</span>`;
+    const sec = h('select', 'gez-sec'); sec.setAttribute('aria-label', 'Haritaya git');
+    BOLUM.filter((b) => b.adim).forEach((b) => { const g = h('optgroup'); g.label = `${b.no} · ${b.ad}`; b.adim.forEach((x) => { const op = h('option', null, kac(ADIM_AD[x])); op.value = x; if (x === id) op.selected = true; g.appendChild(op); }); sec.appendChild(g); });
+    sec.addEventListener('change', () => { const x = SIRA.find((y) => y.id === sec.value); sec.value = id; if (x && x.id !== id) git(x)(); });
+    et.appendChild(sec); kap.append(b1, et, b2); return kap;
+  }
 
   // ───────── üst çubuk + içindekiler
   function ustCubuk() {
@@ -114,15 +153,19 @@
       // seçili sekme çubukta görünsün (haritadaki numaraya dokununca «Gördüklerim» seçilir)
       const b = bar.children[i]; if (b) { const br = bar.getBoundingClientRect(), r = b.getBoundingClientRect(); if (r.left < br.left || r.right > br.right) bar.scrollBy({ left: r.left < br.left ? r.left - br.left - 8 : r.right - br.right + 8, behavior: AZ ? 'auto' : 'smooth' }); }
     };
-    liste.forEach(([ad, icerik], i) => {
-      const b = btn('sekme-b', ad, () => sec(i)); b.setAttribute('role', 'tab'); bar.appendChild(b);
+    liste.forEach(([ad, icerik, n], i) => {
+      const b = btn('sekme-b', `<span>${ad}</span>${n ? `<span class="kat-n">${n}</span>` : ''}`, () => sec(i)); b.setAttribute('role', 'tab'); bar.appendChild(b);
       const p = h('div', 'sekme-panel'); p.setAttribute('role', 'tabpanel'); p.appendChild(icerik); govde.appendChild(p);
     });
     bar.addEventListener('keydown', (e) => { const bs = [...bar.querySelectorAll('button')], i = bs.indexOf(document.activeElement); if (i < 0) return; if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); const j = (i + (e.key === 'ArrowRight' ? 1 : bs.length - 1)) % bs.length; sec(j); bs[j].focus(); } });
     sec(0); kap.sec = sec; return kap;
   }
   const maddeler = (arr) => { const ul = h('ul', 'madde'); arr.forEach((m) => ul.appendChild(h('li', null, kac(m)))); return ul; };
-  function soruPanel(arr) { const d = h('div', 'satirlar'); arr.forEach(([s, c]) => { const x = h('details', 'satir'); x.innerHTML = `<summary><span>${kac(s)}</span></summary><p>${kac(c)}</p>`; d.appendChild(x); }); return d; }
+  function soruPanel(arr, ac) { // ac(i, acik): bir soru açılınca/kapanınca (sahne içindeyse seçim şeridi eşitlenir)
+    const d = h('div', 'satirlar');
+    arr.forEach(([s, c], i) => { const x = h('details', 'satir'); x.innerHTML = `<summary><span>${kac(s)}</span></summary><p>${kac(c)}</p>`; if (ac) x.addEventListener('toggle', () => { if (x.open) d.querySelectorAll('details').forEach((y) => y !== x && (y.open = false)); ac(i, x.open, x); }); d.appendChild(x); });
+    return d;
+  }
   function denePanel(q) {
     const d = h('div', 'dene'); d.appendChild(h('p', 'dene-s', kac(q.s))); const sec = h('div', 'dene-sec'); const geri = h('p', 'dene-geri'); geri.setAttribute('aria-live', 'polite');
     q.c.forEach((c, i) => { const b = btn('dene-b', kac(c), () => { sec.querySelectorAll('button').forEach((x, k) => { x.disabled = true; x.classList.toggle('dogru', k === q.d); x.classList.toggle('yanlis', k === i && i !== q.d); }); geri.innerHTML = (i === q.d ? '<b>Doğru.</b> ' : '<b>Tam değil.</b> ') + kac(q.a); tekrar.hidden = false; odakla(d.closest('.sahne, .arac-kart'), tekrar); }); sec.appendChild(b); });
@@ -131,31 +174,37 @@
   }
 
   // ───────── harita adımı
+  // Sahne = harita (değişen kısım) + panel (seçim listesi). Panel: harita gezintisi → sunum/tam ekran/lejant → kategori satırı
+  // (yapışkan; sekmeler = kategoriler, sayılı) → o kategorinin öğeleri ve açıklaması → «‹ Önceki · Sonraki ›» (yapışkan, altta).
+  // Telefonda kategori + öğe şeridi yapışkan haritanın hemen altına taşınır; açıklama altında akar.
   const HARITA_NESNE = {};
+  const lejTur = (tur) => (tur === 'renk' ? 'renk' : tur === 'kesik' ? 'kesik' : tur === 'harf' ? 'harf' : tur === 'ist' || tur === 'ok' ? 'ist' : 'cizgi');
   function haritaAdim(id) {
     const v = V.H[id], m = HR[id], rol = V.ROL[v.rol]; m.id = id;
     const a = h('article', 'adim'); a.id = id; a.style.setProperty('--rol', rol.renk);
     a.innerHTML = `<header class="adim-bas"><p class="adim-etiket"><span class="rol-nokta"></span>${rol.ad} · ${rol.is} · ${v.sure}</p><h3>${kac(v.baslik)}</h3><p class="adim-kisa">${kac(v.kisa)}</p></header>`;
-    // sahne: harita (telefonda üstte yapışkan) + panel (düğmeler, lejant, sekmeler)
-    const kart = h('figure', 'harita-kart sahne');
+    const kart = h('figure', 'harita-kart sahne sahne-harita');
     kart.innerHTML = `<figcaption class="harita-ust"><b>${kac(v.ad)}</b><span>${kac(v.tur)} · ${kac(v.gecerli)}</span><span class="harita-kaynak">Kaynak: ${kac(v.kaynak)} · sadeleştirilmiş çizim</span></figcaption>`;
-    const gorsel = h('div', 'sahne-gorsel'); const alan = h('div', 'harita-alan'); gorsel.appendChild(alan); kart.appendChild(gorsel);
-    const H = window.Motor.ciz(alan, m); HARITA_NESNE[id] = H; alan.style.setProperty('--ar', (H.g.w / H.g.h).toFixed(4));
+    const gorsel = h('div', 'sahne-gorsel'); const cer = h('div', 'sahne-cer'); const alan = h('div', 'harita-alan'); cer.appendChild(alan); gorsel.appendChild(cer); kart.appendChild(gorsel);
+    const H = window.Motor.ciz(alan, m); HARITA_NESNE[id] = H; const ar = (H.g.w / H.g.h).toFixed(4); alan.style.setProperty('--ar', ar); kart.style.setProperty('--ar', ar); kart.classList.toggle('genis-gorsel', ar >= 1.6);
     const altyazi = h('div', 'sunum-alt'); altyazi.hidden = true; altyazi.setAttribute('aria-live', 'polite');
     const panel = h('div', 'sahne-panel'); kart.appendChild(panel);
+    panel.appendChild(gezinti(id));
     const arac = h('div', 'harita-arac'); panel.appendChild(arac);
-    // katmanlar (lejant)
-    const lej = h('div', 'lejant'); lej.setAttribute('aria-label', 'Katmanlar');
-    const katlar = [...new Set((m.lejant || []).map((l) => l[0]))];
-    (m.lejant || []).forEach(([k, tur, renk, ad]) => {
-      const b = btn('lej', `<span class="lej-ornek lej-${tur === 'renk' ? 'renk' : tur === 'kesik' ? 'kesik' : tur === 'harf' ? 'harf' : tur === 'ist' || tur === 'ok' ? 'ist' : 'cizgi'}" style="--c:${renk}"></span><span>${kac(ad)}</span>`);
+    // lejant: kapalıyken tek satır (örnek çizgiler + sayı); açınca katman düğmeleri
+    const lejK = h('details', 'lejant-kap'); const lej = h('div', 'lejant'); lej.setAttribute('aria-label', 'Katmanlar');
+    const L = m.lejant || [];
+    const ozet = h('summary', 'lejant-ozet'); ozet.innerHTML = `<span class="lejant-et">Lejant</span><span class="lejant-mini" aria-hidden="true">${L.map(([, tur, renk]) => `<span class="lej-ornek lej-${lejTur(tur)}" style="--c:${renk}"></span>`).join('')}</span><span class="kat-n">${L.length}</span>`;
+    lejK.append(ozet, lej); if (!L.length) lejK.hidden = true;
+    lejK.addEventListener('toggle', () => { if (lejK.open) odakla(kart, lej); });
+    L.forEach(([k, tur, renk, ad]) => {
+      const b = btn('lej', `<span class="lej-ornek lej-${lejTur(tur)}" style="--c:${renk}"></span><span>${kac(ad)}</span>`);
       b.setAttribute('aria-pressed', 'true'); b.dataset.k = k;
       b.addEventListener('click', () => { const acik = b.getAttribute('aria-pressed') !== 'true'; lej.querySelectorAll(`[data-k="${k}"]`).forEach((x) => x.setAttribute('aria-pressed', String(acik))); const g = H.katman[k]; if (g) g.style.display = acik ? '' : 'none'; odakla(kart); });
-      b.addEventListener('mouseenter', () => { if (!H.katman[k]) return; H.svg.classList.add('vurgu-kip'); Object.entries(H.katman).forEach(([ad, g]) => g.classList.toggle('one', ad === k)); });
+      b.addEventListener('mouseenter', () => { if (!H.katman[k]) return; H.svg.classList.add('vurgu-kip'); Object.entries(H.katman).forEach(([ad2, g]) => g.classList.toggle('one', ad2 === k)); });
       b.addEventListener('mouseleave', () => { H.svg.classList.remove('vurgu-kip'); Object.values(H.katman).forEach((g) => g.classList.remove('one')); });
       lej.appendChild(b);
     });
-    void katlar;
     // sunum modu
     let sira = -1, madde = 0, zam = null, oynuyor = false;
     const durdur = () => { clearTimeout(zam); zam = null; oynuyor = false; oynat.textContent = 'Sunum modu'; };
@@ -182,46 +231,79 @@
     const kontrol = h('div', 'sunum-kontrol'); kontrol.hidden = true;
     kontrol.append(btn('cip', 'Önceki', () => { durdur(); geri(); sunumOdak(); }), btn('cip', 'Sonraki', () => { durdur(); kart.classList.add('sunumda'); ileri(); sunumOdak(); }), btn('cip', 'Bitir', bitir));
     const tam = btn('dugme ikincil', 'Tam ekran', () => { const acik = kart.classList.toggle('tam'); tam.textContent = acik ? 'Küçült' : 'Tam ekran'; document.body.classList.toggle('kilit', acik); olc(); });
-    arac.append(oynat, kontrol, tam, lej);
-    // alt yazı: geniş ekranda paneldeki düğmelerin altında (harita örtülmez), telefonda haritanın hemen altında
-    const yerlestir = () => { if (YAN.matches) arac.insertBefore(altyazi, lej); else gorsel.appendChild(altyazi); };
-    yerlestir(); YAN.addEventListener('change', yerlestir);
-    kart.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (kart.classList.contains('tam')) tam.click(); else bitir(); return; } if (e.target.closest('.adim-yan')) return; if (e.key === 'ArrowRight') { durdur(); kart.classList.add('sunumda'); kontrol.hidden = false; ileri(); sunumOdak(); } if (e.key === 'ArrowLeft') { durdur(); geri(); sunumOdak(); } });
+    arac.append(oynat, kontrol, tam, lejK);
+    kart.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (kart.classList.contains('tam')) tam.click(); else bitir(); return; } if (e.target.closest('.sekme, .secim-serit, .sahne-gez')) return; if (e.key === 'ArrowRight') { durdur(); kart.classList.add('sunumda'); kontrol.hidden = false; ileri(); sunumOdak(); } if (e.key === 'ArrowLeft') { durdur(); geri(); sunumOdak(); } });
     kart.tabIndex = -1;
     a.appendChild(kart);
-    // sekmeler
+    // kategoriler (eski sekmeler) ve öğeleri
     const gordum = h('div', 'bolge-liste');
-    v.bolgeler.forEach((b, i) => {
+    const bolgeD = v.bolgeler.map((b, i) => {
       const d = h('details', 'bolge'); d.innerHTML = `<summary><span class="b-no">${i + 1}</span><span>${kac(b.ad)}</span></summary>`; d.appendChild(maddeler(b.m));
-      d.addEventListener('toggle', () => { if (d.open) { gordum.querySelectorAll('details').forEach((x) => x !== d && (x.open = false)); durdur(); sira = i; madde = b.m.length; window.Motor.odak(H, i); odakla(kart, d); } else if (![...gordum.querySelectorAll('details')].some((x) => x.open)) { window.Motor.odak(H, -1); sira = -1; } });
-      gordum.appendChild(d);
+      d.addEventListener('toggle', () => {
+        if (d.open) { bolgeD.forEach((x) => x !== d && (x.open = false)); durdur(); sira = i; madde = b.m.length; window.Motor.odak(H, i); ks.ayarla(0, i); odakla(kart, d); }
+        else if (!bolgeD.some((x) => x.open)) { window.Motor.odak(H, -1); sira = -1; if (ks.durum()[0] === 0) ks.ayarla(0, -1); }
+      });
+      gordum.appendChild(d); return d;
     });
     gordum.appendChild(h('p', 'ipucu', 'Haritadaki turuncu numaralara da dokunabilirsin.'));
-    H.bolgeler.forEach((b, i) => { const ac = () => { const d = gordum.querySelectorAll('details')[i]; d.open = !d.open; sk.sec(0); }; b.el.addEventListener('click', ac); b.el.addEventListener('keydown', (e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), ac())); });
     const soyle = h('div', 'soyle'); soyle.appendChild(h('blockquote', 'konusma', kac(v.soyle))); soyle.appendChild(dinleBtn(v.soyle, 'tr-TR', 'Sesli dinle'));
-    const okuP = h('div'); okuP.appendChild(maddeler(v.oku)); okuP.appendChild(h('p', 'ipucu', 'Haritanın altındaki katman düğmelerinin üstüne gel: o katman öne çıkar; dokununca gizlenir.'));
+    const okuP = h('div'); okuP.appendChild(maddeler(v.oku)); okuP.appendChild(h('p', 'ipucu', 'Lejantı aç ve bir katmanın üstüne gel: o katman öne çıkar; dokununca gizlenir.'));
     const nereden = h('div', 'nereden'); nereden.innerHTML = `<p class="site">${kac(v.nereden.site)}</p>` + (v.nereden.url ? `<p><a href="${v.nereden.url}" target="_blank" rel="noopener">${kac(v.nereden.url.replace('https://', ''))} ↗</a></p>` : ''); nereden.appendChild(maddeler(v.nereden.adim));
     const en = h('div', 'en'); en.appendChild(h('p', 'en-cumle', kac(v.en))); en.appendChild(dinleBtn(v.en, 'en-US', 'Listen'));
-    const sk = sekmeler([['Gördüklerim', gordum], ['Söylediğim', soyle], ['Neden?', maddeler(v.neden)], ['Nasıl okunur', okuP], ['Soru gelirse', soruPanel(v.soru)], ['Nereden?', nereden], ['İngilizce', en], ['Kendini dene', denePanel(v.dene)]]);
-    const yan = h('div', 'adim-yan'); yan.appendChild(sk); panel.appendChild(yan);
+    const soruP = soruPanel(v.soru, (i, acik, d) => { if (acik) { ks.ayarla(4, i); odakla(kart, d); } else if (ks.durum()[0] === 4 && ![...soruP.querySelectorAll('details')].some((x) => x.open)) ks.ayarla(4, -1); });
+    const soruD = [...soruP.querySelectorAll('details')];
+    const dene = denePanel(v.dene);
+    // [ad, içerik, öğe kutuları (details), öğe adları, gösterilen sayı, öğesiz kategoride şerit notu]
+    const KAT = [
+      ['Gördüklerim', gordum, bolgeD, v.bolgeler.map((b, i) => `<span class="b-no">${i + 1}</span>${kac(b.ad)}`)],
+      ['Söylediğim', soyle, [], [], 0, 'Konuşma metni aşağıda'],
+      ['Neden?', maddeler(v.neden), [], [], v.neden.length, `${v.neden.length} gerekçe aşağıda`],
+      ['Nasıl okunur', okuP, [], [], v.oku.length, 'Okuma ipuçları aşağıda'],
+      ['Soru gelirse', soruP, soruD, v.soru.map(([q]) => kac(q))],
+      ['Nereden?', nereden, [], [], 0, 'Kaynak ve indirme adımları aşağıda'],
+      ['İngilizce', en, [], [], 0, 'İngilizce cümle aşağıda'],
+      ['Kendini dene', dene, [], [], 0, 'Soru aşağıda'],
+    ];
+    const sk = h('div', 'sekme'); const govde = h('div', 'sekme-govde');
+    const paneller = KAT.map(([, icerik]) => { const p = h('div', 'sekme-panel'); p.setAttribute('role', 'tabpanel'); p.appendChild(icerik); govde.appendChild(p); return p; });
+    const ks = window.Araclar.katSecim(KAT.map(([ad, , , adlar, n]) => ({ ad, n: n != null ? n : adlar.length, ogeler: adlar.map((x) => ({ ad: x })) })), (k, i, kd) => {
+      paneller.forEach((p, j) => (p.hidden = j !== k));
+      const ds = KAT[k][2];
+      if (i >= 0 && ds[i]) { if (!ds[i].open) ds[i].open = true; else odakla(kart, ds[i]); } // açılınca toggle → odakla
+      else if (!kd) ds.forEach((d) => (d.open = false)); // seçili öğeye yeniden basıldı: kapat
+      else odakla(kart, paneller[k]);
+    }, { ad: 'Kategoriler', ilk: (k) => KAT[k][2].findIndex((d) => d.open), bos: (k) => KAT[k][5] || 'Aşağıda', sinif: 'serit-harita', kapanir: true });
+    ks.bar.querySelectorAll('.sekme-b').forEach((b, j) => b.setAttribute('aria-controls', paneller[j].id = `${id}-k${j}`));
+    paneller.forEach((p, j) => (p.hidden = j !== 0));
+    sk.append(ks.serit, govde, ks.gez); panel.appendChild(sk);
+    // haritadaki numaralı işaret → «Gördüklerim»deki bölge
+    H.bolgeler.forEach((b, i) => { const ac = () => { if (bolgeD[i].open && ks.durum()[0] === 0) bolgeD[i].open = false; else ks.git(0, i); }; b.el.addEventListener('click', ac); b.el.addEventListener('keydown', (e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), ac())); });
+    // alt yazı: geniş ekranda paneldeki düğmelerin altında (harita örtülmez), telefonda haritanın hemen altında
+    seritKur(kart, gorsel);
+    const yerlestir = () => { if (YAN.matches) arac.insertBefore(altyazi, lejK); else gorsel.appendChild(altyazi); };
+    yerlestir(); YAN.addEventListener('change', yerlestir);
     const alt = h('div', 'adim-alt'); alt.innerHTML = `<p class="oz"><b>ÖZ</b>${kac(v.oz)}</p>`; alt.appendChild(bittiDugme(id)); a.appendChild(alt);
     return a;
   }
 
-  // ───────── araç adımı (SYNOP, Skew-T, meteogram)
+  // ───────── araç adımı (SYNOP, Skew-T, meteogram): sahne = görsel; panel = gezinti + aracın kendi seçim listesi
   function aracAdim(id) {
     const v = V.ARAC[id], rol = V.ROL[v.rol];
     const a = h('article', 'adim adim-arac'); a.id = id; a.style.setProperty('--rol', rol.renk);
     a.innerHTML = `<header class="adim-bas"><p class="adim-etiket"><span class="rol-nokta"></span>${rol.ad} · ${rol.is} · ${v.sure}</p><h3>${kac(v.baslik)}</h3><p class="adim-kisa">${kac(v.kisa)}</p></header>`;
-    const kart = h('figure', 'arac-kart'); kart.innerHTML = `<figcaption class="harita-ust"><b>${kac(v.ad)}</b><span>${kac(v.tur)} · ${kac(v.gecerli)}</span><span class="harita-kaynak">Kaynak: ${kac(v.kaynak)}</span></figcaption>`;
-    const ic = h('div', 'arac-ic arac-' + id); kart.appendChild(ic); a.appendChild(kart);
-    window.Araclar[id](ic);
-    // araç sahnesi: bir düğmeye basınca görsel ve açıklaması aynı ekranda kalsın
+    const kart = h('figure', `arac-kart sahne sahne-arac sahne-${id}`); kart.innerHTML = `<figcaption class="harita-ust"><b>${kac(v.ad)}</b><span>${kac(v.tur)} · ${kac(v.gecerli)}</span><span class="harita-kaynak">Kaynak: ${kac(v.kaynak)}</span></figcaption>`;
+    const gorsel = h('div', 'sahne-gorsel'), panel = h('div', 'sahne-panel'); kart.append(gorsel, panel);
+    panel.appendChild(gezinti(id));
+    const ic = h('div', 'arac-ic arac-' + id); panel.appendChild(ic); a.appendChild(kart);
+    window.Araclar[id](ic, gorsel);
+    const vb = gorsel.querySelector('svg').viewBox.baseVal; kart.style.setProperty('--ar', (vb.width / vb.height).toFixed(4));
+    seritKur(kart, gorsel);
+    // bir düğmeye basınca görsel ve açıklaması aynı ekranda kalsın
     const aciklama = { synop: '.syn-tablo', skewt: '.skt-aciklama' }[id];
-    ic.addEventListener('click', (e) => { if (e.target.closest('button, [role=button]')) odakla(kart, aciklama ? ic.querySelector(aciklama) : null); });
+    kart.addEventListener('click', (e) => { const b = e.target.closest('button, [role=button]'); if (b && !b.closest('.sahne-gez')) odakla(kart, aciklama ? kart.querySelector(aciklama) : b.closest('.mg-kart')); });
     const soyle = h('div', 'soyle'); soyle.appendChild(h('blockquote', 'konusma', kac(v.soyle))); soyle.appendChild(dinleBtn(v.soyle, 'tr-TR', 'Sesli dinle'));
     const en = h('div', 'en'); en.appendChild(h('p', 'en-cumle', kac(v.en))); en.appendChild(dinleBtn(v.en, 'en-US', 'Listen'));
-    a.appendChild(sekmeler([['Söylediğim', soyle], ['Neden?', maddeler(v.neden)], ['Soru gelirse', soruPanel(v.soru)], ['İngilizce', en]]));
+    a.appendChild(sekmeler([['Söylediğim', soyle], ['Neden?', maddeler(v.neden), v.neden.length], ['Soru gelirse', soruPanel(v.soru), v.soru.length], ['İngilizce', en]]));
     const alt = h('div', 'adim-alt'); alt.innerHTML = `<p class="oz"><b>ÖZ</b>${kac(v.oz)}</p>`; alt.appendChild(bittiDugme(id)); a.appendChild(alt);
     return a;
   }
@@ -255,8 +337,12 @@
   // ───────── hazırlık
   function hazirlik(s) {
     const adim = (id, baslik, kisa, govde) => { const a = h('article', 'adim adim-duz'); a.id = id; a.innerHTML = `<header class="adim-bas"><p class="adim-etiket">Hazırlık</p><h3>${baslik}</h3><p class="adim-kisa">${kisa}</p></header>`; a.appendChild(govde); s.appendChild(a); };
-    const saatK = h('div', 'arac-kart saat'); window.Araclar.saat(saatK);
+    // saat aracı da bir sahne: zaman çizelgesi (değişen kısım) + girdiler ve sonuç (panel)
+    const saatK = h('figure', 'arac-kart sahne sahne-arac sahne-saat'); saatK.innerHTML = '<figcaption class="harita-ust"><b>Saat hesaplayıcı</b><span>Analiz anı → sunum günü · UTC ↔ TSİ</span></figcaption>';
+    const saatG = h('div', 'sahne-gorsel'), saatP = h('div', 'sahne-panel'), saatI = h('div', 'arac-ic arac-saat saat'); saatP.appendChild(saatI); saatK.append(saatG, saatP);
+    window.Araclar.saat(saatI, saatG); { const vb = saatG.querySelector('svg').viewBox.baseVal; saatK.style.setProperty('--ar', (vb.width / vb.height).toFixed(4)); }
     saatK.querySelectorAll('input[type=date], input[type=time]').forEach((i) => i.addEventListener('change', () => odakla(saatK, saatK.querySelector('.saat-sonuc'))));
+    saatK.querySelector('.saat-kay').addEventListener('change', () => odakla(saatK, saatK.querySelector('.saat-cevir-t')));
     adim('saat', 'Önce saati sabitledim', 'Bütün analiz haritaları aynı ana ait olmalı: sunumdan önceki günün 12 UTC’si. Tahmin sunum günü için.', saatK);
     // veri listesi
     const isaret = new Set(depo.al('sb:liste', []));
@@ -352,8 +438,25 @@
     icindekiler();
     olc(); addEventListener('resize', olc, { passive: true }); if (document.fonts) document.fonts.ready.then(olc);
     $('#alt').innerHTML = `<div class="alt-ic"><p><b>Sinoptik Brifing Atölyesi</b> · Atmosfer Akademisi · MTO 302E.</p><p>Haritalar gerçek analiz ve tahminlerin sadeleştirilmiş çizimleridir; sayılar örnek brifingde okunan değerlerdir. Kıyı ve sınır çizgileri: Natural Earth (kamu malı). Sondaj: University of Wyoming. SYNOP: Ogimet. Model haritaları: ECMWF Open Charts (CC BY 4.0), GFS (wetter3), DWD analizi. Yazı tipi: Inter (SIL OFL).</p><p><a href="../">Atmosfer Akademisi</a> · <a href="../harita-okulu/">Harita Okulu</a> · <a href="../hava-analizi-proje-rehberi/">Proje Rehberi</a></p></div>`;
-    if (location.hash) { const t = document.getElementById(location.hash.slice(1)); if (t) setTimeout(() => t.scrollIntoView(), 60); }
-    addEventListener('hashchange', () => { const t = document.getElementById(location.hash.slice(1)); if (t) { t.classList.remove('parla'); void t.offsetWidth; t.classList.add('parla'); } });
+    // çapa: sahnesi olan adımda sahnenin üstü çubuğun hemen altına gelir; diğerlerinde başlık
+    const hedef = () => { try { return document.getElementById(decodeURIComponent(location.hash.slice(1))); } catch (e) { return null; } };
+    if (location.hash) { const t = hedef(); if (t) { const git = () => sahneyeGit(t.id, true) || t.scrollIntoView(); setTimeout(git, 60); if (document.fonts) document.fonts.ready.then(() => setTimeout(git, 30)); } }
+    addEventListener('hashchange', () => { const t = hedef(); if (t) { sahneyeGit(t.id); parla(t); } });
+    document.addEventListener('click', (e) => {
+      const l = e.target.closest('a[href^="#"]'); if (!l || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      let t = null; try { t = document.getElementById(decodeURIComponent(l.getAttribute('href').slice(1))); } catch (x) { /* bozuk çapa */ }
+      if (!t || !t.querySelector('.sahne')) return;
+      e.preventDefault(); history.pushState(null, '', '#' + t.id); sahneyeGit(t.id); parla(t);
+    });
+    // sahne ekranın ortasındayken yan İçindekiler çekilir; üst çubuktaki «İçindekiler» onu çekmece olarak açar
+    const gorunen = new Set();
+    const io = new IntersectionObserver((es) => {
+      es.forEach((x) => (x.isIntersecting ? gorunen.add(x.target) : gorunen.delete(x.target)));
+      const m = gorunen.size > 0; if (m !== document.body.classList.contains('sahne-modu')) { document.body.classList.toggle('sahne-modu', m); if (innerWidth >= 1100) document.body.classList.remove('toc-acik'); }
+    }, { rootMargin: '-30% 0px -30% 0px' });
+    document.querySelectorAll('.sahne').forEach((x) => io.observe(x));
+    document.addEventListener('click', (e) => { if (document.body.classList.contains('toc-acik') && !e.target.closest('#toc, .ust-toc')) document.body.classList.remove('toc-acik'); });
+    addEventListener('keydown', (e) => { if (e.key === 'Escape') document.body.classList.remove('toc-acik'); });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', kur); else kur();
 })();

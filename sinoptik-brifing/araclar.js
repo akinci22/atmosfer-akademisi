@@ -8,6 +8,53 @@
   const tx = (p, x, y, t, at) => { const e = el('text', Object.assign({ x, y }, at), p); e.textContent = t; return e; };
   const h = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
   const virgul = (v, n) => v.toFixed(n == null ? 1 : n).replace('.', ',').replace('-', '−');
+  const dugme = (cls, html, f, et) => { const b = h('button', cls, html); b.type = 'button'; if (et) { b.setAttribute('aria-label', et); b.title = et; } if (f) b.addEventListener('click', f); return b; };
+
+  // ───────────────────────────────────────── KATEGORİ KATEGORİ SEÇİM
+  // Önce kategori satırı (ad + sayı), sonra yalnız o kategorinin öğeleri; «‹ Önceki · Sonraki ›» kategoriler arasında da geçer.
+  // Masaüstünde şerit panelin üstünde yapışkan, adım düğmeleri panelin altında; telefonda şerit yapışkan sahnenin içine taşınır
+  // (app.js) ve ‹ › öğe satırının iki ucundadır.
+  // kats: [{ ad, n?, baslik?, ogeler: [{ ad (html), baslik? }] }] · sec(k, i, katDegisti): sahneyi değiştir (i = −1: öğe yok)
+  // se: { ilk(k) → kategoriye basınca seçilecek öğe, ogeCls, ad, bos(k) → öğesiz kategoride şerit notu, sinif }
+  function katSecim(kats, sec, se) {
+    se = se || {};
+    const serit = h('div', 'secim-serit' + (se.sinif ? ' ' + se.sinif : ''));
+    const bar = h('div', 'sekme-bar kat'); bar.setAttribute('role', 'tablist'); bar.setAttribute('aria-label', se.ad || 'Kategoriler');
+    const satir = h('div', 'oge-satir'); const oge = h('div', 'oge');
+    const g1 = dugme('gez-b', '‹', () => geri(), 'Önceki'), g2 = dugme('gez-b', '›', () => ileri(), 'Sonraki');
+    satir.append(g1, oge, g2); serit.append(bar, satir);
+    const gez = h('div', 'adim-gez'); const d1 = dugme('gez-d', '‹ Önceki', () => geri()), et = h('span', 'gez-yazi'), d2 = dugme('gez-d gez-ileri', 'Sonraki ›', () => ileri());
+    et.setAttribute('aria-live', 'polite');
+    gez.append(d1, et, d2);
+    let K = 0, I = -1, cizilen = -1;
+    const kaydirGor = (kap, el) => { if (!el || kap.scrollWidth <= kap.clientWidth + 1) return; const kr = kap.getBoundingClientRect(), r = el.getBoundingClientRect(); if (r.left < kr.left + 4 || r.right > kr.right - 4) kap.scrollLeft += r.left - kr.left - 28; };
+    kats.forEach((k, j) => {
+      const n = k.n != null ? k.n : k.ogeler.length;
+      const b = dugme('sekme-b kat-b', `<span>${k.ad}</span>${n ? `<span class="kat-n">${n}</span>` : ''}`, () => git(j, se.ilk ? se.ilk(j) : (kats[j].ogeler.length ? 0 : -1)));
+      b.setAttribute('role', 'tab'); if (k.baslik) b.title = k.baslik; bar.appendChild(b);
+    });
+    const ciz = () => {
+      [...bar.children].forEach((b, j) => { b.setAttribute('aria-selected', String(j === K)); b.tabIndex = j === K ? 0 : -1; });
+      const k = kats[K], n = k.ogeler.length;
+      if (cizilen !== K) {
+        cizilen = K; oge.innerHTML = '';
+        if (n) k.ogeler.forEach((o, i) => { const b = dugme(se.ogeCls || 'oge-b', o.ad, () => git(K, I === i && se.kapanir ? -1 : i)); if (o.baslik) b.title = o.baslik; oge.appendChild(b); });
+        else oge.appendChild(h('span', 'oge-bos', se.bos ? se.bos(K) : 'Açıklama aşağıda'));
+        oge.scrollLeft = 0;
+      }
+      [...oge.querySelectorAll('button')].forEach((b, i) => b.setAttribute('aria-pressed', String(i === I)));
+      et.innerHTML = `<b>${k.ad}</b><span>${n ? `${I >= 0 ? I + 1 : '–'} / ${n}` : `${K + 1}. kategori / ${kats.length}`}</span>`;
+      const bas = K === 0 && I <= 0, son = K === kats.length - 1 && (!n || I === n - 1);
+      g1.disabled = d1.disabled = bas; g2.disabled = d2.disabled = son;
+      kaydirGor(bar, bar.children[K]); kaydirGor(oge, oge.children[Math.max(0, I)]);
+    };
+    const git = (k, i) => { const kd = k !== K; K = k; I = i; ciz(); sec(k, i, kd); };
+    const ileri = () => { const n = kats[K].ogeler.length; if (n && I < n - 1) git(K, I + 1); else if (K < kats.length - 1) git(K + 1, kats[K + 1].ogeler.length ? 0 : -1); };
+    const geri = () => { if (I > 0) git(K, I - 1); else if (K > 0) { const m = kats[K - 1].ogeler.length; git(K - 1, m ? m - 1 : -1); } };
+    bar.addEventListener('keydown', (e) => { if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return; e.preventDefault(); const j = (K + (e.key === 'ArrowRight' ? 1 : kats.length - 1)) % kats.length; bar.children[j].click(); bar.children[j].focus(); });
+    ciz();
+    return { serit, gez, bar, git, ileri, geri, ayarla: (k, i) => { K = k; I = i; ciz(); }, durum: () => [K, I], sonda: () => K === kats.length - 1 && I === kats[K].ogeler.length - 1 };
+  }
 
   // ───────────────────────────────────────── SYNOP
   const SYNOP = [
@@ -28,10 +75,15 @@
     { g: '90760', ad: 'Ek olay süresi', r: [['907', 'Sonraki 9 grubunun süresi'], ['tt = 60', '60 × 6 dk = 6 saat']] },
     { g: '91106', ad: 'En yüksek hamle', r: [['911', 'Hamle grubu'], ['ff = 06', 'Son 6 saatte en yüksek hamle 6 knot']] },
   ];
-  function synop(kap) {
-    // sahne: model (görsel) · grup düğmeleri · açıklama ayrı kutular; yerleşimi site.css kurar
-    const kod = h('div', 'syn-kod');
-    const svgKap = h('div', 'syn-model'); const tablo = h('div', 'syn-tablo', '<p class="ipucu">Bir gruba dokun: anlamı burada, istasyon modelindeki yeri yanda yanar.</p>'); kap.append(kod, svgKap, tablo);
+  const SYN_KISIM = { 'Kısım 0': 'Kısım 0: mesaj türü, gün-saat, istasyon', 'Kısım 1': 'Kısım 1: ana gözlem grupları', 'Kısım 3': 'Kısım 3: ek gruplar' };
+  function synop(kap, gorsel) {
+    // sahne (gorsel): istasyon modeli + mesajın tamamı · panel (kap): kısım → grup seçimi, açıklama
+    gorsel = gorsel || kap;
+    const svgKap = h('div', 'sahne-cer syn-model');
+    const mesaj = h('p', 'syn-mesaj'); mesaj.setAttribute('aria-label', 'Mesajın tamamı; seçili grup vurgulu');
+    const parcaM = SYNOP.map((s) => { const sp = h('span', 'syn-m', s.g); mesaj.append(sp, ' '); return sp; });
+    gorsel.append(svgKap, mesaj);
+    const tablo = h('div', 'syn-tablo', '<p class="ipucu">Önce kısmı, sonra grubu seç: anlamı burada; istasyon modelinde ve mesajda yeri yanar.</p>');
     // viewBox çizimin sınırına kırpılmış: boş kenar yok, sahnede yer kazanır
     const svg = el('svg', { viewBox: '22 30 182 122', class: 'syn-svg', role: 'img', 'aria-label': 'Kartal istasyon modeli' }, svgKap);
     const P = {};
@@ -44,19 +96,21 @@
     parca('e', (g) => { tx(g, 140, 122, '−20', { class: 'syn-d', fill: '#1f5fd1' }); el('path', { d: 'M178 112l8 8l8-14', fill: 'none', stroke: '#1f5fd1', 'stroke-width': 2 }, g); });
     parca('ch', (g) => { el('path', { d: 'M108 52h22m0 0q6 0 8-6', fill: 'none', stroke: 'currentColor', 'stroke-width': 2 }, g); tx(g, 146, 50, 'CH 4', { class: 'syn-k' }); });
     parca('vv', (g) => tx(g, 64, 106, '10 km', { 'text-anchor': 'end', class: 'syn-k' }));
-    const sec = (i) => {
-      kod.querySelectorAll('button').forEach((b, k) => b.setAttribute('aria-pressed', k === i ? 'true' : 'false'));
-      const s = SYNOP[i]; Object.values(P).forEach((g) => g.classList.remove('yan'));
-      (s.p || []).forEach((p) => P[p] && P[p].classList.add('yan'));
+    const goster = (i) => {
+      Object.values(P).forEach((g) => g.classList.remove('yan')); parcaM.forEach((sp, k) => sp.classList.toggle('yan', k === i));
+      if (i < 0) return;
+      const s = SYNOP[i]; (s.p || []).forEach((p) => P[p] && P[p].classList.add('yan'));
       tablo.innerHTML = `<p class="syn-baslik"><b>${s.g}</b> · ${s.ad}</p><dl>${s.r.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join('')}</dl>` + ((s.p || []).length ? '' : '<p class="ipucu">Bu grup istasyon modelinde gösterilmez.</p>');
+      // mesaj şeridi telefonda tek satır, yana kayar: seçili grup görünsün
+      const sp = parcaM[i]; if (mesaj.scrollWidth > mesaj.clientWidth + 1) { const mr = mesaj.getBoundingClientRect(), r = sp.getBoundingClientRect(); if (r.left < mr.left || r.right > mr.right) mesaj.scrollLeft += r.left - mr.left - 40; }
     };
-    let bolum = null;
-    SYNOP.forEach((s, i) => {
-      if (s.k && s.k !== bolum) { bolum = s.k; kod.appendChild(h('span', 'syn-bolum', s.k)); }
-      const b = h('button', 'syn-g', s.g); b.type = 'button'; b.setAttribute('aria-pressed', 'false'); b.addEventListener('click', () => sec(i)); kod.appendChild(b);
-    });
-    const tum = h('button', 'dugme ikincil syn-tum', 'Hepsini sırayla oynat'); tum.type = 'button'; kap.appendChild(tum);
-    let t = null; tum.addEventListener('click', () => { if (t) { clearInterval(t); t = null; tum.textContent = 'Hepsini sırayla oynat'; return; } let i = 0; sec(0); tum.textContent = 'Durdur'; t = setInterval(() => { i++; if (i >= SYNOP.length) { clearInterval(t); t = null; tum.textContent = 'Hepsini sırayla oynat'; return; } sec(i); }, 2200); });
+    // kategoriler = mesajın kendi kısımları (0, 1, 3); öğeler = o kısmın grupları
+    const KAT = []; SYNOP.forEach((s, i) => { if (s.k) KAT.push({ ad: s.k, baslik: SYN_KISIM[s.k], idx: [] }); KAT[KAT.length - 1].idx.push(i); });
+    const ks = katSecim(KAT.map((k) => ({ ad: k.ad, baslik: k.baslik, ogeler: k.idx.map((i) => ({ ad: SYNOP[i].g, baslik: SYNOP[i].ad })) })), (k, i) => goster(i < 0 ? -1 : KAT[k].idx[i]), { ogeCls: 'syn-g', ad: 'SYNOP kısımları' });
+    const tum = dugme('dugme ikincil syn-tum', 'Hepsini sırayla oynat');
+    let t = null; const dur = () => { clearInterval(t); t = null; tum.textContent = 'Hepsini sırayla oynat'; };
+    tum.addEventListener('click', () => { if (t) { dur(); return; } ks.git(0, 0); tum.textContent = 'Durdur'; t = setInterval(() => { if (ks.sonda()) { dur(); return; } ks.ileri(); }, 2200); });
+    kap.append(ks.serit, tablo, tum, ks.gez);
   }
 
   // ───────────────────────────────────────── SKEW-T (Kartal 09.11.2026 00 UTC; Wyoming)
@@ -78,11 +132,13 @@
     { ad: '500 hPa', p: [500, 500], m: 'T −21,7 °C · 5670 m · 315° 16,5 m/s ≈ 32 kt. 500 haritasındaki «567 dam».' },
     { ad: '300 hPa', p: [300, 300], m: 'T −47,7 °C · 9250 m · 310° 24,7 m/s ≈ 48 kt: jetin dışında.' },
   ];
-  function skewt(kap) {
+  const INDIS_P = [[850, 500], [850, 500], [850, 500], [1028, 200], [1028, 300]]; // indisin dayandığı tabaka (diyagramda yanar)
+  function skewt(kap, gorsel) {
+    gorsel = gorsel || kap;
     const W = 560, H = 600, L = Math.log(1050 / 200), sx = 7;
     const Y = (p) => H * (1 - Math.log(1050 / p) / L), X = (T, p) => (T + 40) * sx + (H - Y(p));
-    const svg = el('svg', { viewBox: `-40 -10 ${W + 110} ${H + 40}`, class: 'skt-svg', role: 'img', 'aria-label': 'Kartal sondajı Skew-T diyagramı' });
-    const sol = h('div', 'skt-sol'); const sag = h('div', 'skt-sag'); sol.appendChild(svg); kap.append(sol, sag);
+    const svg = el('svg', { viewBox: `-44 -26 ${W + 114} ${H + 66}`, class: 'skt-svg', role: 'img', 'aria-label': 'Kartal sondajı Skew-T diyagramı' });
+    const sol = h('div', 'sahne-cer skt-sol'); const sag = h('div', 'skt-sag'); sol.appendChild(svg); gorsel.appendChild(sol); kap.appendChild(sag);
     const clip = el('clipPath', { id: 'skt-k' }, el('defs', {}, svg)); el('rect', { x: 0, y: 0, width: W, height: H }, clip);
     const ic = el('g', { 'clip-path': 'url(#skt-k)' }, svg);
     el('rect', { x: 0, y: 0, width: W, height: H, class: 'skt-zemin' }, ic);
@@ -95,29 +151,37 @@
     for (let T = -110; T <= 40; T += 10) line([[X(T, 1050), Y(1050)], [X(T, 200), Y(200)]], { class: T === 0 ? 'skt-izo0' : 'skt-izo' });
     for (const p of [1000, 850, 700, 500, 400, 300, 250, 200]) { el('line', { x1: 0, x2: W, y1: Y(p), y2: Y(p), class: 'skt-izobar' }, svg); tx(svg, -6, Y(p) + 4, String(p), { 'text-anchor': 'end', class: 'skt-et' }); }
     for (let T = -40; T <= 40; T += 10) tx(svg, X(T, 1050), H + 18, String(T).replace('-', '−'), { 'text-anchor': 'middle', class: 'skt-et' });
-    tx(svg, -36, -2, 'hPa', { class: 'skt-et' }); tx(svg, W, H + 34, '°C', { 'text-anchor': 'end', class: 'skt-et' });
+    tx(svg, -40, -12, 'hPa', { class: 'skt-et' }); tx(svg, W, H + 37, '°C', { 'text-anchor': 'end', class: 'skt-et' });
     // vurgu bandı
     const bant = el('rect', { x: 0, width: W, y: 0, height: 0, class: 'skt-bant' }, ic);
     line(SND.map((s) => [X(s[2], s[0]), Y(s[0])]), { class: 'skt-T' });
     line(SND.filter((s) => s[3] != null).map((s) => [X(s[3], s[0]), Y(s[0])]), { class: 'skt-Td' });
     // rüzgâr okları (sağ kenar)
     for (const s of SND.filter((q) => [1000, 925, 850, 700, 500, 400, 300, 250, 200].includes(q[0]))) window.Motor.ok(svg, W + 52, Y(s[0]), s[4], s[5] * 1.944, 'currentColor');
-    tx(svg, W + 52, -2, 'rüzgâr', { 'text-anchor': 'middle', class: 'skt-et' });
+    tx(svg, W + 52, -12, 'rüzgâr', { 'text-anchor': 'middle', class: 'skt-et' });
     // imleç okuması
     const imlec = el('g', { class: 'skt-imlec', visibility: 'hidden' }, svg); const iy = el('line', { x1: 0, x2: W, class: 'skt-iy' }, imlec);
-    const oku = h('p', 'skt-oku', 'İmleci (ya da parmağını) diyagramın üstünde gezdir: basınç, yükseklik, T, Td ve nem okunur.'); sol.appendChild(oku);
+    const oku = h('p', 'skt-oku sahne-oku', 'İmleci (ya da parmağını) diyagramın üstünde gezdir: basınç, yükseklik, T, Td ve nem okunur.'); gorsel.appendChild(oku);
     const interp = (p) => { for (let i = 0; i < SND.length - 1; i++) { const a = SND[i], b = SND[i + 1]; if (p <= a[0] && p >= b[0]) { const t = Math.log(a[0] / p) / Math.log(a[0] / b[0]); const f = (k) => (a[k] == null || b[k] == null ? null : a[k] + (b[k] - a[k]) * t); return { z: f(1), T: f(2), Td: f(3) }; } } return null; };
     const hareket = (ev) => { const r = svg.getBoundingClientRect(), vb = svg.viewBox.baseVal, y = ((ev.clientY - r.top) / r.height) * vb.height + vb.y; if (y < 0 || y > H) return; const p = 1050 / Math.exp((1 - y / H) * L), v = interp(p); if (!v) return; imlec.setAttribute('visibility', 'visible'); iy.setAttribute('y1', y); iy.setAttribute('y2', y); const rh = v.Td == null ? null : (100 * es(v.Td)) / es(v.T); oku.innerHTML = `<b>${Math.round(p)} hPa</b> · ${Math.round(v.z)} m · T ${virgul(v.T)} °C` + (v.Td == null ? '' : ` · Td ${virgul(v.Td)} °C · T − Td ${virgul(v.T - v.Td)} · nem %${Math.round(rh)}`); };
     svg.addEventListener('pointermove', hareket); svg.addEventListener('pointerdown', hareket);
-    // odak listesi
-    const liste = h('div', 'skt-liste'); sag.appendChild(h('p', 'kucuk-baslik', 'Diyagramda göster')); sag.appendChild(liste);
-    const aciklama = h('p', 'skt-aciklama', 'Bir tabakaya dokun: diyagramda yanar, açıklaması burada çıkar.');
-    ODAK.forEach((o) => { const b = h('button', 'cip', o.ad); b.type = 'button'; b.addEventListener('click', () => { liste.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', x === b ? 'true' : 'false')); const y0 = Y(o.p[0]), y1 = Y(o.p[1]); bant.setAttribute('y', Math.min(y0, y1) - (o.p[0] === o.p[1] ? 6 : 2)); bant.setAttribute('height', Math.abs(y1 - y0) + (o.p[0] === o.p[1] ? 12 : 4)); aciklama.textContent = o.m; }); b.setAttribute('aria-pressed', 'false'); liste.appendChild(b); });
-    sag.appendChild(aciklama);
-    sag.appendChild(h('p', 'kucuk-baslik', 'İndisler'));
-    const ind = h('div', 'skt-indis'); sag.appendChild(ind);
-    INDIS.forEach(([a, v, m]) => { const d = h('details', 'satir'); d.innerHTML = `<summary><span>${a}</span><b>${v}</b></summary><p>${m}</p>`; ind.appendChild(d); });
+    // seçim: Tabakalar (inversiyonlar, kuru tabaka) · Seviyeler (standart seviyeler) · İndisler — her öğe diyagramda bir bandı yakar
+    const bantKoy = (p0, p1) => { const y0 = Y(p0), y1 = Y(p1), tek = p0 === p1; bant.setAttribute('y', Math.min(y0, y1) - (tek ? 6 : 2)); bant.setAttribute('height', Math.abs(y1 - y0) + (tek ? 12 : 4)); };
+    const KAT = [
+      { ad: 'Tabakalar', baslik: 'İnversiyonlar ve kuru tabaka', ogeler: ODAK.slice(0, 3).map((o) => ({ ad: o.ad, o })) },
+      { ad: 'Seviyeler', baslik: 'Standart basınç seviyeleri', ogeler: ODAK.slice(3).map((o) => ({ ad: o.ad, o })) },
+      { ad: 'İndisler', baslik: 'Kararlılık ve nem indisleri', ogeler: INDIS.map(([a, v, m], i) => ({ ad: `${a.replace(/ \(.*\)/, '')} <b>${v}</b>`, baslik: a, o: { ad: a, v, m, p: INDIS_P[i] } })) },
+    ];
+    const aciklama = h('p', 'skt-aciklama', 'Önce kategoriyi, sonra tabakayı seç: diyagramda yanar, açıklaması burada çıkar.');
+    const ks = katSecim(KAT, (k, i) => {
+      if (i < 0) { bant.setAttribute('height', 0); return; }
+      const o = KAT[k].ogeler[i].o; bantKoy(o.p[0], o.p[1]);
+      aciklama.innerHTML = o.v ? `<b>${o.ad} = ${o.v}.</b> ${o.m}` : `<b>${o.ad}.</b> ${o.m}`;
+    }, { ogeCls: 'cip', ad: 'Sondaj kategorileri' });
+    ks.serit.querySelector('.oge').classList.add('skt-liste');
+    sag.append(ks.serit, aciklama);
     sag.appendChild(h('p', 'skt-lejant', '<span class="c-T"></span> sıcaklık (T) <span class="c-Td"></span> çiy noktası (Td) <span class="c-k"></span> kuru adyabat <span class="c-n"></span> nemli adyabat <span class="c-m"></span> karışma oranı'));
+    sag.appendChild(ks.gez);
   }
 
   // ───────────────────────────────────────── METEOGRAM (Kartal, 09.11.2026 00 UTC koşusu; saatler UTC)
@@ -130,16 +194,20 @@
   };
   for (let i = 0; i < 72; i++) { MG.yagis.push([0.1, 0.2, 1.1, 1.6, 0.7, 0.7, 0.3, 0.3, 0.1][i - 24] || (i === 61 ? 0.1 : 0)); MG.yon.push(i < 13 ? 70 : i < 24 ? 80 : i < 31 ? 30 : i < 42 ? 60 : i < 48 ? 190 : 215); }
   const GUN = ['Pzt', 'Sal', 'Çrş', 'Prş'];
-  function meteogram(kap) {
+  function meteogram(kap, gorsel) {
+    gorsel = gorsel || kap;
     let tsi = false;
-    const ust = h('div', 'mg-ust'); const sw = h('button', 'cip', 'Saatleri TSİ göster'); sw.type = 'button'; sw.setAttribute('aria-pressed', 'false'); ust.appendChild(sw);
-    const oku = h('p', 'mg-oku', 'İmleci grafikte gezdir: o saatin bütün değerleri burada.'); kap.append(ust);
+    const ust = h('div', 'mg-ust'); const sw = dugme('cip', 'Saatleri TSİ göster'); sw.setAttribute('aria-pressed', 'false'); ust.appendChild(sw);
+    // telefonda grafik okunur ölçekte (yana kayar); «Tümü» bütün grafiği sığdırır
+    const tumu = dugme('cip mg-tumu', 'Tümü'); tumu.setAttribute('aria-pressed', 'false'); ust.appendChild(tumu);
+    const oku = h('p', 'mg-oku sahne-oku', 'İmleci grafikte gezdir (ya da dokun): o saatin bütün değerleri burada.'); kap.append(ust);
     const W = 720, x0 = 46, pw = W - x0 - 46, dx = pw / 71, X = (i) => x0 + i * dx;
     const pan = [['Bulut kapalılığı (%)', 70], ['Sıcaklık (°C) · basınç (hPa)', 120], ['Saatlik yağış (mm)', 70], ['Rüzgâr (km/sa) · yön', 80]];
     let y = 14; const yer = pan.map(([ad, hh]) => { const o = { ad, y: y + 16, h: hh }; y += hh + 34; return o; });
-    const svg = el('svg', { viewBox: `0 0 ${W} ${y}`, class: 'mg-svg', role: 'img', 'aria-label': 'Kartal WRF meteogramı' }); const kay = h('div', 'mg-kaydir'); kay.appendChild(svg);
-    const gorsel = h('div', 'mg-gorsel'); gorsel.append(kay, oku); kap.append(gorsel); // sahne: grafik + okuma birlikte (telefonda yapışkan)
+    const svg = el('svg', { viewBox: `0 0 ${W} ${y}`, class: 'mg-svg', role: 'img', 'aria-label': 'Kartal WRF meteogramı' }); const kay = h('div', 'sahne-cer mg-kaydir'); kay.appendChild(svg);
+    gorsel.append(kay, oku); // sahne: grafik + okuma birlikte (telefonda yapışkan)
     const vurgu = el('rect', { x: X(24) - dx / 2, width: dx * 10, y: 0, height: y, class: 'mg-yagisbant' }, svg);
+    const secBant = el('rect', { x: 0, width: 0, y: 0, height: 0, class: 'mg-secbant' }, svg); // seçili kartın penceresi
     const an = el('line', { x1: X(30.75), x2: X(30.75), y1: 0, y2: y, class: 'mg-an' }, svg); tx(svg, X(30.75) + 4, 10, 'sunum anı', { class: 'mg-et mg-an-t' });
     const eksenG = el('g', {}, svg);
     yer.forEach((o) => { tx(svg, x0, o.y - 4, o.ad, { class: 'mg-baslik' }); el('rect', { x: x0, y: o.y, width: pw, height: o.h, class: 'mg-cerceve' }, svg); });
@@ -150,13 +218,13 @@
     // sıcaklık + basınç
     const t = yer[1], Ty = (v) => t.y + t.h * (1 - (v - 6) / 13), Py = (v) => t.y + t.h * (1 - (v - 1014) / 18);
     const yol = (arr, f, cls) => el('path', { d: 'M' + arr.map((v, i) => X(i).toFixed(1) + ' ' + f(v).toFixed(1)).join('L'), class: cls }, svg);
-    yol(MG.T, Ty, 'mg-T'); yol(MG.p, Py, 'mg-p');
+    yol(MG.T, Ty, 'mg-T'); const pYol = yol(MG.p, Py, 'mg-p');
     for (const v of [8, 12, 16]) tx(svg, x0 - 6, Ty(v) + 4, String(v), { 'text-anchor': 'end', class: 'mg-et mg-Tet' });
     for (const v of [1015, 1020, 1025, 1030]) tx(svg, x0 + pw + 6, Py(v) + 4, String(v), { class: 'mg-et mg-pet' });
     // yağış
     const r = yer[2]; MG.yagis.forEach((v, i) => { if (!v) return; el('rect', { x: X(i) - dx * 0.4, width: dx * 0.8, y: r.y + r.h * (1 - v / 2), height: (r.h * v) / 2, class: 'mg-yagis' }, svg); if (v >= 0.1) tx(svg, X(i), r.y + r.h * (1 - v / 2) - 3, virgul(v), { 'text-anchor': 'middle', class: 'mg-et' }); });
     // rüzgâr
-    const w = yer[3], Wy = (v) => w.y + w.h * (1 - v / 55); yol(MG.ruzgar, Wy, 'mg-r');
+    const w = yer[3], Wy = (v) => w.y + w.h * (1 - v / 55); const rYol = yol(MG.ruzgar, Wy, 'mg-r');
     for (const v of [10, 30, 50]) tx(svg, x0 - 6, Wy(v) + 4, String(v), { 'text-anchor': 'end', class: 'mg-et' });
     for (let i = 0; i < 72; i += 3) { const a = (MG.yon[i] + 180) * R, cx = X(i), cy = w.y + w.h - 9; el('line', { x1: cx - Math.sin(a) * 7, y1: cy + Math.cos(a) * 7, x2: cx + Math.sin(a) * 7, y2: cy - Math.cos(a) * 7, class: 'mg-yon', 'marker-end': 'url(#mg-uc)' }, svg); }
     const mk = el('marker', { id: 'mg-uc', viewBox: '0 0 6 6', refX: 5, refY: 3, markerWidth: 5, markerHeight: 5, orient: 'auto' }, el('defs', {}, svg)); el('path', { d: 'M0 0L6 3L0 6Z', class: 'mg-uc' }, mk);
@@ -165,27 +233,83 @@
     const hareket = (ev) => { const rr = svg.getBoundingClientRect(), xx = ((ev.clientX - rr.left) / rr.width) * W, i = Math.round((xx - x0) / dx); if (i < 0 || i > 71) return; im.setAttribute('x1', X(i)); im.setAttribute('x2', X(i)); im.setAttribute('visibility', 'visible'); const s = i + (tsi ? 3 : 0); oku.innerHTML = `<b>${GUN[Math.floor(s / 24)]} ${String(s % 24).padStart(2, '0')}:00 ${tsi ? 'TSİ' : 'UTC'}</b> · bulut %${MG.bulut[i]} · ${virgul(MG.T[i])} °C · ${virgul(MG.p[i])} hPa · yağış ${virgul(MG.yagis[i])} mm · rüzgâr ${MG.ruzgar[i]} km/sa (${MG.yon[i]}°)`; };
     svg.addEventListener('pointermove', hareket); svg.addEventListener('pointerdown', hareket);
     sw.addEventListener('click', () => { tsi = !tsi; sw.setAttribute('aria-pressed', String(tsi)); sw.textContent = tsi ? 'Saatleri UTC göster' : 'Saatleri TSİ göster'; eksenCiz(); });
-    const kart = h('div', 'mg-kartlar');
-    [['Yağış penceresi', 'Salı 00–10 UTC (03–13 TSİ), toplam ~5 mm, en çok 03 UTC’de 1,6 mm', () => vurgu.classList.toggle('vurgu')], ['Basınç', 'Pazartesi ~1031 → Salı ~1025 → Çarşamba ~1017 hPa: sürekli düşüş', null], ['Lodos', 'Çarşamba güneybatılı rüzgâr 48 km/sa’ya kadar', null]].forEach(([a, m, f]) => { const d = h('div', 'mg-kart', `<b>${a}</b><span>${m}</span>`); if (f) { d.tabIndex = 0; d.setAttribute('role', 'button'); d.addEventListener('click', f); d.addEventListener('keydown', (e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), f())); } kart.appendChild(d); });
+    // telefonda: seçili pencere yana kayan grafikte ortalansın
+    const ortala = (i0, i1) => { if (kay.scrollWidth <= kay.clientWidth + 1) return; const o = ((X(i0) + X(i1)) / 2 / W) * kay.scrollWidth - kay.clientWidth / 2; kay.scrollTo({ left: Math.max(0, o), behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); };
+    tumu.addEventListener('click', () => { const a = kay.classList.toggle('tumu'); tumu.setAttribute('aria-pressed', String(a)); tumu.textContent = a ? 'Yakınlaştır' : 'Tümü'; });
+    // kartlar = öğeler: her biri grafikte kendi penceresini yakar (yağış: Salı sabahı · basınç: bütün dönem · lodos: Çarşamba rüzgârı)
+    const KART = [
+      ['Yağış penceresi', 'Salı 00–10 UTC (03–13 TSİ), toplam ~5 mm, en çok 03 UTC’de 1,6 mm', [24, 33], null, null],
+      ['Basınç', 'Pazartesi ~1031 → Salı ~1025 → Çarşamba ~1017 hPa: sürekli düşüş', [0, 71], yer[1], pYol],
+      ['Lodos', 'Çarşamba güneybatılı rüzgâr 48 km/sa’ya kadar', [48, 71], yer[3], rYol],
+    ];
+    const kart = h('div', 'mg-kartlar'); let secili = -1;
+    const kartSec = (j) => {
+      secili = secili === j ? -1 : j;
+      [...kart.children].forEach((d, k) => d.setAttribute('aria-pressed', String(k === secili)));
+      vurgu.classList.toggle('vurgu', secili === 0); pYol.classList.toggle('vurgu', secili === 1); rYol.classList.toggle('vurgu', secili === 2);
+      if (secili > 0) { const [, , [i0, i1], p] = KART[secili]; secBant.setAttribute('x', X(i0) - dx / 2); secBant.setAttribute('width', X(i1) - X(i0) + dx); secBant.setAttribute('y', p.y - 2); secBant.setAttribute('height', p.h + 4); } else secBant.setAttribute('width', 0);
+      if (secili >= 0) ortala(...KART[secili][2]);
+    };
+    KART.forEach(([a, m], j) => { const d = h('div', 'mg-kart', `<b>${a}</b><span>${m}</span>`); d.tabIndex = 0; d.setAttribute('role', 'button'); d.setAttribute('aria-pressed', 'false'); d.addEventListener('click', () => kartSec(j)); d.addEventListener('keydown', (e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), kartSec(j))); kart.appendChild(d); });
     kap.appendChild(kart); void an;
   }
 
   // ───────────────────────────────────────── SAAT HESAPLAYICI
-  function saat(kap) {
+  function saat(kap, gorsel) {
+    gorsel = gorsel || kap;
     const gunAd = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
     const ay = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
-    kap.innerHTML = `<div class="saat-giris"><label>Sunum günü <input type="date" value="2026-11-10" class="saat-tarih"></label><label>Sunum saati (TSİ) <input type="time" value="09:45" class="saat-saat"></label></div><div class="saat-sonuc"></div><div class="saat-cevir"><label>UTC ↔ TSİ çevir <input type="range" min="0" max="23" value="12" class="saat-kay"></label><p class="saat-cevir-t"></p></div>`;
+    const iki = (n) => String(n).padStart(2, '0');
+    kap.innerHTML = `<div class="saat-giris"><label>Sunum günü <input type="date" value="2026-11-10" class="saat-tarih"></label><label>Sunum saati (TSİ) <input type="time" value="09:45" class="saat-saat"></label></div><div class="saat-cevir"><label>UTC ↔ TSİ çevir <input type="range" min="0" max="23" value="12" class="saat-kay"></label><p class="saat-cevir-t"></p></div><div class="saat-sonuc"></div>`; // girdiler üstte, sonuç altta
+    // sahne: iki günlük zaman çizelgesi — üst satır sunumdan önceki gün, alt satır sunum günü; her satırda üstte UTC, altta TSİ ekseni.
+    // Aynı dikey çizgi aynı anı gösterir: UTC ile TSİ arasındaki 3 saatlik kayma gözle görülür.
+    const cer = h('div', 'sahne-cer saat-cer'); gorsel.appendChild(cer);
+    const VW = 480, x0 = 44, x1 = 470, X = (s) => x0 + (s * (x1 - x0)) / 24, R = [0, 196];
+    const svg = el('svg', { viewBox: `0 0 ${VW} 392`, class: 'saat-cizgi', role: 'img', 'aria-label': 'Zaman çizelgesi: analiz anı, indirme, sunum ve tahmin günü; UTC ve TSİ' }, cer);
+    const sabit = el('g', {}, svg), dyn = el('g', {}, svg);
+    R.forEach((yT) => {
+      tx(sabit, 4, yT + 64, 'UTC', { class: 'saat-eks' }); tx(sabit, 4, yT + 155, 'TSİ', { class: 'saat-eks' });
+      for (const ey of [yT + 60, yT + 150]) el('line', { x1: X(0), x2: X(24), y1: ey, y2: ey, class: 'saat-eksen' }, sabit);
+      for (let s = 0; s <= 24; s++) {
+        const b = s % 3 === 0;
+        el('line', { x1: X(s), x2: X(s), y1: yT + 60 - (b ? 5 : 0), y2: yT + 60 + (b ? 5 : 3), class: 'saat-centik' }, sabit);
+        el('line', { x1: X(s), x2: X(s), y1: yT + 150 - (b ? 5 : 3), y2: yT + 150 + (b ? 5 : 0), class: 'saat-centik' }, sabit);
+        if (b) { tx(sabit, X(s), yT + 49, iki(s), { 'text-anchor': 'middle', class: 'saat-et' }); const t = (s + 3) % 24; tx(sabit, X(s), yT + 171, iki(t), { 'text-anchor': 'middle', class: t === 0 ? 'saat-et saat-yarim' : 'saat-et' }); }
+      }
+    });
+    const ciz = (once, gun, s, hh, mm) => {
+      while (dyn.firstChild) dyn.removeChild(dyn.firstChild);
+      const [r0, r1] = R;
+      tx(dyn, 4, r0 + 20, `${once} · sunumdan önceki gün`, { class: 'saat-gun' }); tx(dyn, 4, r1 + 20, `${gun} · sunum günü`, { class: 'saat-gun' });
+      // önceki gün: indirme penceresi (akşam) + analiz anı
+      el('rect', { x: X(15), y: r0 + 108, width: X(20) - X(15), height: 26, rx: 7, class: 'saat-indir' }, dyn); tx(dyn, (X(15) + X(20)) / 2, r0 + 126, 'İndirme', { 'text-anchor': 'middle', class: 'saat-bant-t' });
+      el('line', { x1: X(12), x2: X(12), y1: r0 + 60, y2: r0 + 150, class: 'saat-analiz' }, dyn);
+      tx(dyn, X(12) - 8, r0 + 86, 'Analiz anı', { 'text-anchor': 'end', class: 'saat-olay saat-olay-a' }); tx(dyn, X(12) - 8, r0 + 104, '12 UTC = 15 TSİ', { 'text-anchor': 'end', class: 'saat-olay2' });
+      // sunum günü: tahmin bandı (model +12 … +36 sa = bütün UTC günü) + sunum anı
+      let su = hh + mm / 60 - 3, sy = r1; if (su < 0) { su += 24; sy = r0; }
+      el('line', { x1: X(su), x2: X(su), y1: sy + 60, y2: sy + 150, class: 'saat-sunum' }, dyn);
+      el('rect', { x: X(0), y: r1 + 122, width: X(24) - X(0), height: 20, rx: 6, class: 'saat-tahmin' }, dyn); tx(dyn, X(0) + 8, r1 + 137, 'Tahmin günü: model +12 … +36 sa', { class: 'saat-bant-t' });
+      const sag = X(su) < 270; tx(dyn, X(su) + (sag ? 8 : -8), sy + 86, `Sunum ${s} TSİ`, { 'text-anchor': sag ? 'start' : 'end', class: 'saat-olay saat-olay-s' });
+      // çevirici imleci: aynı an iki eksende
+      const u = +kap.querySelector('.saat-kay').value, xu = X(u);
+      el('line', { x1: xu, x2: xu, y1: r1 + 56, y2: r1 + 154, class: 'saat-imlec' }, dyn);
+      for (const ey of [r1 + 60, r1 + 150]) el('circle', { cx: xu, cy: ey, r: 5, class: 'saat-imlec-n' }, dyn);
+      const et = `${iki(u)} UTC = ${iki((u + 3) % 24)} TSİ${u + 3 >= 24 ? ' (ertesi gün)' : ''}`, ew = et.length * 7.4 + 18, ex = Math.min(Math.max(xu, x0 + ew / 2), x1 - ew / 2);
+      el('rect', { x: ex - ew / 2, y: r1 + 95, width: ew, height: 22, rx: 11, class: 'saat-hap' }, dyn); tx(dyn, ex, r1 + 110, et, { 'text-anchor': 'middle', class: 'saat-hap-t' });
+    };
+    let son = null;
     const yaz = () => {
       const t = kap.querySelector('.saat-tarih').value, s = kap.querySelector('.saat-saat').value || '09:45'; if (!t) return;
       const d = new Date(t + 'T00:00:00Z'), once = new Date(d.getTime() - 864e5);
       const f = (x) => `${x.getUTCDate()} ${ay[x.getUTCMonth()]} ${gunAd[x.getUTCDay()]}`;
       const [hh, mm] = s.split(':').map(Number); const utc = (hh - 3 + 24) % 24;
+      son = [f(once), f(d), s, hh, mm]; ciz(...son);
       kap.querySelector('.saat-sonuc').innerHTML = `<div class="saat-satir"><span>Analiz anı</span><b>${f(once)} · 12 UTC</b><em>= 15:00 TSİ. Bütün analiz haritaları bu ana ait olmalı.</em></div><div class="saat-satir"><span>Tahmin</span><b>${f(d)} · bütün gün</b><em>Model haritalarında «+12 … +36» saatleri bu güne düşer.</em></div><div class="saat-satir"><span>Sunum anı</span><b>${s} TSİ = ${String(utc).padStart(2, '0')}:${String(mm).padStart(2, '0')} UTC</b><em>Meteogramda bu saati işaretle: «şu an yağış zayıflamış olmalı» gibi cümleler buradan çıkar.</em></div><div class="saat-satir"><span>İndirme</span><b>${f(once)} akşamı</b><em>12 UTC kartları birkaç saat gecikmeyle çıkar ve sitede yalnız son hâl durur: indirdiğin anda dosya adına saati yaz.</em></div>`;
     };
-    const cevir = () => { const u = +kap.querySelector('.saat-kay').value; kap.querySelector('.saat-cevir-t').innerHTML = `<b>${String(u).padStart(2, '0')}:00 UTC</b> = <b>${String((u + 3) % 24).padStart(2, '0')}:00 TSİ</b>` + (u + 3 >= 24 ? ' (ertesi gün)' : ''); };
+    const cevir = () => { const u = +kap.querySelector('.saat-kay').value; kap.querySelector('.saat-cevir-t').innerHTML = `<b>${String(u).padStart(2, '0')}:00 UTC</b> = <b>${String((u + 3) % 24).padStart(2, '0')}:00 TSİ</b>` + (u + 3 >= 24 ? ' (ertesi gün)' : ''); if (son) ciz(...son); };
     kap.querySelectorAll('input').forEach((i) => i.addEventListener('input', () => { yaz(); cevir(); }));
     yaz(); cevir();
   }
 
-  window.Araclar = { synop, skewt, meteogram, saat };
+  window.Araclar = { synop, skewt, meteogram, saat, katSecim };
 })();
