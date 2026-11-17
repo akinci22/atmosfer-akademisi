@@ -5,77 +5,96 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Ödev ve quiz hazırlığı</title>
 <meta name="description" content="HEC-HMS ödevlerinin ne-neden-ekranda ne tekrarı, haftalık quiz konuları, olası sorular ve tek sayfa formül kartı.">
-<meta name="color-scheme" content="light dark">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="data:,">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 <style>
-:root{--bg:#f6f7f9;--surface:#fff;--ink:#15171c;--ink2:#565d6b;--line:#e1e4e9;--acc:#184f9a;--acc-bg:#eaf1fb;--mark:#ffe58a;--code:#f0f2f5}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1013;--surface:#171a1f;--ink:#eceef1;--ink2:#a4aab5;--line:#262a31;--acc:#a0c3ff;--acc-bg:#1b2533;--mark:#6b5a12;--code:#1f2329;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0e1013;--surface:#171a1f;--ink:#eceef1;--ink2:#a4aab5;--line:#262a31;--acc:#a0c3ff;--acc-bg:#1b2533;--mark:#6b5a12;--code:#1f2329;color-scheme:dark}
+:root{--bg:#ffffff;--surface:#ffffff;--surface2:#f5f7fa;--ink:#111827;--ink2:#4b5563;--line:#e2e7ee;--acc:#1d5fd6;--acc-bg:#eaf1fd;--mark:#ffe58a;--code:#f1f3f6;--ok:#15803d;--gut:clamp(16px,4vw,48px)}
 *{box-sizing:border-box}
-html{scroll-padding-top:76px}
-body{margin:0;background:var(--bg);color:var(--ink);font:16.5px/1.6 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+[hidden]{display:none!important}
+html{scroll-padding-top:88px}
+body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.7 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 a{color:var(--acc)}
-.ust{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);border-bottom:1px solid var(--line)}
-.ust-ic{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:10px;min-height:56px;padding:6px max(16px,env(safe-area-inset-right,0px)) 6px max(16px,env(safe-area-inset-left,0px))}
-.geri{font-weight:600;font-size:14.5px;text-decoration:none;white-space:nowrap}
-.ara{margin-left:auto;display:flex;align-items:center;gap:8px;flex:0 1 320px;min-width:0}
-.ara input{width:100%;height:36px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit;font-size:15px}
-.ara small{color:var(--ink2);font-size:13px;white-space:nowrap}
-.dugme{height:36px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:600 14px/1 inherit;font-family:inherit;cursor:pointer;white-space:nowrap}
+.ust{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(255,255,255,.92);backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);border-bottom:1px solid var(--line)}
+.ust-ic{max-width:1440px;margin:0 auto;display:flex;align-items:center;gap:12px;min-height:64px;padding:8px max(var(--gut),env(safe-area-inset-right,0px)) 8px max(var(--gut),env(safe-area-inset-left,0px))}
+.geri{font-weight:600;font-size:16px;text-decoration:none;white-space:nowrap}
+.ara{margin-left:auto;display:flex;align-items:center;gap:10px;flex:0 1 420px;min-width:0}
+.ara input{width:100%;height:44px;padding:0 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface2);color:var(--ink);font:inherit;font-size:16px}
+.ara small{color:var(--ink2);font-size:15px;white-space:nowrap}
+.dugme{height:44px;padding:0 16px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font-family:inherit;font-weight:600;font-size:16px;line-height:1;cursor:pointer;white-space:nowrap}
 .dugme:hover{border-color:var(--acc);color:var(--acc)}
-.izgara{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:230px minmax(0,1fr);gap:48px;padding:40px max(16px,env(safe-area-inset-right,0px)) 80px max(16px,env(safe-area-inset-left,0px))}
-nav.toc{position:sticky;top:84px;align-self:start;max-height:calc(100dvh - 104px);overflow:auto;display:grid;gap:2px;font-size:14.5px}
-nav.toc b{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);margin-bottom:6px}
-nav.toc a{color:var(--ink2);text-decoration:none;padding:5px 10px;border-radius:8px;line-height:1.3}
+.ilerleme{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--ink2);white-space:nowrap}
+.ilerleme i{display:block;width:90px;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.ilerleme i b{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+.izgara{max-width:1440px;margin:0 auto;display:grid;grid-template-columns:260px minmax(0,1fr);gap:56px;padding:48px max(var(--gut),env(safe-area-inset-right,0px)) 96px max(var(--gut),env(safe-area-inset-left,0px))}
+nav.toc{position:sticky;top:96px;align-self:start;max-height:calc(100dvh - 116px);overflow:auto;display:grid;gap:4px;font-size:16px}
+nav.toc b{font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);margin-bottom:8px}
+nav.toc a{color:var(--ink2);text-decoration:none;padding:8px 12px;border-radius:10px;line-height:1.35}
 nav.toc a:hover,nav.toc a.etkin{color:var(--acc);background:var(--acc-bg)}
-main{min-width:0;max-width:780px}
-.k{color:var(--ink2);font-size:14.5px;margin:0}
-h1{font-size:clamp(2rem,1.3rem + 2.6vw,2.9rem);line-height:1.08;letter-spacing:-.03em;margin:8px 0 12px}
-.lede{color:var(--ink2);font-size:1.12rem;margin:0 0 18px;max-width:60ch}
-.giris{color:var(--ink);}
-section{margin-top:44px;padding-top:24px;border-top:1px solid var(--line)}
-h2{font-size:1.45rem;letter-spacing:-.02em;margin:0 0 14px}
-h4,.ara-b{font-size:1.02rem;margin:22px 0 8px}
-p{margin:.55em 0}
-ul,ol{padding-left:1.25em;margin:.5em 0}
-li{margin:.25em 0}
-code{background:var(--code);border-radius:5px;padding:.08em .35em;font:14px/1.4 ui-monospace,"SF Mono","Cascadia Code",Consolas,monospace}
-pre{background:var(--code);border-radius:12px;padding:14px 16px;overflow:auto}
+main{min-width:0}
+.k{color:var(--ink2);font-size:16px;font-weight:600;margin:0}
+h1{font-size:clamp(2.2rem,1.5rem + 2.6vw,3.4rem);line-height:1.1;letter-spacing:-.03em;margin:10px 0 16px}
+.lede{color:var(--ink2);font-size:1.2rem;margin:0 0 24px;max-width:80ch}
+.giris{max-width:95ch}
+section{margin-top:72px;padding-top:32px;border-top:1px solid var(--line)}
+section>*:not(.kartlar){max-width:95ch}
+h2{font-size:clamp(1.6rem,1.3rem + 1vw,2rem);letter-spacing:-.02em;line-height:1.25;margin:0 0 20px}
+h4,.ara-b{font-size:1.15rem;margin:26px 0 10px}
+p{margin:.7em 0}
+ul,ol{padding-left:1.3em;margin:.6em 0}
+li{margin:.45em 0}
+ul.mad{list-style:none;padding-left:0;display:grid;gap:8px}
+ul.mad li{position:relative;padding-left:22px;margin:0}
+ul.mad li::before{content:"";position:absolute;left:3px;top:.68em;width:8px;height:8px;border-radius:50%;background:var(--acc)}
+code{background:var(--code);border-radius:6px;padding:.1em .4em;font:15.5px/1.45 ui-monospace,"SF Mono","Cascadia Code",Consolas,monospace}
+pre{background:var(--code);border-radius:12px;padding:16px 18px;overflow:auto}
 pre code{background:none;padding:0}
-blockquote{margin:12px 0;padding:10px 16px;border-left:3px solid var(--acc);background:var(--acc-bg);border-radius:0 10px 10px 0}
-.tablo{overflow-x:auto;margin:12px 0;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
-table{border-collapse:collapse;width:100%;font-size:15px}
-th,td{text-align:left;vertical-align:top;padding:9px 12px;border-bottom:1px solid var(--line)}
-th{font-size:13px;letter-spacing:.02em;color:var(--ink2);background:color-mix(in srgb,var(--surface) 70%,var(--bg))}
+blockquote{margin:16px 0;padding:12px 18px;border-left:4px solid var(--acc);background:var(--acc-bg);border-radius:0 12px 12px 0}
+.tablo{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:12px;background:#fff}
+table{border-collapse:collapse;width:100%;font-size:16.5px;line-height:1.55}
+th,td{text-align:left;vertical-align:top;padding:12px 14px;border-bottom:1px solid var(--line)}
+th{font-size:15px;letter-spacing:.02em;color:var(--ink2);background:var(--surface2)}
 tr:last-child td{border-bottom:0}
-.tex{overflow-x:auto;margin:10px 0;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:12px;text-align:center}
-details.kart{background:var(--surface);border:1px solid var(--line);border-radius:14px;margin:10px 0;overflow:hidden}
-details.kart>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:14px 16px;font-weight:600;font-size:1.04rem}
+.tex{overflow-x:auto;margin:14px 0;padding:16px 18px;background:#fff;border:1px solid var(--line);border-radius:12px;text-align:center;font-size:1.1em}
+.kartlar{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,520px),1fr));gap:16px 20px;align-items:start;margin-top:20px}
+details.kart{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:border-color .15s,box-shadow .15s}
+details.kart:hover{border-color:#c9d3e0}
+details.kart[open]{grid-column:1/-1;border-color:var(--acc);box-shadow:0 6px 22px rgba(17,24,39,.07)}
+details.kart>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:14px;padding:18px 20px;font-weight:650;font-size:1.12rem;line-height:1.4;min-height:64px}
 details.kart>summary::-webkit-details-marker,details.ic>summary::-webkit-details-marker{display:none}
 details.kart>summary:hover .kb{color:var(--acc)}
-.ok{margin-left:auto;width:9px;height:9px;border-right:2px solid var(--ink2);border-bottom:2px solid var(--ink2);transform:rotate(45deg);transition:transform .2s;flex:none}
+.durum{flex:none;width:12px;height:12px;border-radius:50%;border:2px solid var(--line)}
+details.kart.okundu .durum{background:var(--ok);border-color:var(--ok)}
+.ok{margin-left:auto;width:10px;height:10px;border-right:2px solid var(--ink2);border-bottom:2px solid var(--ink2);transform:rotate(45deg);transition:transform .2s;flex:none}
 details[open]>summary .ok{transform:rotate(225deg)}
-.kg{padding:2px 18px 16px;border-top:1px solid var(--line)}
-details.ic{border-top:1px solid var(--line)}
+.kg{padding:6px 24px 22px;border-top:1px solid var(--line);columns:2 520px;column-gap:44px}
+.kg>*{break-inside:avoid}
+.kg>.tablo,.kg>.tex,.kg>.oku{column-span:all}
+.oku{display:flex;gap:10px;align-items:center;margin-top:18px;padding-top:14px;border-top:1px dashed var(--line)}
+.oku button{height:44px;padding:0 16px;border:1px solid var(--line);border-radius:12px;background:#fff;font-family:inherit;font-weight:600;font-size:16px;cursor:pointer;color:var(--ink)}
+.oku button[aria-pressed="true"]{background:#e8f5ec;border-color:var(--ok);color:var(--ok)}
+details.ic{border-top:1px solid var(--line);break-inside:avoid}
 details.ic:first-child{border-top:0}
 .kg>details.ic:first-child,section>details.ic:first-of-type{border-top:1px solid var(--line)}
-details.ic>summary{list-style:none;cursor:pointer;padding:11px 0 11px 22px;position:relative;font-weight:600}
-details.ic>summary::before{content:"+";position:absolute;left:2px;top:9px;color:var(--acc);font:700 17px/1.4 ui-monospace,Consolas,monospace}
+details.ic>summary{list-style:none;cursor:pointer;padding:14px 0 14px 28px;position:relative;font-weight:600;font-size:1.05rem}
+details.ic>summary::before{content:"+";position:absolute;left:4px;top:11px;color:var(--acc);font:700 20px/1.4 ui-monospace,Consolas,monospace}
 details.ic[open]>summary::before{content:"−"}
-.ic-g{padding:0 0 12px 22px}
-section>details.ic{background:var(--surface);border:1px solid var(--line);border-radius:12px;margin:8px 0;padding:0 14px}
-section>details.ic>summary{padding-left:22px}
+.ic-g{padding:0 0 14px 28px}
+section>details.ic{background:#fff;border:1px solid var(--line);border-radius:12px;margin:10px 0;padding:0 18px}
+section>details.ic>summary{padding-left:28px}
 mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
-footer{color:var(--ink2);font-size:13.5px;margin-top:56px;padding-top:18px;border-top:1px solid var(--line)}
+footer{color:var(--ink2);font-size:15px;margin-top:80px;padding-top:22px;border-top:1px solid var(--line)}
 :focus-visible{outline:2px solid var(--acc);outline-offset:2px}
-@media (max-width:900px){.izgara{grid-template-columns:minmax(0,1fr);gap:0;padding-top:24px}nav.toc{position:static;max-height:none;display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px}nav.toc b{display:none}nav.toc a{white-space:nowrap;border:1px solid var(--line);background:var(--surface)}.ara small{display:none}.ust .dugme{padding:0 10px}}
+@media (max-width:900px){body{font-size:17px}.izgara{grid-template-columns:minmax(0,1fr);gap:0;padding-top:0}nav.toc{position:sticky;top:calc(65px + env(safe-area-inset-top,0px));z-index:15;background:rgba(255,255,255,.96);max-height:none;display:flex;gap:8px;overflow-x:auto;padding:10px var(--gut);margin:0 calc(-1 * var(--gut)) 24px;border-bottom:1px solid var(--line);scrollbar-width:none}nav.toc::-webkit-scrollbar{display:none}nav.toc b{display:none}nav.toc a{white-space:nowrap;border:1px solid var(--line);background:#fff;padding:8px 14px;border-radius:999px}.ara small,.ilerleme{display:none}.ust .dugme{padding:0 12px}section{margin-top:52px;padding-top:24px}.kg{columns:1;padding:4px 18px 18px}html{scroll-padding-top:136px}}
 @media (max-width:520px){.geri span{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 <header class="ust"><div class="ust-ic">
   <a class="geri" href="../">‹<span> Atmosfer Akademisi</span></a>
   <div class="ara"><input id="ara" type="search" placeholder="Bu sayfada ara" aria-label="Bu sayfada ara"><small id="say"></small></div>
+  <span class="ilerleme" title="Okuduğun kartlar"><i><b id="ilerB"></b></i><span id="ilerS"></span></span>
   <button class="dugme" id="hepsi" type="button">Hepsini aç</button>
 </div></header>
 <div class="izgara">
@@ -84,8 +103,8 @@ footer{color:var(--ink2);font-size:13.5px;margin-top:56px;padding-top:18px;borde
     <p class="k">MTO 316 · Hidrometeoroloji · 1.–7. hafta</p>
     <h1>Ödev ve quiz hazırlığı</h1>
     <p class="lede">HEC-HMS ödevlerinin ne-neden-ekranda ne tekrarı, haftalık quiz konuları, olası sorular ve tek sayfa formül kartı.</p>
-    <div class="giris"><p>Bu not 1.–7. hafta için kısa quiz hazırlığı ve HEC-HMS ödevlerinin birlikte tekrarıdır. Türkçe, madde madde; her teknik terimin İngilizcesi ilk geçtiği yerde parantez içinde; her formülün altında terim-birim açıklaması ve en az bir çözülmüş mini örnek vardır. Quiz kökü İngilizce gelebileceğinden Bölüm C'deki sorular hem İngilizce hem Türkçe verilmiştir.</p><p>Bilinen slayt hataları, aşağıda doğrusu ile birlikte işlenir: hazne bütçesi örneğinde <strong>1,05 m/yıl</strong> yerine doğru değer <strong>1,150 m/yıl</strong> (dolma süresi ≈ 2,61 yıl); optimum ölçer örneğinde <strong>N ≈ 14</strong> yerine doğru değer <strong>N ≈ 52</strong> (yüzdenin karesi unutulduğu için).</p></div>
-    <section id="bölüm-a-hec-hms-ödevleri"><h2>BÖLÜM A — HEC-HMS Ödevleri</h2><details class="kart" id="hw1-creating-a-new-basin-model"><summary><span class="kb">HW1 — Creating a New Basin Model</span><span class="ok" aria-hidden="true"></span></summary><div class="kg"><p><strong>Havza elemanları (basin elements):</strong></p><ul>
+    <div class="giris"><ul class="mad"><li>Bu not 1.–7. hafta için kısa quiz hazırlığı ve HEC-HMS ödevlerinin birlikte tekrarıdır.</li><li>Türkçe, madde madde; her teknik terimin İngilizcesi ilk geçtiği yerde parantez içinde; her formülün altında terim-birim açıklaması ve en az bir çözülmüş mini örnek vardır.</li><li>Quiz kökü İngilizce gelebileceğinden Bölüm C'deki sorular hem İngilizce hem Türkçe verilmiştir.</li></ul><p>Bilinen slayt hataları, aşağıda doğrusu ile birlikte işlenir: hazne bütçesi örneğinde <strong>1,05 m/yıl</strong> yerine doğru değer <strong>1,150 m/yıl</strong> (dolma süresi ≈ 2,61 yıl); optimum ölçer örneğinde <strong>N ≈ 14</strong> yerine doğru değer <strong>N ≈ 52</strong> (yüzdenin karesi unutulduğu için).</p></div>
+    <section id="bölüm-a-hec-hms-ödevleri"><h2>BÖLÜM A — HEC-HMS Ödevleri</h2><div class="kartlar"><details class="kart" id="hw1-creating-a-new-basin-model"><summary><span class="kb">HW1 — Creating a New Basin Model</span><span aria-hidden="true" class="ok"></span></summary><div class="kg"><p><strong>Havza elemanları (basin elements):</strong></p><ul>
 <li>Alt havzalar (subbasins): EB Mahoning Creek 41 mi², Stump Creek 29 mi², Mahoning Creek Local 88 mi²</li>
 <li>Reach: Reach-1 (Lag ile ötelenir)</li>
 <li>Junctionlar: Junction-1 (EB Mahoning + Stump birleşimi), Junction-2 = havza çıkışı (outlet) = Reach-1 çıkışı + Mahoning Creek Local</li>
@@ -112,7 +131,7 @@ footer{color:var(--ink2);font-size:13.5px;margin-top:56px;padding-top:18px;borde
 <li>Neden Lag? Kısa bir kanal parçası için sönümleme ihmal edilebildiğinde en basit seçimdir; HW2'de Reach-1 girişi ile çıkışı aynı yükseklikte ama 5 sa ötelenmiş görünür.</li>
 <li>Ekranda ne? Reach editor › Routing: Lag method, Lag (min).</li>
 <li>Quiz: 'Does Lag routing attenuate the peak?' → Hayır, sadece zamanda öteler.</li>
-</ul><p><strong>HW1'in HW2'ye katkısı:</strong> HW1 yalnızca havza modelini (basin model) kurar — henüz yağış/zaman/simülasyon yoktur. HW2 bu basin modeline bir meteorologic model, control specifications ve simulation run ekler.</p></div></details></div></details><details class="kart" id="hw2-creating-a-simple-model"><summary><span class="kb">HW2 — Creating a Simple Model</span><span class="ok" aria-hidden="true"></span></summary><div class="kg"><h4 class="ara-b">1) Meteorologic Model</h4><p><strong>Ne yaptım?</strong></p><ol>
+</ul><p><strong>HW1'in HW2'ye katkısı:</strong> HW1 yalnızca havza modelini (basin model) kurar — henüz yağış/zaman/simülasyon yoktur. HW2 bu basin modeline bir meteorologic model, control specifications ve simulation run ekler.</p></div></details></div></details><details class="kart" id="hw2-creating-a-simple-model"><summary><span class="kb">HW2 — Creating a Simple Model</span><span aria-hidden="true" class="ok"></span></summary><div class="kg"><h4 class="ara-b">1) Meteorologic Model</h4><p><strong>Ne yaptım?</strong></p><ol>
 <li>Time-Series Data Manager › Precipitation Gages → üç ölçer oluşturdum: <strong>DUJP</strong>, <strong>PNXP</strong>, <strong>MFFP</strong>.</li>
 <li>Her ölçer için Data Source = <strong>Single Record HEC-DSS</strong>, DSS dosyası = data/observe.dss; pathname listesinde B-part süzüldü:
    - /ALLEGHENY/DUJP/PRECIP-INC/…/1Hour/OBS/
@@ -254,7 +273,7 @@ footer{color:var(--ink2);font-size:13.5px;margin-top:56px;padding-top:18px;borde
 <li>'Positive PBIAS — over- or under-estimation?' → Over (model fazla tahmin ediyor).</li>
 <li>'Model peak is 5% high and arrives late. Name two parameter changes that fix both.' → R↑ (tepeyi küçültür, hafifçe yayar) + Tc↓ (tepe erken gelir). Lag↓ de zamanlamaya yardım eder.</li>
 <li>'KGE 1'e nereden uzaklaşır?' → r, α veya β'den herhangi biri 1'den uzaklaşırsa.</li>
-</ul></div></details></section><section id="bölüm-b-quiz-konuları-haftalık"><h2>BÖLÜM B — Quiz Konuları (haftalık)</h2><details class="kart" id="1-2-hafta-havza-ve-su-bütçesi"><summary><span class="kb">1.–2. hafta — Havza ve Su Bütçesi</span><span class="ok" aria-hidden="true"></span></summary><div class="kg"><p><strong>Havza ve ilgili tanımlar</strong></p><ul>
+</ul></div></details></div></section><section id="bölüm-b-quiz-konuları-haftalık"><h2>BÖLÜM B — Quiz Konuları (haftalık)</h2><div class="kartlar"><details class="kart" id="1-2-hafta-havza-ve-su-bütçesi"><summary><span class="kb">1.–2. hafta — Havza ve Su Bütçesi</span><span aria-hidden="true" class="ok"></span></summary><div class="kg"><p><strong>Havza ve ilgili tanımlar</strong></p><ul>
 <li><strong>Havza (drainage basin / watershed / catchment):</strong> Bir çıkış noktasına (outlet) akışı toplayan topoğrafik alan.</li>
 <li><strong>Su ayırım çizgisi (watershed divide):</strong> İki komşu havzayı ayıran en yüksek sırt hattı; harita üzerinde kontur çizgilerine dik olarak geçirilir.</li>
 <li><strong>Alt havza (subbasin):</strong> Büyük havzanın daha küçük parçalara ayrılmış hali; farklı eğim, zemin, bitki örtüsü için ayrı parametre set'i tutmak, model kalibrasyonu ve havza içi akış çalışmaları için bölünür.</li>
@@ -284,7 +303,7 @@ footer{color:var(--ink2);font-size:13.5px;margin-top:56px;padding-top:18px;borde
 </ul><p><strong>Mini örnek 2 (çözümlü, debi→derinlik):</strong> A = 88 mi² (Mahoning Local), 24 saatte yuvarlak hesap toplam hacim = 150·10⁶ ft³. Derinliği bul (in).</p><ul>
 <li>1 mi² = 27,878·10⁶ ft²; A = 88·27,878·10⁶ = 2,453·10⁹ ft².</li>
 <li>d (ft) = V/A = 150·10⁶ / 2,453·10⁹ = 0,0612 ft = <strong>0,73 in</strong>.</li>
-</ul><p><strong>İngilizce anahtar terimler:</strong> drainage basin, watershed, catchment, divide, subbasin, hydrologic cycle, evaporation, transpiration, condensation, precipitation, interception, depression storage, infiltration, percolation, interflow, baseflow, runoff, discharge, water budget, runoff coefficient.</p></div></details><details class="kart" id="3-hafta-yağış"><summary><span class="kb">3. hafta — Yağış</span><span class="ok" aria-hidden="true"></span></summary><div class="kg"><p><strong>Yağış türleri (precipitation types)</strong></p><ul>
+</ul><p><strong>İngilizce anahtar terimler:</strong> drainage basin, watershed, catchment, divide, subbasin, hydrologic cycle, evaporation, transpiration, condensation, precipitation, interception, depression storage, infiltration, percolation, interflow, baseflow, runoff, discharge, water budget, runoff coefficient.</p></div></details><details class="kart" id="3-hafta-yağış"><summary><span class="kb">3. hafta — Yağış</span><span aria-hidden="true" class="ok"></span></summary><div class="kg"><p><strong>Yağış türleri (precipitation types)</strong></p><ul>
 <li>Yağmur damlası ≥ <strong>0,5 mm</strong> (daha küçük = çiseleme / drizzle).</li>
 <li><strong>Virga:</strong> yağmur yere ulaşmadan buharlaşır.</li>
 <li><strong>Sleet:</strong> donmuş yağmur taneleri (küre buz).</li>
@@ -319,7 +338,7 @@ footer{color:var(--ink2);font-size:13.5px;margin-top:56px;padding-top:18px;borde
 </ul><p><strong>Konvektif vs. stratiform</strong></p><ul>
 <li><strong>Convective:</strong> dar alan (km mertebesi), yüksek şiddet, kısa süre, tek keskin tepeli hidrograf; Cb bulutu, dikey gelişim.</li>
 <li><strong>Stratiform:</strong> geniş alan (yüz km), orta/düşük şiddet, uzun süre; Ns/As bulutu, yatay gelişim.</li>
-</ul><p><strong>Tuzak:</strong> dBZ doğrudan Z değil, logaritmasıdır; 10 dBZ artış Z'yi 10 kat büyütür. 60 dBZ'den yüksek değerler yağmur yerine dolu göstergesidir.</p><p><strong>İngilizce anahtar terimler:</strong> precipitation, drizzle, virga, sleet, freezing rain, hail, drop size distribution, Marshall–Palmer, reflectivity factor Z, dBZ, Z–R relation, precipitable water, convective, stratiform.</p></div></details><details class="kart" id="4-hafta-ölçüm-ağı-ve-alansal-ortalama"><summary><span class="kb">4. hafta — Ölçüm Ağı ve Alansal Ortalama</span><span class="ok" aria-hidden="true"></span></summary><div class="kg"><p><strong>Hyetograf ve seri türleri</strong></p><ul>
+</ul><p><strong>Tuzak:</strong> dBZ doğrudan Z değil, logaritmasıdır; 10 dBZ artış Z'yi 10 kat büyütür. 60 dBZ'den yüksek değerler yağmur yerine dolu göstergesidir.</p><p><strong>İngilizce anahtar terimler:</strong> precipitation, drizzle, virga, sleet, freezing rain, hail, drop size distribution, Marshall–Palmer, reflectivity factor Z, dBZ, Z–R relation, precipitable water, convective, stratiform.</p></div></details><details class="kart" id="4-hafta-ölçüm-ağı-ve-alansal-ortalama"><summary><span class="kb">4. hafta — Ölçüm Ağı ve Alansal Ortalama</span><span aria-hidden="true" class="ok"></span></summary><div class="kg"><p><strong>Hyetograf ve seri türleri</strong></p><ul>
 <li><strong>Hyetograph:</strong> zaman-yağış şiddeti (ya da birim zaman yağışı) bar grafiği.</li>
 <li>Veri PRECIP-INC (her adımda eklenen) ya da PRECIP-CUM (kumülatif) olabilir; HEC-HMS'de ikisi arası çevrim otomatik.</li>
 </ul><p><strong>Alansal ortalama (areal average) — üç yöntem</strong></p><details class="ic"><summary><span>1) Aritmetik ortalama (arithmetic mean)</span></summary><div class="ic-g"><div class="tex">\bar{P} = \frac{1}{n} \sum_{i=1}^{n} P_{i}
@@ -365,7 +384,7 @@ footer{color:var(--ink2);font-size:13.5px;margin-top:56px;padding-top:18px;borde
 </ul><p><strong>Yeni ölçerlerin dağıtımı</strong></p><ul>
 <li>Havza A alt-bölgelere bölünür (Aj). Eksik sayı ΔN = N − n_mevcut. Her bölgeye ΔN·(Aj/A) oranında yeni ölçer düşer.</li>
 <li>Mini: ΔN = 48; iki bölge 3000 ve 7000 km² → 48·(3/10) = <strong>14 ölçer</strong>, 48·(7/10) = <strong>34 ölçer</strong>.</li>
-</ul><p><strong>İngilizce anahtar terimler:</strong> hyetograph, arithmetic mean, Thiessen polygon, isohyet, WMO gauge density, coefficient of variation Cv, optimum gauge number.</p></div></details></div></details><details class="kart" id="5-hafta-akış-üretimi-ve-model-ödev-haftası"><summary><span class="kb">5. hafta — Akış Üretimi ve Model (ödev haftası)</span><span class="ok" aria-hidden="true"></span></summary><div class="kg"><p><strong>Akış oluşum mekanizmaları</strong></p><ul>
+</ul><p><strong>İngilizce anahtar terimler:</strong> hyetograph, arithmetic mean, Thiessen polygon, isohyet, WMO gauge density, coefficient of variation Cv, optimum gauge number.</p></div></details></div></details><details class="kart" id="5-hafta-akış-üretimi-ve-model-ödev-haftası"><summary><span class="kb">5. hafta — Akış Üretimi ve Model (ödev haftası)</span><span aria-hidden="true" class="ok"></span></summary><div class="kg"><p><strong>Akış oluşum mekanizmaları</strong></p><ul>
 <li><strong>Hortonian overland flow (infiltration-excess):</strong> yağış şiddeti &gt; infiltrasyon kapasitesi; fazlası yüzeyde akar. Kurak/yarı-kurak, kentsel, geçirimsiz yüzeyler.</li>
 <li><strong>Dunne (saturation-excess):</strong> zemin doyar, sonraki yağış doymuş yüzeyde akar. Nemli iklim, vadi dibi, orman altı.</li>
 <li><strong>Interflow:</strong> zemin içi, yanal, doyma zonunun üstünde; hidrografa Hortonian'dan geliş, baseflow'dan erken katılır.</li>
@@ -409,7 +428,7 @@ footer{color:var(--ink2);font-size:13.5px;margin-top:56px;padding-top:18px;borde
 <li><strong>SCS Curve Number (CN):</strong> Ia = 0,2·S; S (mm) = 25400/CN − 254; Pe = (P−Ia)² / (P−Ia+S). CN = 100 geçirimsiz, CN = 30 çok geçirgen. [kaynakta adı verilirse]</li>
 <li><strong>φ-indeksi (phi-index):</strong> Homojen sabit kayıp; Σ(Pᵢ−φ)+ = toplam fazla yağış; deneme-yanılma ile φ bulunur.</li>
 <li><strong>Muskingum:</strong> O₂ = C₀·I₂ + C₁·I₁ + C₂·O₁; C'ler K ve X ile hesaplanır; Lag'den farklı olarak hem öteler hem sönümler.</li>
-</ul><p><strong>İngilizce anahtar terimler:</strong> Hortonian flow, saturation-excess (Dunne) flow, interflow, baseflow, hydrograph rising/recession limb, lumped/semi-distributed/distributed, rational method, time of concentration, runoff coefficient, Clark unit hydrograph, linear reservoir, Lag routing, SCS curve number, phi-index, Muskingum.</p></div></details><details class="kart" id="6-hafta-veri-kalitesi-ve-ekstremler"><summary><span class="kb">6. hafta — Veri Kalitesi ve Ekstremler</span><span class="ok" aria-hidden="true"></span></summary><div class="kg"><p><strong>Çift kütle eğrisi (double-mass curve)</strong></p><ul>
+</ul><p><strong>İngilizce anahtar terimler:</strong> Hortonian flow, saturation-excess (Dunne) flow, interflow, baseflow, hydrograph rising/recession limb, lumped/semi-distributed/distributed, rational method, time of concentration, runoff coefficient, Clark unit hydrograph, linear reservoir, Lag routing, SCS curve number, phi-index, Muskingum.</p></div></details><details class="kart" id="6-hafta-veri-kalitesi-ve-ekstremler"><summary><span class="kb">6. hafta — Veri Kalitesi ve Ekstremler</span><span aria-hidden="true" class="ok"></span></summary><div class="kg"><p><strong>Çift kütle eğrisi (double-mass curve)</strong></p><ul>
 <li>Amacı: Bir ölçerin verisinin <strong>tutarlılığını</strong> test etmek (homogeneity test).</li>
 <li>Çizim: x = komşu/şahit ölçerlerin kümülatif ortalaması (Ma); y = test edilen ölçerin kümülatif değeri (Mx). Düz çizgi = tutarlı; <strong>kırılma</strong> = o tarihte ölçüm koşulu değişti (tapa taşındı, binayı kapıyor, alet değişti).</li>
 <li>Düzeltme: yeni dönemi eski dönemin eğimine çek.</li>
@@ -449,7 +468,7 @@ footer{color:var(--ink2);font-size:13.5px;margin-top:56px;padding-top:18px;borde
 <li>ln k = −2,2504 − 0,530·4,605 = −2,2504 − 2,441 = −4,691 → k = e^(−4,691) = <strong>0,00917</strong>.</li>
 </ul><p><strong>PMP'ye giriş</strong></p><ul>
 <li>Belirli bir süre ve havza için meteorolojik olarak mümkün en büyük yağış. İstatistiksel (Hershfield, 7. haftada) veya fiziksel (maksimizasyon) yöntemlerle bulunur.</li>
-</ul><p><strong>İngilizce anahtar terimler:</strong> double-mass curve, homogeneity, record adjustment, IDF curve, intensity, duration, return period, exceedance probability, risk of failure, areal reduction, Horton depth–area, PMP.</p></div></details><details class="kart" id="7-hafta-depolama-pmp-buharlaşma"><summary><span class="kb">7. hafta — Depolama, PMP, Buharlaşma</span><span class="ok" aria-hidden="true"></span></summary><div class="kg"><p><strong>Hazne bütçesi (reservoir / lake water balance)</strong></p><div class="tex">\frac{dh}{dt} = P - E + \frac{Q_{in} - Q_{out}}{A}
+</ul><p><strong>İngilizce anahtar terimler:</strong> double-mass curve, homogeneity, record adjustment, IDF curve, intensity, duration, return period, exceedance probability, risk of failure, areal reduction, Horton depth–area, PMP.</p></div></details><details class="kart" id="7-hafta-depolama-pmp-buharlaşma"><summary><span class="kb">7. hafta — Depolama, PMP, Buharlaşma</span><span aria-hidden="true" class="ok"></span></summary><div class="kg"><p><strong>Hazne bütçesi (reservoir / lake water balance)</strong></p><div class="tex">\frac{dh}{dt} = P - E + \frac{Q_{in} - Q_{out}}{A}
 </div><ul>
 <li>h: su seviyesi (m)</li>
 <li>P: yağış (m/yıl) — göl yüzeyine düşen</li>
@@ -496,7 +515,7 @@ footer{color:var(--ink2);font-size:13.5px;margin-top:56px;padding-top:18px;borde
 </ul><p><strong>Mini örnek (Dalton-benzeri):</strong> es = 25 hPa, ea = 15 hPa, u = 3 m/s, f(u) = 0,35·(1+0,1·u) mm/gün/hPa.</p><ul>
 <li>f(u) = 0,35·1,3 = 0,455 mm/gün/hPa.</li>
 <li>E = 0,455·(25−15) = <strong>4,55 mm/gün</strong>.</li>
-</ul><p><strong>İngilizce anahtar terimler:</strong> reservoir water balance, steady state, probable maximum precipitation (PMP), Hershfield method, Km factor, Class A pan, pan coefficient Kp, Dalton's law, Harbeck–Meyers, vapor pressure deficit.</p></div></details></section><section id="bölüm-c-olası-quiz-soruları"><h2>BÖLÜM C — Olası Quiz Soruları</h2><p>Her sorunun altında önce boş <strong>Kendi çözümün:</strong> satırı var — denemeden aşağıya bakma. Sonrasında adım adım çözüm ve tek satırlık <strong>Sınavda yaz:</strong> kalıbı gelir.</p><hr/><p><strong>Q1 (hesap, su bütçesi).</strong> <em>Over a 1200 km² basin, mean annual P = 950 mm and Q = 420 mm. Assuming ΔS ≈ 0, find ET and the runoff coefficient c.</em></p><p>1200 km² havzada yıllık ortalama P = 950 mm, Q = 420 mm. ΔS ≈ 0 iken ET ve akış katsayısı c?</p><ul>
+</ul><p><strong>İngilizce anahtar terimler:</strong> reservoir water balance, steady state, probable maximum precipitation (PMP), Hershfield method, Km factor, Class A pan, pan coefficient Kp, Dalton's law, Harbeck–Meyers, vapor pressure deficit.</p></div></details></div></section><section id="bölüm-c-olası-quiz-soruları"><h2>BÖLÜM C — Olası Quiz Soruları</h2><p>Her sorunun altında önce boş <strong>Kendi çözümün:</strong> satırı var — denemeden aşağıya bakma. Sonrasında adım adım çözüm ve tek satırlık <strong>Sınavda yaz:</strong> kalıbı gelir.</p><hr/><p><strong>Q1 (hesap, su bütçesi).</strong> <em>Over a 1200 km² basin, mean annual P = 950 mm and Q = 420 mm. Assuming ΔS ≈ 0, find ET and the runoff coefficient c.</em></p><p>1200 km² havzada yıllık ortalama P = 950 mm, Q = 420 mm. ΔS ≈ 0 iken ET ve akış katsayısı c?</p><ul>
 <li><strong>Kendi çözümün:</strong></li>
 <li>ET = P − Q = 950 − 420 = <strong>530 mm/yıl</strong>.</li>
 <li>c = Q/P = 420/950 ≈ <strong>0,442</strong>.</li>
@@ -573,7 +592,7 @@ footer{color:var(--ink2);font-size:13.5px;margin-top:56px;padding-top:18px;borde
 <li>(a) R ↑ → tepe <strong>düşer</strong>, hidrograf <strong>yayılır</strong> (daha büyük domağın depolama).</li>
 <li>(b) Lag ↑ → hidrograf sadece <strong>sağa kayar</strong> (gecikme), tepe büyüklüğü <strong>aynı kalır</strong> (no attenuation). Junction-2'de Mahoning Creek Local ile tepelerin çakışma zamanı değişir.</li>
 <li><strong>Sınavda yaz:</strong> R↑ tepeyi küçültür/yayar; Lag↑ yalnız öteler.</li>
-</ul></section><section id="bölüm-d-tek-sayfa-özet"><h2>BÖLÜM D — Tek Sayfa Özet</h2><details class="kart" id="formül-kartı"><summary><span class="kb">Formül kartı</span><span class="ok" aria-hidden="true"></span></summary><div class="kg"><div class="tablo"><table>
+</ul></section><section id="bölüm-d-tek-sayfa-özet"><h2>BÖLÜM D — Tek Sayfa Özet</h2><div class="kartlar"><details class="kart" id="formül-kartı"><summary><span class="kb">Formül kartı</span><span aria-hidden="true" class="ok"></span></summary><div class="kg"><div class="tablo"><table>
 <thead>
 <tr>
 <th>Formül</th>
@@ -703,7 +722,7 @@ footer{color:var(--ink2);font-size:13.5px;margin-top:56px;padding-top:18px;borde
 <td>Sistematik yanlılık</td>
 </tr>
 </tbody>
-</table></div></div></details><details class="kart" id="10-tuzak"><summary><span class="kb">10 tuzak</span><span class="ok" aria-hidden="true"></span></summary><div class="kg"><ol>
+</table></div></div></details><details class="kart" id="10-tuzak"><summary><span class="kb">10 tuzak</span><span aria-hidden="true" class="ok"></span></summary><div class="kg"><ol>
 <li>Rasyonel yöntemde A'yı ha yerine km² yazmak (1 km² = 100 ha; km² ile bölen 3,6 olur).</li>
 <li>Dış ölçeri aritmetik ortalamaya katmak (Thiessen gerekir).</li>
 <li>N = Cv/ε yazmak — kare unutmak; <strong>N = (Cv/ε)²</strong>.</li>
@@ -714,8 +733,8 @@ footer{color:var(--ink2);font-size:13.5px;margin-top:56px;padding-top:18px;borde
 <li>Precipitable water W'yi 'olası yağış' sanmak; W <strong>anlık sütun suyu</strong>, yağışın sınırı değil.</li>
 <li>Hershfield'da X̄_(n−1)/σ_(n−1) ile X̄_n/σ_n serilerini karıştırmak.</li>
 <li>Class A tava değerini doğrudan göl buharlaşması almak (Kp ≈ 0,7 çarpımı unutulmaz).</li>
-</ol></div></details><details class="kart" id="3-kavram-bağı-1-sık-yanılgı"><summary><span class="kb">3 kavram bağı + 1 sık yanılgı</span><span class="ok" aria-hidden="true"></span></summary><div class="kg"><details class="ic"><summary><span>1. Loss → Excess → Transform → (+ Baseflow) → Routing</span></summary><div class="ic-g"><p>. HEC-HMS'de bir alt havzadan çıkışa kadar tam zincir: Loss (Ia, fc) fazla yağışı verir → Transform (Clark Tc, R) direct runoff hidrografını üretir → Baseflow (linear reservoir k) eklenir → Reach'te Routing (Lag) öteler. Loss büyürse excess küçülür; R büyürse tepe düşer.</p></div></details><details class="ic"><summary><span>2. Cv, ε ve N</span></summary><div class="ic-g"><p>. Veri dağınıklığı (Cv) <strong>artarsa</strong> veya tolerans (ε) <strong>düşerse</strong> gereken ölçer sayısı <strong>karesel</strong> büyür. WMO'nun dağ çöl farklı yoğunluklar önermesinin altında bu yatıyor.</p></div></details><details class="ic"><summary><span>3. Tc ve R, zamanlama vs. büyüklük</span></summary><div class="ic-g"><p>. Tc tepe geliş <strong>zamanını</strong> belirler; R tepe <strong>boyunu</strong> yayar. Model tepe hem geç hem yüksekse: Tc↓ zamanlamayı öne alır, R↑ tepeyi küçültür.</p><p><strong>Sık yanılgı:</strong> 'NSE 0,85 ile 0,95 arası fark küçük' — aslında 0,95 tepe ve zamanlama hatalarına çok duyarlıdır. PBIAS küçük ama NSE düşükse model <strong>dinamiği</strong> yakalayamaz (tepe saatinde değil); PBIAS büyük ama NSE yüksekse model şekli yakalar ama <strong>ölçek</strong> kaymıştır — kalibrasyonda hangisine baktığın fark eder.</p></div></details></div></details></section>
-    <footer>Atmosfer Akademisi · dokununca açılan kartlar; «Hepsini aç» ile tümü. <a href="../">Tüm dersler</a></footer>
+</ol></div></details><details class="kart" id="3-kavram-bağı-1-sık-yanılgı"><summary><span class="kb">3 kavram bağı + 1 sık yanılgı</span><span aria-hidden="true" class="ok"></span></summary><div class="kg"><details class="ic"><summary><span>1. Loss → Excess → Transform → (+ Baseflow) → Routing</span></summary><div class="ic-g"><ul class="mad"><li>. HEC-HMS'de bir alt havzadan çıkışa kadar tam zincir: Loss (Ia, fc) fazla yağışı verir → Transform (Clark Tc, R) direct runoff hidrografını üretir → Baseflow (linear reservoir k) eklenir → Reach'te Routing (Lag) öteler.</li><li>Loss büyürse excess küçülür; R büyürse tepe düşer.</li></ul></div></details><details class="ic"><summary><span>2. Cv, ε ve N</span></summary><div class="ic-g"><p>. Veri dağınıklığı (Cv) <strong>artarsa</strong> veya tolerans (ε) <strong>düşerse</strong> gereken ölçer sayısı <strong>karesel</strong> büyür. WMO'nun dağ çöl farklı yoğunluklar önermesinin altında bu yatıyor.</p></div></details><details class="ic"><summary><span>3. Tc ve R, zamanlama vs. büyüklük</span></summary><div class="ic-g"><p>. Tc tepe geliş <strong>zamanını</strong> belirler; R tepe <strong>boyunu</strong> yayar. Model tepe hem geç hem yüksekse: Tc↓ zamanlamayı öne alır, R↑ tepeyi küçültür.</p><ul class="mad"><li><strong>Sık yanılgı:</strong> 'NSE 0,85 ile 0,95 arası fark küçük' — aslında 0,95 tepe ve zamanlama hatalarına çok duyarlıdır.</li><li>PBIAS küçük ama NSE düşükse model <strong>dinamiği</strong> yakalayamaz (tepe saatinde değil); PBIAS büyük ama NSE yüksekse model şekli yakalar ama <strong>ölçek</strong> kaymıştır — kalibrasyonda hangisine baktığın fark eder.</li></ul></div></details></div></details></div></section>
+    <footer>Atmosfer Akademisi · dokununca açılan kartlar; «Hepsini aç» ile tümü; okuduğun kartı «Okudum» ile işaretle. <a href="../">Tüm dersler</a></footer>
   </main>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
@@ -724,6 +743,18 @@ footer{color:var(--ink2);font-size:13.5px;margin-top:56px;padding-top:18px;borde
   const $$=(s,e=document)=>Array.from(e.querySelectorAll(s));
   function tex(){ if(!window.katex) return; $$('.tex').forEach(d=>{ if(d.dataset.ok) return; const t=d.textContent; try{ katex.render(t,d,{displayMode:true,throwOnError:false}); d.dataset.ok=1; }catch(e){} }); }
   if (window.katex) tex(); else window.addEventListener('load', tex);
+  // okudum işareti + ilerleme (yalnız bu tarayıcıda)
+  const KEY='not:'+location.pathname+':';
+  const sakla={ al:k=>{ try{ return localStorage.getItem(KEY+k); }catch(e){ return null; } }, koy:(k,v)=>{ try{ if(v) localStorage.setItem(KEY+k,'1'); else localStorage.removeItem(KEY+k); }catch(e){} } };
+  const kartlar=$$('details.kart');
+  function ilerle(){ const n=kartlar.filter(d=>d.classList.contains('okundu')).length; document.getElementById('ilerB').style.width=(kartlar.length?100*n/kartlar.length:0)+'%'; document.getElementById('ilerS').textContent=n+' / '+kartlar.length+' okundu'; }
+  kartlar.forEach(d=>{
+    const sm=d.querySelector('summary'); const dot=document.createElement('span'); dot.className='durum'; dot.setAttribute('aria-hidden','true'); sm.prepend(dot);
+    const o=document.createElement('div'); o.className='oku'; const b=document.createElement('button'); b.type='button';
+    const ciz=()=>{ const v=!!sakla.al(d.id); d.classList.toggle('okundu',v); b.setAttribute('aria-pressed',v); b.textContent=v?'✓ Okudum':'Okudum olarak işaretle'; ilerle(); };
+    b.onclick=()=>{ sakla.koy(d.id,!sakla.al(d.id)); ciz(); };
+    o.append(b); d.querySelector('.kg').append(o); ciz();
+  });
   const hepsi=document.getElementById('hepsi');
   const tum=()=>$$('details');
   const guncelle=()=>{ hepsi.textContent = tum().every(d=>d.open) ? 'Hepsini kapat' : 'Hepsini aç'; };
