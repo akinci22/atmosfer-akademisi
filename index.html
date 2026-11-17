@@ -5,68 +5,168 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Atmosfer Akademisi</title>
 <meta name="description" content="İTÜ Meteoroloji Mühendisliği dersleri ve dönem projeleri: görsellerle, adım adım.">
-<meta name="color-scheme" content="light dark">
+<meta name="color-scheme" content="light">
 <style>
-:root { --bg: #f6f7f9; --surface: #fff; --ink: #15171c; --ink2: #565d6b; --line: #e1e4e9; --acc: #184f9a; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #0e1013; --surface: #171a1f; --ink: #eceef1; --ink2: #a4aab5; --line: #262a31; --acc: #a0c3ff; color-scheme: dark; } }
-:root[data-theme="dark"] { --bg: #0e1013; --surface: #171a1f; --ink: #eceef1; --ink2: #a4aab5; --line: #262a31; --acc: #a0c3ff; color-scheme: dark; }
-body { margin: 0; background: var(--bg); color: var(--ink); font: 16.5px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
-main { position: relative; max-width: 1080px; margin: 0 auto; padding-block: 64px 80px; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
-.k { color: var(--ink2); font-size: 14.5px; margin: 0; }
-h1 { font-size: clamp(2.2rem, 1.4rem + 3vw, 3.2rem); line-height: 1.05; letter-spacing: -0.03em; margin: 8px 0 10px; }
-.lede { color: var(--ink2); font-size: 1.15rem; max-width: 56ch; margin: 0; }
-section { margin-top: 56px; padding-top: 28px; border-top: 1px solid var(--line); }
-h2 { font-size: 1.15rem; letter-spacing: -0.01em; margin: 0 0 16px; }
-.row { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 16px; }
-a.c { display: grid; grid-template-rows: auto 1fr; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; color: inherit; text-decoration: none; }
-a.c img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; background: #fff; border-bottom: 1px solid var(--line); }
-a.c div { display: grid; gap: 4px; padding: 14px 16px 16px; align-content: start; }
-a.c b { font-size: 1.12rem; letter-spacing: -0.01em; }
-a.c span { color: var(--ink2); font-size: 15px; }
-a.c:hover b { color: var(--acc); }
-a.c:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
-a.folio { position: absolute; top: 18px; right: max(20px, env(safe-area-inset-right, 0px)); display: inline-flex; align-items: center; gap: 5px; height: 36px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink2); font-size: 14px; font-weight: 600; text-decoration: none; }
+:root { --bg: #ffffff; --surface: #f5f7fa; --ink: #111827; --ink2: #4b5563; --line: #e2e7ee; --acc: #1d5fd6; --acc-bg: #eaf1fd;
+  --c302: #1d5fd6; --c229: #0f766e; --c316: #b45309; --c303: #7c3aed; --gut: clamp(16px, 4vw, 48px); }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { scroll-padding-top: 88px; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 18px/1.7 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.kap { max-width: 1440px; margin: 0 auto; padding-left: max(var(--gut), env(safe-area-inset-left, 0px)); padding-right: max(var(--gut), env(safe-area-inset-right, 0px)); }
+/* üst çubuk */
+.bar { position: sticky; top: 0; z-index: 10; background: rgba(255, 255, 255, .92); backdrop-filter: saturate(1.6) blur(12px); -webkit-backdrop-filter: saturate(1.6) blur(12px); border-bottom: 1px solid var(--line); padding-top: env(safe-area-inset-top, 0px); }
+.bar .kap { display: flex; align-items: center; gap: 14px; min-height: 64px; }
+.marka { font-weight: 700; font-size: 18px; letter-spacing: -0.01em; color: var(--ink); text-decoration: none; white-space: nowrap; }
+.ara { flex: 1 1 auto; max-width: 460px; margin-left: auto; position: relative; }
+.ara input { width: 100%; height: 44px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); padding: 0 14px 0 42px; font: inherit; font-size: 16px; color: var(--ink); }
+.ara input:focus { outline: 2px solid var(--acc); outline-offset: 1px; background: #fff; }
+.ara svg { position: absolute; left: 14px; top: 13px; width: 18px; height: 18px; color: var(--ink2); }
+a.folio { display: inline-flex; align-items: center; gap: 6px; height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 12px; color: var(--ink2); font-size: 16px; font-weight: 600; text-decoration: none; white-space: nowrap; }
 a.folio:hover { border-color: var(--acc); color: var(--acc); }
-a.folio:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
+/* giriş */
+header.giris { padding-block: 56px 8px; }
+.k { color: var(--ink2); font-size: 16px; font-weight: 600; letter-spacing: .02em; margin: 0; }
+h1 { font-size: clamp(2.3rem, 1.5rem + 2.6vw, 3.4rem); line-height: 1.1; letter-spacing: -0.03em; margin: 10px 0 18px; }
+.ozet { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 12px 28px; margin: 0; padding: 0; list-style: none; }
+.ozet li { display: flex; gap: 12px; align-items: flex-start; font-size: 18px; color: var(--ink); }
+.ozet b { flex: 0 0 auto; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--acc-bg); color: var(--acc); font-size: 15px; margin-top: 1px; }
+/* ders çipleri */
+.cipler { position: sticky; top: calc(65px + env(safe-area-inset-top, 0px)); z-index: 9; background: var(--bg); padding-block: 14px; margin-top: 36px; border-bottom: 1px solid var(--line); }
+.cipler .kap { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; }
+.cipler .kap::-webkit-scrollbar { display: none; }
+.cip { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--ink); font-family: inherit; font-weight: 600; font-size: 16px; line-height: 1; cursor: pointer; }
+.cip i { font-style: normal; font-size: 14px; color: var(--ink2); background: var(--surface); border-radius: 999px; padding: 3px 8px; }
+.cip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+.cip[aria-pressed="true"] i { background: rgba(255, 255, 255, .18); color: #fff; }
+.cip:focus-visible, a.c:focus-visible, .ara input:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
+/* bölümler */
+main { padding-block: 8px 96px; }
+section { padding-top: 56px; }
+section + section { margin-top: 24px; border-top: 1px solid var(--line); }
+.sb { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin: 0 0 24px; }
+.sb h2 { font-size: clamp(1.5rem, 1.2rem + 1vw, 1.9rem); letter-spacing: -0.015em; line-height: 1.25; margin: 0; }
+.sb .kod { font-size: 15px; font-weight: 700; letter-spacing: .04em; color: var(--renk); background: color-mix(in srgb, var(--renk) 11%, #fff); border-radius: 8px; padding: 4px 10px; }
+.row { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 24px; }
+a.c { display: grid; grid-template-rows: auto 1fr; background: #fff; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; color: inherit; text-decoration: none; transition: border-color .15s, box-shadow .15s, transform .15s; }
+a.c:hover { border-color: color-mix(in srgb, var(--renk) 55%, var(--line)); box-shadow: 0 8px 24px rgba(17, 24, 39, .08); transform: translateY(-2px); }
+a.c img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--surface); border-bottom: 1px solid var(--line); }
+a.c .g { display: grid; gap: 10px; padding: 18px 20px 22px; align-content: start; }
+a.c b { font-size: 1.25rem; letter-spacing: -0.01em; line-height: 1.3; }
+a.c:hover b { color: var(--renk); }
+a.c ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+a.c li { position: relative; padding-left: 20px; font-size: 17px; line-height: 1.65; color: var(--ink2); }
+a.c li::before { content: ""; position: absolute; left: 2px; top: .62em; width: 7px; height: 7px; border-radius: 50%; background: var(--renk); }
+a.c .git { margin-top: 4px; font-size: 16px; font-weight: 650; color: var(--renk); }
+.bos { padding: 28px; border: 1px dashed var(--line); border-radius: 14px; color: var(--ink2); font-size: 18px; }
+@media (prefers-reduced-motion: reduce) { a.c { transition: none; } a.c:hover { transform: none; } }
+@media (max-width: 640px) {
+  body { font-size: 17px; }
+  .bar .kap { gap: 10px; min-height: 60px; }
+  .marka { font-size: 17px; }
+  a.folio span.uz { display: none; }
+  header.giris { padding-block: 36px 4px; }
+  .cipler { top: calc(61px + env(safe-area-inset-top, 0px)); margin-top: 28px; }
+  section { padding-top: 44px; }
+}
+@media (max-width: 420px) { .marka { font-size: 16px; } .ara input { padding-left: 36px; } .ara svg { left: 11px; } }
 </style>
 </head>
 <body>
-<main>
-  <a class="folio" href="https://akinci22.github.io/hakkimda/" target="_blank" rel="noopener noreferrer" aria-label="Portföy sitem (yeni sekmede açılır)">Portföyüm<span aria-hidden="true">↗</span></a>
+<div class="bar"><div class="kap">
+  <a class="marka" href="./">Atmosfer Akademisi</a>
+  <label class="ara"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="ara" type="search" placeholder="Ara: SYNOP, Skew-T, HEC-HMS, cephe…" aria-label="Bölümlerde ara" autocomplete="off"></label>
+  <a class="folio" href="https://akinci22.github.io/hakkimda/" target="_blank" rel="noopener noreferrer" aria-label="Portföy sitem (yeni sekmede açılır)"><span class="uz">Portföyüm</span><span aria-hidden="true">↗</span></a>
+</div></div>
+
+<header class="giris kap">
   <p class="k">İTÜ Meteoroloji Mühendisliği</p>
   <h1>Atmosfer Akademisi</h1>
-  <p class="lede">Dersler ve dönem projeleri: önce resim, sonra tek cümle; ayrıntı tıklayınca açılır.</p>
+  <ul class="ozet">
+    <li><b>1</b><span><strong>Önce resim:</strong> her konu bir görsel ya da araçla başlar.</span></li>
+    <li><b>2</b><span><strong>Sonra kısa madde:</strong> ne, neden, neye bakmalı.</span></li>
+    <li><b>3</b><span><strong>Ayrıntı dokununca:</strong> derinlik isteyene açılır.</span></li>
+    <li><b>4</b><span><strong>Kendini dene:</strong> her bölümde kısa sorular.</span></li>
+  </ul>
+</header>
 
-  <section>
-    <h2>MTO 302E · Hava Analizi ve Öngörü</h2>
+<nav class="cipler" aria-label="Derse göre süz"><div class="kap" id="cipler"></div></nav>
+
+<main class="kap" id="liste">
+  <section id="mto302e" data-ders="MTO 302E" style="--renk: var(--c302)">
+    <div class="sb"><span class="kod">MTO 302E</span><h2>Hava Analizi ve Öngörü</h2></div>
     <div class="row">
-      <a class="c" href="./hava-analizi-proje-rehberi/"><img src="./hava-analizi-proje-rehberi/rehber/mto302/500-mslp.webp" alt="500 hPa jeopotansiyel ve deniz seviyesi basıncı haritası" loading="lazy"><div><b>Proje rehberi</b><span>Brifing sunumu, proje raporu ve sunumu: ne isteniyor, adım adım nasıl yapılır.</span></div></a>
-      <a class="c" href="./sinoptik-brifing/"><img src="./sinoptik-brifing/kapak.jpg" alt="Kendi çizimimiz: Avrupa yer analizi, Atlantik alçağı ve cepheler" loading="lazy"><div><b>Brifing atölyesi</b><span>Sinoptik brifing adım adım: her harita gerçek bir örnekle, sunum modu, SYNOP çözücü, Skew-T ve kanıt zinciri.</span></div></a>
-      <a class="c" href="./harita-okulu/"><img src="./harita-okulu/img/ders1/istasyon-modeli-ornek.png" alt="İstasyon modeli örneği" loading="lazy"><div><b>Harita Okulu</b><span>SYNOP kodu, istasyon modeli, trof ve sırt, cepheler, kısa sınav provası.</span></div></a>
-      <a class="c" href="./brifing-ornegi/"><img src="./brifing-ornegi/kapak.webp" alt="ECMWF tahmini: deniz seviyesi basıncı ve 850 hPa rüzgâr hızı" loading="lazy"><div><b>Brifing örneği</b><span>Beş kişilik gerçek bir brifing: her harita tık tık, konuşmacı başına kalıp cümle, olası sorular, kendini dene.</span></div></a>
+      <a class="c" href="./harita-okulu/"><img src="./harita-okulu/img/ders1/istasyon-modeli-ornek.png" alt="İstasyon modeli örneği" loading="lazy"><div class="g"><b>Harita Okulu</b>
+        <ul><li>SYNOP kodu, istasyon modeli, trof ve sırt, cepheler</li><li>11 laboratuvar: değeri değiştir, sonucu gör</li><li>Gerçek haritalar ve sınav provası</li></ul><span class="git">Aç →</span></div></a>
+      <a class="c" href="./sinoptik-brifing/"><img src="./sinoptik-brifing/kapak.jpg" alt="Kendi çizimimiz: Avrupa yer analizi, Atlantik alçağı ve cepheler" loading="lazy"><div class="g"><b>Brifing atölyesi</b>
+        <ul><li>Sinoptik brifing adım adım, her harita örnekle</li><li>Sunum modu, harita harita gezinti</li><li>SYNOP çözücü, Skew-T, meteogram</li></ul><span class="git">Aç →</span></div></a>
+      <a class="c" href="./brifing-ornegi/"><img src="./brifing-ornegi/kapak.webp" alt="ECMWF tahmini: deniz seviyesi basıncı ve 850 hPa rüzgâr hızı" loading="lazy"><div class="g"><b>Brifing örneği</b>
+        <ul><li>Beş konuşmacılık gerçek bir brifing</li><li>Her harita tık tık, konuşmacı başına kalıp cümle</li><li>Olası sorular ve Kendini dene</li></ul><span class="git">Aç →</span></div></a>
+      <a class="c" href="./hava-analizi-proje-rehberi/"><img src="./hava-analizi-proje-rehberi/rehber/mto302/500-mslp.webp" alt="500 hPa jeopotansiyel ve deniz seviyesi basıncı haritası" loading="lazy"><div class="g"><b>Proje rehberi</b>
+        <ul><li>Brifing sunumu, proje raporu ve sunumu</li><li>Ne isteniyor, adım adım nasıl yapılır</li><li>Araçlar: saat, katmanlar, SYNOP, mekanizma</li></ul><span class="git">Aç →</span></div></a>
     </div>
   </section>
 
-  <section>
-    <h2>MTO 229E · Bulut ve Yağış Fiziği</h2>
+  <section id="mto229e" data-ders="MTO 229E" style="--renk: var(--c229)">
+    <div class="sb"><span class="kod">MTO 229E</span><h2>Bulut ve Yağış Fiziği</h2></div>
     <div class="row">
-      <a class="c" href="./bulut-fizigi-rehberi/"><img src="./bulut-fizigi-rehberi/rehber/pcp/gok_28.jpg" alt="Mavi gökte dağınık kümülüs bulutları" loading="lazy"><div><b>Proje rehberi</b><span>Gökyüzü fotoğrafından Skew-T’ye: Part I ve Part II’yi adım adım gösteriyorum.</span></div></a>
-    </div>
-  </section>
-  <section>
-    <h2>MTO 316 · Hidrometeoroloji</h2>
-    <div class="row">
-      <a class="c" href="./hec-hms/"><img src="./hec-hms/img/hw2-observed-graph.webp" alt="HEC-HMS: Junction-2 için hesaplanan ve gözlenen akım grafiği" loading="lazy"><div><b>HEC-HMS okulu</b><span>Programın birebir benzeri: menüye, araca, editöre dokun, ne işe yaradığını gör. HW#1 ve HW#2 Türkçe, tık tık.</span></div></a>
-      <a class="c" href="./hidrometeoroloji-quiz/"><img src="./hec-hms/img/hw1-connected.webp" alt="HEC-HMS havza modeli: alt havzalar, kanal ve birleşimler bağlı" loading="lazy"><div><b>Ödev ve quiz hazırlığı</b><span>1.–7. hafta: ödevlerin ne-neden tekrarı, haftalık konular, olası sorular, formül kartı.</span></div></a>
+      <a class="c" href="./bulut-fizigi-rehberi/"><img src="./bulut-fizigi-rehberi/rehber/pcp/gok_28.jpg" alt="Mavi gökte dağınık kümülüs bulutları" loading="lazy"><div class="g"><b>Proje rehberi</b>
+        <ul><li>Part I: gökyüzü fotoğrafından bulut tanıma</li><li>Part II: Skew-T, parsel ve LCL</li><li>Araçlar: Bulutu tanı, Parsel yolculuğu</li></ul><span class="git">Aç →</span></div></a>
     </div>
   </section>
 
-  <section>
-    <h2>MTO 303E · Hesaplamalı Akışkanlar Dinamiği</h2>
+  <section id="mto316" data-ders="MTO 316" style="--renk: var(--c316)">
+    <div class="sb"><span class="kod">MTO 316</span><h2>Hidrometeoroloji</h2></div>
     <div class="row">
-      <a class="c" href="./cfd-temelleri/"><img src="./cfd-temelleri/kapak.svg" alt="Kapaklı kare kutu akışı şeması" loading="lazy"><div><b>CFD temelleri</b><span>Sekiz denklem, terim sözlüğü, DNS/LES/RANS, RK3, OpenFOAM ve HEC-HMS'e köprü.</span></div></a>
+      <a class="c" href="./hec-hms/"><img src="./hec-hms/img/hw2-observed-graph.webp" alt="HEC-HMS: Junction-2 için hesaplanan ve gözlenen akım grafiği" loading="lazy"><div class="g"><b>HEC-HMS okulu</b>
+        <ul><li>Programın birebir benzeri: dokun, ne işe yaradığını gör</li><li>HW#1 ve HW#2 rehberli, Türkçe</li><li>İzle: program adımları kendisi yapar</li></ul><span class="git">Aç →</span></div></a>
+      <a class="c" href="./hidrometeoroloji-quiz/"><img src="./hec-hms/img/hw1-connected.webp" alt="HEC-HMS havza modeli: alt havzalar, kanal ve birleşimler bağlı" loading="lazy"><div class="g"><b>Ödev ve quiz hazırlığı</b>
+        <ul><li>1.–7. hafta konuları</li><li>Ödevlerin ne–neden tekrarı</li><li>Olası sorular ve formül kartı</li></ul><span class="git">Aç →</span></div></a>
     </div>
   </section>
+
+  <section id="mto303e" data-ders="MTO 303E" style="--renk: var(--c303)">
+    <div class="sb"><span class="kod">MTO 303E</span><h2>Hesaplamalı Akışkanlar Dinamiği</h2></div>
+    <div class="row">
+      <a class="c" href="./cfd-temelleri/"><img src="./cfd-temelleri/kapak.svg" alt="Kapaklı kare kutu akışı şeması" loading="lazy"><div class="g"><b>CFD temelleri</b>
+        <ul><li>Sekiz denklem ve terim sözlüğü</li><li>DNS, LES, RANS ve RK3</li><li>OpenFOAM ve HEC-HMS'e köprü</li></ul><span class="git">Aç →</span></div></a>
+    </div>
+  </section>
+  <p class="bos" id="bos" hidden>Bu aramayla eşleşen bölüm yok. Başka bir kelime dene: «SYNOP», «bulut», «HEC-HMS».</p>
 </main>
+
+<script>
+(() => {
+  const bolumler = [...document.querySelectorAll('main section')];
+  const kartlar = [...document.querySelectorAll('a.c')];
+  const kutu = document.getElementById('cipler');
+  const ara = document.getElementById('ara');
+  let ders = 'hepsi';
+  const kucuk = (s) => s.toLocaleLowerCase('tr');
+  const cipler = [{ id: 'hepsi', ad: 'Tümü', n: kartlar.length }].concat(bolumler.map((s) => ({ id: s.id, ad: s.dataset.ders, n: s.querySelectorAll('a.c').length })));
+  cipler.forEach((c) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'cip'; b.dataset.id = c.id;
+    b.innerHTML = `${c.ad}<i>${c.n}</i>`;
+    b.setAttribute('aria-pressed', c.id === ders);
+    b.onclick = () => { ders = c.id; uygula(); if (c.id !== 'hepsi') { const s = document.getElementById(c.id); window.scrollTo({ top: s.getBoundingClientRect().top + scrollY - document.querySelector('.cipler').getBoundingClientRect().bottom - 8, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); } };
+    kutu.append(b);
+  });
+  function uygula() {
+    const q = kucuk(ara.value.trim());
+    let gorunen = 0;
+    bolumler.forEach((s) => {
+      let n = 0;
+      s.querySelectorAll('a.c').forEach((a) => { const ok = (ders === 'hepsi' || s.id === ders) && (!q || kucuk(a.textContent + ' ' + s.dataset.ders + ' ' + s.querySelector('h2').textContent).includes(q)); a.hidden = !ok; if (ok) n++; });
+      s.hidden = n === 0; gorunen += n;
+    });
+    document.getElementById('bos').hidden = gorunen > 0;
+    kutu.querySelectorAll('.cip').forEach((b) => b.setAttribute('aria-pressed', b.dataset.id === ders));
+  }
+  ara.addEventListener('input', uygula);
+  document.addEventListener('keydown', (e) => { if (e.key === '/' && document.activeElement !== ara) { e.preventDefault(); ara.focus(); } });
+})();
+</script>
 </body>
 </html>
