@@ -36,8 +36,11 @@ h1 { font-size: clamp(2.3rem, 1.5rem + 2.6vw, 3.4rem); line-height: 1.1; letter-
 .cipler { position: sticky; top: calc(65px + env(safe-area-inset-top, 0px)); z-index: 9; background: var(--bg); padding-block: 14px; margin-top: 36px; border-bottom: 1px solid var(--line); }
 .cipler .kap { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; }
 .cipler .kap::-webkit-scrollbar { display: none; }
+/* masaüstü: çipler sığmayınca alt satıra sarar; telefonda yatay kayar ama sağ kenar solgunlaşır (devamı var ipucu) */
+@media (min-width: 761px) { .cipler .kap { flex-wrap: wrap; overflow-x: visible; } }
+@media (max-width: 760px) { .cipler .kap { -webkit-mask-image: linear-gradient(90deg, #000 82%, transparent); mask-image: linear-gradient(90deg, #000 82%, transparent); padding-right: 40px; } }
 .cip { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--ink); font-family: inherit; font-weight: 600; font-size: 16px; line-height: 1; cursor: pointer; }
-.cip i { font-style: normal; font-size: 14px; color: var(--ink2); background: var(--surface); border-radius: 999px; padding: 3px 8px; }
+.cip i { font-style: normal; font-size: 15px; color: var(--ink2); background: var(--surface); border-radius: 999px; padding: 3px 8px; }
 .cip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
 .cip[aria-pressed="true"] i { background: rgba(255, 255, 255, .18); color: #fff; }
 .cip:focus-visible, a.c:focus-visible, .ara input:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
