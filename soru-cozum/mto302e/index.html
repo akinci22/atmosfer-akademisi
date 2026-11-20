@@ -1,0 +1,785 @@
+<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="data:,">
+<title>MTO302E soru çözümleri · Atmosfer Akademisi</title>
+<meta name="description" content="MTO302E Sinoptik Meteoroloji · Harita Analizi: 9 sorunun adım adım çözümü. Defterdeki kare kod doğrudan ilgili soruya ve kısma açılır.">
+<link rel="stylesheet" href="../site.css"></head><body>
+<svg class="gizli" aria-hidden="true"><defs></defs></svg>
+<header class="ust" id="ust"><a class="geri" href="../">Soru çözümleri</a><p class="kod">MTO302E</p><h1>Sinoptik Meteoroloji · Harita Analizi</h1>
+<p class="alt">9 soru · adım adım çözüm. Defterdeki kare kodu okutunca ilgili soru ya da kısım burada açılır ve sarı çizgiyle işaretlenir.</p></header>
+<nav class="dizin" aria-label="Sorular"><h3>MTO302E · SYNOP + harita soruları</h3><div class="cipler"><a href="#s1"><b>1</b> İZOBAR ANALIZI</a><a href="#s2"><b>2</b> YER BASINÇ SISTEMLERI</a><a href="#s3"><b>3</b> TROF VE SIRT EKSENLERI</a><a href="#s5"><b>5</b> SICAK VE SOĞUK ÇEKIRDEK</a><a href="#s6"><b>6</b> SICAKLIK ADVEKSIYONUNUN YÖNÜ</a><a href="#s7"><b>7</b> KONTUR VE IZOTERMDEN ADVEKSIYON</a><a href="#s8"><b>8</b> İZOTERMLERI RÜZGÂRLA TAŞIMA</a><a href="#s9"><b>9</b> BAROTROPIK VE BAROKLINIK</a><a href="#s10"><b>10</b> SISTEMIN DÜŞEY EKSENI</a></div></nav>
+<main><article class="soru" id="s1">
+<header><span class="no">MTO302E · Soru 1</span><h2>İZOBAR ANALIZI</h2></header>
+<section class="metin" aria-label="Soru"><p><strong>Konu:</strong> Yer basıncı · Çiz + yorumla</p>
+<ul>
+<li>5 × 5 istasyonlu bir deniz seviyesi basınç haritası veriliyor (değerler şekilde).</li>
+<li>a) 1016, 1020 ve 1024 hPa izobarlarını çiz, değerlerini üstlerine yaz.</li>
+<li>b) Merkezdeki sisteme H ya da L de; izobarların en sık olduğu bir bölgeyi işaretle.</li>
+</ul>
+<h4>Şekil — üstüne çiz</h4>
+<figure><img src="sekil/s1_soru.png" width="976" height="993" loading="lazy" alt="Soru şekli (kendi çizimimiz)"><figcaption>Soru şekli (kendi çizimimiz)</figcaption></figure>
+<p><strong>Hatırlatma (önce dene, sonra oku):</strong> Bir izobar iki istasyonun arasından, değerlerin oranına göre geçer: fark ne kadar büyükse çizgi o istasyona o kadar uzak düşer.</p>
+</section>
+<nav class="kisimlar" aria-label="Kısımlar"><a href="#s1-a">(a) çözümü</a><a href="#s1-b">(b) çözümü</a></nav>
+<details class="ipucu"><summary>İpucu</summary><ul>
+<li>Bir istasyon ağında eş basınç çizgilerini basit orantıyla yerleştirmek.</li>
+<li>Önce her satırda geçiş noktasını bul, sonra birleştir: eğri noktalardan geçer, istasyondan değil.</li>
+<li>Kutuya yazmadan çözüme geçme: hatayı görmek için önce kendi cevabın gerekli.</li>
+</ul>
+</details>
+<section class="cozum" aria-label="Çözüm"><h3>Çözüm — adım adım</h3><span id="s1-a" class="kisim tum"></span><span id="s1-b" class="kisim tum"></span><ol>
+<li><strong>Merkezi bul</strong></li>
+</ol>
+<ul>
+<li>En büyük değer ortada: 1027,0 hPa.</li>
+<li>Her yöne doğru değerler azalıyor → merkez yüksek basınç: <strong>H</strong>.</li>
+</ul>
+<ol start="2">
+<li><strong>Orantı kuralını kur</strong></li>
+</ol>
+<ul>
+<li>Çizginin yeri: x = (p − p₁) / (p₂ − p₁) × aralık.</li>
+</ul>
+<ol start="3">
+<li><strong>1024 hPa</strong></li>
+</ol>
+<ul>
+<li>Orta satırda tam 1024,0 istasyonlarının üstünden geçer.</li>
+<li>İkinci ve dördüncü satırda 1022,5 ile 1025,5'in tam ortasında: (1024 − 1022,5) / 3 = 0,5.</li>
+<li>Orta sütunda 1021,0'dan 1025,5'e giderken 3 / 4,5 = 2/3 yolda.</li>
+</ul>
+<ol start="4">
+<li><strong>1020 hPa</strong></li>
+</ol>
+<ul>
+<li>Orta satır: 1015,0 → 1024,0 arasında (1020 − 1015) / 9 = 0,56 aralık içeride.</li>
+<li>İkinci ve dördüncü satır: (1020 − 1013,5) / 9 = 0,72.</li>
+<li>İlk ve son satır: 1018,0 → 1021,0 arasında 2/3 yolda.</li>
+</ul>
+<ol start="5">
+<li><strong>1016 hPa</strong></li>
+</ol>
+<ul>
+<li>Orta satır: (1016 − 1015) / 9 = 0,11 → kenar istasyonuna çok yakın.</li>
+<li>İkinci ve dördüncü satır: 2,5 / 9 = 0,28; ilk ve son satır: 7 / 9 = 0,78.</li>
+</ul>
+<ol start="6">
+<li><strong>Sık bölgeyi seç</strong></li>
+</ol>
+<ul>
+<li>Doğu-batı yönünde komşu istasyon farkı 9 hPa, kuzey-güney yönünde en çok 4,5 hPa.</li>
+<li>Fark büyük → izobarlar sık → basınç gradyanı ve rüzgâr güçlü.</li>
+<li>Doğu (ya da batı) kanatta 1024,0 ile 1015,0 arası işaretlenir.</li>
+</ul>
+<h4>Çözüm şekli</h4>
+<figure><img src="sekil/s1_cozum.png" width="976" height="993" loading="lazy" alt="Çözüm — kendi çizimini bununla karşılaştır"><figcaption>Çözüm — kendi çizimini bununla karşılaştır</figcaption></figure>
+<h4>Sınavda yaz</h4>
+<blockquote>
+<p>Merkez 1027 hPa → H. İzobar yeri basit orantıyla. Doğu-batıda fark 9 hPa, kuzey-güneyde 4,5 hPa → izobarlar doğu ve batı kanatta sık, rüzgâr orada güçlü.</p>
+</blockquote>
+<p>Merkez bir yüksek basınç; izobarlar doğu ve batı kanatta sık, orada rüzgâr en güçlü.</p>
+<p><em>The centre is a high; the isobars are closest on the east and west flanks, where the wind is strongest.</em></p>
+<h4>Cevap + dikkat</h4>
+<ul>
+<li>Merkez H (1027 hPa).</li>
+<li>1024 kapalı elips; 1020 ve 1016 kuzey-güney uzanan yaylar.</li>
+<li>Sık bölge: doğu ya da batı kanat (fark 9 hPa).</li>
+</ul>
+<p><strong>Dikkat:</strong></p>
+<ul>
+<li>1016'yı harita içinde kapatmaya çalışmak.</li>
+<li>Sık bölgeyi değerler en büyük yerde sanmak: sıklığı fark belirler.</li>
+</ul>
+</section>
+<aside class="oz"><h3>Sınavda yaz</h3><ul>
+<li>Önce her istasyon satırında geçiş noktalarını işaretle (✕), sonra noktaları yumuşak bir eğriyle birleştir.</li>
+<li>Sonuç: merkezi saran, kuzey-güney uzun kapalı bir elips.</li>
+<li>Kuzey ve güney kenarda haritadan çıkar: harita içinde açık yay.</li>
+<li>Batıda ve doğuda birer yay; harita içinde kapanmaz.</li>
+<li>İzobar = basit orantı; en büyük değer H; değer en hızlı nerede değişiyorsa izobar orada sık.</li>
+<li>Merkez H (1027 hPa). · 1024 kapalı elips; 1020 ve 1016 kuzey-güney uzanan yaylar.</li>
+<li>İzobar = basit orantı; en büyük değer H; değer en hızlı nerede değişiyorsa izobar orada sık.</li>
+<li>En sık hata: İzobarı her istasyonun üstünden geçirmeye zorlamak.</li>
+</ul>
+</aside>
+<footer><span></span><a href="#ust">Tüm sorular</a><a href="../../ders-kitapligi/#mto302e/S1">Kavramlarıyla aç</a><a href="#s2">Soru 2 ›</a></footer>
+</article>
+<article class="soru" id="s2">
+<header><span class="no">MTO302E · Soru 2</span><h2>YER BASINÇ SISTEMLERI</h2></header>
+<section class="metin" aria-label="Soru"><p><strong>Konu:</strong> Yer basıncı · Çiz + yorumla</p>
+<ul>
+<li>İki kapalı izobar sistemi: A'da dıştan içe 1020 → 1028 → 1036 hPa; B'de 1012 → 1004 → 996 hPa.</li>
+<li>a) Merkezlere H ya da L yaz; her sistemin çevresine dört yer rüzgârı oku çiz.</li>
+<li>b) Yerdeki akış CONV mu DIV mi? Merkezden alınan kesitte düşey hareketi okla göster.</li>
+</ul>
+<h4>Şekil — üstüne çiz</h4>
+<figure><img src="sekil/s2_soru.png" width="1100" height="936" loading="lazy" alt="Soru şekli (kendi çizimimiz)"><figcaption>Soru şekli (kendi çizimimiz)</figcaption></figure>
+<p><strong>Hatırlatma (önce dene, sonra oku):</strong> Yerde sürtünme rüzgârı yavaşlatır; rüzgâr izobarlara paralel kalamaz, alçak basınç tarafına doğru açıyla keser.</p>
+</section>
+<nav class="kisimlar" aria-label="Kısımlar"><a href="#s2-a">(a) çözümü</a><a href="#s2-b">(b) çözümü</a></nav>
+<details class="ipucu"><summary>İpucu</summary><ul>
+<li>Yerde rüzgârın alçak ve yüksek çevresinde nasıl döndüğünü ve merkezde havanın yükselip çöktüğünü göstermek.</li>
+<li>Okları çizmeden önce sor: bu merkez alçak mı yüksek mi, hava nereden nereye kaçar?</li>
+<li>Kutuya yazmadan çözüme geçme: hatayı görmek için önce kendi cevabın gerekli.</li>
+</ul>
+</details>
+<section class="cozum" aria-label="Çözüm"><h3>Çözüm — adım adım</h3><span id="s2-a" class="kisim tum"></span><span id="s2-b" class="kisim tum"></span><ol>
+<li><strong>Merkezleri adlandır</strong></li>
+</ol>
+<ul>
+<li>A'da değer içe doğru artıyor → <strong>H</strong>.</li>
+<li>B'de içe doğru azalıyor → <strong>L</strong>.</li>
+</ul>
+<ol start="2">
+<li><strong>Dönüş yönü</strong></li>
+</ol>
+<ul>
+<li>Kuzey Yarımküre: H çevresinde saat yönünde, L çevresinde saat yönünün tersine.</li>
+</ul>
+<ol start="3">
+<li><strong>Sürtünme açısı</strong></li>
+</ol>
+<ul>
+<li>Yer yakınında rüzgâr yavaşlar → Coriolis zayıflar → basınç gradyan kuvveti ağır basar.</li>
+<li>Oklar izobarı alçak tarafa doğru keser: H'de dışa, L'de içe.</li>
+<li>Kesme açısı denizde küçük, karada daha büyüktür. [EK]</li>
+</ul>
+<ol start="4">
+<li><strong>CONV / DIV</strong></li>
+</ol>
+<ul>
+<li>A: hava merkezden dışa yayılıyor → <strong>DIV</strong> (ıraksama).</li>
+</ul>
+<ol start="5">
+<li><strong>Düşey hareket</strong></li>
+</ol>
+<ul>
+<li>Kütle korunur: yerde dışa giden havanın yerini yukarıdan inen doldurur → A'da çökme ↓ (ısınır, kurur, açık hava).</li>
+<li>B'de içe toplanan hava yukarı kaçar → yükselme ↑ (soğur, bulut ve yağış).</li>
+</ul>
+<h4>Çözüm şekli</h4>
+<figure><img src="sekil/s2_cozum.png" width="1100" height="936" loading="lazy" alt="Çözüm — kendi çizimini bununla karşılaştır"><figcaption>Çözüm — kendi çizimini bununla karşılaştır</figcaption></figure>
+<h4>Sınavda yaz</h4>
+<blockquote>
+<p>A = H: saat yönünde, dışa doğru, DIV, çökme. B = L: saat yönünün tersine, içe doğru, CONV, yükselme. Neden: sürtünme rüzgârı alçağa doğru saptırır; kütle korunumu düşey hareketi verir.</p>
+</blockquote>
+<p>Yerde alçağın çevresinde rüzgâr içe doğru döner, hava toplanır ve yükselir.</p>
+<p><em>Around a surface low the wind spirals inward; the air converges and rises.</em></p>
+<h4>Cevap + dikkat</h4>
+<ul>
+<li>A: H · saat yönünde ve dışa · DIV · merkezde çökme ↓</li>
+<li>B: L · saat yönünün tersine ve içe · CONV · merkezde yükselme ↑</li>
+</ul>
+<p><strong>Dikkat:</strong></p>
+<ul>
+<li>Güney Yarımküre dönüş yönünü kullanmak.</li>
+<li>CONV'u çökmeyle eşlemek: yerde CONV = yükselme.</li>
+</ul>
+</section>
+<aside class="oz"><h3>Sınavda yaz</h3><ul>
+<li>Yukarıda (sürtünmesiz) bu dönüş izobarlara tam paraleldir.</li>
+<li>B: hava merkeze toplanıyor → CONV (yakınsama).</li>
+<li>Yerde L: içe + yukarı + bulut; H: dışa + aşağı + açık hava.</li>
+<li>A: H · saat yönünde ve dışa · DIV · merkezde çökme ↓ · B: L · saat yönünün tersine ve içe · CONV · merkezde yükselme ↑</li>
+<li>Yerde L: içe + yukarı + bulut; H: dışa + aşağı + açık hava.</li>
+<li>En sık hata: Yer rüzgârını izobara tam paralel çizmek (o 500 hPa için doğru).</li>
+</ul>
+</aside>
+<footer><a href="#s1">‹ Soru 1</a><a href="#ust">Tüm sorular</a><a href="../../ders-kitapligi/#mto302e/S2">Kavramlarıyla aç</a><a href="#s3">Soru 3 ›</a></footer>
+</article>
+<article class="soru" id="s3">
+<header><span class="no">MTO302E · Soru 3</span><h2>TROF VE SIRT EKSENLERI</h2></header>
+<section class="metin" aria-label="Soru"><p><strong>Konu:</strong> 500 hPa akışı · Çiz + yorumla</p>
+<ul>
+<li>500 hPa'da 534–558 dam konturları batıda kuzeye kabarıyor, doğuda güneye sarkıyor.</li>
+<li>P ve Q 552 dam konturu üzerinde: P çukurun batısında, Q doğusunda.</li>
+<li>a) Trof eksenini kesik, sırt eksenini noktalı çizgiyle çiz ve adlandır.</li>
+<li>b) P ve Q'da rüzgâr okunu çiz. c) Yağış için hangisi daha elverişli?</li>
+</ul>
+<h4>Şekil — üstüne çiz</h4>
+<figure><img src="sekil/s3_soru.png" width="1100" height="921" loading="lazy" alt="Soru şekli (kendi çizimimiz)"><figcaption>Soru şekli (kendi çizimimiz)</figcaption></figure>
+<p><strong>Hatırlatma (önce dene, sonra oku):</strong> Trof: konturların en güneye sarktığı yer (düşük değerler güneye uzanır). Sırt: en kuzeye kabardığı yer. Eksen, her konturun en çok büküldüğü noktadan geçer.</p>
+</section>
+<nav class="kisimlar" aria-label="Kısımlar"><a href="#s3-a">(a) çözümü</a><a href="#s3-b">(b) çözümü</a></nav>
+<details class="ipucu"><summary>İpucu</summary><ul>
+<li>500 hPa dalgasında trof ve sırt eksenini bulmak, rüzgârı ve yağış bölgesini okumak.</li>
+<li>Trof çukur, sırt tepe: eksen her konturun en çok büküldüğü noktadan geçer.</li>
+<li>Kutuya yazmadan çözüme geçme: hatayı görmek için önce kendi cevabın gerekli.</li>
+</ul>
+</details>
+<section class="cozum" aria-label="Çözüm"><h3>Çözüm — adım adım</h3><span id="s3-a" class="kisim tum"></span><span id="s3-b" class="kisim tum"></span><ol>
+<li><strong>Yönü oku</strong></li>
+</ol>
+<ul>
+<li>Kuzeyde 534, güneyde 558 dam: alçak değerler kuzeyde.</li>
+<li>Bu yüzden akış batıdan doğuya (Kuzey Yarımküre'de alçak solda kalır).</li>
+</ul>
+<ol start="2">
+<li><strong>Sırt ekseni</strong></li>
+</ol>
+<ul>
+<li>Her konturun en kuzey noktasını işaretle (batı kısım).</li>
+</ul>
+<ol start="3">
+<li><strong>Trof ekseni</strong></li>
+</ol>
+<ul>
+<li>Her konturun en güney noktasını işaretle (doğu kısım).</li>
+<li>Birleştir → kesik çizgi, adı TROF.</li>
+<li>Tepe noktaları konturdan kontura biraz kayıyorsa eksen eğik çıkar; bu normaldir.</li>
+</ul>
+<ol start="4">
+<li><strong>P ve Q'da rüzgâr</strong></li>
+</ol>
+<ul>
+<li>500 hPa'da sürtünme yok → rüzgâr konturlara paralel (jeostrofik).</li>
+</ul>
+<ol start="5">
+<li><strong>Neden paralel?</strong></li>
+</ol>
+<ul>
+<li>Başta basınç gradyan kuvveti havayı kuzeye (alçağa) iter.</li>
+<li>Hava hızlanınca Coriolis onu sağa çevirir; doğuya dönünce Coriolis güneye, gradyan kuvveti kuzeye bakar.</li>
+</ul>
+<ol start="6">
+<li><strong>Yağış: P mi Q mu?</strong></li>
+</ol>
+<ul>
+<li>Trofun arkası (P): hava yavaşlar, yukarıda birikir (yakınsama) → çökme, yerde basınç artar, açık hava.</li>
+<li>Trofun önü (Q): hava hızlanır, yukarıda dağılır (ıraksama) → alttan hava yükselir, soğur → bulut ve yağış; yerde basınç düşer.</li>
+<li>Cevap: <strong>Q</strong>.</li>
+</ul>
+<h4>Çözüm şekli</h4>
+<figure><img src="sekil/s3_cozum.png" width="1100" height="921" loading="lazy" alt="Çözüm — kendi çizimini bununla karşılaştır"><figcaption>Çözüm — kendi çizimini bununla karşılaştır</figcaption></figure>
+<h4>Sınavda yaz</h4>
+<blockquote>
+<p>Sırt = konturların en kuzey noktaları, trof = en güney noktaları. Rüzgâr konturlara paralel, batıdan doğuya. Q trofun önünde: yukarıda ıraksama → yükselme → bulut ve yağış.</p>
+</blockquote>
+<p>Trofun önünde yukarıdaki hava dağılır, alttan hava yükselir ve yağış oluşur.</p>
+<p><em>Ahead of the trough the air aloft diverges, so air rises from below and rain forms.</em></p>
+<h4>Cevap + dikkat</h4>
+<ul>
+<li>Sırt batıda (noktalı), trof doğuda (kesik).</li>
+<li>P ve Q'da oklar konturlara paralel, batıdan doğuya.</li>
+<li>Yağış: Q (trofun önü).</li>
+</ul>
+<p><strong>Dikkat:</strong></p>
+<ul>
+<li>Rüzgârı konturlara dik çizmek.</li>
+<li>Trofun arkasını yağışlı sanmak.</li>
+</ul>
+</section>
+<aside class="oz"><h3>Sınavda yaz</h3><ul>
+<li>Noktaları birleştir → noktalı çizgi, adı SIRT.</li>
+<li>P'de kontur boyunca güneydoğuya, Q'da kuzeydoğuya doğru.</li>
+<li>İki kuvvet eşitlenir → jeostrofik denge: rüzgâr konturlara paralel kalır.</li>
+<li>Trofun önü = ıraksama + yükselme = yağış; arkası = yakınsama + çökme = açık hava.</li>
+<li>Sırt batıda (noktalı), trof doğuda (kesik). · P ve Q'da oklar konturlara paralel, batıdan doğuya.</li>
+<li>Trofun önü = ıraksama + yükselme = yağış; arkası = yakınsama + çökme = açık hava.</li>
+<li>En sık hata: Ekseni kontur boyunca çizmek: eksen konturları keser.</li>
+</ul>
+</aside>
+<footer><a href="#s2">‹ Soru 2</a><a href="#ust">Tüm sorular</a><a href="../../ders-kitapligi/#mto302e/S3">Kavramlarıyla aç</a><a href="#s5">Soru 5 ›</a></footer>
+</article>
+<article class="soru" id="s5">
+<header><span class="no">MTO302E · Soru 5</span><h2>SICAK VE SOĞUK ÇEKIRDEK</h2></header>
+<section class="metin" aria-label="Soru"><p><strong>Konu:</strong> Düşey yapı · Çiz + hesapla</p>
+<ul>
+<li>Düşey kesit: A'da 950 hPa yüzeyi merkezde çukurlaşıyor, 700 ve 500 kabarıyor; B'de tersi.</li>
+<li>a) Merkezde 950 ve 500 hPa için L ya da H yaz.</li>
+<li>b) 850–500 kalınlığını merkezde ve kenarda okla göster; çekirdek W mi C mi?</li>
+<li>c) Tablodaki dört sistem için kalınlığı (Z500 − Z850) hesapla, çekirdeği bul.</li>
+</ul>
+<h4>c şıkkı için tablo</h4>
+<ul>
+<li><strong>S1</strong> · yerde H · Z850 1560 / 1500 m · Z500 5280 / 5460 m</li>
+<li><strong>S2</strong> · yerde L · Z850 1440 / 1500 m · Z500 5900 / 5820 m</li>
+<li><strong>S3</strong> · yerde L · Z850 1260 / 1500 m · Z500 5160 / 5520 m</li>
+<li><strong>S4</strong> · yerde H · Z850 1620 / 1500 m · Z500 5980 / 5820 m</li>
+</ul>
+<p><em>Değerler: merkez / kenar.</em></p>
+<h4>Şekil — üstüne çiz</h4>
+<figure><img src="sekil/s5_soru.png" width="1100" height="834" loading="lazy" alt="Soru şekli (kendi çizimimiz)"><figcaption>Soru şekli (kendi çizimimiz)</figcaption></figure>
+<p><strong>Hatırlatma (önce dene, sonra oku):</strong> Sıcak hava genleşir, aynı basınç aralığı daha kalın bir tabaka kaplar. Merkezde kalınlık kenardan büyükse çekirdek sıcak (W), küçükse soğuk (C).</p>
+</section>
+<nav class="kisimlar" aria-label="Kısımlar"><a href="#s5-a">(a) çözümü</a><a href="#s5-b">(b) çözümü</a><a href="#s5-c">(c) çözümü</a></nav>
+<details class="ipucu"><summary>İpucu</summary><ul>
+<li>Basınç yüzeylerinin düşey kesitinden ve kalınlıktan sistemin çekirdeğini bulmak.</li>
+<li>Kalınlık = Z500 − Z850; merkezi ve kenarı ayrı ayrı hesapla.</li>
+<li>Önce yüzeyin merkezde inip çıktığına bak (L/H), sonra 850–500 arasını ölç (W/C).</li>
+<li>Kutuya yazmadan çözüme geçme: hatayı görmek için önce kendi cevabın gerekli.</li>
+</ul>
+</details>
+<section class="cozum" aria-label="Çözüm"><h3>Çözüm — adım adım</h3><span id="s5-a" class="kisim tum"></span><span id="s5-b" class="kisim tum"></span><span id="s5-c" class="kisim tum"></span><ol>
+<li><strong>Yüzey iniyor = L</strong></li>
+</ol>
+<ul>
+<li>Bir basınç yüzeyi merkezde aşağı iniyorsa aynı yükseklikte merkezin basıncı kenardan düşük → L.</li>
+<li>Yukarı çıkıyorsa → H.</li>
+</ul>
+<ol start="2">
+<li><strong>A ve B'yi oku</strong></li>
+</ol>
+<ul>
+<li>A: 950 aşağı → yerde <strong>L</strong>; 500 yukarı → yukarıda <strong>H</strong>.</li>
+</ul>
+<ol start="3">
+<li><strong>Kalınlık okları</strong></li>
+</ol>
+<ul>
+<li>850 ile 500 arasını merkezde ve kenarda ölç.</li>
+<li>A: merkez oku uzun → tabaka merkezde kalın → <strong>W</strong> (sıcak çekirdekli alçak).</li>
+</ul>
+<ol start="4">
+<li><strong>Tablo: S1 ve S2</strong></li>
+</ol>
+<ul>
+<li>S1: merkez 5280 − 1560 = 3720 m, kenar 5460 − 1500 = 3960 m → ince → <strong>C</strong>; yerde H → soğuk çekirdekli yüksek (kışın Sibirya yükseği).</li>
+</ul>
+<ol start="5">
+<li><strong>Tablo: S3 ve S4</strong></li>
+</ol>
+<ul>
+<li>S3: 5160 − 1260 = 3900 m, kenar 4020 m → <strong>C</strong>; yerde L → soğuk çekirdekli alçak (İzlanda alçağı).</li>
+</ul>
+<ol start="6">
+<li><strong>Yükseklikle ne olur?</strong></li>
+</ol>
+<ul>
+<li>Sıcak çekirdekli alçak yukarıda zayıflar, 500 hPa'da yükseğe döner (sığ sistem).</li>
+<li>Soğuk çekirdekli yüksek yukarıda alçağa döner; soğuk çekirdekli alçak ve sıcak çekirdekli yüksek yükseklikle güçlenir.</li>
+<li>Tablo da bunu söylüyor: S1 ve S3'te 500 hPa merkezi alçak, S2 ve S4'te yüksek.</li>
+</ul>
+<h4>Çözüm şekli</h4>
+<figure><img src="sekil/s5_cozum.png" width="1100" height="834" loading="lazy" alt="Çözüm — kendi çizimini bununla karşılaştır"><figcaption>Çözüm — kendi çizimini bununla karşılaştır</figcaption></figure>
+<h4>Sınavda yaz</h4>
+<blockquote>
+<p>Kalınlık = Z500 − Z850; merkezde büyükse W, küçükse C. A: 950 L, 500 H, W. B: 950 H, 500 L, C. S1 C (Sibirya), S2 W (Basra), S3 C (İzlanda), S4 W (Azor).</p>
+</blockquote>
+<p>Sıcak hava genleştiği için sıcak çekirdeğin üstünde tabaka daha kalındır.</p>
+<p><em>Warm air expands, so the layer is thicker over a warm core.</em></p>
+<h4>Cevap + dikkat</h4>
+<ul>
+<li>A: 950 L · 500 H · W (sıcak çekirdekli alçak).</li>
+<li>B: 950 H · 500 L · C (soğuk çekirdekli yüksek).</li>
+<li>S1 3720/3960 C · S2 4460/4320 W · S3 3900/4020 C · S4 4360/4320 W.</li>
+</ul>
+<p><strong>Dikkat:</strong></p>
+<ul>
+<li>Yerdeki L/H'yi çekirdekle karıştırmak: L sıcak da olabilir soğuk da.</li>
+<li>Merkez ile kenarı karıştırmak.</li>
+</ul>
+</section>
+<aside class="oz"><h3>Sınavda yaz</h3><ul>
+<li>B: 950 yukarı → yerde H; 500 aşağı → yukarıda L.</li>
+<li>B: merkez oku kısa → tabaka merkezde ince → C (soğuk çekirdekli yüksek).</li>
+<li>S2: 5900 − 1440 = 4460 m, kenar 4320 m → kalın → W; yerde L → sıcak çekirdekli (termik) alçak (yazın Basra alçağı).</li>
+<li>S4: 5980 − 1620 = 4360 m, kenar 4320 m → W; yerde H → sıcak çekirdekli yüksek (Azor yükseği).</li>
+<li>Çekirdeği yerdeki basınç değil kalınlık söyler: merkezde kalın = W, ince = C.</li>
+<li>A: 950 L · 500 H · W (sıcak çekirdekli alçak). · B: 950 H · 500 L · C (soğuk çekirdekli yüksek).</li>
+<li>Çekirdeği yerdeki basınç değil kalınlık söyler: merkezde kalın = W, ince = C.</li>
+<li>En sık hata: Kalınlığı Z850 − Z500 diye ters çıkarmak.</li>
+</ul>
+</aside>
+<footer><a href="#s3">‹ Soru 3</a><a href="#ust">Tüm sorular</a><a href="../../ders-kitapligi/#mto302e/S5">Kavramlarıyla aç</a><a href="#s6">Soru 6 ›</a></footer>
+</article>
+<article class="soru" id="s6">
+<header><span class="no">MTO302E · Soru 6</span><h2>SICAKLIK ADVEKSIYONUNUN YÖNÜ</h2></header>
+<section class="metin" aria-label="Soru"><p><strong>Konu:</strong> Sıcaklık adveksiyonu · Çiz + hesapla</p>
+<ul>
+<li>850 hPa'da dört panel: izotermler kuzey-güney uzanıyor; batıda 0 °C, P'den geçen 4 °C, doğuda 8 °C.</li>
+<li>Rüzgâr A'da batıdan, B'de doğudan, C'de güneyden (izoterme paralel), D'de güneybatıdan.</li>
+<li>a) P'ye gelen havanın şu anki yerini S ile işaretle. b) Adveksiyon W/C/0, değişim +/−/0.</li>
+<li>c) A'da rüzgâr 10 m/s, iki izoterm arası (4 °C) 200 km: P 6 saatte kaç derece değişir?</li>
+</ul>
+<h4>Şekil — üstüne çiz</h4>
+<figure><img src="sekil/s6_soru.png" width="1100" height="751" loading="lazy" alt="Soru şekli (kendi çizimimiz)"><figcaption>Soru şekli (kendi çizimimiz)</figcaption></figure>
+<p><strong>Hatırlatma (önce dene, sonra oku):</strong> Adveksiyon = havanın rüzgârla yatay taşınması. Rüzgâr soğuk yerden geliyorsa soğuk adveksiyon (sıcaklık düşer), sıcak yerden geliyorsa sıcak adveksiyon (artar), izoterme paralelse yok.</p>
+</section>
+
+<details class="ipucu"><summary>İpucu</summary><ul>
+<li>Rüzgârın P noktasına sıcak mı soğuk mu hava taşıdığını bulmak ve değişimi hesaplamak.</li>
+<li>Rüzgâr nereden geliyor? O yerin sıcaklığı P'ninkinden düşük mü yüksek mi?</li>
+<li>Kutuya yazmadan çözüme geçme: hatayı görmek için önce kendi cevabın gerekli.</li>
+</ul>
+</details>
+<section class="cozum" aria-label="Çözüm"><h3>Çözüm — adım adım</h3><ol>
+<li><strong>S'yi bul</strong></li>
+</ol>
+<ul>
+<li>Oku tersine izle: S, P'nin rüzgâr yönünde gerisinde (okun kuyruğunda).</li>
+<li>S'deki sıcaklık birazdan P'ye gelecek.</li>
+</ul>
+<ol start="2">
+<li><strong>A ve B</strong></li>
+</ol>
+<ul>
+<li>A: rüzgâr batıdan → S batıda, 0–4 °C arası → <strong>C</strong>, <strong>−</strong>.</li>
+</ul>
+<ol start="3">
+<li><strong>C ve D</strong></li>
+</ol>
+<ul>
+<li>C: rüzgâr izotermle aynı doğrultuda → S de 4 °C'de → <strong>0</strong>, <strong>0</strong>.</li>
+<li>D: rüzgâr güneybatıdan → S soğuk tarafta → <strong>C</strong>, <strong>−</strong>; izotermi 45° ile kestiği için etkisi A'dakinin ≈ %71'i (cos 45°).</li>
+</ul>
+<ol start="4">
+<li><strong>Hesap (A)</strong></li>
+</ol>
+<ul>
+<li>Gradyan: 4 °C / 200 000 m = 2 × 10⁻⁵ °C/m.</li>
+<li>10 m/s × 2 × 10⁻⁵ °C/m = 2 × 10⁻⁴ °C/s.</li>
+</ul>
+<ol start="5">
+<li><strong>Varsayımlar</strong></li>
+</ol>
+<ul>
+<li>Rüzgâr ve gradyan 6 saat boyunca aynı kalıyor.</li>
+<li>Güneşle ısınma, bulut, düşey hareket gibi başka etkiler yok sayılıyor.</li>
+</ul>
+<h4>Çözüm şekli</h4>
+<figure><img src="sekil/s6_cozum.png" width="1100" height="751" loading="lazy" alt="Çözüm — kendi çizimini bununla karşılaştır"><figcaption>Çözüm — kendi çizimini bununla karşılaştır</figcaption></figure>
+<h4>Sınavda yaz</h4>
+<blockquote>
+<p>Okun kuyruğundaki S soğuksa C (−), sıcaksa W (+), aynı izotermdeyse 0. A: C −, B: W +, C: 0 0, D: C −. Hesap: 10 × 4 / 200 000 = 2 × 10⁻⁴ °C/s ≈ 0,72 °C/sa → 6 saatte ≈ −4,3 °C.</p>
+</blockquote>
+<p>Rüzgâr soğuk taraftan estiği için P'de sıcaklık düşüyor: soğuk adveksiyon.</p>
+<p><em>The wind blows from the colder side, so the temperature at P falls: cold advection.</em></p>
+<h4>Cevap + dikkat</h4>
+<ul>
+<li>A: S batıda · C · −</li>
+<li>B: S doğuda · W · +</li>
+<li>C: S güneyde · 0 · 0</li>
+<li>D: S güneybatıda · C · −</li>
+<li>c) ≈ 4,3 °C düşüş (6 saatte).</li>
+</ul>
+<p><strong>Dikkat:</strong></p>
+<ul>
+<li>km'yi m'ye çevirmeyi unutmak.</li>
+<li>Paralel rüzgârda da adveksiyon var sanmak.</li>
+</ul>
+</section>
+<aside class="oz"><h3>Sınavda yaz</h3><ul>
+<li>B: rüzgâr doğudan → S doğuda, 4–8 °C arası → W, +.</li>
+<li>× 3600 s = 0,72 °C/saat → × 6 saat = 4,32 ≈ 4,3 °C düşüş.</li>
+<li>Okun kuyruğuna bak: oradaki sıcaklık P'ye gelecek. Hız × gradyan = değişim hızı.</li>
+<li>A: S batıda · C · − · B: S doğuda · W · +</li>
+<li>Okun kuyruğuna bak: oradaki sıcaklık P'ye gelecek. Hız × gradyan = değişim hızı.</li>
+<li>En sık hata: S'yi okun ucuna koymak: S okun kuyruğundadır.</li>
+</ul>
+</aside>
+<footer><a href="#s5">‹ Soru 5</a><a href="#ust">Tüm sorular</a><a href="../../ders-kitapligi/#mto302e/S6">Kavramlarıyla aç</a><a href="#s7">Soru 7 ›</a></footer>
+</article>
+<article class="soru" id="s7">
+<header><span class="no">MTO302E · Soru 7</span><h2>KONTUR VE IZOTERMDEN ADVEKSIYON</h2></header>
+<section class="metin" aria-label="Soru"><p><strong>Konu:</strong> Sıcaklık adveksiyonu · Çiz + yorumla</p>
+<ul>
+<li>500 hPa'da 552, 558, 564 dam konturları ortada kuzeye kabaran bir sırt çiziyor.</li>
+<li>Kesik izotermler doğu-batı düz: kuzeyde −24, sonra −18, −12, güneyde −6 °C.</li>
+<li>P sırtın batı yamacında, R tepede, Q doğu yamacında (üçü de 558 konturunda).</li>
+<li>a) P, R ve Q'da rüzgâr okunu çiz. b) Her nokta için W, C ya da 0 yaz.</li>
+</ul>
+<h4>Şekil — üstüne çiz</h4>
+<figure><img src="sekil/s7_soru.png" width="1100" height="862" loading="lazy" alt="Soru şekli (kendi çizimimiz)"><figcaption>Soru şekli (kendi çizimimiz)</figcaption></figure>
+<p><strong>Hatırlatma (önce dene, sonra oku):</strong> Üst seviyede rüzgâr konturları izler. Konturlar izotermleri kesiyorsa rüzgâr sıcak ya da soğuk hava taşır: adveksiyon var.</p>
+</section>
+
+<details class="ipucu"><summary>İpucu</summary><ul>
+<li>500 hPa'da konturların izotermleri kestiği yerde sıcak ya da soğuk adveksiyonu okumak.</li>
+<li>Rüzgâr konturu izler; sonra sor: kuyruktaki izoterm P'dekinden sıcak mı?</li>
+<li>Kutuya yazmadan çözüme geçme: hatayı görmek için önce kendi cevabın gerekli.</li>
+</ul>
+</details>
+<section class="cozum" aria-label="Çözüm"><h3>Çözüm — adım adım</h3><ol>
+<li><strong>Rüzgâr yönü</strong></li>
+</ol>
+<ul>
+<li>Alçak değerler kuzeyde → rüzgâr konturlara paralel, batıdan doğuya.</li>
+<li>P'de kontur kuzeydoğuya tırmanıyor, R'de yatay, Q'da güneydoğuya iniyor.</li>
+</ul>
+<ol start="2">
+<li><strong>P</strong></li>
+</ol>
+<ul>
+<li>Rüzgâr güneybatıdan → hava güneydeki daha sıcak izotermlerden geliyor.</li>
+<li>→ <strong>W</strong> (sıcak adveksiyon).</li>
+</ul>
+<ol start="3">
+<li><strong>R</strong></li>
+</ol>
+<ul>
+<li>Tepe noktasında kontur izoterme paralel → rüzgâr izotermi kesmiyor.</li>
+</ul>
+<ol start="4">
+<li><strong>Q</strong></li>
+</ol>
+<ul>
+<li>Rüzgâr kuzeybatıdan → kuzeydeki soğuk havayı getiriyor.</li>
+<li>→ <strong>C</strong> (soğuk adveksiyon).</li>
+</ul>
+<ol start="5">
+<li><strong>Genel kural</strong></li>
+</ol>
+<ul>
+<li>Kesme açısı büyüdükçe ve izotermler sıklaştıkça adveksiyon güçlenir.</li>
+<li>Kontur izotermi kesiyorsa sistem baroklinik demektir (bkz. Soru 9).</li>
+</ul>
+<h4>Çözüm şekli</h4>
+<figure><img src="sekil/s7_cozum.png" width="1100" height="862" loading="lazy" alt="Çözüm — kendi çizimini bununla karşılaştır"><figcaption>Çözüm — kendi çizimini bununla karşılaştır</figcaption></figure>
+<h4>Sınavda yaz</h4>
+<blockquote>
+<p>P: W, güneyden ılık hava geliyor. R: 0, akış izoterme paralel. Q: C, kuzeyden soğuk hava geliyor. Kural: kontur izotermi kesiyorsa adveksiyon var.</p>
+</blockquote>
+<p>Konturların izotermleri kestiği yerde rüzgâr sıcak ya da soğuk hava taşır.</p>
+<p><em>Where the contours cross the isotherms, the wind carries warm or cold air.</em></p>
+<h4>Cevap + dikkat</h4>
+<ul>
+<li>P: W (güneybatıdan ılık hava)</li>
+<li>R: 0 (akış izoterme paralel)</li>
+<li>Q: C (kuzeybatıdan soğuk hava)</li>
+</ul>
+<p><strong>Dikkat:</strong></p>
+<ul>
+<li>R'de de adveksiyon var sanmak.</li>
+<li>P'deki hava yönünü okun ucuna göre okumak.</li>
+</ul>
+</section>
+<aside class="oz"><h3>Sınavda yaz</h3><ul>
+<li>→ 0.</li>
+<li>Kontur izotermi kesiyorsa adveksiyon var; okun geldiği yer sıcaksa W, soğuksa C.</li>
+<li>P: W (güneybatıdan ılık hava) · R: 0 (akış izoterme paralel)</li>
+<li>Kontur izotermi kesiyorsa adveksiyon var; okun geldiği yer sıcaksa W, soğuksa C.</li>
+<li>En sık hata: Rüzgârı izotermlere paralel çizmek: rüzgâr konturu izler.</li>
+</ul>
+</aside>
+<footer><a href="#s6">‹ Soru 6</a><a href="#ust">Tüm sorular</a><a href="../../ders-kitapligi/#mto302e/S7">Kavramlarıyla aç</a><a href="#s8">Soru 8 ›</a></footer>
+</article>
+<article class="soru" id="s8">
+<header><span class="no">MTO302E · Soru 8</span><h2>İZOTERMLERI RÜZGÂRLA TAŞIMA</h2></header>
+<section class="metin" aria-label="Soru"><p><strong>Konu:</strong> Sıcaklık adveksiyonu · Çiz + hesapla</p>
+<ul>
+<li>Kareli eksende (x doğu, y kuzey) üç izoterm: 14 °C (0,2)→(4,0), 10 °C (0,4)→(6,1), 6 °C (0,6)→(6,3). P (3,2)'de.</li>
+<li>Kuzeydoğulu rüzgâr Δt sürede alanı bir kare batıya, bir kare güneye taşıyor.</li>
+<li>a) Yeni izotermleri kesik çizgiyle çiz.</li>
+<li>b) P'ye gelecek havanın şimdiki yerini S ile işaretle; P'nin şimdiki ve Δt sonraki sıcaklığını yaz, + ya da −.</li>
+</ul>
+<h4>Şekil — üstüne çiz</h4>
+<figure><img src="sekil/s8_soru.png" width="1050" height="1067" loading="lazy" alt="Soru şekli (kendi çizimimiz)"><figcaption>Soru şekli (kendi çizimimiz)</figcaption></figure>
+<p><strong>Hatırlatma (önce dene, sonra oku):</strong> Rüzgâr her yerde aynıysa sıcaklık alanı bütünüyle rüzgârla taşınır. P'ye gelecek sıcaklık, şu anda P'nin rüzgâr yönünde gerisindeki noktanın sıcaklığıdır.</p>
+</section>
+<nav class="kisimlar" aria-label="Kısımlar"><a href="#s8-a">(a) çözümü</a><a href="#s8-b">(b) çözümü</a></nav>
+<details class="ipucu"><summary>İpucu</summary><ul>
+<li>Düzgün rüzgârda sıcaklık alanını öteleyip P'nin gelecekteki sıcaklığını bulmak.</li>
+<li>Kuzeydoğulu = kuzeydoğudan gelen. S'yi P'nin hangi tarafında arayacağını önce yaz.</li>
+<li>Kutuya yazmadan çözüme geçme: hatayı görmek için önce kendi cevabın gerekli.</li>
+</ul>
+</details>
+<section class="cozum" aria-label="Çözüm"><h3>Çözüm — adım adım</h3><span id="s8-a" class="kisim tum"></span><span id="s8-b" class="kisim tum"></span><ol>
+<li><strong>P'nin şimdiki sıcaklığı</strong></li>
+</ol>
+<ul>
+<li>x = 3'te 14 °C çizgisi y = 0,5'te, 10 °C çizgisi y = 2,5'te.</li>
+<li>P (y = 2) bu aralığın 3/4'ünde → 14 − 3 = <strong>11 °C</strong>.</li>
+</ul>
+<ol start="2">
+<li><strong>Yeni izotermler</strong></li>
+</ol>
+<ul>
+<li>Her noktayı bir kare batıya ve bir kare güneye taşı: (x, y) → (x − 1, y − 1).</li>
+</ul>
+<ol start="3">
+<li><strong>S'yi bul</strong></li>
+</ol>
+<ul>
+<li>Rüzgârın tersine git: bir kare doğu, bir kare kuzey → S = (4, 3).</li>
+<li>x = 4'te 10 °C çizgisi y = 2'de, 6 °C çizgisi y = 4'te; S tam ortada → <strong>8 °C</strong>.</li>
+</ul>
+<ol start="4">
+<li><strong>Değişim</strong></li>
+</ol>
+<ul>
+<li>Δt sonra P'de 8 °C (yeni kesik izotermlerde de P, 10 ile 6 °C'nin ortasında).</li>
+<li>8 − 11 = −3 °C → <strong>−</strong>: kuzeydoğudan soğuk hava geliyor, soğuk adveksiyon.</li>
+</ul>
+<h4>Çözüm şekli</h4>
+<figure><img src="sekil/s8_cozum.png" width="1050" height="1067" loading="lazy" alt="Çözüm — kendi çizimini bununla karşılaştır"><figcaption>Çözüm — kendi çizimini bununla karşılaştır</figcaption></figure>
+<h4>Sınavda yaz</h4>
+<blockquote>
+<p>S = P'den rüzgârın tersine bir kare doğu + bir kare kuzey = (4,3), 8 °C. P: şimdi 11 °C, Δt sonra 8 °C, ΔT = −3 °C → soğuk adveksiyon.</p>
+</blockquote>
+<p>Rüzgâr düzgünse sıcaklık alanı bütünüyle rüzgârla taşınır; S'deki hava Δt sonra P'de olur.</p>
+<p><em>If the wind is uniform, the whole temperature field is carried downstream; the air now at S reaches P after Δt.</em></p>
+<h4>Cevap + dikkat</h4>
+<ul>
+<li>S = (4, 3), 8 °C.</li>
+<li>P: şimdi 11 °C → Δt sonra 8 °C, ΔT = −3 °C (−).</li>
+</ul>
+<p><strong>Dikkat:</strong></p>
+<ul>
+<li>S'yi P'nin güneybatısına koymak.</li>
+<li>İzotermleri ters yöne taşımak.</li>
+</ul>
+</section>
+<aside class="oz"><h3>Sınavda yaz</h3><ul>
+<li>14 °C: (0; 0,5)→(1; 0) · 10 °C: (0; 2,5)→(5; 0) · 6 °C: (0; 4,5)→(6; 1,5). Kesik çizgiyle çiz.</li>
+<li>Rüzgâr adı geldiği yönü söyler. P'nin geleceği = S'nin bugünü.</li>
+<li>S = (4, 3), 8 °C. · P: şimdi 11 °C → Δt sonra 8 °C, ΔT = −3 °C (−).</li>
+<li>Rüzgâr adı geldiği yönü söyler. P'nin geleceği = S'nin bugünü.</li>
+<li>En sık hata: Kuzeydoğulu rüzgârı kuzeydoğuya esen sanmak: rüzgâr adı geldiği yönü söyler.</li>
+</ul>
+</aside>
+<footer><a href="#s7">‹ Soru 7</a><a href="#ust">Tüm sorular</a><a href="../../ders-kitapligi/#mto302e/S8">Kavramlarıyla aç</a><a href="#s9">Soru 9 ›</a></footer>
+</article>
+<article class="soru" id="s9">
+<header><span class="no">MTO302E · Soru 9</span><h2>BAROTROPIK VE BAROKLINIK</h2></header>
+<section class="metin" aria-label="Soru"><p><strong>Konu:</strong> Düşey yapı · Çiz + yorumla</p>
+<ul>
+<li>500 hPa'da kapalı bir alçak (540, 546, 552 dam), iki ayrı sıcaklık alanıyla.</li>
+<li>A: izotermler doğu-batı düz (kuzeyde −24, ortada −18, güneyde −12 °C). B: izotermler konturlara paralel daireler (içte −30, −24, dışta −18 °C).</li>
+<li>W ve E noktaları merkezin batısında ve doğusunda.</li>
+<li>a) W ve E'de rüzgâr okunu çiz, adveksiyonu W, C ya da 0 yaz. b) Modelin adı: eşdeğer barotropik mi baroklinik mi?</li>
+</ul>
+<h4>Şekil — üstüne çiz</h4>
+<figure><img src="sekil/s9_soru.png" width="1100" height="534" loading="lazy" alt="Soru şekli (kendi çizimimiz)"><figcaption>Soru şekli (kendi çizimimiz)</figcaption></figure>
+<p><strong>Hatırlatma (önce dene, sonra oku):</strong> Konturlar ile izotermler paralelse adveksiyon yok: eşdeğer barotropik model, yavaş hareket eder. Birbirini kesiyorlarsa adveksiyon var: baroklinik model, hareket eder, çoğu kez cephe taşır.</p>
+</section>
+
+<details class="ipucu"><summary>İpucu</summary><ul>
+<li>Aynı alçağın iki sıcaklık alanıyla modelini adlandırmak: konturlar izotermleri kesiyor mu?</li>
+<li>W ve E burada yer adı; cevaptaki W (sıcak) başka şey. Önce dönüş yönünü çiz.</li>
+<li>Kutuya yazmadan çözüme geçme: hatayı görmek için önce kendi cevabın gerekli.</li>
+</ul>
+</details>
+<section class="cozum" aria-label="Çözüm"><h3>Çözüm — adım adım</h3><ol>
+<li><strong>Dönüş</strong></li>
+</ol>
+<ul>
+<li>Alçak çevresinde Kuzey Yarımküre'de saat yönünün tersine dolaşım.</li>
+<li>Batı kenarda (W) rüzgâr kuzeyden güneye, doğu kenarda (E) güneyden kuzeye.</li>
+</ul>
+<ol start="2">
+<li><strong>A: W ve E</strong></li>
+</ol>
+<ul>
+<li>W noktasına hava kuzeyden, −24 °C tarafından gelir → <strong>C</strong>.</li>
+</ul>
+<ol start="3">
+<li><strong>A'nın adı</strong></li>
+</ol>
+<ul>
+<li>Konturlar izotermleri kesiyor → adveksiyon var → <strong>baroklinik</strong>.</li>
+<li>Sistem hareket eder ve gelişir; genellikle cephe taşır.</li>
+</ul>
+<ol start="4">
+<li><strong>B</strong></li>
+</ol>
+<ul>
+<li>Rüzgâr dairesel izotermler boyunca eser, kesmez → W'de <strong>0</strong>, E'de <strong>0</strong>.</li>
+<li>→ <strong>eşdeğer barotropik</strong>: yavaş, çoğu kez yerinde sayan sistem (kesik alçak gibi); ekseni düşey.</li>
+</ul>
+<h4>Çözüm şekli</h4>
+<figure><img src="sekil/s9_cozum.png" width="1100" height="559" loading="lazy" alt="Çözüm — kendi çizimini bununla karşılaştır"><figcaption>Çözüm — kendi çizimini bununla karşılaştır</figcaption></figure>
+<h4>Sınavda yaz</h4>
+<blockquote>
+<p>A: W'de C (kuzeyden soğuk), E'de W (güneyden ılık) → baroklinik. B: W'de 0, E'de 0 (izoterm konturla paralel) → eşdeğer barotropik.</p>
+</blockquote>
+<p>Eşdeğer barotropik sistemde izotermler konturlara paraleldir, bu yüzden adveksiyon yoktur.</p>
+<p><em>In an equivalent barotropic system the isotherms are parallel to the contours, so there is no advection.</em></p>
+<h4>Cevap + dikkat</h4>
+<ul>
+<li>A: W noktası C, E noktası W → baroklinik.</li>
+<li>B: W noktası 0, E noktası 0 → eşdeğer barotropik.</li>
+</ul>
+<p><strong>Dikkat:</strong></p>
+<ul>
+<li>Batıdaki W noktasını W (sıcak) cevabıyla karıştırmak.</li>
+<li>Barotropik sistemin de cephe taşıdığını sanmak.</li>
+</ul>
+</section>
+<aside class="oz"><h3>Sınavda yaz</h3><ul>
+<li>E noktasına güneyden, −12 °C tarafından gelir → W.</li>
+<li>Kontur izotermi kesiyor = baroklinik (adveksiyon, hareket, cephe); paralel = eşdeğer barotropik.</li>
+<li>A: W noktası C, E noktası W → baroklinik. · B: W noktası 0, E noktası 0 → eşdeğer barotropik.</li>
+<li>Kontur izotermi kesiyor = baroklinik (adveksiyon, hareket, cephe); paralel = eşdeğer barotropik.</li>
+<li>En sık hata: Alçağın çevresinde saat yönünde dönüş çizmek.</li>
+</ul>
+</aside>
+<footer><a href="#s8">‹ Soru 8</a><a href="#ust">Tüm sorular</a><a href="../../ders-kitapligi/#mto302e/S9">Kavramlarıyla aç</a><a href="#s10">Soru 10 ›</a></footer>
+</article>
+<article class="soru" id="s10">
+<header><span class="no">MTO302E · Soru 10</span><h2>SISTEMIN DÜŞEY EKSENI</h2></header>
+<section class="metin" aria-label="Soru"><p><strong>Konu:</strong> Düşey yapı · Bul + yorumla</p>
+<ul>
+<li>Ortak bir batı-doğu hattında üç seviye, her birinde batı · orta · doğu değeri:</li>
+<li>A: 500 hPa 528 · 540 · 552 dam; 850 hPa 147 · 141 · 147 dam; yerde 1012 · 1008 · 996 hPa.</li>
+<li>B: 500 hPa 546 · 534 · 546 dam; 850 hPa 153 · 144 · 153 dam; yerde 1010 · 998 · 1010 hPa.</li>
+<li>a) Her satırda en küçük değeri daire içine al, yanına L yaz. b) Merkezleri birleştir: düşey mi eğik mi? Eğikse 500 hPa merkezi yerdekinin batısında mı doğusunda mı?</li>
+</ul>
+<h4>Şekil — üstüne çiz</h4>
+<figure><img src="sekil/s10_soru.png" width="1100" height="868" loading="lazy" alt="Soru şekli (kendi çizimimiz)"><figcaption>Soru şekli (kendi çizimimiz)</figcaption></figure>
+<p><strong>Hatırlatma (önce dene, sonra oku):</strong> Yerde alçağı basınca (hPa), yukarıda yüksekliğe (dam) bakarak buluruz; ikisinde de en küçük değer merkezdir. Merkezleri alttan üste birleştirmek ekseni verir.</p>
+</section>
+
+<details class="ipucu"><summary>İpucu</summary><ul>
+<li>Üç seviyedeki alçak merkezlerini birleştirip eksenin düşey mi eğik mi olduğunu söylemek.</li>
+<li>Her satırda yalnız en küçük değeri ara; birimler farklı olsa da kural aynı.</li>
+<li>Kutuya yazmadan çözüme geçme: hatayı görmek için önce kendi cevabın gerekli.</li>
+</ul>
+</details>
+<section class="cozum" aria-label="Çözüm"><h3>Çözüm — adım adım</h3><ol>
+<li><strong>Merkezleri işaretle</strong></li>
+</ol>
+<ul>
+<li>A: 500 → 528 (batı), 850 → 141 (orta), yer → 996 (doğu).</li>
+<li>B: 534, 144 ve 998: üçü de ortada.</li>
+</ul>
+<ol start="2">
+<li><strong>Birleştir</strong></li>
+</ol>
+<ul>
+<li>A: çizgi alttan üste batıya yatıyor → <strong>eğik</strong>; 500 hPa merkezi yerdekinin <strong>batısında</strong>.</li>
+</ul>
+<ol start="3">
+<li><strong>Neden eğik? (kalınlık)</strong></li>
+</ol>
+<ul>
+<li>A'da kalınlık batıda 3810, ortada 3990, doğuda 4050 m → batı soğuk, doğu sıcak.</li>
+<li>Soğuk hava basınç yüzeylerini aşağı çeker, sıcak hava yukarı iter → yukarı çıktıkça en düşük değer soğuk tarafa (batıya) kayar.</li>
+</ul>
+<ol start="4">
+<li><strong>Anlamı</strong></li>
+</ol>
+<ul>
+<li>Batıya eğik eksen: gelişen baroklinik alçak. Üst trof yer alçağının batısında; trofun önündeki ıraksama yer alçağını derinleştirir.</li>
+<li>Düşey eksen: olgun, eşdeğer barotropik sistem; gelişme bitmiş, yavaş.</li>
+</ul>
+<h4>Çözüm şekli</h4>
+<figure><img src="sekil/s10_cozum.png" width="1100" height="868" loading="lazy" alt="Çözüm — kendi çizimini bununla karşılaştır"><figcaption>Çözüm — kendi çizimini bununla karşılaştır</figcaption></figure>
+<h4>Sınavda yaz</h4>
+<blockquote>
+<p>A: L'ler 528 (W), 141 (orta), 996 (E) → eksen batıya eğik, 500 hPa merkezi yer merkezinin batısında: baroklinik, gelişen. B: hepsi ortada → eksen düşey: eşdeğer barotropik.</p>
+</blockquote>
+<p>Gelişen baroklinik alçakta eksen yükseklikle batıya eğilir; üst alçak yer alçağının batısındadır.</p>
+<p><em>In a developing baroclinic low the axis tilts westward with height.</em></p>
+<h4>Cevap + dikkat</h4>
+<ul>
+<li>A: L'ler 528 (batı) · 141 (orta) · 996 (doğu) → eksen eğik, 500 hPa merkezi BATIDA.</li>
+<li>B: hepsi ortada → eksen düşey.</li>
+</ul>
+<p><strong>Dikkat:</strong></p>
+<ul>
+<li>Batı ile doğuyu karıştırmak: W solda, E sağda.</li>
+<li>Eğimin yönünü 500'den yere doğru okumak: eksen alttan üste okunur.</li>
+</ul>
+</section>
+<aside class="oz"><h3>Sınavda yaz</h3><ul>
+<li>B: çizgi dik → düşey.</li>
+<li>B'de batı ve doğu eşit (3930 m) → kayma yok.</li>
+<li>Merkezleri alttan üste birleştir: batıya eğik = baroklinik, gelişen; düşey = eşdeğer barotropik, olgun.</li>
+<li>A: L'ler 528 (batı) · 141 (orta) · 996 (doğu) → eksen eğik, 500 hPa merkezi BATIDA. · B: hepsi ortada → eksen düşey.</li>
+<li>Merkezleri alttan üste birleştir: batıya eğik = baroklinik, gelişen; düşey = eşdeğer barotropik, olgun.</li>
+<li>En sık hata: En büyük değeri merkez sanmak.</li>
+</ul>
+</aside>
+<footer><a href="#s9">‹ Soru 9</a><a href="#ust">Tüm sorular</a><a href="../../ders-kitapligi/#mto302e/S10">Kavramlarıyla aç</a><span></span></footer>
+</article></main>
+<footer class="alt-bilgi"><a href="../">Tüm dersler</a> · <a href="../../ders-kitapligi/#mto302e">Ders Kitaplığı</a> · <a href="../../">Atmosfer Akademisi</a></footer>
+</body></html>
