@@ -94,7 +94,7 @@
       <div class="soru-govde">${q.soru || ''}</div>
       ${q.ipucu ? `<details class="ipucu"><summary>İpucu</summary>${q.ipucu}</details>` : ''}
       <h2 style="margin-top:22px">Çözüm <small class="yok" style="font-size:15px;font-weight:500">PDF s. ${q.pdf_cozum ?? '—'} · ${n} adım</small></h2>
-      ${q.giris ? `<div>${q.giris}</div>` : ''}
+      ${q.giris ? `<div id="cozum-giris" hidden>${q.giris}</div>` : ''}
       <ol class="adimlar" id="adimlar">${(q.adimlar || []).map((a, i) => `<li data-i="${i}" hidden>${a.html}${bagHTML(K, a.kavram, q.id)}</li>`).join('')}</ol>
       <div class="cozum-bas"><button type="button" class="dugme" id="adim-ac">1. adımı aç</button><button type="button" class="dugme ikincil" id="hepsi">Hepsini aç</button><button type="button" class="kucuk" id="kapat" hidden>Çözümü kapat</button></div>
       <div id="cozum-son" hidden>${q.oz ? `<div class="oz"><b>💎 Öz:</b> ${q.oz.replace(/^<p>|<\/p>$/g, '')}</div>` : ''}
@@ -108,6 +108,7 @@
       lis.forEach((li, i) => { const ac = i < m; if (ac && li.hidden && yeni) li.classList.add('yeni'); li.hidden = !ac; });
       btn.hidden = m >= n; btn.textContent = `${m + 1}. adımı aç`;
       $('#hepsi').hidden = m >= n; $('#kapat').hidden = m === 0; $('#cozum-son').hidden = m < n;
+      if ($('#cozum-giris')) $('#cozum-giris').hidden = m === 0; // «önce kendin çöz»: giriş de ilk adımla açılır
       acikAdim[`${K.id}/${q.id}`] = m;
     };
     goster(acikAdim[`${K.id}/${q.id}`] || 0, false);
