@@ -3,6 +3,9 @@
 (function () {
   'use strict';
   const { AC, ODEV, IMG, KESIF } = window.OKUL;
+  /* benzetimi olan ödevler (HW#1, HW#2); benzetim: false olan (HW#3) yalnız ödevler bölümünde gerçek ekranlarla */
+  const SIM = ODEV.filter((o) => o.benzetim !== false);
+  const simOdev = (id) => SIM.find((o) => o.id === id) || null;
   const $ = (s, k) => (k || document).querySelector(s);
   const kac = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const RESMI = new Set(['hw1-fig1', 'hw1-fig2', 'hw1-fig3', 'hw1-area', 'hw1-area-menu', 'hw1-baseflow-menu', 'hw1-loss-menu', 'hw1-loss', 'hw1-transform-menu', 'hw1-clark', 'hw1-loss-tab']);
@@ -52,7 +55,8 @@
           ${modKart(3, 'HW#2 rehberli', 'Meteoroloji, koşu, sonuç', [`<b>${t2.length} adım, ${tikSay(ODEV[1])} tık:</b> HW#1'in bittiği projeden başlar.`, '<b>Gerçek sonuç:</b> Junction-2 tepe 3082,9 cfs.', '<b>Gözlemle kıyas:</b> Nash-Sutcliffe 0,952.'], 'HW#2\'ye başla', 'hw2')}
           ${modKart(4, 'İzle', 'Program kendisi yapar', ['<b>Her tıkta:</b> imleç hedefe gider; ekranda ne değiştiği ve nedeni yazar.', '<b>Kontrol:</b> Geri · Oynat · İleri; klavyede ← → ve boşluk.', '<b>Atla:</b> aşama ve adım listesinden istediğin yere.'], 'HW#1\'i izle', 'izle-hw1')}
         </div>
-        <dl class="kunye"><div><dt>Program</dt><dd>HEC-HMS 4.14</dd></div><div><dt>Örnek havza</dt><dd>Punxsutawney, ABD · 158 mi²</dd></div><div><dt>Fırtına</dt><dd>28 Nisan – 4 Mayıs 1996</dd></div><div><dt>Ödevler</dt><dd>HW#1 · HW#2</dd></div></dl>
+        ${ODEV.filter((o) => o.benzetim === false).map((o) => `<p class="nasil-not"><b>${o.ad} · ${kac(o.konu)}:</b> benzetimde yok; <a href="#${o.id}">Ödevler › ${o.ad}</a> gerçek HEC-HMS 4.14 ekranlarıyla ${o.adimlar.length} adımlık rehber.</p>`).join('')}
+        <dl class="kunye"><div><dt>Program</dt><dd>HEC-HMS 4.14</dd></div><div><dt>Örnek havza</dt><dd>Punxsutawney, ABD · 158 mi²</dd></div><div><dt>Fırtına</dt><dd>28 Nisan – 4 Mayıs 1996</dd></div><div><dt>Ödevler</dt><dd>${ODEV.map((o) => o.ad).join(' · ')}</dd></div></dl>
       </section>
       <section id="odevler" class="bolum odevler" aria-labelledby="odevler-h"></section>
       <div class="isik" id="isik" hidden role="dialog" aria-modal="true" aria-label="Ekran görüntüsü"><figure><img alt=""><figcaption></figcaption></figure><button type="button" class="dugme ikincil isik-kapat">Kapat</button></div>`;
@@ -121,9 +125,10 @@
   /* keşif tabanı: iki ödevin son hâli, hesap yapılmış, pencereler kapalı */
   function kesifTaban() { HMS().bosalt(true); ileriSar(tumMikro(ODEV[0])); ileriSar(tumMikro(ODEV[1])); sadele(); HMS().yap('tb:compute', { cizme: true }); HMS().temizle(); }
   function kur(yeniMod, odevId, baslangicAdim) {
+    if (yeniMod === 'odev' && !simOdev(odevId)) return; // benzetimi olmayan ödev (HW#3) rehberli moda girmez
     const izdeydi = mod === 'izle', eskiMod = mod;
     if (iz) izKapat();
-    mod = yeniMod; odev = odevId ? ODEV.find((o) => o.id === odevId) : null; adim = baslangicAdim || 0; mik = 0; sonAc = null;
+    mod = yeniMod; odev = odevId ? simOdev(odevId) : null; adim = baslangicAdim || 0; mik = 0; sonAc = null;
     fazGor = null; tumu = false;
     if (mod === 'kesif') { kesSec = null; odakHd = null; }
     if (izdeydi || eskiMod !== mod) olcekle();
@@ -624,7 +629,7 @@
   function izBasla(id, f) {
     const izdeydi = mod === 'izle';
     if (iz) izKapat(true);
-    const o = ODEV.find((x) => x.id === id) || ODEV[0];
+    const o = simOdev(id) || SIM[0];
     mod = 'izle'; odev = o; adim = 0; mik = 0; sonAc = null; fazGor = null; tumu = false;
     iz = { o, kareler: izKareler(o), f: 0, tok: 0, anim: false, acele: false, oynuyor: false, oyunNo: 0, hizAd: izHiz, imlec: null, parca: {}, uyan: null, oyunUyan: null };
     $('.sim-alan').classList.add('izle');
@@ -670,7 +675,7 @@
   }
   function izIc(bekliyor) {
     const o = iz.o, K = iz.kareler, kr = K[iz.f], N = o.adimlar.length;
-    const ust = (konum) => `<div class="iz-ust"><div class="iz-odev" role="group" aria-label="İzlenen ödev">${ODEV.map((x) => `<button type="button" data-mod="izle-${x.id}" aria-pressed="${x.id === o.id}">${x.ad}</button>`).join('')}</div><p class="iz-konum">${konum}</p><button type="button" class="pn-bas" data-iz="bas">Baştan</button></div>`;
+    const ust = (konum) => `<div class="iz-ust"><div class="iz-odev" role="group" aria-label="İzlenen ödev">${SIM.map((x) => `<button type="button" data-mod="izle-${x.id}" aria-pressed="${x.id === o.id}">${x.ad}</button>`).join('')}</div><p class="iz-konum">${konum}</p><button type="button" class="pn-bas" data-iz="bas">Baştan</button></div>`;
     const not = '<p class="iz-not" id="iz-not" role="status" hidden></p>';
     if (kr.t === 'son') {
       return ust(`${N} adım · <b>bitti</b>`) + izSerit() + not + `<h2 class="pn-h">${o.ad} izlendi.</h2><p class="pn-t">Benzetimdeki proje öğreticinin son hâliyle aynı.</p><div class="pn-dugmeler iz-son-d"><button type="button" class="dugme" data-mod="${o.id}">Şimdi kendin yap (rehberli mod)</button>${o.id === 'hw1' ? '<button type="button" class="dugme ikincil" data-mod="izle-hw2">HW#2\'yi izle</button>' : '<button type="button" class="dugme ikincil" data-mod="kesif">Keşfe dön</button>'}</div><p class="iz-k iz-son-k">Özet</p>${liste(o.izleSon)}`;
@@ -731,7 +736,9 @@
     const resim = [].concat(a.img || []), an = `${o.id}:${i}`, bitti = BITTI.has(an);
     const res = resim.length ? `<div class="ak-res r${Math.min(resim.length, 2)}">${resim.map((r) => `<figure><button type="button" class="ak-buyut" data-isik="${r}" aria-label="Büyüt: ${kac(IMG[r])}"><img src="img/${r}.webp" alt="${kac(IMG[r])}" loading="lazy" decoding="async"></button><figcaption>${kac(IMG[r])} · ${RESMI.has(r) ? 'öğreticideki ekran' : 'HEC-HMS 4.14 ekranı'}</figcaption></figure>`).join('')}</div>` : '';
     const dene = a.soru ? soruHTML(a) : `<div class="soru"><p class="soru-et">Kendini dene</p><p class="soru-s">Bu adım neden gerekli? Önce kendin düşün.</p><button type="button" class="kt-b" aria-expanded="false">Cevabı aç</button><div class="kt-ic" hidden>${liste(a.neden)}</div></div>`;
-    return `<li class="ak${bitti ? ' bitti' : ''}" id="${o.id}-${i + 1}"><div class="ak-ust"><span class="ak-no">${i + 1}</span><h5>${kac(a.baslik)}</h5></div>${a.ne && a.ne.length ? `<p class="ak-ne"><b>Ne:</b> ${kac(a.ne[0])}</p>` : ''}${degerTablo(a.tablo)}${res}${katman(a, o.id + i, !a.soru, true)}${dene}<div class="ak-d"><button type="button" class="dugme adim-git" data-git="${o.id}:${i}">Benzetimde yap</button><button type="button" class="dugme ikincil adim-izle" data-git="izle:${o.id}:${i}">Bu adımı izle</button><button type="button" class="ak-bitti" data-bitti="${an}" aria-pressed="${bitti}">${bitti ? 'Bitti' : 'Bitirdim'}</button></div></li>`;
+    /* benzetimi olmayan ödevde (HW#3) yalnız gerçek ekran büyütücüsü ve «Bitirdim» */
+    const sim = o.benzetim !== false ? `<button type="button" class="dugme adim-git" data-git="${o.id}:${i}">Benzetimde yap</button><button type="button" class="dugme ikincil adim-izle" data-git="izle:${o.id}:${i}">Bu adımı izle</button>` : '';
+    return `<li class="ak${bitti ? ' bitti' : ''}" id="${o.id}-${i + 1}"><div class="ak-ust"><span class="ak-no">${i + 1}</span><h5>${kac(a.baslik)}</h5></div>${a.ne && a.ne.length ? `<p class="ak-ne"><b>Ne:</b> ${kac(a.ne[0])}</p>` : ''}${degerTablo(a.tablo)}${res}${katman(a, o.id + i, !a.soru, true)}${dene}<div class="ak-d">${sim}<button type="button" class="ak-bitti" data-bitti="${an}" aria-pressed="${bitti}">${bitti ? 'Bitti' : 'Bitirdim'}</button></div></li>`;
   }
   function odevlerCiz() {
     const k = $('#odevler');
@@ -744,7 +751,11 @@
         const ad = `${o.id}-f${fi + 1}`;
         return `<section class="faz" id="${ad}" aria-labelledby="${ad}-h"><header class="faz-bas"><h4 id="${ad}-h"><span class="faz-no">${fi + 1}</span>${kac(f.ad)}</h4><p class="faz-alt"><span>${f.son - f.bas} adım</span><span class="faz-say"></span>${bol ? `<span>Öğretici: ${kac(bol)}</span>` : ''}</p></header><ol class="ak-izgara">${o.adimlar.slice(f.bas, f.son).map((a, j) => adimKart(o, a, f.bas + j)).join('')}</ol></section>`;
       }).join('');
-      return `<article class="odev" id="${o.id}" aria-labelledby="${o.id}-h"><header class="od-bas"><div class="od-sol"><p class="ust-eti">${o.ad} · teslim ${kac(o.teslim)}</p><h3 class="odev-h" id="${o.id}-h">${kac(o.konu)}</h3><div class="od-ilerleme"><span>Bitirdim</span><b>0/${o.adimlar.length}</b><span class="od-bar" aria-hidden="true"><i></i></span></div></div><div class="pn-dugmeler od-d"><button type="button" class="dugme" data-git="${o.id}:0">${o.ad} rehberli benzetimi başlat</button><button type="button" class="dugme ikincil" data-git="izle:${o.id}:0">${o.ad}'i adım adım izle</button></div></header><div class="od-kartlar">${kartlar}</div>${fazlar}</article>`;
+      const ekranli = o.benzetim === false;
+      const sag = ekranli
+        ? `<p class="od-rozet">Gerçek ekranlarla rehber · ${o.adimlar.length} adım, ${o.adimlar.reduce((n, a) => n + [].concat(a.img || []).length, 0)} ekran · benzetim yok</p>`
+        : `<div class="pn-dugmeler od-d"><button type="button" class="dugme" data-git="${o.id}:0">${o.ad} rehberli benzetimi başlat</button><button type="button" class="dugme ikincil" data-git="izle:${o.id}:0">${o.ad}'i adım adım izle</button></div>`;
+      return `<article class="odev${ekranli ? ' ekranli' : ''}" id="${o.id}" aria-labelledby="${o.id}-h"><header class="od-bas"><div class="od-sol"><p class="ust-eti">${o.ad} · teslim ${kac(o.teslim)}</p><h3 class="odev-h" id="${o.id}-h">${kac(o.konu)}</h3><div class="od-ilerleme"><span>Bitirdim</span><b>0/${o.adimlar.length}</b><span class="od-bar" aria-hidden="true"><i></i></span></div></div>${sag}</header><div class="od-kartlar">${kartlar}</div>${fazlar}</article>`;
     }).join('');
     ilerlemeGuncelle();
   }
@@ -791,8 +802,9 @@
         const v = md.dataset.mod;
         if (v === 'kesif') kur('kesif');
         else if (v === 'izle') izBasla(iz ? iz.o.id : 'hw1', 0);
-        else if (v.startsWith('izle-')) izBasla(v.slice(5), 0);
-        else kur('odev', v, 0);
+        else if (v.startsWith('izle-')) { if (!simOdev(v.slice(5))) return; izBasla(v.slice(5), 0); }
+        else if (simOdev(v)) kur('odev', v, 0);
+        else return;
         odakla(); return;
       }
       /* seçim listesi */
@@ -825,8 +837,8 @@
       const git = e.target.closest('[data-git]');
       if (git) {
         const p = git.dataset.git.split(':');
-        if (p[0] === 'izle') { const o = ODEV.find((x) => x.id === p[1]); izBasla(o.id, izAdimKare(o, +p[2])); }
-        else kur('odev', p[0], +p[1]);
+        if (p[0] === 'izle') { const o = simOdev(p[1]); if (!o) return; izBasla(o.id, izAdimKare(o, +p[2])); }
+        else { if (!simOdev(p[0])) return; kur('odev', p[0], +p[1]); }
         benzetimeIn(); setTimeout(odakla, 30); return;
       }
       if (e.target.closest('#goster')) { goster(); return; }
