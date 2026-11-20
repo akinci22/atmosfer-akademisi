@@ -86,7 +86,7 @@
     const W = 560, H = 330, svg = svgYap(kap, W, H, 'Havza su bütçesi: yağış, buharlaşma-terleme, akış ve depo değişimi');
     const g = el('g'); svg.append(g);
     g.append(el('rect', { x: 26, y: 68, width: 478, height: 250, rx: 14, fill: 'none', stroke: 'var(--ikincil)', 'stroke-dasharray': '7 6' }));
-    yaz(g, 38, 88, 'kontrol hacmi = havza', { k: 13, r: 'var(--ikincil)' });
+    yaz(g, 186, 88, 'kontrol hacmi = havza', { k: 13, r: 'var(--ikincil)' });
     g.append(el('path', { d: 'M27,170 C90,120 160,112 230,148 S380,196 470,206 L503,208 L503,317 L27,317 Z', fill: 'var(--yuzey)', stroke: 'var(--yazi)', 'stroke-width': 2 }));
     const dy = 236, dh = 66;
     g.append(el('rect', { x: 100, y: dy, width: 300, height: dh, rx: 8, fill: 'var(--zemin)', stroke: 'var(--acc)', 'stroke-width': 1.5 }));
@@ -197,7 +197,8 @@
       const gen = 60 + 200 * Math.sqrt(A / 3000), h = 2 + 46 * R / 800, x0 = 150 - gen / 2, y0 = 168;
       kara.setAttribute('d', `M${x0},${y0} L${x0 + gen},${y0} L${x0 + gen + 40},${y0 - 40} L${x0 + 40},${y0 - 40} Z`);
       su.setAttribute('d', `M${x0},${y0} L${x0 + gen},${y0} L${x0 + gen + 40},${y0 - 40} L${x0 + gen + 40},${y0 - 40 - h} L${x0 + 40},${y0 - 40 - h} L${x0},${y0 - h} Z`);
-      yA.textContent = `A = ${A.toLocaleString('tr-TR')} km² = ${(A * 1e6).toExponential(2).replace('.', ',').replace('e+', '×10^')} m²`;
+      const [mant, us] = (A * 1e6).toExponential(2).split('e+');
+      yA.textContent = `A = ${A.toLocaleString('tr-TR')} km² = ${mant.replace('.', ',')}×10${String(+us).split('').map((c) => UST[+c]).join('')} m²`;
       yR.textContent = `R = ${tr(R)} mm = ${tr(R / 1000, 4)} m (havzaya eşit yayılmış su)`;
       okG.replaceChildren(); ok(okG, 350, 120, 550, 120, 'var(--acc)', 2 + 8 * Math.sqrt(Math.min(Q, 200) / 200));
       yQ.textContent = `Q̄ = ${tr(Q, Q < 10 ? 2 : 1)} m³/s`;
@@ -249,8 +250,8 @@
     for (const [z, ad] of [[35, '35 → 5,5'], [43, '43 → 17,5'], [50, '50 → 48,0']]) { nokta(svg, d.x(z), d.y(RRz(z))); yaz(svg, d.x(z) + 8, d.y(RRz(z)) + 18, ad, { k: 13, b: true }); }
     svg.append(el('path', { d: `M${d.x(10)},${d.y(10)} H${d.x(39.1)} V${d.y(0.1)}`, fill: 'none', stroke: 'var(--tur)', 'stroke-dasharray': '5 4', 'stroke-width': 1.8 }));
     yaz(svg, d.x(11), d.y(10) - 6, '10 mm/h → 39,1 dBZ', { k: 13, r: 'var(--tur)', b: true });
-    ok(svg, d.x(24), d.y(RRz(24)) - 30, d.x(40), d.y(RRz(40)) - 30, 'var(--ikincil)', 1.5, true);
-    yaz(svg, d.x(24), d.y(RRz(24)) - 40, '+16 dBZ = ×10 şiddet', { k: 13, r: 'var(--ikincil)' });
+    ok(svg, d.x(44), d.y(0.25), d.x(60), d.y(0.25 * 10 ** 0), 'var(--ikincil)', 1.5, true);
+    yaz(svg, d.x(59), d.y(0.25) - 8, '+16 dBZ = şiddet × 10', { h: 'end', k: 13, r: 'var(--ikincil)' });
     const im = el('circle', { r: 7, fill: 'var(--tur)', stroke: '#fff', 'stroke-width': 2, visibility: 'hidden' }); svg.append(im);
     const yazOku = okuma(kap, ['dBZ', 'Z', 'RR']);
     imlec(svg, d, (z) => { z = sinir(z, 10, 60); im.setAttribute('cx', d.x(z)); im.setAttribute('cy', d.y(RRz(z))); im.setAttribute('visibility', 'visible'); yazOku({ dBZ: tr(z), Z: `10^(${tr(z / 10, 2)}) = ${Math.round(10 ** (z / 10)).toLocaleString('tr-TR')} mm⁶/m³`, RR: `${tr(RRz(z), 2)} mm/h` }); });
@@ -304,7 +305,7 @@
       yaz(kg, d.x(19.5), d.T + 12, `W = ${tr(top)} mm`, { h: 'end', k: 18, b: true, r: 'var(--tur)' });
       yazOku({ katmanlar: parca.join(' · '), 'W = Σ q·Δp / (ρ_w g)': `${tr(top)} mm (= kg/m²)` });
     };
-    const kur = () => { k2.replaceChildren(); sl = MOD[mod].map((l, i) => { const s = surgu(k2, `q${MOD[mod].length > 1 ? i + 1 : ''} (${l[0]}–${l[1]} hPa)`, 0, 20, 0.5, l[2], (v) => `${tr(v)} g/kg`); s.inp.addEventListener('input', ciz); return s; }); ciz(); };
+    const kur = () => { k2.replaceChildren(); sl = MOD[mod].map((l, i) => { const s = surgu(k2, MOD[mod].length > 1 ? `q${'₁₂'[i]}` : 'q̄', 0, 20, 0.5, l[2], (v) => `${tr(v)} g/kg`); s.inp.addEventListener('input', ciz); return s; }); ciz(); };
     secenek(k, ['S8-a · tek katman', 'S8-b · iki katman'], mod, (i) => { mod = i; kur(); });
     kur();
   };
@@ -339,11 +340,11 @@
       g.append(el('circle', { cx: X((xi + xj) / 2), cy: Y((yi + yj) / 2), r: 3.5, fill: 'var(--tur)' }));
     }
     if (adim >= 3) { const adlar = Object.keys(OLCER); for (let i = 0; i < adlar.length; i++) for (let j = i + 1; j < adlar.length; j++) { const s = ortakKenar(adlar[i], adlar[j]); if (s) g.append(el('line', { x1: X(s[0][0]), y1: Y(s[0][1]), x2: X(s[1][0]), y2: Y(s[1][1]), stroke: 'var(--tur)', 'stroke-width': adim === 3 ? 2.5 : 1.6, 'stroke-dasharray': '7 5' })); } }
-    const ETK = { A: [11, 14, 'start'], B: [11, 14, 'start'], C: [11, 14, 'start'], D: [-12, 26, 'end'], E: [26, 30, 'end'] };
+    const ETK = { A: [11, 16, 'start'], B: [11, 16, 'start'], C: [11, 16, 'start'], D: [11, 16, 'start'], E: [58, 36, 'end'] };
     for (const [a, [x, y]] of Object.entries(OLCER)) {
       g.append(el('circle', { cx: X(x), cy: Y(y), r: 8, fill: a === 'E' ? 'var(--zemin)' : 'var(--yazi)', stroke: 'var(--yazi)', 'stroke-width': 2.5 }));
       yaz(g, X(x) + 11, Y(y) - 9, a, { k: 22, b: true });
-      if (adim >= 5) { const [dx, dy, h] = ETK[a]; yaz(g, X(x) + dx, Y(y) + dy, `${OP[a]} mm · ${OA[a]} km²`, { k: 15, b: true, h, r: a === 'E' ? 'var(--tur)' : 'var(--yazi)' }); }
+      if (adim >= 5) { const [dx, dy, h] = ETK[a]; yaz(g, X(x) + dx, Y(y) + dy, `${OP[a]} mm · ${OA[a]} km²`, { k: 14, b: true, h, r: a === 'E' ? 'var(--tur)' : 'var(--yazi)' }); }
     }
     yaz(g, 528, Y(7.5), 'E havza dışında', { h: 'end', k: 14, r: 'var(--tur)', b: true });
     const not = ['ölçerler ve havza sınırı (kalın)', 'komşu ölçerler kesikli çizgiyle birleşir', 'her doğrunun orta dikmesi (turuncu)', 'orta dikmeler poligonları kapatır', 'poligonlar havza sınırıyla kesilir; E\'nin içeri düşen parçası turuncu', 'alan × yağış → P̄ = 34 440 / 600 = 57,4 mm'][adim];
@@ -360,7 +361,7 @@
   };
 
   Sekil.m316_izohiyet = function (kap, ayar = {}) {
-    const adim = ayar.adim ?? 5, W = 560, H = 380, svg = svgYap(kap, W, H, 'İzohiyet yöntemi: eş yağış eğrileri arasındaki şeritler');
+    const adim = ayar.adim ?? 5, W = 560, H = 420, svg = svgYap(kap, W, H, 'İzohiyet yöntemi: eş yağış eğrileri arasındaki şeritler');
     const g = el('g'); svg.append(g);
     const E = [[270, 190, 230, 150, 10], [290, 180, 197, 128.5, 20], [315, 165, 132.8, 86.6, 30], [335, 152, 72.7, 47.4, 40]];
     const S = [[10, 20, 40, 15], [20, 30, 60, 25], [30, 40, 35, 35], [40, 48, 15, 44]];
@@ -376,8 +377,8 @@
     yaz(g, 40, 30, 'kalın: havza sınırı (≈ 10 mm eğrisi) · ince: izohiyetler (mm)', { k: 13, r: 'var(--ikincil)' });
     let top = 0; const satir = [];
     S.forEach(([u, v, A, ort], i) => { if (i < adim) { top += A * ort; satir.push(`${A}×${ort}`); } });
-    if (adim >= 1) yaz(g, 20, 362, adim >= 4 ? `Σ A·P̄ = 3985 → P̄ = 3985 / 150 = ${tr(3985 / 150)} mm` : `Σ A·P̄ = ${satir.join(' + ')} = ${top.toLocaleString('tr-TR')}`, { k: 15, b: true, r: 'var(--tur)' });
-    if (adim >= 1 && adim <= 4) { const [u, v, A, ort] = S[adim - 1]; yaz(g, 20, 340, `şerit ${u}–${v} mm: ortalama ${v === 48 ? '(40+48)/2' : `(${u}+${v})/2`} = ${ort} mm · alan ${A} km²`, { k: 14 }); }
+    if (adim >= 1) yaz(g, 20, 408, adim >= 4 ? `Σ A·P̄ = 3985 → P̄ = 3985 / 150 = ${tr(3985 / 150)} mm` : `Σ A·P̄ = ${satir.join(' + ')} = ${top.toLocaleString('tr-TR')}`, { k: 15, b: true, r: 'var(--tur)' });
+    if (adim >= 1 && adim <= 4) { const [u, v, A, ort] = S[adim - 1]; yaz(g, 20, 384, `şerit ${u}–${v} mm: ortalama ${v === 48 ? '(40+48)/2' : `(${u}+${v})/2`} = ${ort} mm · alan ${A} km²`, { k: 14 }); }
     if (ayar.adim != null) return;
     const yazOku = okuma(kap, ['şerit', 'A·P̄']);
     const icinde = ([cx, cy, rx, ry], x, y) => ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 <= 1;
@@ -413,7 +414,7 @@
     const hat = el('path', { fill: 'none', stroke: 'var(--acc)', 'stroke-width': 3 }), duz = el('path', { fill: 'none', stroke: 'var(--tur)', 'stroke-width': 3, 'stroke-dasharray': '8 5' });
     svg.append(hat, duz);
     const ng = el('g'); svg.append(ng);
-    const kirY = yaz(svg, d.x(cx[5]) - 150, d.y(cy[5]) - 40, 'kırılma (2016)', { k: 15, b: true, r: 'var(--tur)' });
+    const kirY = yaz(svg, d.x(cx[5]) - 14, d.y(cy[5]) - 10, 'kırılma (2016) →', { h: 'end', k: 15, b: true, r: 'var(--tur)' });
     const yazOku = okuma(kap, ['yıl', 'eğim (dönem)', 'düzeltme']);
     const k = kontrol(kap);
     const btn = anim ? dugme(k, '▶ Oynat') : null;
@@ -444,7 +445,7 @@
     const W = 560, H = 390, svg = svgYap(kap, W, H, 'Şiddet–süre–sıklık (IDF) eğrileri');
     const d = eksen(svg, { W, H, x: [0, 120], y: [0, 200], xt: [0, 15, 30, 45, 60, 75, 90, 105, 120], yt: [0, 40, 80, 120, 160, 200], xad: 'süre t (dk)', yad: 'şiddet i (mm/h)' });
     const T = [[2400, 'T = 2 yıl', '2 5'], [3600, 'T = 10 yıl', ''], [5000, 'T = 100 yıl', '9 5']];
-    for (const [a, ad, ks] of T) { const p = []; for (let t = 3; t <= 120; t += 1) p.push([d.x(t), d.y(a / (t + 20))]); svg.append(el('path', { d: yol(p), fill: 'none', stroke: a === 3600 ? 'var(--acc)' : 'var(--ikincil)', 'stroke-width': a === 3600 ? 3.2 : 2, 'stroke-dasharray': ks || null })); yaz(svg, d.x(92), d.y(a / 112) - 7, ad, { k: 13, b: a === 3600, r: a === 3600 ? 'var(--acc)' : 'var(--ikincil)' }); }
+    for (const [a, ad, ks] of T) { const p = []; for (let t = 3; t <= 120; t += 1) p.push([d.x(t), d.y(a / (t + 20))]); svg.append(el('path', { d: yol(p), fill: 'none', stroke: a === 3600 ? 'var(--acc)' : 'var(--ikincil)', 'stroke-width': a === 3600 ? 3.2 : 2, 'stroke-dasharray': ks || null })); yaz(svg, d.x(118), d.y(a / 138) - 6, ad, { h: 'end', k: 13, b: a === 3600, r: a === 3600 ? 'var(--acc)' : 'var(--ikincil)' }); }
     for (const [t, i, ad] of [[10, 120, 'S16 (10; 120)'], [60, 45, 'S16 (60; 45)'], [25, 80, 'S32 Tc = 25 → 80']]) { nokta(svg, d.x(t), d.y(i)); yaz(svg, d.x(t) + 8, d.y(i) - 8, ad, { k: 13, b: true }); }
     const dik = el('line', { y1: d.T, y2: d.H - d.B, stroke: 'var(--tur)', 'stroke-width': 2 }); svg.append(dik);
     const yazOku = okuma(kap, ['t', 'i (2 / 10 / 100 yıl)', 'derinlik = i·t (10 yıl)']);
@@ -499,8 +500,8 @@
   };
 
   Sekil.m316_horton = function (kap) {
-    const W = 560, H = 580, svg = svgYap(kap, W, H, 'Horton derinlik–alan bağıntısı ve doğrusallaştırılmış hâli');
-    const ust = el('g'), alt = el('g', { transform: 'translate(0,290)' }); svg.append(ust, alt);
+    const W = 660, H = 480, PH = 240, svg = svgYap(kap, W, H, 'Horton derinlik–alan bağıntısı ve doğrusallaştırılmış hâli');
+    const ust = el('g'), alt = el('g', { transform: `translate(0,${PH})` }); svg.append(ust, alt);
     const yazOku = okuma(kap, ['A', 'P = Pm·e^(−kAⁿ)', 'k, n']);
     const k = kontrol(kap), k2 = kontrol(kap);
     const VERI = [{ Pm: 54, p: [[500, 51], [5000, 39]], ek: [[1000, 48]], Amax: 6000, y: [30, 56], yt: [30, 35, 40, 45, 50, 55], ad: 'S19' }, { Pm: 30, p: [[100, 28], [2000, 20]], ek: [], Amax: 3000, y: [14, 31], yt: [15, 20, 25, 30], ad: 'S20' }];
@@ -509,14 +510,14 @@
       const V = VERI[v], y1 = Math.log(Math.log(V.Pm / V.p[0][1])), y2 = Math.log(Math.log(V.Pm / V.p[1][1])), x1 = Math.log(V.p[0][0]), x2 = Math.log(V.p[1][0]);
       const n = (y2 - y1) / (x2 - x1), kk = Math.exp(y1 - n * x1), P = (A) => V.Pm * Math.exp(-kk * A ** n);
       ust.replaceChildren(); alt.replaceChildren();
-      const d = eksen(ust, { W, H: 290, x: [0, V.Amax], y: V.y, xt: V.Amax === 6000 ? [0, 1000, 2000, 3000, 4000, 5000, 6000] : [0, 500, 1000, 1500, 2000, 2500, 3000], yt: V.yt, xad: 'alan A (km²)', yad: `ortalama derinlik P (cm) · Pm = ${V.Pm}` });
+      const d = eksen(ust, { W, H: PH, x: [0, V.Amax], y: V.y, xt: V.Amax === 6000 ? [0, 1000, 2000, 3000, 4000, 5000, 6000] : [0, 500, 1000, 1500, 2000, 2500, 3000], yt: V.yt, xad: 'alan A (km²)', yad: `ortalama derinlik P (cm) · Pm = ${V.Pm}` });
       const p = []; for (let A = 1; A <= V.Amax; A += V.Amax / 300) p.push([d.x(A), d.y(P(A))]); ust.append(el('path', { d: yol(p), fill: 'none', stroke: 'var(--acc)', 'stroke-width': 3 }));
       for (const [A, Pv] of V.p) nokta(ust, d.x(A), d.y(Pv), 6);
       for (const [A, Pv] of V.ek) { nokta(ust, d.x(A), d.y(Pv), 5, 'var(--ikincil)'); yaz(ust, d.x(A) + 8, d.y(Pv) + 16, 'tablo 48', { k: 12, r: 'var(--ikincil)' }); }
       const A = sA.v, m = nokta(ust, d.x(A), d.y(P(A)), 7, 'var(--tur)'); void m;
-      const d2 = eksen(alt, { W, H: 290, x: [4, 9], y: [-3.5, 0], xt: [4, 5, 6, 7, 8, 9], yt: [-3, -2, -1, 0], yf: (q) => q.toLocaleString('tr-TR'), xad: 'x = ln A', yad: 'y = ln ln(Pm/P)' });
+      const d2 = eksen(alt, { W, H: PH, x: [4, 9], y: [-3.5, 0], xt: [4, 5, 6, 7, 8, 9], yt: [-3, -2, -1, 0], yf: (q) => q.toLocaleString('tr-TR'), xad: 'x = ln A', yad: 'y = ln ln(Pm/P)' });
       alt.append(el('line', { x1: d2.x(4), y1: d2.y(Math.log(kk) + n * 4), x2: d2.x(9), y2: d2.y(Math.log(kk) + n * 9), stroke: 'var(--acc)', 'stroke-width': 3 }));
-      for (const [Ap, Pv] of V.p) { const xx = Math.log(Ap), yy = Math.log(Math.log(V.Pm / Pv)); nokta(alt, d2.x(xx), d2.y(yy), 6); yaz(alt, d2.x(xx) + 8, d2.y(yy) + 18, `(${tr(xx, 3)}; ${tr(yy, 3)})`, { k: 13, b: true }); }
+      for (const [Ap, Pv] of V.p) { const xx = Math.log(Ap), yy = Math.log(Math.log(V.Pm / Pv)); nokta(alt, d2.x(xx), d2.y(yy), 6); const sag = xx > 7.5; yaz(alt, d2.x(xx) + (sag ? -10 : 8), d2.y(yy) + (sag ? -10 : 18), `(${tr(xx, 3)}; ${tr(yy, 3)})`, { k: 13, b: true, h: sag ? 'end' : 'start' }); }
       yaz(alt, d2.x(4.1), d2.y(-0.3), `eğim n = ${tr(n, 3)} · kesişim ln k = ${tr(Math.log(kk), 3)}`, { k: 14, b: true, r: 'var(--tur)' });
       yazOku({ A: `${A.toLocaleString('tr-TR')} km²`, 'P = Pm·e^(−kAⁿ)': `${V.Pm} × e^(−${tr(kk * A ** n, 4)}) = ${tr(P(A))} cm`, 'k, n': `k = ${kk.toExponential(3).replace('.', ',')} · n = ${tr(n, 3)}` });
     };
@@ -530,7 +531,7 @@
     const d = eksen(svg, { W, H, x: [0.01, 1000], y: [1, 2000], xlog: true, ylog: true, xt: [0.01, 0.1, 1, 10, 100, 1000], yt: [1, 10, 100, 1000], xf: (v) => v.toLocaleString('tr-TR'), xad: 'süre D (saat, log)', yad: 'zarf derinliği R (cm, log)' });
     const Rz = (D) => 42.2 * D ** 0.475;
     svg.append(el('path', { d: yol([[d.x(0.01), d.y(Rz(0.01))], [d.x(1000), d.y(Rz(1000))]]), fill: 'none', stroke: 'var(--acc)', 'stroke-width': 3 }));
-    yaz(svg, d.x(0.02), d.y(Rz(0.02)) - 14, 'R = 42,2 · D^0,475', { k: 15, b: true, r: 'var(--acc)' });
+    yaz(svg, d.x(0.2), d.y(Rz(0.2)) + 30, 'R = 42,2 · D⁰·⁴⁷⁵', { k: 15, b: true, r: 'var(--acc)' });
     for (const [D, R, ad] of [[3, 71.1, '3 h → 71,1 cm'], [0.5, 30.4, '30 dk → 30,4 cm'], [14.44, 150, '14,4 h → 150 cm']]) { nokta(svg, d.x(D), d.y(R)); yaz(svg, d.x(D) + 8, d.y(R) + 18, ad, { k: 13, b: true }); }
     const m = nokta(svg, 0, 0, 7, 'var(--tur)');
     const yazOku = okuma(kap, ['D', 'R', 'ortalama şiddet R/D']);
@@ -554,7 +555,7 @@
     const yigin = {}; HS.forEach((v) => { const kx = Math.round(X(v) / 9); yigin[kx] = (yigin[kx] || 0) + 1; nokta(g, X(v), 112 - (yigin[kx] - 1) * 11, 5, v === 210 && adim >= 1 ? 'var(--tur)' : 'var(--yazi)'); });
     if (adim >= 1) yaz(g, X(210), 92, 'Xm = 210', { h: 'middle', k: 13, b: true, r: 'var(--tur)' });
     if (adim >= 4) { g.append(el('rect', { x: X(m2 - s2), y: 52, width: X(m2 + s2) - X(m2 - s2), height: 70, fill: 'var(--acc)', opacity: 0.12 })); g.append(el('line', { x1: X(m2), x2: X(m2), y1: 48, y2: 124, stroke: 'var(--acc)', 'stroke-width': 2 })); yaz(g, X(m2) + 4, 46, `X̄ₙ = ${tr(m2, 2)} · σₙ = ${tr(s2, 2)}`, { k: 13, b: true, r: 'var(--acc)' }); }
-    if (adim >= 5) { ok(g, X(m2), 70, X(PMP), 70, 'var(--tur)', 3); nokta(g, X(PMP), 70, 7, 'var(--tur)'); yaz(g, X(PMP), 58, `PMP ≈ ${Math.round(PMP)} mm`, { h: 'end', k: 15, b: true, r: 'var(--tur)' }); yaz(g, (X(m2) + X(PMP)) / 2, 88, `Km·σₙ = ${tr(Km, 2)} × ${tr(s2, 2)}`, { h: 'middle', k: 13, r: 'var(--tur)' }); }
+    if (adim >= 5) { ok(g, X(m2), 70, X(PMP), 70, 'var(--tur)', 3); nokta(g, X(PMP), 70, 7, 'var(--tur)'); yaz(g, X(PMP), 58, `PMP ≈ ${Math.round(PMP)} mm`, { h: 'end', k: 15, b: true, r: 'var(--tur)' }); yaz(g, X(m2) + 70, 63, `Km·σₙ = ${tr(Km, 2)} × ${tr(s2, 2)}`, { k: 13, r: 'var(--tur)' }); }
     // alt panel: σₙ₋₁ biriminde uzaklık
     if (adim >= 2) {
       const Z = (z) => 50 + (z + 2) / 15 * 480, y0 = 330;
@@ -594,7 +595,9 @@
     const g = el('g'); svg.append(g);
     g.append(el('path', { d: 'M20,120 C80,130 110,250 200,262 L420,262 L420,90 L470,90 L470,282 L20,282 Z', fill: 'var(--yuzey)', stroke: 'var(--yazi)', 'stroke-width': 2 }));
     yaz(g, 445, 112, 'baraj', { h: 'middle', k: 12, r: 'var(--ikincil)' });
-    const su = el('path', { fill: 'var(--acc)', opacity: 0.3 }), seviye = el('line', { stroke: 'var(--acc)', 'stroke-width': 3 }); g.append(su, seviye);
+    const kid = `m316-hz-${Math.random().toString(36).slice(2, 8)}`;
+    const cp = el('clipPath', { id: kid }); cp.append(el('path', { d: 'M20,120 C80,130 110,250 200,262 L420,262 L420,20 L20,20 Z' })); svg.append(cp);
+    const su = el('rect', { x: 20, width: 400, fill: 'var(--acc)', opacity: 0.3, 'clip-path': `url(#${kid})` }), seviye = el('line', { stroke: 'var(--acc)', 'stroke-width': 3, 'clip-path': `url(#${kid})` }); g.append(su, seviye);
     const oklar = el('g'); g.append(oklar);
     const yd = yaz(g, 300, 30, '', { h: 'middle', k: 18, b: true, r: 'var(--tur)' });
     const yazOku = okuma(kap, ['terimler (m/yıl)', 'dh/dt', '3 m yükselme', 'kararlı Qout']);
@@ -603,9 +606,9 @@
     const A = 1e8;
     const ciz = () => {
       const P = sP.v, E = sE.v * 365 / 1000, I = sI.v * YIL / A, O = sO.v * YIL / A, dh = P - E + I - O;
-      const yS = 175 - sinir(dh, -2, 2) * 25, xs = (yy) => 20 + (yy - 120) / 142 * 180 * 0.6;
-      su.setAttribute('d', `M${xs(yS)},${yS} L420,${yS} L420,262 L200,262 C110,250 80,130 ${xs(yS)},${yS} Z`);
-      seviye.setAttribute('x1', xs(yS)); seviye.setAttribute('x2', 420); seviye.setAttribute('y1', yS); seviye.setAttribute('y2', yS);
+      const yS = 175 - sinir(dh, -2, 2) * 25;
+      su.setAttribute('y', yS); su.setAttribute('height', 262 - yS);
+      seviye.setAttribute('x1', 20); seviye.setAttribute('x2', 420); seviye.setAttribute('y1', yS); seviye.setAttribute('y2', yS);
       oklar.replaceChildren(); const w = (v) => 1.5 + 4 * Math.min(Math.abs(v), 2);
       ok(oklar, 230, 40, 230, yS - 6, 'var(--acc)', w(P)); yaz(oklar, 238, 70, `P ${tr(P, 2)}`, { k: 13, b: true, r: 'var(--acc)' });
       ok(oklar, 330, yS - 6, 330, 50, 'var(--tur)', w(E)); yaz(oklar, 338, 80, `E ${tr(E, 4)}`, { k: 13, b: true, r: 'var(--tur)' });
@@ -631,7 +634,7 @@
     svg.append(el('line', { x1: 24, x2: 116, y1: d.y(3), y2: d.y(3), stroke: 'var(--tur)', 'stroke-dasharray': '5 4' })); yaz(svg, 70, d.y(3) - 6, 'hedef 3 m', { h: 'middle', k: 12, b: true, r: 'var(--tur)' });
     svg.append(el('line', { x1: d.x(0), x2: d.x(4), y1: d.y(3), y2: d.y(3), stroke: 'var(--tur)', 'stroke-dasharray': '5 4' }));
     const slayt = el('path', { d: yol([[d.x(0), d.y(0)], [d.x(3 / 1.05), d.y(3)]]), fill: 'none', stroke: 'var(--ikincil)', 'stroke-dasharray': '6 5', 'stroke-width': 2 }); svg.append(slayt);
-    yaz(svg, d.x(2.9), d.y(2.2), 'slayt toplamı 1,05 → 2,86 yıl', { k: 12, r: 'var(--ikincil)' });
+    yaz(svg, d.x(2.75), d.y(3.25), 'slayt toplamı 1,05 → 2,86 yıl', { h: 'end', k: 12, r: 'var(--ikincil)' });
     const egri = el('path', { fill: 'none', stroke: 'var(--acc)', 'stroke-width': 3.5 }); svg.append(egri);
     const m = nokta(svg, 0, 0, 7, 'var(--acc)');
     const yazOku = okuma(kap, ['t', 'h', 'Qout', 'dh/dt']);
@@ -666,14 +669,14 @@
     const ciz = () => {
       const es = esT(sTs.v), ea = esT(sTa.v), e2 = sRH.v / 100 * ea, de = es - e2, E = 0.0119 * sU.v * de * 10;
       dg.replaceChildren();
-      const bar = (x, v, ad, renk) => { const h = v / 45 * 120; dg.append(el('rect', { x, y: 220 - h, width: 46, height: h, fill: renk, opacity: 0.75 })); yaz(dg, x + 23, 214 - h, `${tr(v)} mb`, { h: 'middle', k: 13, b: true }); yaz(dg, x + 23, 222 - h - 18, ad, { h: 'middle', k: 12, r: 'var(--ikincil)' }); };
+      const bar = (x, v, ad, renk) => { const h = v / 45 * 120; dg.append(el('rect', { x, y: 220 - h, width: 46, height: h, fill: renk, opacity: 0.75 })); yaz(dg, x + 23, 214 - h, `${tr(v)} mb`, { h: 'middle', k: 13, b: true }); yaz(dg, x + 23, 197 - h, ad, { h: 'middle', k: 12, r: 'var(--ikincil)' }); };
       bar(70, es, 'yüzeyde eₛ', 'var(--acc)'); bar(140, e2, '2 m\'de e₂', 'var(--ikincil)');
       for (let i = 0; i < 3; i++) ok(dg, 250 + i * 40, 50 + i * 4, 250 + i * 40 + 20 + 14 * sU.v, 50 + i * 4, 'var(--ikincil)', 1.5 + sU.v / 4);
       yaz(dg, 250, 36, `rüzgâr u₂ = ${tr(sU.v)} m/s`, { k: 13, b: true });
       const w = 1.5 + Math.min(Math.abs(E), 15) * 0.9;
       if (E >= 0) ok(dg, 430, 226, 430, 96, 'var(--tur)', w); else ok(dg, 430, 96, 430, 226, 'var(--yesil)', w);
-      yaz(dg, 445, 160, `E = ${tr(E, 2)} mm/gün`, { k: 15, b: true, r: E >= 0 ? 'var(--tur)' : 'var(--yesil)' });
-      if (E < 0) yaz(dg, 445, 180, 'e₂ > eₛ → yoğuşma', { k: 12, r: 'var(--yesil)' });
+      yaz(dg, 420, 160, `E = ${tr(E, 2)} mm/gün`, { h: 'end', k: 15, b: true, r: E >= 0 ? 'var(--tur)' : 'var(--yesil)' });
+      if (E < 0) yaz(dg, 420, 180, 'e₂ > eₛ → yoğuşma', { h: 'end', k: 12, r: 'var(--yesil)' });
       yazOku({ 'eₛ(Ts)': `${tr(es, 2)} mb (Tetens)`, 'e₂ = BN·eₛ(Ta)': `${tr(sRH.v / 100, 2)} × ${tr(ea, 2)} = ${tr(e2, 2)} mb`, 'E = b·u₂·(eₛ − e₂)': `0,0119 × ${tr(sU.v)} × ${tr(de, 2)} = ${tr(E / 10, 3)} cm/gün = ${tr(E, 2)} mm/gün` });
     };
     [sTs, sTa, sRH, sU].forEach((s) => s.inp.addEventListener('input', ciz)); ciz();
@@ -704,7 +707,7 @@
   Sekil.m316_hidrograf = function (kap, ayar = {}) {
     const adim = ayar.adim ?? 4, W = 560, H = 420, svg = svgYap(kap, W, H, 'Hiyetograf ve hidrograf; taban akışı ayrımı');
     const d = eksen(svg, { W, H, T: 120, x: [0, 26], y: [0, 50], xt: [0, 3, 6, 9, 12, 15, 18, 21, 24], yt: [0, 10, 20, 30, 40, 50], xad: 'zaman (saat)', yad: '' });
-    yaz(svg, 8, 112, 'debi Q (m³/s)', { k: 14, b: true });
+    yaz(svg, d.x(4), 112, 'debi Q (m³/s)', { k: 14, b: true });
     const ry = (v) => 22 + v / 15 * 70;
     yaz(svg, d.x(5), 30, 'yağış (mm/h)', { k: 13, b: true, r: 'var(--ikincil)' });
     for (const [h, v] of [[1, 8], [2, 14], [3, 6]]) { svg.append(el('rect', { x: d.x(h - 1), y: 22, width: d.x(h) - d.x(h - 1) - 1, height: ry(v) - 22, fill: 'var(--acc)', opacity: 0.55 })); yaz(svg, d.x(h - 0.5), ry(v) + 14, String(v), { h: 'middle', k: 12, b: true }); }
@@ -713,7 +716,7 @@
     svg.append(el('path', { d: yol(top), fill: 'none', stroke: 'var(--yazi)', 'stroke-width': 3.2 }));
     if (adim >= 1) { svg.append(el('line', { x1: d.x(0), x2: d.x(26), y1: d.y(5), y2: d.y(5), stroke: 'var(--tur)', 'stroke-width': 2.2, 'stroke-dasharray': '7 5' })); yaz(svg, d.x(14), d.y(5) + 18, 'taban akışı 5 m³/s', { k: 13, b: true, r: 'var(--tur)' }); }
     if (adim === 0 || ayar.adim == null) for (const [ad, t, q] of [['1', 5, Qh(5)], ['2', 9, 45], ['3', 15, Qh(15)], ['4', 24.6, 5]]) { rozet(svg, d.x(t) + (ad === '1' ? -16 : 16), d.y(q) - 14, ad, false); }
-    if (adim === 0) yaz(svg, d.x(11), d.y(47), '1 yükselme · 2 tepe · 3 çekilme · 4 tabana dönüş', { k: 13, b: true });
+    if (adim === 0) { yaz(svg, d.x(12), d.y(46), '1 yükselme kolu · 2 tepe', { k: 13, b: true }); yaz(svg, d.x(12), d.y(42), '3 çekilme kolu · 4 tabana dönüş', { k: 13, b: true }); }
     if (adim >= 3) { svg.append(el('path', { d: yol([[d.x(2), d.y(5)], [d.x(9), d.y(45)], [d.x(24), d.y(5)]]) + 'Z', fill: 'none', stroke: 'var(--tur)', 'stroke-width': 2.4 })); yaz(svg, d.x(15.5), d.y(36), 'üçgen: V = ½ × 22 h × 3600 × 40', { k: 13, b: true, r: 'var(--tur)' }); yaz(svg, d.x(15.5), d.y(32), '= 1,58×10⁶ m³ → 13,2 mm', { k: 13, b: true, r: 'var(--tur)' }); }
     if (adim >= 4) { svg.append(el('line', { x1: d.x(1.43), x2: d.x(1.43), y1: 22, y2: d.y(0), stroke: 'var(--yesil)', 'stroke-width': 2, 'stroke-dasharray': '4 4' })); svg.append(el('line', { x1: d.x(9), x2: d.x(9), y1: d.y(45), y2: d.y(0), stroke: 'var(--yesil)', 'stroke-width': 2, 'stroke-dasharray': '4 4' })); ok(svg, d.x(1.43), d.y(2), d.x(9), d.y(2), 'var(--yesil)', 2.5); yaz(svg, d.x(5.2), d.y(2) - 8, 'gecikme 7,6 h', { h: 'middle', k: 13, b: true, r: 'var(--yesil)' }); }
     const not = ['toplam hidrograf ve kısımları', 'taban akışı çizgisi çekilir', 'çizginin üstü = doğrudan akış', 'üçgenle hacim', 'yağış ağırlık merkezi 1,43 h → tepe 9 h'][adim];
@@ -808,7 +811,7 @@
   const icKayip = (Ia = 1, fc = 0.1) => { let cum = 0; return IC_P.map((v) => { const once = cum; cum += v; const ia = Math.max(0, Math.min(v, Ia - once)); const kal = v - ia; const f = Math.min(kal, fc); return { v, ia, f, ex: Math.round((kal - f) * 1000) / 1000, cum }; }); };
   Sekil.m316_ickayip = function (kap, ayar = {}) {
     const adim = ayar.adim ?? 6, W = 560, H = 360, svg = svgYap(kap, W, H, 'Initial and Constant kayıp yöntemi');
-    const d = eksen(svg, { W, H, x: [0, 5], y: [0, 1], xt: [0, 1, 2, 3, 4, 5], yt: [0, 0.2, 0.4, 0.6, 0.8, 1], xad: 'saat', yad: 'yağış (in)' });
+    const d = eksen(svg, { W, H, x: [0, 5], y: [0, 1.3], xt: [0, 1, 2, 3, 4, 5], yt: [0, 0.2, 0.4, 0.6, 0.8, 1, 1.2], xad: 'saat', yad: 'yağış (in)' });
     const R = icKayip();
     R.forEach((r, i) => {
       if (i + 1 > adim) return;
@@ -817,12 +820,10 @@
       yaz(svg, x0 + w / 2, d.y(r.v) - 22, `P ${tr(r.v)}`, { h: 'middle', k: 13, b: true });
       yaz(svg, x0 + w / 2, d.y(r.v) - 6, `fazla ${tr(r.ex)}`, { h: 'middle', k: 13, b: true, r: 'var(--acc)' });
     });
-    const cumY = [0, ...R.map((r) => r.cum)];
-    yaz(svg, d.x(0) + 4, d.y(0.97), 'birikimli P: ' + R.slice(0, Math.min(adim, 5)).map((r) => tr(r.cum)).join(' → ') + (adim >= 2 ? '  (Ia = 1 in 2. saatte doldu)' : ''), { k: 13, b: true, r: 'var(--ikincil)' });
-    void cumY;
     const lj = [['Ia (başlangıç kaybı)', 'var(--ikincil)'], ['fc·Δt (sabit kayıp)', 'var(--tur)'], ['fazla yağış', 'var(--acc)']];
-    lj.forEach(([a, r], i) => { svg.append(el('rect', { x: 330, y: 44 + i * 20, width: 14, height: 14, fill: r, opacity: 0.8 })); yaz(svg, 350, 56 + i * 20, a, { k: 13 }); });
-    if (adim >= 6) yaz(svg, d.x(1.7), d.y(0.72), 'Σ fazla = 1,3 in · kayıp = 1,4 in', { k: 15, b: true, r: 'var(--acc)' });
+    lj.forEach(([a, r], i) => { svg.append(el('rect', { x: 384, y: 40 + i * 20, width: 14, height: 14, fill: r, opacity: 0.8 })); yaz(svg, 404, 52 + i * 20, a, { k: 13 }); });
+    yaz(svg, d.x(0) + 6, d.y(1.22), 'birikimli: ' + R.slice(0, Math.min(adim, 5)).map((r) => tr(r.cum)).join(' → '), { k: 13, b: true, r: 'var(--ikincil)' });
+    if (adim >= 6) { yaz(svg, 384, 122, 'Σ fazla = 1,3 in', { k: 15, b: true, r: 'var(--acc)' }); yaz(svg, 384, 142, 'kayıp = 1,0 + 0,4 = 1,4 in', { k: 13, b: true }); }
     if (ayar.adim != null) return;
     const yazOku = okuma(kap, ['saat', 'dağılım']);
     imlec(svg, d, (x) => { const i = sinir(Math.floor(x), 0, 4), r = R[i]; yazOku({ saat: `${i + 1}. saat: P = ${tr(r.v)} in (birikimli ${tr(r.cum)})`, dağılım: `Ia'ya ${tr(r.ia)} · sabit kayıp ${tr(r.f)} · fazla ${tr(r.ex)} in` }); });
@@ -877,7 +878,7 @@
       const kk = sK.v, Q = (t) => 40 * Math.exp(-t / kk), iki = (t) => 20 * Math.exp(-t / 70) + 20 * Math.exp(-t / 100);
       const p = [], p2 = []; for (let t = 0; t <= 200; t += 1) { p.push([d.x(t), d.y(Math.max(Q(t), 1))]); p2.push([d.x(t), d.y(iki(t))]); }
       icg.append(el('path', { d: yol(p2), fill: 'none', stroke: 'var(--ikincil)', 'stroke-width': 2, 'stroke-dasharray': '6 5' }));
-      yaz(icg, d.x(120), d.y(iki(120)) - 8, 'iki katman (70 h + 100 h)', { k: 12, r: 'var(--ikincil)' });
+      yaz(icg, d.x(196), d.y(iki(196)) - 10, 'iki katman (70 h + 100 h)', { h: 'end', k: 12, r: 'var(--ikincil)' });
       icg.append(el('path', { d: yol(p), fill: 'none', stroke: 'var(--acc)', 'stroke-width': 3.2 }));
       if (kk === 70) for (const [t, q, ad] of [[24, 28.4, '24 h: 28,4'], [70, 14.7, 't = k: %36,8'], [97, 10, '97 h: 10']]) { nokta(icg, d.x(t), d.y(q)); yaz(icg, d.x(t) + 8, d.y(q) - 8, ad, { k: 13, b: true }); }
       const t = sT.v; nokta(icg, d.x(t), d.y(Math.max(Q(t), 1)), 7, 'var(--tur)');
@@ -923,7 +924,7 @@
   };
 
   Sekil.m316_hms = function (kap) {
-    const W = 560, H = 430, svg = svgYap(kap, W, H, 'HEC-HMS bileşenleri: hangi kutu hangi soruyu cevaplar');
+    const W = 560, H = 386, svg = svgYap(kap, W, H, 'HEC-HMS bileşenleri: hangi kutu hangi soruyu cevaplar');
     const g = el('g'); svg.append(g);
     const kutu = (x, y, w, h, b1, b2, id, renk = 'var(--acc)') => {
       const gg = el('g', id ? { 'data-git': kavramaGit(id), style: 'cursor:pointer', tabindex: 0, role: 'link', 'aria-label': `${b1} kavramına git` } : {});
@@ -932,20 +933,22 @@
       if (id) gg.addEventListener('keydown', (e) => { if (e.key === 'Enter') location.hash = kavramaGit(id); });
       g.append(gg);
     };
-    g.append(el('rect', { x: 10, y: 92, width: 540, height: 252, rx: 14, fill: 'var(--acc)', opacity: 0.06, stroke: 'var(--acc)', 'stroke-dasharray': '6 5' }));
-    yaz(g, 22, 112, 'Basin model (nerede?) — havza elemanları', { k: 13, b: true, r: 'var(--acc)' });
+    g.append(el('rect', { x: 10, y: 92, width: 540, height: 214, rx: 14, fill: 'var(--acc)', opacity: 0.06, stroke: 'var(--acc)', 'stroke-dasharray': '6 5' }));
+    yaz(g, 538, 112, 'Basin model (nerede?)', { h: 'end', k: 13, b: true, r: 'var(--acc)' });
+    yaz(g, 118, 112, 'alt havza (subbasin):', { k: 13, r: 'var(--ikincil)' });
     kutu(20, 14, 250, 52, 'Meteorologic model', 'ne kadar yağış? (ölçer ağırlığı)', 'thiessen', 'var(--tur)');
     kutu(290, 14, 250, 52, 'Control specifications', 'ne zaman? başlangıç, bitiş, Δt', 'hec-hms', 'var(--tur)');
-    kutu(24, 126, 162, 56, 'Loss', 'ne kadarı akar?', 'ic-kayip');
-    kutu(199, 126, 162, 56, 'Transform', 'ne zaman, hangi şekil?', 'clark');
-    kutu(374, 126, 162, 56, 'Baseflow', 'ne kalır?', 'taban-akisi');
-    kutu(24, 218, 162, 56, 'Reach · routing', 'kanalda ötele', 'oteleme');
-    kutu(199, 218, 162, 56, 'Junction', 'kolları topla', 'hidrograf');
-    kutu(374, 218, 162, 56, 'GIS', 'havzayı ayır', 'gis-havza');
-    kutu(110, 290, 340, 46, 'Subbasin çıktısı = hidrograf', '', 'hidrograf', 'var(--yazi)');
-    kutu(20, 362, 520, 56, 'Kalibrasyon: gözlenen akımla karşılaştır', 'NSE, PBIAS, tepe hatası → parametreyi ayarla', 'kalibrasyon', 'var(--yesil)');
-    ok(g, 145, 66, 145, 124, 'var(--tur)', 2.5); ok(g, 186, 154, 197, 154, 'var(--ikincil)', 2); ok(g, 361, 154, 372, 154, 'var(--ikincil)', 2);
-    ok(g, 280, 182, 280, 288, 'var(--ikincil)', 2); ok(g, 186, 246, 197, 246, 'var(--ikincil)', 2); ok(g, 280, 336, 280, 360, 'var(--yesil)', 2);
+    kutu(24, 122, 162, 56, 'Loss', 'ne kadarı akar?', 'ic-kayip');
+    kutu(199, 122, 162, 56, 'Transform', 'ne zaman, hangi şekil?', 'clark');
+    kutu(374, 122, 162, 56, 'Baseflow', 'ne kalır?', 'taban-akisi');
+    yaz(g, 280, 202, '↓ alt havza hidrografı', { h: 'middle', k: 13, b: true, r: 'var(--ikincil)' });
+    kutu(24, 214, 162, 56, 'Reach · routing', 'kanalda ötele', 'oteleme');
+    kutu(199, 214, 162, 56, 'Junction', 'kolları topla', 'hidrograf');
+    kutu(374, 214, 162, 56, 'GIS', 'havzayı ayır (HW3)', 'gis-havza');
+    yaz(g, 280, 292, 'çıkış hidrografı → gözlemle kıyas ↓', { h: 'middle', k: 13, b: true, r: 'var(--ikincil)' });
+    kutu(20, 322, 520, 56, 'Kalibrasyon: gözlenen akımla karşılaştır', 'NSE, PBIAS, tepe hatası → parametreyi ayarla', 'kalibrasyon', 'var(--yesil)');
+    ok(g, 105, 66, 105, 120, 'var(--tur)', 2.5); ok(g, 186, 150, 197, 150, 'var(--ikincil)', 2); ok(g, 361, 150, 372, 150, 'var(--ikincil)', 2);
+    ok(g, 186, 242, 197, 242, 'var(--ikincil)', 2);
     const yazOku = okuma(kap, ['simülasyon']);
     yazOku({ simülasyon: 'Basin model + Meteorologic model + Control specifications · bir kutuya bas → o kavrama git' });
   };
@@ -992,7 +995,7 @@
     egim.sort((a, b) => b[0] - a[0]);
     const [, bi, bj] = egim[0];
     g.append(el('rect', { x: x0 + bj * c, y: y0 + bi * c, width: c - 2, height: c - 2, fill: 'none', stroke: 'var(--acc)', 'stroke-width': 4 }));
-    ok(g, x0 + 1.5 * c, y0 + 1.5 * c - 20, x0 + (bj + 0.5) * c - 30, y0 + (bi + 0.5) * c - 20, 'var(--acc)', 4);
+    ok(g, x0 + 1.5 * c, y0 + 1.5 * c + 26, x0 + (bj + 0.5) * c - 26, y0 + (bi + 0.5) * c + 26, 'var(--acc)', 4);
     const t = 340; yaz(g, t, 50, 'Merkez hücre 50 m', { k: 15, b: true });
     yaz(g, t, 76, 'eğim = düşüş / uzaklık', { k: 14 }); yaz(g, t, 98, 'yan komşu 10 m, çapraz 14,14 m', { k: 13, r: 'var(--ikincil)' });
     yaz(g, t, 132, `en dik: doğu ${tr(egim[0][0], 3)}`, { k: 15, b: true, r: 'var(--acc)' });
@@ -1016,13 +1019,13 @@
     for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
       const x = x0 + j * c, y = y0 + i * c, akarsu = adim >= 4 && acc[i][j] >= (adim >= 5 ? 3 : 6);
       g.append(el('rect', { x, y, width: c - 2, height: c - 2, fill: akarsu ? 'var(--acc)' : 'var(--tur)', opacity: akarsu ? 0.55 : 0.1 + 0.5 * (zmax - Z[i][j]) / (zmax - zmin) * (adim >= 3 ? 0.4 : 1), stroke: i === 2 && j === 1 && adim <= 1 ? 'var(--yazi)' : 'none', 'stroke-width': 3 }));
-      if (adim <= 1 || adim === 2) yaz(g, x + c / 2 - 1, y + c / 2 + 5, i === 2 && j === 1 && adim >= 1 ? '47,1' : String(Z[i][j]), { h: 'middle', k: 14, b: i === 2 && j === 1 });
-      if (adim >= 3) yaz(g, x + c / 2 - 1, y + c / 2 + 5, String(acc[i][j]), { h: 'middle', k: 15, b: true, r: acc[i][j] >= 6 ? 'var(--yazi)' : 'var(--ikincil)' });
-      if (adim >= 2 && yon[i][j]) { const [ii, jj] = yon[i][j], dx = jj - j, dy = ii - i, cx = x + c / 2 - 1, cy = y + c / 2 - 1; ok(g, cx - dx * 10 + (adim >= 3 ? 0 : 0), cy - dy * 10 + (adim === 2 ? 14 : 0), cx + dx * 18, cy + dy * 18 + (adim === 2 ? 14 : 0), 'var(--yazi)', 1.6); }
+      if (adim <= 2) yaz(g, x + c / 2 - 1, y + c / 2 + (adim === 2 ? -4 : 5), i === 2 && j === 1 && adim >= 1 ? '47,1' : String(Z[i][j]), { h: 'middle', k: 14, b: i === 2 && j === 1 });
+      if (adim >= 3) yaz(g, x + c / 2 - 1, y + c / 2 - 4, String(acc[i][j]), { h: 'middle', k: 15, b: true, r: acc[i][j] >= 6 ? 'var(--yazi)' : 'var(--ikincil)' });
+      if (adim >= 2 && yon[i][j]) { const [ii, jj] = yon[i][j], dx = jj - j, dy = ii - i, cx = x + c / 2 - 1, cy = y + c / 2 + 12; const okg = ok(g, cx - dx * 8, cy - dy * 5, cx + dx * 16, cy + dy * 10, 'var(--yazi)', 1.6); if (adim >= 3) okg.setAttribute('opacity', 0.45); }
     }
     yaz(g, x0 + 3 * c + c / 2, y0 + n * c + 18, '↓ çıkış (40 m)', { h: 'middle', k: 13, b: true, r: 'var(--acc)' });
-    const notlar = [['1 · Arazi (DEM)', 'her hücrede yükseklik (m)', '2. sıradaki 46 m hücre bir çukur:', 'bütün komşuları ondan yüksek'], ['2 · Preprocess Sinks', 'çukur en alçak komşusunun', 'hemen üstüne doldurulur (47,1)', 'yoksa su orada hapsolur'], ['3 · Preprocess Drainage', 'her hücreden en dik inişe', 'tek ok (D8 akış yönü)', ''], ['4 · Akış birikimi', 'her hücreden geçen', 'yukarı hücre sayısı', '(kendisi dahil)'], ['5 · Identify Streams', 'birikim ≥ 6 → akarsu', '(eşik büyük: az kol)', ''], ['6 · Eşiği düşür', 'birikim ≥ 3 → akarsu', 'daha çok kol → daha çok', 'kavşak ve alt havza']][adim];
-    notlar.forEach((s, i) => yaz(g, 372, 70 + i * 24, s, { k: i ? 14 : 16, b: !i, r: i ? 'var(--yazi)' : 'var(--acc)' }));
+    const notlar = [['1 · Arazi (DEM)', 'her hücrede yükseklik', 'çerçeveli 46 m hücre', 'bir çukur: bütün', 'komşuları ondan yüksek'], ['2 · Preprocess Sinks', 'çukur, en alçak', 'komşusunun hemen', 'üstüne doldurulur', '(46 → 47,1 m)'], ['3 · Preprocess Drainage', 'her hücreden', 'en dik inişe tek ok', '(D8 akış yönü)'], ['4 · Akış birikimi', 'hücreden geçen', 'yukarı hücre sayısı', '(kendisi dahil)'], ['5 · Identify Streams', 'birikim ≥ 6 → dere', '(eşik büyük: az kol)'], ['6 · Eşiği düşür', 'birikim ≥ 3 → dere', 'daha çok kol, kavşak', 've alt havza']][adim];
+    notlar.forEach((s, i) => yaz(g, 368, 70 + i * 24, s, { k: i ? 14 : 15, b: !i, r: i ? 'var(--yazi)' : 'var(--acc)' }));
   };
 
   /* ================= F · EK HESAPLAR ================= */
@@ -1078,8 +1081,8 @@
       if (b) svg.append(el('rect', { x, y: d.y(a + b), width: bw, height: d.y(a) - d.y(a + b), fill: 'var(--tur)', opacity: 0.7 }));
       if (a + b) yaz(svg, d.x(i), d.y(a + b) - 6, adim >= 3 ? String(a + b) : adim === 2 ? `${a}+${b}` : String(a), { h: 'middle', k: 13, b: true });
     }
-    const satir = [['BH: 10 mm fazla yağışın hidrografı', 'var(--ikincil)'], ['20 mm = 2 birim → 2 × BH (1. saat)', 'var(--acc)'], ['10 mm = 1 birim → 1 × BH, 1 h ötelenmiş', 'var(--tur)'], ['toplam: tepe 35 m³/s (2–3 h)', 'var(--yazi)']];
-    satir.slice(adim === 0 ? 0 : 1, adim + 1).forEach(([s, r], i) => { svg.append(el('rect', { x: 250, y: 36 + i * 22, width: 14, height: 14, fill: r, opacity: 0.7 })); yaz(svg, 270, 48 + i * 22, s, { k: 13, b: i === adim - 1 || adim === 0 }); });
+    const satir = [['BH (10 mm başına)', 'var(--ikincil)'], ['2 × BH (20 mm, 1. saat)', 'var(--acc)'], ['1 × BH, 1 h ötele (10 mm)', 'var(--tur)'], ['toplam: tepe 35 m³/s', 'var(--yazi)']];
+    satir.slice(adim === 0 ? 0 : 1, adim + 1).forEach(([s, r], i) => { svg.append(el('rect', { x: 378, y: 38 + i * 21, width: 13, height: 13, fill: r, opacity: 0.7 })); yaz(svg, 396, 49 + i * 21, s, { k: 13, b: i === adim - 1 || adim === 0 }); });
     if (ayar.adim != null) return;
     const yazOku = okuma(kap, ['t', 'Qₙ = Σ Pₘ·U']);
     imlec(svg, d, (x) => { const i = sinir(Math.round(x), 0, 6); yazOku({ t: `${i} h`, 'Qₙ = Σ Pₘ·U': `2 × ${U[i] || 0} + 1 × ${U[i - 1] || 0} = ${S[i]} m³/s` }); });
@@ -1089,7 +1092,7 @@
   Sekil.m316_normaloran = function (kap) {
     const W = 560, H = 320, svg = svgYap(kap, W, H, 'Normal oran yöntemi');
     const K = [['A', 48, 820], ['B', 62, 1050], ['C', 55, 930]], Nx = 900;
-    const d = eksen(svg, { W, H, x: [0, 3], y: [0, 70], xt: [], yt: [0, 20, 40, 60], xad: '', yad: 'günlük yağış (mm)' });
+    const d = eksen(svg, { W, H, x: [0, 3], y: [0, 90], xt: [], yt: [0, 20, 40, 60, 80], xad: '', yad: 'günlük yağış (mm)' });
     K.forEach(([ad, P, N], i) => {
       const x = d.x(i + 0.5), s = Nx / N * P;
       svg.append(el('rect', { x: x - 44, y: d.y(P), width: 40, height: d.y(0) - d.y(P), fill: 'var(--ikincil)', opacity: 0.45 }));
@@ -1097,8 +1100,9 @@
       yaz(svg, x - 24, d.y(P) - 6, String(P), { h: 'middle', k: 13, b: true }); yaz(svg, x + 24, d.y(s) - 6, tr(s, 2), { h: 'middle', k: 13, b: true, r: 'var(--acc)' });
       yaz(svg, x, d.y(0) + 20, `${ad} · N = ${N}`, { h: 'middle', k: 13, b: true }); yaz(svg, x, d.y(0) + 37, `fark %${tr((N - Nx) / Nx * 100)}`, { h: 'middle', k: 12, r: Math.abs(N - Nx) / Nx > 0.1 ? 'var(--tur)' : 'var(--ikincil)' });
     });
-    svg.append(el('line', { x1: d.x(0), x2: d.x(3), y1: d.y(53.0), y2: d.y(53.0), stroke: 'var(--acc)', 'stroke-width': 2 })); yaz(svg, d.x(3) - 4, d.y(53) + 16, 'Pₓ = 53,0 (normal oran)', { h: 'end', k: 13, b: true, r: 'var(--acc)' });
-    svg.append(el('line', { x1: d.x(0), x2: d.x(3), y1: d.y(55.0), y2: d.y(55.0), stroke: 'var(--ikincil)', 'stroke-dasharray': '5 4' })); yaz(svg, d.x(0) + 4, d.y(55) - 6, 'aritmetik 55,0', { k: 12, r: 'var(--ikincil)' });
-    yaz(svg, d.x(0) + 4, 24, 'gri: ölçülen Pᵢ · mavi: (Nₓ/Nᵢ)·Pᵢ, Nₓ = 900', { k: 13, b: true });
+    svg.append(el('line', { x1: d.x(0), x2: d.x(3), y1: d.y(53.0), y2: d.y(53.0), stroke: 'var(--acc)', 'stroke-width': 2 }));
+    svg.append(el('line', { x1: d.x(0), x2: d.x(3), y1: d.y(55.0), y2: d.y(55.0), stroke: 'var(--ikincil)', 'stroke-dasharray': '5 4' }));
+    const lj = [['rect', 'var(--ikincil)', 'ölçülen Pᵢ'], ['rect', 'var(--acc)', '(Nₓ/Nᵢ)·Pᵢ, Nₓ = 900'], ['line', 'var(--acc)', 'Pₓ = 53,0 mm (normal oran)'], ['kesik', 'var(--ikincil)', 'aritmetik ortalama 55,0 mm']];
+    lj.forEach(([t, r, s], i) => { const x = i < 2 ? d.x(0) + 8 : d.x(1.45), y = d.y(86) + (i % 2) * 20; if (t === 'rect') svg.append(el('rect', { x, y: y - 11, width: 14, height: 14, fill: r, opacity: 0.7 })); else svg.append(el('line', { x1: x, x2: x + 16, y1: y - 4, y2: y - 4, stroke: r, 'stroke-width': 2.5, 'stroke-dasharray': t === 'kesik' ? '4 3' : null })); yaz(svg, x + 22, y, s, { k: 13, b: true }); });
   };
 })();
