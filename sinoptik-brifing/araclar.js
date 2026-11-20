@@ -93,7 +93,7 @@
     parca('T', (g) => tx(g, 100, 88, '14', { 'text-anchor': 'end', class: 'syn-d', fill: '#c0281b' }));
     parca('Td', (g) => tx(g, 100, 122, '0', { 'text-anchor': 'end', class: 'syn-d', fill: '#1a7f37' }));
     parca('p', (g) => tx(g, 140, 88, '268', { class: 'syn-d' }));
-    parca('e', (g) => { tx(g, 140, 122, '−20', { class: 'syn-d', fill: '#1f5fd1' }); el('path', { d: 'M178 112l8 8l8-14', fill: 'none', stroke: '#1f5fd1', 'stroke-width': 2 }, g); });
+    parca('e', (g) => { tx(g, 140, 122, '−20', { class: 'syn-d', fill: '#1f5fd1' }); el('path', { d: 'M178 106l16 14', fill: 'none', stroke: '#1f5fd1', 'stroke-width': 2 }, g); }); // a = 7: düzenli düşüş → tek eğik çizgi (\)
     parca('ch', (g) => { el('path', { d: 'M108 52h22m0 0q6 0 8-6', fill: 'none', stroke: 'currentColor', 'stroke-width': 2 }, g); tx(g, 146, 50, 'CH 4', { class: 'syn-k' }); });
     parca('vv', (g) => tx(g, 64, 106, '10 km', { 'text-anchor': 'end', class: 'syn-k' }));
     const goster = (i) => {

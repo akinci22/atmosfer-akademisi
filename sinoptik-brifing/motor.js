@@ -286,5 +286,6 @@
     H._raf = requestAnimationFrame(adim);
   }
 
-  window.Motor = { ciz, odak, proj, inv, alan, ok, el, yazi, SEHIR };
+  // izolin: soru çözümleri (sorular.js) kendi ızgarasıyla aynı marching squares'i kullanır
+  window.Motor = { ciz, odak, proj, inv, alan, ok, el, yazi, SEHIR, izolin };
 })();

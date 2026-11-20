@@ -94,6 +94,7 @@
     { id: 'istanbul', no: '6', ad: 'İstanbul’a iniş', rol: 5, adim: ['synop', 'skewt', 'meteogram'] },
     { id: 'sonuc', no: '7', ad: 'Sonuç ve tahmin', rol: 5 },
     { id: 'gun', no: '8', ad: 'Sunum günü' },
+    { id: 'soru-cozum', no: '9', ad: 'Soru çözümleri' },
     { id: 'sss', no: '?', ad: 'Sık sorulanlar' },
   ];
   const ADIM_AD = {}; Object.entries(V.H).forEach(([k, v]) => (ADIM_AD[k] = v.ad)); Object.entries(V.ARAC).forEach(([k, v]) => (ADIM_AD[k] = v.ad));
@@ -468,6 +469,88 @@
     qk.appendChild(skor); s.appendChild(qk);
   }
 
+  // ───────── soru çözümleri (sınıftaki harita alıştırmaları): «önce kendin dene → çözümü aç», çözüm adım adım.
+  // Sahne = sorunun şekli (sorular.js, kendi SVG'miz); panel = konu → soru seçimi, soru, deneme, adımlar, cevap.
+  // Adıma dokununca o adımın katmanı şekilde turuncu yanar, öncekiler mavi kalır; açıklama panelde (telefonda şeklin altında).
+  function soruCozum(s) {
+    const D = window.SORU_VERI, C = window.SoruCiz; if (!D || !C) return;
+    const not = depo.al('sb:sc', {});
+    const kh = h('div', 'sc-kural'); kh.id = 'soru-cozum-kural';
+    kh.innerHTML = `<h3>Beş kural, dokuz soru</h3><p class="bolum-kisa">Genelden özele: önce basınç, sonra rüzgâr, sonra sıcaklık, en son düşey yapı. Her soru bu zincirin bir halkası.</p><ol class="sc-kural-l">${D.KURAL.map(([a, b, c]) => `<li><b>${a}</b><span>${b}</span><em>${c}</em></li>`).join('')}</ol>`;
+    s.appendChild(kh);
+    const a = h('article', 'adim adim-arac'); a.id = 'soru-cozum-sahne';
+    a.innerHTML = `<header class="adim-bas"><p class="adim-etiket">9 soru · 4 konu · numaralar sınıftaki setle aynı (4. soru bu sette yok)</p><h3>Önce kendin dene, sonra adım adım aç<a class="capa" href="#soru-cozum-sahne" aria-label="Bu adımın bağlantısı" title="Bu adımın bağlantısı">#</a></h3><p class="adim-kisa">Konuyu, sonra soruyu seç. Şekli kâğıda çiz; «Çözümü aç» de ve adımlara tek tek dokun.</p></header>`;
+    const kart = h('figure', 'arac-kart sahne sahne-arac sahne-soru'); kart.tabIndex = -1;
+    const ust = h('figcaption', 'harita-ust'), gorsel = h('div', 'sahne-gorsel'), cer = h('div', 'sahne-cer'), oku = h('p', 'sahne-oku');
+    oku.setAttribute('aria-live', 'polite'); gorsel.append(cer, oku);
+    const panel = h('div', 'sahne-panel'), ic = h('div', 'arac-ic sc-ic'), govde = h('div', 'sc-govde');
+    kart.append(ust, gorsel, panel); panel.appendChild(ic); a.appendChild(kart); s.appendChild(a);
+    const KATS = D.KAT.map((k) => Object.assign({}, k, { idx: D.S.map((x, i) => (x.kat === k.id ? i : -1)).filter((i) => i >= 0) }));
+    const duz = (x) => x.replace(/<[^>]+>/g, '');
+    const DENE = 'Önce kendin dene: şekli kâğıda çiz, sonra «Çözümü aç».';
+    let S = null, cz = null, adim = -1, ref = null, ilkYuk = true;
+    const ks = window.Araclar.katSecim(KATS.map((k) => ({ ad: k.ad, baslik: k.baslik, ogeler: k.idx.map((i) => ({ ad: `<span class="b-no">${D.S[i].no}</span>${kac(D.S[i].ad)}`, baslik: duz(D.S[i].ne) })) })), (k, i) => { if (i >= 0) sec(KATS[k].idx[i], ilkYuk); }, { ad: 'Soru konuları' });
+    ic.append(ks.serit, govde, ks.gez);
+    const liste = (arr) => `<ul class="madde">${arr.map((x) => `<li>${x}</li>`).join('')}</ul>`;
+    function katman() { // adıma kadar açılan katmanlar görünür; bu adımınki turuncu (.yan), öncekiler mavi (.eski)
+      const L = C.ADIM[S.id] || [], gor = new Set(), yan = new Set(adim >= 0 ? L[adim] || [] : []);
+      for (let i = 0; i <= adim; i++) (L[i] || []).forEach((x) => gor.add(x));
+      Object.entries(cz.k).forEach(([ad, g]) => { g.classList.toggle('gor', gor.has(ad)); g.classList.toggle('yan', yan.has(ad)); g.classList.toggle('eski', gor.has(ad) && !yan.has(ad)); });
+    }
+    function adimKoy(j, kul) {
+      if (!S || !ref || j < 0 || j >= S.adim.length) return;
+      adim = j; const A = S.adim[j];
+      ref.adB.forEach((b, i) => { b.setAttribute('aria-pressed', String(i === j)); b.classList.toggle('gecti', i < j); });
+      ref.acik.innerHTML = `<p class="sc-a-bas"><span class="b-no">${j + 1}</span>${A.ad}</p>${liste(A.m)}`;
+      ref.g1.disabled = j === 0; ref.g2.disabled = j === S.adim.length - 1;
+      oku.innerHTML = `<b>Adım ${j + 1} / ${S.adim.length}:</b> ${A.ad}`;
+      katman();
+      if (kul) odakla(kart, ref.acik);
+    }
+    function govdeCiz() {
+      const tablo = S.tablo ? `<div class="tablo-kap sc-tablo"><table><thead><tr>${S.tablo[0].map((x) => `<th>${kac(x)}</th>`).join('')}</tr></thead><tbody>${S.tablo.slice(1).map((r) => `<tr>${r.map((x) => `<td>${kac(x)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>` : '';
+      govde.innerHTML = `<div class="sc-soru"><p class="kd-et">Soru ${S.no}</p>${liste(S.soru)}${tablo}</div>`;
+      const dene = h('div', 'sc-dene'); dene.innerHTML = '<p class="kd-et">Önce kendin dene</p><p>Şekli kâğıda çiz, cevabını yaz. Takılırsan önce kurala bak.</p>';
+      const ip = h('details', 'sc-ipucu'); ip.innerHTML = `<summary>İpucu: kural</summary><p>${S.kural}</p>`;
+      const ac = btn('dugme sc-ac', 'Çözümü aç'); ac.setAttribute('aria-expanded', 'false'); dene.append(ip, ac);
+      const coz = h('div', 'sc-cozum'); coz.hidden = true;
+      const ol = h('ol', 'sc-adimlar'); ol.setAttribute('aria-label', 'Çözüm adımları');
+      const adB = S.adim.map((x, j) => { const li = h('li'), b = btn('sc-adim-b', `<span class="b-no">${j + 1}</span><span>${x.ad}</span>`, () => adimKoy(j, true)); b.setAttribute('aria-pressed', 'false'); li.appendChild(b); ol.appendChild(li); return b; });
+      const acik = h('div', 'sc-aciklama'); acik.setAttribute('aria-live', 'polite');
+      const gz = h('div', 'sc-adim-gez'), g1 = btn('cip', '‹ Önceki adım', () => adimKoy(adim - 1, true)), g2 = btn('dugme', 'Sonraki adım ›', () => adimKoy(adim + 1, true)); gz.append(g1, g2);
+      const cev = h('div', 'sc-cevap');
+      cev.innerHTML = `<p class="kd-et">Cevap</p>${liste(S.cevap)}` +
+        (S.formul ? `<p class="kd-et">Formül</p><p class="sc-formul">${kac(S.formul.duz)}</p><ul class="madde">${S.formul.terim.map(([x, y]) => `<li><b>${x}:</b> ${y}</li>`).join('')}</ul>${S.ornek ? `<p class="ipucu">Örnek: ${S.ornek}</p>` : ''}` : '') +
+        `<p class="kd-et">Sınavda yaz</p><blockquote class="sc-sinav">${S.sinav}</blockquote><p class="sc-tr">${S.tr}</p><p class="sc-en" lang="en">${S.en}</p>` +
+        `<p class="kd-et">Dikkat</p>${liste(S.hata)}<p class="oz sc-oz"><b>ÖZ</b>${S.oz}</p>`;
+      const oz = h('div', 'kd-oz'); oz.appendChild(h('span', null, 'Bildin mi?'));
+      const isaret = (v) => { not[S.id] = v; depo.koy('sb:sc', not); oz.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.v === v))); };
+      [['evet', 'Bildim'], ['tekrar', 'Tekrar bakacağım']].forEach(([v, ad]) => { const x = btn('cip', ad, () => isaret(v)); x.dataset.v = v; x.setAttribute('aria-pressed', String(not[S.id] === v)); oz.appendChild(x); });
+      cev.appendChild(oz);
+      coz.append(h('p', 'kd-et', 'Çözüm · adım adım'), ol, acik, gz, cev);
+      ac.addEventListener('click', () => {
+        const aciliyor = coz.hidden; coz.hidden = !aciliyor; ac.textContent = aciliyor ? 'Çözümü gizle' : 'Çözümü aç'; ac.setAttribute('aria-expanded', String(aciliyor));
+        if (aciliyor) adimKoy(0, true); else { adim = -1; katman(); oku.textContent = DENE; odakla(kart, dene); }
+      });
+      govde.append(dene, coz);
+      ref = { adB, acik, g1, g2 };
+    }
+    function sec(i, ilk) {
+      if (S === D.S[i]) { if (!ilk) odakla(kart, govde); return; }
+      S = D.S[i]; adim = -1;
+      cz = C.ciz(S.id); cer.replaceChildren(cz.svg);
+      const vb = cz.svg.viewBox.baseVal; kart.style.setProperty('--ar', (vb.width / vb.height).toFixed(4));
+      const konu = D.KAT.find((k) => k.id === S.kat).ad;
+      ust.innerHTML = `<b>S${S.no} · ${kac(S.ad)}</b><span>${kac(konu)} · ${kac(S.tur)}</span><span class="harita-kaynak">Kendi çizimimiz · soru kendi cümlemizle</span>`;
+      oku.textContent = DENE; govdeCiz(); katman();
+      if (!ilk) odakla(kart, govde);
+    }
+    kart.addEventListener('keydown', (e) => { if (adim < 0 || e.target.closest('.secim-serit, .adim-gez')) return; if (e.key === 'ArrowRight') { e.preventDefault(); adimKoy(adim + 1, true); } if (e.key === 'ArrowLeft') { e.preventDefault(); adimKoy(adim - 1, true); } });
+    ks.git(0, 0); ilkYuk = false;
+    seritKur(kart, gorsel);
+    const hk = h('div', 'hatalar'); hk.id = 'soru-cozum-hata'; hk.innerHTML = `<h3>Sık yapılan hatalar</h3>${liste(D.HATA)}`; s.appendChild(hk);
+  }
+
   function sss(s) { s.appendChild(soruPanel(V.SSS)); }
 
   // «Bu bölümde» çipleri: harita bölümlerinde adımlar (kısa ad), diğerlerinde bölümün parçaları
@@ -476,6 +559,7 @@
     hazirlik: [['saat', 'Saat'], ['liste', 'Veri listesi'], ['roller', 'İş bölümü'], ['kalip', 'Slayt kalıbı']],
     sonuc: [['sonuc-zincir', 'Kanıt zinciri'], ['sonuc-tablo', 'Son slayt'], ['sonuc-konusma', 'Konuşma']],
     gun: [['gun-kalip', 'Cümle kalıpları'], ['gun-hata', 'Sık hatalar'], ['gun-kart', 'Soru kartları'], ['gun-sinav', 'Kısa sınav']],
+    'soru-cozum': [['soru-cozum-kural', 'Beş kural'], ['soru-cozum-sahne', 'Dokuz soru'], ['soru-cozum-hata', 'Sık hatalar']],
   };
   const KISA_AD = { 'ec-mslp850': 'Yer basıncı + 850 hPa rüzgâr', 'gfs-500': '500 hPa + kalınlık', 'gfs-vort': 'Vortisite adveksiyonu', 'gfs-jet': '300 hPa jet + diverjans', 'gfs-nem': '700 hPa bağıl nem', radar: 'Radar · Türkiye', ppi: 'Radar · İstanbul PPI', yagis: 'Yağış tahmini', skewt: 'Sondaj (Skew-T)', meteogram: 'Meteogram' };
   // terim ipuçları: her adımda (ve her bölümün adım dışı kısmında) bir terimin ilk geçtiği yer; açıklamalar sitedeki tanımlardan
@@ -549,13 +633,14 @@
     BOLUM.forEach((b) => { const a = h('a', 'cip', `${b.no === '?' ? '' : b.no + ' · '}${b.ad}`); a.href = '#' + b.id; bs.appendChild(a); }); hero.appendChild(bs);
     ana.appendChild(hero);
     for (const b of BOLUM) {
-      const kisa = { giris: 'Ne yapıyoruz, hangi sırayla ve neden. Akışın bir halkasına dokun: o bölüme gidersin.', hazirlik: 'Sunumdan önceki akşam yapılanlar: saat, veri listesi, iş bölümü ve slayt kalıbı.', yer: 'Kıtadaki alçak, yüksek ve cepheler: «ne var?»', ustsev: '850’den 300 hPa’ya: «neden var?» Değerleri aynı saatin sondajıyla doğruladık.', dinamik: 'Model haritalarıyla yükselmenin nedeni: «nereye gidiyor?»', gozlem: 'Uydu ve radar: «gerçekten oluyor mu?»', istanbul: 'Bölgeden noktaya: SYNOP, sondaj, meteogram.', sonuc: 'Bütün haritaları tek tahmine bağla.', gun: 'Konuşma kalıpları, hatalar, soru kartları ve kısa sınav.', sss: '' }[b.id];
+      const kisa = { giris: 'Ne yapıyoruz, hangi sırayla ve neden. Akışın bir halkasına dokun: o bölüme gidersin.', hazirlik: 'Sunumdan önceki akşam yapılanlar: saat, veri listesi, iş bölümü ve slayt kalıbı.', yer: 'Kıtadaki alçak, yüksek ve cepheler: «ne var?»', ustsev: '850’den 300 hPa’ya: «neden var?» Değerleri aynı saatin sondajıyla doğruladık.', dinamik: 'Model haritalarıyla yükselmenin nedeni: «nereye gidiyor?»', gozlem: 'Uydu ve radar: «gerçekten oluyor mu?»', istanbul: 'Bölgeden noktaya: SYNOP, sondaj, meteogram.', sonuc: 'Bütün haritaları tek tahmine bağla.', gun: 'Konuşma kalıpları, hatalar, soru kartları ve kısa sınav.', 'soru-cozum': 'Harita analizinin dokuz alıştırması: önce kendin dene, sonra çözümü adım adım aç. Her adımın kuralı panelde, şekildeki karşılığı yanar.', sss: '' }[b.id];
       const s = bolum(b, null, kisa, PARCA[b.id] || (b.adim ? b.adim.map((id) => [id, KISA_AD[id] || ADIM_AD[id].split(' — ')[0]]) : null)); ana.appendChild(s);
       if (b.id === 'giris') giris(s);
       else if (b.id === 'hazirlik') hazirlik(s);
       else if (b.id === 'sonuc') sonuc(s);
       else if (b.id === 'gun') gun(s);
       else if (b.id === 'sss') sss(s);
+      else if (b.id === 'soru-cozum') soruCozum(s);
       else if (b.id === 'istanbul') b.adim.forEach((id) => s.appendChild(aracAdim(id)));
       else b.adim.forEach((id) => s.appendChild(haritaAdim(id)));
       const kd = kdAlan(b); if (kd) { s.appendChild(kd); const n = s.querySelector('.bu-bolumde'); if (n) { const a = h('a', 'cip', 'Kendini dene'); a.href = '#' + kd.id; n.appendChild(a); } }

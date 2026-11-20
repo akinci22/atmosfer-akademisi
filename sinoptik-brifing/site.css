@@ -663,3 +663,62 @@ th { font-size: 14px; }
   .kalip-t td { border: 0; padding: 6px 12px; white-space: normal; }
   .kalip-t td::before { content: attr(data-et); display: block; font-size: 14px; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; color: var(--ink3); font-style: normal; }
 }
+
+/* ── SORU ÇÖZÜMLERİ (bölüm 9): şekil = sorular.js'in kendi SVG'si (kâğıt hep açık renk); çözüm katmanları adım adım açılır:
+   o adımın katmanı turuncu (.yan), önceki adımlarınki mavi (.eski). Panel: konu → soru şeridi, soru, «önce kendin dene», adımlar, cevap. */
+.sahne-soru { --serit-h: 98px; }
+.sc-svg { color: var(--kagit-ink); border-radius: 10px; box-shadow: 0 0 0 1px rgba(0, 0, 0, .08); touch-action: manipulation; }
+.sc-zemin { fill: var(--kagit); }
+.sc-t { font-family: var(--font); fill: currentColor; font-size: 15px; paint-order: stroke; stroke: var(--kagit); stroke-width: 3.5px; stroke-linejoin: round; }
+.sc-baslik { font-size: 17px; font-weight: 600; }
+.sc-deger { font-size: 15.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.sc-etiket { font-size: 15px; font-weight: 700; }
+.sc-kalin { font-size: 16px; font-weight: 750; }
+.sc-kucuk { font-size: 13.5px; }
+.sc-tablo { font-size: 14px; font-variant-numeric: tabular-nums; }
+.sc-merkez { font-size: 42px; font-weight: 800; }
+.sc-panel { font-size: 22px; font-weight: 800; }
+.sc-nokta { font-size: 18px; font-weight: 800; }
+.sc-ince { stroke: #d5dbe3; stroke-width: 1; }
+.sc-k { display: none; color: #1d5fd6; }
+.sc-k.gor { display: inline; }
+.sc-k.yan { color: #e8590c; animation: sc-yan .45s ease; }
+@keyframes sc-yan { from { opacity: 0; } }
+.sc-kural { margin-bottom: 32px; }
+.sc-kural-l { list-style: none; counter-reset: sck; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 10px; margin-top: 14px; padding: 0; }
+.sc-kural-l li { counter-increment: sck; display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 2px 12px; padding: 12px 14px; background: var(--bg2); border-radius: 12px; }
+.sc-kural-l li::before { content: counter(sck); grid-row: span 3; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--acc); color: var(--acc-yazi); font-weight: 700; font-size: 15px; }
+.sc-kural-l b { font-weight: 650; }
+.sc-kural-l span { color: var(--ink2); font-size: 16px; line-height: 1.55; }
+.sc-kural-l em { font-style: normal; font-size: 14px; color: var(--acc-ink); font-weight: 650; }
+.sc-ic { gap: 14px; }
+.sc-govde { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.sc-govde .madde li { font-size: 16px; line-height: 1.6; }
+.sc-dene { background: var(--acc-soft); border-radius: 12px; padding: 12px 14px; display: grid; gap: 10px; }
+.sc-dene p { font-size: 16px; }
+.sc-dene .dugme { justify-self: start; }
+.sc-ipucu summary { cursor: pointer; font-weight: 650; color: var(--acc-ink); min-height: 32px; display: flex; align-items: center; }
+.sc-ipucu p { margin-top: 6px; color: var(--ink2); }
+.sc-cozum { display: grid; gap: 12px; }
+.sc-adimlar { list-style: none; display: grid; gap: 6px; padding: 0; margin: 0; }
+.sc-adim-b { width: 100%; display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 12px; border-radius: 12px; text-align: left; font-size: 16px; font-weight: 560; background: var(--yuzey); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line2); }
+.sc-adim-b .b-no { background: var(--ink3); }
+.sc-adim-b.gecti .b-no { background: #1d5fd6; }
+.sc-adim-b[aria-pressed="true"] { background: var(--acc-soft); box-shadow: inset 0 0 0 2px #e8590c; font-weight: 650; }
+.sc-adim-b[aria-pressed="true"] .b-no { background: #e8590c; }
+.sc-aciklama { border-left: 4px solid #e8590c; background: var(--yuzey); padding: 10px 14px; border-radius: 0 12px 12px 0; box-shadow: 0 0 0 1px var(--line); animation: gel .3s ease; }
+.sc-aciklama:empty { display: none; }
+.sc-a-bas { display: flex; align-items: center; gap: 10px; font-weight: 650; margin-bottom: 8px; }
+.sc-a-bas .b-no { background: #e8590c; }
+.sc-adim-gez { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; }
+.sc-adim-gez button:disabled { opacity: .4; cursor: default; }
+.sc-cevap { display: grid; gap: 8px; padding-top: 10px; border-top: 1px solid var(--line); }
+.sc-formul { font: 600 16px/1.55 var(--mono); overflow-wrap: anywhere; }
+.sc-sinav { margin: 0; border-left: 4px solid var(--ok); padding: 8px 12px; background: var(--ok-soft); border-radius: 0 10px 10px 0; font-size: 16px; line-height: 1.6; }
+.sc-tr { font-size: 15px; font-style: italic; color: var(--ink2); }
+.sc-en { font-size: 16px; }
+.sc-en u { text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.sc-oz { flex: none; font-size: 16px; }
+.sc-tablo table { font-size: 14px; }
+.sc-tablo th, .sc-tablo td { padding: 6px 8px; white-space: nowrap; }
+#soru-cozum-hata { margin-top: 32px; }
