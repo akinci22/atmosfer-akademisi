@@ -53,7 +53,7 @@
     for (const [ad, d] of liste) { const b = document.createElement('button'); b.type = 'button'; b.className = 'kucuk'; b.textContent = ad; b.addEventListener('click', () => cb(d, b)); k.append(b); }
     kap.append(k); return k;
   }
-  /* zaman çizelgeli animasyon: ▶/⏸ + kaydırıcı; ciz(t) her karede */
+  /* zaman çizelgeli animasyon: ▶/⏸ + sürgü; ciz(t) her karede */
   function zamanli(kap, o, ciz) {
     const k = document.createElement('div'); k.className = 'kontrol';
     k.innerHTML = `<button type="button" class="dugme">▶ Oynat</button><input type="range" min="${o.t0}" max="${o.t1}" step="${o.adim || (o.t1 - o.t0) / 400}" value="${o.t0}" aria-label="${o.ad}"><span class="yok">${o.ad}</span>`;

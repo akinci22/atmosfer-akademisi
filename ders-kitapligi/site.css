@@ -107,6 +107,10 @@ td,th{border:1px solid var(--cizgi);padding:4px 8px;text-align:left}
 .sekil-kap{border:1px solid var(--cizgi);border-radius:14px;background:var(--yuzey);padding:8px;position:sticky;top:0;z-index:2}
 @media(max-height:700px){.sekil-kap{position:static}}
 .sekil-kap svg{display:block;width:100%;height:auto;max-height:52svh}
+.buyut{margin:0 0 6px}
+.sekil-kap.buyuk{overflow-x:auto;position:static;-webkit-overflow-scrolling:touch}
+.sekil-kap.buyuk svg{width:680px;max-width:none;max-height:none}
+.sekil-kap.buyuk svg svg{width:auto}
 .okuma{font:600 15px/1.4 Inter,sans-serif;display:flex;flex-wrap:wrap;gap:4px 14px;padding:6px 6px 2px;color:var(--yazi)}
 .okuma span{white-space:nowrap}
 .okuma i{font-style:normal;color:var(--tur)}
