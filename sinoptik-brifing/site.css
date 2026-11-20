@@ -722,3 +722,8 @@ th { font-size: 14px; }
 .sc-tablo table { font-size: 14px; }
 .sc-tablo th, .sc-tablo td { padding: 6px 8px; white-space: nowrap; }
 #soru-cozum-hata { margin-top: 32px; }
+/* soru çözümü → Ders Kitaplığı (PDF eş zamanlı) */
+.sc-ez { display: flex; flex-direction: column; gap: 4px; margin: 18px 0 0; padding: 14px 16px; border: 1px solid var(--line); border-left: 4px solid var(--acc); border-radius: 14px; background: var(--acc-soft); }
+.sc-ez a { color: var(--acc-ink); font-size: 1.05em; text-decoration: none; }
+.sc-ez a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.sc-ez span { color: var(--ink2); }

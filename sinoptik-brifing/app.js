@@ -117,7 +117,7 @@
   // ───────── üst çubuk + içindekiler
   function ustCubuk() {
     const u = $('#ust');
-    u.innerHTML = `<div class="ust-ic"><a class="ust-marka" href="../">Atmosfer Akademisi</a><span class="ust-ayrac">/</span><span class="ust-ders">MTO 302E · Brifing Atölyesi</span><nav class="ust-nav"><a href="../harita-okulu/">Harita Okulu</a><a href="../hava-analizi-proje-rehberi/">Proje Rehberi</a><a class="ust-portfoy" href="https://akinci22.github.io/hakkimda/" target="_blank" rel="noopener">Portföyüm ↗</a></nav></div>`;
+    u.innerHTML = `<div class="ust-ic"><a class="ust-marka" href="../">Atmosfer Akademisi</a><span class="ust-ayrac">/</span><span class="ust-ders">MTO 302E · Brifing Atölyesi</span><nav class="ust-nav"><a href="../ders-kitapligi/#mto302e">Soru çözümü (PDF)</a><a href="../harita-okulu/">Harita Okulu</a><a href="../hava-analizi-proje-rehberi/">Proje Rehberi</a><a class="ust-portfoy" href="https://akinci22.github.io/hakkimda/" target="_blank" rel="noopener">Portföyüm ↗</a></nav></div>`;
     const ic = u.querySelector('.ust-ic'); const tb = btn('ust-toc', 'İçindekiler', () => document.body.classList.toggle('toc-acik')); ic.insertBefore(tb, ic.querySelector('.ust-nav'));
     // tema: varsayılan açık; koyu yalnız bu düğmeyle (seçim tarayıcıda kalır, sistem ayarı izlenmez)
     const AY = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5Z"/></svg>';
@@ -477,6 +477,8 @@
     const not = depo.al('sb:sc', {});
     const kh = h('div', 'sc-kural'); kh.id = 'soru-cozum-kural';
     kh.innerHTML = `<h3>Beş kural, dokuz soru</h3><p class="bolum-kisa">Genelden özele: önce basınç, sonra rüzgâr, sonra sıcaklık, en son düşey yapı. Her soru bu zincirin bir halkası.</p><ol class="sc-kural-l">${D.KURAL.map(([a, b, c]) => `<li><b>${a}</b><span>${b}</span><em>${c}</em></li>`).join('')}</ol>`;
+    // PDF ile eş zamanlı çözüm (Ders Kitaplığı): aynı 9 soru, sayfa numarasıyla açılır; her adımdan kavram paneline
+    kh.insertAdjacentHTML('beforeend', `<p class="sc-ez"><a href="../ders-kitapligi/#mto302e"><b>PDF ile eş zamanlı çöz</b> · Ders Kitaplığı, MTO302E →</a><span>reMarkable'daki sayfa numarasını yaz, aynı soru açılır; her çözüm adımından kavramın tanımına, formülündeki terimlere, türetimine ve animasyonuna geç.</span></p>`);
     s.appendChild(kh);
     const a = h('article', 'adim adim-arac'); a.id = 'soru-cozum-sahne';
     a.innerHTML = `<header class="adim-bas"><p class="adim-etiket">9 soru · 4 konu · numaralar sınıftaki setle aynı (4. soru bu sette yok)</p><h3>Önce kendin dene, sonra adım adım aç<a class="capa" href="#soru-cozum-sahne" aria-label="Bu adımın bağlantısı" title="Bu adımın bağlantısı">#</a></h3><p class="adim-kisa">Konuyu, sonra soruyu seç. Şekli kâğıda çiz; «Çözümü aç» de ve adımlara tek tek dokun.</p></header>`;

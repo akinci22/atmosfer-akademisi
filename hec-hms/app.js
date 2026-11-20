@@ -31,7 +31,7 @@
   const IMLEC = '<svg viewBox="0 0 20 24" aria-hidden="true"><path d="M2.5 1.8v17.6l4.3-4.1 3 6.6 3.1-1.4-3-6.5h6z" fill="#fff" stroke="#111" stroke-width="1.4" stroke-linejoin="round"/></svg>';
   function iskelet() {
     /* sayfa başlığı üst çubukta: program sahnesi açılışta çubuğun hemen altında, tümüyle ekranda; giriş içeriği sahnenin altında («Nasıl çalışır») */
-    $('#ust').innerHTML = `<div class="ust-ic"><a class="ust-marka" href="../">Atmosfer Akademisi</a><span class="ust-ayrac" aria-hidden="true">/</span><h1 class="ust-baslik">HEC-HMS Okulu <span>MTO 316</span></h1><nav class="ust-nav" aria-label="Bu sayfada"><a href="#benzetim">Benzetim</a><a href="#nasil">Nasıl çalışır</a><a href="#odevler">Ödevler</a></nav><button type="button" class="ust-tema" id="tema"></button><a class="ust-don" href="../"><span class="ust-don-u">Atmosfer Akademisi'ne dön</span><span class="ust-don-k">‹ Akademi</span></a></div>`;
+    $('#ust').innerHTML = `<div class="ust-ic"><a class="ust-marka" href="../">Atmosfer Akademisi</a><span class="ust-ayrac" aria-hidden="true">/</span><h1 class="ust-baslik">HEC-HMS Okulu <span>MTO 316</span></h1><nav class="ust-nav" aria-label="Bu sayfada"><a href="#benzetim">Benzetim</a><a href="#nasil">Nasıl çalışır</a><a href="#odevler">Ödevler</a><a href="../ders-kitapligi/#mto316">Soru çözümü (PDF)</a></nav><button type="button" class="ust-tema" id="tema"></button><a class="ust-don" href="../"><span class="ust-don-u">Atmosfer Akademisi'ne dön</span><span class="ust-don-k">‹ Akademi</span></a></div>`;
     $('#tema').addEventListener('click', () => { tema = tema === 'koyu' ? 'acik' : 'koyu'; try { localStorage.setItem('hms-tema', tema); } catch (e) { /* yok */ } temaUygula(); });
     temaUygula();
     const t1 = ODEV[0].adimlar, t2 = ODEV[1].adimlar, tikSay = (o) => o.adimlar.reduce((n, a) => n + a.mikro.length, 0);
@@ -48,7 +48,7 @@
         <p class="gizli" id="iz-duyuru" aria-live="polite"></p>
       </section>
       <section id="nasil" class="bolum nasil" aria-labelledby="nasil-h">
-        <header class="bolum-bas"><p class="ust-eti">MTO 316 · Hidrometeoroloji</p><h2 id="nasil-h">HEC-HMS Okulu'nda ne yaparsın?</h2><p class="bolum-alt">HEC-HMS 4.14'ü tarayıcıda tıklayarak öğren. Dört yol var; her biri programı yukarıda açar.</p></header>
+        <header class="bolum-bas"><p class="ust-eti">MTO 316 · Hidrometeoroloji</p><h2 id="nasil-h">HEC-HMS Okulu'nda ne yaparsın?</h2><p class="bolum-alt">HEC-HMS 4.14'ü tarayıcıda tıklayarak öğren. Dört yol var; her biri programı yukarıda açar.</p><p class="dk-ez"><a href="../ders-kitapligi/#mto316"><b>Soru çözümü, PDF ile eş zamanlı</b> · Ders Kitaplığı, MTO316 →</a><span>reMarkable'daki sayfa numarasını yaz, aynı soru açılır; her adımdan kavramın tanımına, formülüne, türetimine ve animasyonuna geç.</span></p></header>
         <div class="mod-kartlar">
           ${modKart(1, 'Keşif', 'Programı tanı', [`<b>${KOGE.length} parça, ${KESIF.length} kategori:</b> menüler, araçlar, ağaç, harita, pencereler.`, '<b>Seç ya da bas:</b> program parçayı açar, işaretler ve anlatır.', '<b>Proje hazır:</b> iki ödevin son hâli yüklü.'], 'Keşfe başla', 'kesif')}
           ${modKart(2, 'HW#1 rehberli', 'Havza modelini sen kur', [`<b>${t1.length} adım, ${tikSay(ODEV[0])} tık:</b> sıradaki yer mavi çerçeveyle işaretli.`, '<b>Takılırsan:</b> «Bu tıklamayı göster» ya da «Adımı benim yerime bitir».', '<b>Sonunda:</b> 3 alt havza, 1 kanal, 2 birleşim bağlı.'], 'HW#1\'e başla', 'hw1')}

@@ -177,6 +177,16 @@ html:not(.fare) .raf-serit > li.net .kac { opacity: 1; }
 @media (min-width: 600px) { .tumu .kisa { display: none; } }
 @media (max-width: 420px) { .marka { font-size: 17px; } a.folio span.uz { display: none; } }
 @media (max-width: 380px) { .akd { font-size: 15px; gap: 4px; } .tumu { font-size: 15px; padding: 0 12px; } }
+/* eş zamanlı soru çözümü şeridi — beş kitap her filtrede görünür (Ders Kitaplığı) */
+.ezc { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-top: 18px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 16px; background: var(--odak-zemin); }
+.ezc-bas { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 6px; margin-right: 4px; color: var(--odak); font-size: 17px; font-weight: 700; text-decoration: none; border-radius: 10px; white-space: nowrap; }
+.ezc-bas small { font-size: 15px; font-weight: 500; color: var(--ink2); }
+.ezc-bas:hover { text-decoration: underline; text-underline-offset: 5px; }
+.ezc-k { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border: 1px solid var(--line2); border-left: 4px solid var(--renk); border-radius: 12px; background: #ffffff; color: var(--ink); font-size: 16px; line-height: 1.2; text-decoration: none; white-space: nowrap; transition: border-color var(--t5-hizli) var(--t5-egri); }
+.ezc-k b { font-weight: 700; }
+.ezc-k span { color: var(--ink2); }
+.ezc-k:hover { border-color: var(--renk); }
+@media (max-width: 640px) { .ezc { padding: 8px; gap: 8px; } .ezc-bas { width: 100%; } .ezc-k { flex: 1 1 calc(50% - 8px); padding: 0 10px; font-size: 15px; } }
 </style>
 </head>
 <body>
@@ -227,6 +237,14 @@ html:not(.fare) .raf-serit > li.net .kac { opacity: 1; }
     </nav>
     <button type="button" class="tumu" id="tumu" aria-pressed="false"><svg class="simge" aria-hidden="true"><use href="#s-sayfa"/></svg><span class="t-ac">Tümünü göster</span><span class="t-kapa uz" hidden>Yalnız öne çıkanlar</span><span class="t-kapa kisa" hidden>Öne çıkanlar</span><i>+21</i></button>
   </div>
+  <nav class="ezc" aria-label="Soru çözümü, PDF ile eş zamanlı">
+    <a class="ezc-bas" href="./ders-kitapligi/"><svg class="simge" aria-hidden="true"><use href="#s-ogren"/></svg>Soru çözümü <small>PDF ile eş zamanlı</small></a>
+    <a class="ezc-k" href="./ders-kitapligi/#mto302e" style="--renk: var(--c302)"><b>MTO 302E</b><span>SYNOP</span></a>
+    <a class="ezc-k" href="./ders-kitapligi/#mto316" style="--renk: var(--c316)"><b>MTO 316</b><span>Hidro</span></a>
+    <a class="ezc-k" href="./ders-kitapligi/#mto342e" style="--renk: var(--c229)"><b>MTO 229E</b><span>Bulut</span></a>
+    <a class="ezc-k" href="./ders-kitapligi/#mto323" style="--renk: #be185d"><b>MTO 323</b><span>Kimya</span></a>
+    <a class="ezc-k" href="./ders-kitapligi/#mto303e" style="--renk: var(--c303)"><b>MTO 303E</b><span>CFD</span></a>
+  </nav>
   <p class="gizli" id="durum" role="status" aria-live="polite"></p>
 </header>
 
@@ -239,6 +257,7 @@ html:not(.fare) .raf-serit > li.net .kac { opacity: 1; }
     </div>
     <div class="raf-pencere" data-bas data-sigar>
       <ul class="raf-serit">
+        <li><a class="kart" href="./ders-kitapligi/#mto302e" data-ara="soru çözüm çözümleri kitap kitaplık ders kitaplığı pdf eş zamanlı takip sınav vize final hazırlık adım adım kavram tanım diyagram formül türetim animasyon kod sinoptik synop harita analizi izobar trof sırt adveksiyon kalınlık termal rüzgâr mto 302e"><span class="kg"><img src="./kapak/kart-kitap-synop.webp" alt="" width="480" height="300" decoding="async"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-ogren"/></svg><b>SYNOP soru çözümleri</b></span><span class="kac">PDF ile eş zamanlı · 9 soru, 22 kavram</span></a></li>
         <li><a class="kart" href="./harita-okulu/" data-ara="harita okulu synop kod istasyon modeli trof sırt cephe laboratuvar gerçek harita sınav provası 3b yer analizi"><span class="kg"><img src="./kapak/kart-harita-okulu.webp" alt="" width="480" height="300" decoding="async"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-site"/></svg><b>Harita Okulu</b></span><span class="kac">Ders, harita, sınav provası</span></a></li>
         <li><a class="kart" href="./harita-okulu/#lab-kodcoz" data-ara="synop kod çözücü istasyon modeli grup aaxx ogimet mesaj harita okulu laboratuvar"><span class="kg"><img src="./kapak/kart-synop.webp" alt="" width="480" height="300" decoding="async"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-arac"/></svg><b>SYNOP</b></span><span class="kac">Kodu çöz, istasyon modelini kur</span></a></li>
         <li><a class="kart" href="./sinoptik-brifing/" data-ara="sinoptik brifing sunum modu harita gezinti synop çözücü skew-t meteogram yer analizi uydu radar"><span class="kg"><img src="./kapak/kart-sinoptik-brifing.webp" alt="" width="480" height="300" decoding="async"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-site"/></svg><b>Brifing atölyesi</b></span><span class="kac">Sinoptik brifing adım adım</span></a></li>
@@ -261,6 +280,7 @@ html:not(.fare) .raf-serit > li.net .kac { opacity: 1; }
     </div>
     <div class="raf-pencere" data-bas data-sigar>
       <ul class="raf-serit">
+        <li><a class="kart" href="./ders-kitapligi/#mto316" data-ara="soru çözüm çözümleri kitap kitaplık ders kitaplığı pdf eş zamanlı takip sınav vize final hazırlık adım adım kavram tanım diyagram formül türetim animasyon kod hidrometeoroloji hidrograf birim hidrograf scs cn thiessen idf rasyonel hec-hms mto 316"><span class="kg"><img src="./kapak/kart-kitap-hidro.webp" alt="" width="480" height="300" decoding="async"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-ogren"/></svg><b>Hidrometeoroloji soru çözümleri</b></span><span class="kac">PDF ile eş zamanlı · 45 soru, 36 kavram</span></a></li>
         <li><a class="kart" href="./hec-hms/" data-ara="hec-hms hec hms program benzetim hw#1 hw#2 rehber havza model izle hidrograf akım yağış"><span class="kg"><img src="./kapak/kart-hec-hms.webp" alt="" width="480" height="300" decoding="async" loading="lazy"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-site"/></svg><b>HEC-HMS okulu</b></span><span class="kac">Benzetim: dokun, gör</span></a></li>
         <li><a class="kart" href="./hec-hms/#hw3" data-ara="hw3 hw#3 ödev 3 hec-hms hec hms gis georeferans georeferanslı arazi terrain alt havza subbasin delineate ayırma akış birikimi birleştir böl merge split son ağ rehber gerçek ekran"><span class="kg"><img src="./kapak/kart-hec-hw3.webp" alt="" width="480" height="300" decoding="async" loading="lazy"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-arac"/></svg><b>HW#3 rehberi</b></span><span class="kac">GIS ile havza modeli: 30 adım</span></a></li>
         <li><a class="kart" href="./hec-hms/#odevler" data-ara="hec-hms hec hms ödev hw#1 hw#2 hw1 hw2 havza modeli basin meteoroloji kontrol koşu gözlenen akım rehber türkçe"><span class="kg"><img src="./kapak/kart-hec-odevler.webp" alt="" width="480" height="300" decoding="async" loading="lazy"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-arac"/></svg><b>HEC-HMS ödevleri</b></span><span class="kac">Ödev rehberleri, adım adım</span></a></li>
@@ -280,10 +300,10 @@ html:not(.fare) .raf-serit > li.net .kac { opacity: 1; }
     </div>
     <div class="raf-pencere" data-bas data-sigar>
       <ul class="raf-serit">
+        <li><a class="kart" href="./ders-kitapligi/#mto342e" data-ara="bulut yağış fiziği soru çözüm çözümleri kitap kitaplık ders kitaplığı vize sınav hazırlık potansiyel sıcaklık sanal sıcaklık kuru adyabat kararlılık cape lcl sis köhler bergeron mto 342e"><span class="kg"><img src="./kapak/kart-kitap-bulut.webp" alt="" width="480" height="300" decoding="async"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-arac"/></svg><b>Bulut soru çözümleri</b></span><span class="kac">PDF ile eş zamanlı · 46 soru, 38 kavram</span></a></li>
         <li><a class="kart" href="./bulut-fizigi-rehberi/" data-ara="proje rehberi gökyüzü fotoğraf bulut tanıma skew-t parsel lcl part yağış"><span class="kg"><img src="./kapak/kart-bulut-fizigi-rehberi.webp" alt="" width="480" height="300" decoding="async" loading="lazy"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-site"/></svg><b>Bulut fiziği proje rehberi</b></span><span class="kac">Bulut tanıma, Skew-T, parsel</span></a></li>
         <li><a class="kart" href="./bulut-fizigi-rehberi/#p1" data-ara="part 1 part i gökyüzü fotoğraf bulut tanıma gözlem era5 sıcaklık nem kart"><span class="kg"><img src="./kapak/kart-bulut-p1.webp" alt="" width="480" height="300" decoding="async" loading="lazy"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-arac"/></svg><b>Gökyüzü gözlemi</b></span><span class="kac">Part I: fotoğraftan bulut tanıma</span></a></li>
         <li><a class="kart" href="./bulut-fizigi-rehberi/#p2" data-ara="part 2 part ii hesap skew-t radyosonde wyoming parsel lcl lfc cape denklem kod"><span class="kg"><img src="./kapak/kart-bulut-p2.webp" alt="" width="480" height="300" decoding="async" loading="lazy"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-arac"/></svg><b>Hesap ve Skew-T</b></span><span class="kac">Part II: parsel, LCL, Skew-T</span></a></li>
-        <li><a class="kart" href="./ders-kitapligi/#mto342e" data-ara="bulut yağış fiziği soru çözüm çözümleri kitap kitaplık ders kitaplığı vize sınav hazırlık potansiyel sıcaklık sanal sıcaklık kuru adyabat kararlılık cape lcl sis köhler bergeron mto 342e"><span class="kg"><img src="./kapak/kart-kitap-bulut.webp" alt="" width="480" height="300" decoding="async" loading="lazy"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-arac"/></svg><b>Bulut soru çözümleri</b></span><span class="kac">46 soru, adım adım çözüm</span></a></li>
       </ul>
       <button type="button" class="raf-ok sol" tabindex="-1" aria-label="Bulut ve Yağış Fiziği: geri kaydır"><svg class="simge" aria-hidden="true"><use href="#s-sol"/></svg></button>
       <button type="button" class="raf-ok sag" tabindex="-1" aria-label="Bulut ve Yağış Fiziği: ileri kaydır"><svg class="simge" aria-hidden="true"><use href="#s-sag"/></svg></button>
@@ -298,6 +318,7 @@ html:not(.fare) .raf-serit > li.net .kac { opacity: 1; }
     </div>
     <div class="raf-pencere" data-bas data-sigar>
       <ul class="raf-serit">
+        <li><a class="kart" href="./ders-kitapligi/#mto303e" data-ara="soru çözüm çözümleri kitap kitaplık ders kitaplığı pdf eş zamanlı takip sınav vize final hazırlık adım adım kavram tanım diyagram formül türetim animasyon kod cfd hesaplamalı akışkanlar euler runge kutta ftcs crank nicolson upwind lax wendroff von neumann cfl liebmann thomas openfoam wrf mto 303e"><span class="kg"><img src="./kapak/kart-kitap-cfd.webp" alt="" width="480" height="300" decoding="async"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-ogren"/></svg><b>CFD soru çözümleri</b></span><span class="kac">PDF ile eş zamanlı · 48 soru, 55 kavram</span></a></li>
         <li><a class="kart" href="./cfd-temelleri/" data-ara="cfd denklem terim sözlüğü dns les rans rk3 openfoam hesaplamalı akışkanlar"><span class="kg"><img src="./kapak/kart-cfd-temelleri.webp" alt="" width="480" height="300" decoding="async" loading="lazy"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-site"/></svg><b>CFD temelleri</b></span><span class="kac">Sekiz denklem ve terim sözlüğü</span></a></li>
         <li><a class="kart" href="./cfd-temelleri/#openfoam-pratigi-ve-lid-driven-cavity" data-ara="kapaklı kutu lid-driven cavity openfoam akış çizgisi girdap reynolds cfd"><span class="kg"><img src="./kapak/kart-cfd-kavite.webp" alt="" width="480" height="300" decoding="async" loading="lazy"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-arac"/></svg><b>Kapaklı kutu akışı</b></span><span class="kac">Lid-driven cavity ve OpenFOAM</span></a></li>
       </ul>

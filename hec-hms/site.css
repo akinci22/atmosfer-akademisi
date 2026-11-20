@@ -537,3 +537,8 @@ table.deger { width: 100%; margin-top: 14px; border-collapse: collapse; font-siz
 .h-sallan { animation: h-sal .45s; }
 @keyframes h-sal { 20% { transform: translateX(-3px); } 60% { transform: translateX(3px); } }
 .h-dk .h-sallan { animation: none; }
+/* soru çözümü → Ders Kitaplığı (PDF eş zamanlı) */
+.dk-ez { display: flex; flex-direction: column; gap: 4px; margin: 14px 0 0; padding: 14px 16px; border: 1px solid var(--line); border-left: 4px solid var(--acc); border-radius: 14px; background: var(--acc-soft); }
+.dk-ez a { font-size: 1.05em; }
+.dk-ez a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.dk-ez span { color: var(--ink2); }
