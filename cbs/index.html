@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="tr" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CBS Uygulamaları · QGIS ile harita · MTO 388 · Atmosfer Akademisi</title>
+<meta name="description" content="QGIS ile adım adım harita yapımı: Natural Earth verisiyle Japonya haritası, Tokyo iç haritası, ızgara, ölçek çubuğu, lejant ve dışa aktarım. Gerçek program ekranları ve küçük etkileşimli açıklayıcılarla.">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231d4ed8'/%3E%3Cpath d='M6 9l7-3 6 3 7-3v17l-7 3-6-3-7 3z' fill='none' stroke='%23fff' stroke-width='2' stroke-linejoin='round'/%3E%3Cpath d='M13 6v17M19 9v17' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<header class="ust" id="ust">
+  <div class="kap ust-ic">
+    <a class="geri" href="../" aria-label="Atmosfer Akademisi ana sayfası">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Akademi</span>
+    </a>
+    <strong class="ust-ad">CBS Uygulamaları</strong>
+    <span class="ust-ders">MTO 388</span>
+  </div>
+  <nav class="cipler" aria-label="Bu sayfada">
+    <div class="kap cip-ic" id="cipler"></div>
+    <div class="ilerleme" aria-hidden="true"><i id="ilerleme-cubuk"></i></div>
+  </nav>
+</header>
+<main id="ana">
+  <section class="kap giris" id="uygulama1">
+    <div class="giris-yazi">
+      <p class="ust-etiket">Uygulama-1 · Making a map</p>
+      <h1>QGIS ile harita: Japonya ve Tokyo iç haritası</h1>
+      <ul class="giris-madde">
+        <li>Hazır Natural Earth verisi, <b id="adim-sayi">28</b> kısa adım.</li>
+        <li>Her adımda gerçek program ekranı; kırmızı numara, yanındaki maddeyle eşleşir.</li>
+        <li>Bitirdiğin adımı işaretle; kaldığın yer bu tarayıcıda durur.</li>
+      </ul>
+      <p class="durum-satir"><span id="durum-yazi">0 / 28 adım</span> <button class="dugme-ince" id="devam" type="button">Kaldığım yere git</button></p>
+    </div>
+    <button class="giris-gorsel buyut" type="button" data-buyut="img/harita-bitmis.webp" aria-label="Bitmiş haritayı büyüt">
+      <img src="img/kapak-cbs.webp" width="960" height="600" alt="Bitmiş haritadan bir kesit: Japonya'nın ana adaları ve kırmızı çerçeveli Tokyo iç haritası">
+      <span class="gorsel-not">Hedef: bu harita</span>
+    </button>
+  </section>
+  <div id="asamalar"></div>
+  <section class="kap bolum" id="hatalar">
+    <h2>Sık yapılan hatalar</h2>
+    <div class="hata-liste" id="hata-liste"></div>
+  </section>
+  <section class="kap bolum" id="bitmis">
+    <h2>Bitmiş harita</h2>
+    <div class="bitmis-ic">
+      <button class="buyut bitmis-gorsel" type="button" data-buyut="img/harita-bitmis.webp" aria-label="Bitmiş haritayı büyüt">
+        <img src="img/harita-bitmis.webp" width="1200" height="1697" loading="lazy" alt="Bitmiş Japonya haritası: başlık, ızgara, kuzey oku, ölçek çubuğu, lejant ve Tokyo iç haritası">
+      </button>
+      <ul class="bitmis-madde">
+        <li><b>Ana harita</b> 1:10 000 000, EPSG:3857</li>
+        <li><b>İç harita</b> Tokyo çevresi, kırmızı çerçeve</li>
+        <li><b>Izgara</b> 5° enlem–boylam, zebra kenar</li>
+        <li><b>Öğeler</b> kuzey oku · ölçek çubuğu · lejant · başlık · künye</li>
+        <li><b>Çıktı</b> PNG (300 dpi) + PDF</li>
+        <li><b>Veri</b> Natural Earth (kamu malı)</li>
+      </ul>
+    </div>
+  </section>
+</main>
+<footer class="alt"><div class="kap">CBS Uygulamaları · MTO 388 · <a href="../">Atmosfer Akademisi</a> · Veri: Natural Earth · Yazılım: QGIS 3.44</div></footer>
+<div class="isik" id="isik" hidden><button class="isik-kapat" type="button" aria-label="Kapat">Kapat</button><img alt=""></div>
+<noscript><p style="padding:24px">Adım kartları için JavaScript gerekli.</p></noscript>
+<script src="boyut.js"></script>
+<script src="veri.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
