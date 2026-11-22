@@ -94,26 +94,65 @@
     if (!benzersiz.length) return '';
     return `<div class="baglar">${benzersiz.map((k) => `<div class="bag"><b>${kac(k.sembol)} · ${kac(k.ad)}</b>${PARCA.filter(([p]) => k.parcalar && k.parcalar[p]).map(([p, ad]) => `<button type="button" data-git="#${K.id}/${qid}/k/${k.id}/${p}">${ad}</button>`).join('')}</div>`).join('')}</div>`;
   }
+  function yolHTML(K, q) {
+    const R = q.rehber;
+    return `<section class="yol" id="yol" aria-labelledby="yol-h"><h2 id="yol-h">🧭 Yol haritası ${q.pdf_yol ? `<small class="yok">PDF s. ${q.pdf_yol}</small>` : ''}</h2>
+      <p><b>Ne istiyor?</b> ${R.istiyor}</p><p><b>Soru tipi:</b> ${kac(R.tip)}</p>
+      ${R.kalip.length ? `<p class="yol-alt">Soruda bu ifadeyi görünce:</p><ul class="kalip">${R.kalip.map((k) => `<li><span class="en-k" lang="en">${kac(k.en)}</span> → ${kac(k.tr)}${k.ipucu ? ` · <b>${kac(k.ipucu)}</b>` : ''}</li>`).join('')}</ul>` : ''}
+      <details open><summary>Verilenler ne demek?</summary><ul>${R.veriler.map((v) => `<li><b>${kac(v.ne)}</b> → ${kac(v.anlam)}</li>`).join('')}</ul></details>
+      ${R.formul.length ? `<details open><summary>Hangi formül, neden?</summary>${R.formul.map((f) => `<p><b>${kac(f.ad)}</b> — ${f.neden}</p>${f.tex}${f.terimler.length ? `<ul class="terim">${f.terimler.map((t) => `<li><b>${kac(t[0])}</b>: ${kac(t[1])}</li>`).join('')}</ul>` : ''}${bagHTML(K, f.kavram ? [f.kavram] : [], q.id)}`).join('')}</details>` : ''}
+      ${R.kural ? `<p><b>Kullanılacak bilgi:</b> ${R.kural}</p>` : ''}
+      <p class="plan"><b>Plan:</b> ${R.adimlar.map((a, i) => `<a href="#${K.id}/${q.id}/a${i + 1}">${i + 1} · ${kac(a.kisa)}</a>`).join(' → ')}</p>
+      ${R.tuzak ? `<p class="tuzak">⚠️ <b>Tuzak:</b> ${R.tuzak}</p>` : ''}</section>`;
+  }
+  function rehberAdim(K, q, a, i) {
+    return `<li data-i="${i}" id="a${i + 1}" hidden><p class="adim-bas"><b>${i + 1} · ${kac(a.kisa)}</b></p>
+      <p><b>Ne yapıyoruz?</b> ${a.ne}</p>${a.nasil ? `<p class="nasil">${a.nasil}</p>` : ''}${a.sonuc ? `<p class="sonuc">→ <b>${a.sonuc}</b></p>` : ''}
+      ${a.neden ? `<details class="neden"><summary>Neden böyle?</summary><p>${a.neden}</p></details>` : ''}${bagHTML(K, a.kavram ? [a.kavram] : [], q.id)}</li>`;
+  }
+  let ipRx = null, ipKitap = '';
+  function ipucuEkle(kok, K) {
+    const sz = K.sozluk || [];
+    if (!sz.length) return;
+    if (ipKitap !== K.id) {
+      ipKitap = K.id;
+      const tr = new Map(sz.map((x) => [x.en.toLowerCase(), x.tr]));
+      const kel = [...tr.keys()].sort((a, b) => b.length - a.length).map((e) => e.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+      ipRx = { rx: new RegExp(`(?<![\\p{L}\\p{N}])(${kel.join('|')})(?![\\p{L}\\p{N}])`, 'giu'), tr };
+    }
+    const w = document.createTreeWalker(kok, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.parentElement.closest('svg,button,code,pre,.en-ip,summary,.dizin,.takip,a') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
+    const dugumler = []; while (w.nextNode()) dugumler.push(w.currentNode);
+    for (const d of dugumler) {
+      const t = d.nodeValue; ipRx.rx.lastIndex = 0;
+      if (!ipRx.rx.test(t)) continue;
+      const span = document.createElement('span');
+      span.innerHTML = kac(t).replace(ipRx.rx, (m) => `<span class="en-ip" tabindex="0" lang="en" data-tr="${kac(ipRx.tr.get(m.toLowerCase()) || '')}">${m}</span>`);
+      d.replaceWith(...span.childNodes);
+    }
+  }
+  document.addEventListener('click', (e) => { const t = e.target.closest('.en-ip'); $$('.en-ip.acik').forEach((x) => { if (x !== t) x.classList.remove('acik'); }); if (t) t.classList.toggle('acik'); });
   const acikAdim = {};
   function soruGoster(K, q) {
     document.title = `${q.id} · ${q.baslik} · ${K.kod}`;
     sakla(`dk:son:${K.id}`, q.id);
-    const n = (q.adimlar || []).length;
+    const R = q.rehber, n = R ? R.adimlar.length : (q.adimlar || []).length;
     ana.innerHTML = `<div class="kitap-yer"><nav class="dizin" aria-label="Bölümler ve sorular">${dizinHTML(K, q.id)}</nav><div>
       ${takipHTML(K, q)}
       <article class="soru-kart" aria-labelledby="soru-h"><div class="soru-ust"><span class="no">${kac(K.kod)} · ${q.id}</span><span class="pdf-etiket">PDF s. ${q.pdf_soru ?? '—'}</span></div>
       <h1 id="soru-h">${kac(q.baslik)}</h1>
       <div class="soru-govde">${q.soru || ''}</div>
       ${q.ipucu ? `<details class="ipucu"><summary>İpucu</summary>${q.ipucu}</details>` : ''}
+      ${R ? yolHTML(K, q) : ''}
       <h2 style="margin-top:22px">Çözüm <small class="yok" style="font-size:15px;font-weight:500">PDF s. ${q.pdf_cozum ?? '—'} · ${n} adım</small></h2>
       ${q.giris ? `<div id="cozum-giris" hidden>${q.giris}</div>` : ''}
-      <ol class="adimlar" id="adimlar">${(q.adimlar || []).map((a, i) => `<li data-i="${i}" hidden>${a.html}${bagHTML(K, a.kavram, q.id)}</li>`).join('')}</ol>
+      <ol class="adimlar${R ? ' rehberli' : ''}" id="adimlar">${R ? R.adimlar.map((a, i) => rehberAdim(K, q, a, i)).join('') : (q.adimlar || []).map((a, i) => `<li data-i="${i}" hidden>${a.html}${bagHTML(K, a.kavram, q.id)}</li>`).join('')}</ol>
       <div class="cozum-bas"><button type="button" class="dugme" id="adim-ac">1. adımı aç</button><button type="button" class="dugme ikincil" id="hepsi">Hepsini aç</button><button type="button" class="kucuk" id="kapat" hidden>Çözümü kapat</button></div>
-      <div id="cozum-son" hidden>${q.oz ? `<div class="oz"><b>💎 Öz:</b> ${q.oz.replace(/^<p>|<\/p>$/g, '')}</div>` : ''}
+      <div id="cozum-son" hidden>${R ? `<details class="pdf-metin"><summary>PDF'teki çözüm metni (aynı sayılar)</summary>${q.giris || ''}${(q.adimlar || []).map((a) => a.html).join('')}</details>` : ''}${q.oz ? `<div class="oz"><b>💎 Öz:</b> ${q.oz.replace(/^<p>|<\/p>$/g, '')}</div>` : ''}
       ${q.kod ? `<details class="kod-kutu"><summary>💻 Bu sonucu hesaplayan Python kodu</summary><pre class="kod">${kac(q.kod).split('\n').map((s, i) => `<span class="sat"><span class="no">${i + 1}</span>${s}</span>`).join('')}</pre></details>` : ''}
       ${(q.kavram || []).length ? `<h3>Bu sorudaki kavramlar</h3>${bagHTML(K, q.kavram, q.id)}` : `<p class="yok">Bu sorunun kavram bağları hazırlanıyor; kitabın bölüm özetine <a href="#${K.id}/bol/${q.bolum}">buradan</a> bakabilirsin.</p>`}</div>
       </article></div></div>`;
     texDoldur(ana, K);
+    ipucuEkle(ana.querySelector('.soru-kart'), K);
     $$('table', ana).forEach((t) => { if (!t.parentElement.classList.contains('tablo-kap')) { const k = document.createElement('div'); k.className = 'tablo-kap'; t.before(k); k.append(t); } });
     const lis = $$('#adimlar > li'), btn = $('#adim-ac');
     const goster = (m, yeni) => {
@@ -262,7 +301,13 @@
       if (parca[1] === 'bol') bolumGoster(K, parca[2]);
       else {
         const sid = parca[1] || oku(`dk:son:${K.id}`);
+        const am = /^a(\d+)$/.exec(parca[2] || '');
+        if (am) acikAdim[`${K.id}/${sid}`] = +am[1];
         soruGoster(K, K.sorular[sid] || soruSirasi(K)[0]);
+        if (am || parca[2] === 'yol') {
+          const hedef = $(am ? `#a${am[1]}` : '#yol');
+          if (hedef) { hedef.classList.add('vurgu'); setTimeout(() => hedef.scrollIntoView({ block: 'start', behavior: 'smooth' }), 60); sonSayfa = sayfa; return kPart ? cekmeceAc(K, ...kPart.split('/').slice(0, 2), parca[1]) : cekmeceKapat(); }
+        }
       }
       window.scrollTo({ top: 0 });
     }

@@ -137,3 +137,15 @@ ol.ispat li.yeni{animation:gel .35s ease}
 /* geniş ekranda çekmece soruyu örtmez: yan yana (soru solda, konu sağda) */
 @media(min-width:1280px){.cekmece{width:min(640px,44vw)}body.ck-acik main{margin-right:min(640px,44vw);max-width:none}body.ck-acik .perde{display:none!important}body.ck-acik .kitap-yer{grid-template-columns:minmax(0,1fr)}body.ck-acik .dizin{display:none}}
 .terim-kart dd p{margin:0}
+
+/* rehber v3 */
+.yol{border:2px solid var(--acc);border-radius:12px;padding:14px 18px;margin:20px 0;background:color-mix(in srgb,var(--acc) 6%,transparent)}
+.yol h2{margin:0 0 8px}.yol details{margin:8px 0}.yol summary{font-weight:700;cursor:pointer}
+.yol .kalip li .en-k{font-style:italic;font-weight:600}.yol .yol-alt{margin:8px 0 2px;font-weight:700}
+.yol .plan a{white-space:nowrap}.yol .tuzak{margin-top:10px}
+.adimlar.rehberli .adim-bas{font-size:1.08em;margin:0 0 4px}.adimlar.rehberli .nasil{overflow-x:auto}
+.adimlar.rehberli .sonuc{margin:4px 0}.adimlar details.neden summary{cursor:pointer;color:var(--acc)}
+.vurgu{outline:3px solid var(--acc);outline-offset:4px;border-radius:8px;scroll-margin-top:190px}
+.pdf-metin{margin:14px 0}.pdf-metin summary{cursor:pointer;font-weight:700}
+.en-ip{border-bottom:1.5px dotted currentColor;cursor:help;position:relative}
+.en-ip:hover::after,.en-ip:focus::after,.en-ip.acik::after{content:attr(data-tr);position:absolute;left:0;bottom:calc(100% + 4px);background:#111;color:#fff;padding:3px 8px;border-radius:6px;font-size:14px;font-style:normal;font-weight:500;white-space:nowrap;z-index:30;pointer-events:none}
