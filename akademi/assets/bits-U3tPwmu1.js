@@ -1,0 +1,1 @@
+import{j as e}from"./vendor-C85Ps-P1.js";import{h as o}from"./index-DTtM0-7X.js";import{c as i,S as a}from"./index-BabDhgio.js";const n=s=>a.find(r=>r.id===s).renk;function m({c:s,lang:r}){return e.jsxs("a",{className:"ak-chip",href:o(`ders/${s.slug}`),style:{"--sp":n(s.omurga)},children:[e.jsx("b",{children:s.esler[0]}),e.jsx("span",{children:i(s,r)})]})}export{m as C,n as s};
