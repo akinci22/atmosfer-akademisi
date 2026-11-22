@@ -149,3 +149,12 @@ ol.ispat li.yeni{animation:gel .35s ease}
 .pdf-metin{margin:14px 0}.pdf-metin summary{cursor:pointer;font-weight:700}
 .en-ip{border-bottom:1.5px dotted currentColor;cursor:help;position:relative}
 .en-ip:hover::after,.en-ip:focus::after,.en-ip.acik::after{content:attr(data-tr);position:absolute;left:0;bottom:calc(100% + 4px);background:#111;color:#fff;padding:3px 8px;border-radius:6px;font-size:14px;font-style:normal;font-weight:500;white-space:nowrap;z-index:30;pointer-events:none}
+
+/* öz çözüm + sorudan formüle (22 Kas) */
+.es-ip{border-bottom:2px solid #c62828;background:#fff4f2}
+.es-ip:hover::after,.es-ip:focus::after,.es-ip.acik::after{white-space:normal;width:max-content;max-width:min(320px,80vw)}
+.esles-t td,.esles-t th{vertical-align:top}
+.es-k{border-bottom:2px solid #c62828}
+.oz-cozum{border:2px solid #111;border-radius:10px;padding:10px 16px;margin:14px 0}
+.oz-cozum h3{margin:0 0 6px}
+.oz-cozum.vurgu,.oz-cozum:target{box-shadow:0 0 0 4px #ffd54f}

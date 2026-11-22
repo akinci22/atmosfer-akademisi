@@ -99,16 +99,33 @@
     return `<section class="yol" id="yol" aria-labelledby="yol-h"><h2 id="yol-h">🧭 Yol haritası ${q.pdf_yol ? `<small class="yok">PDF s. ${q.pdf_yol}</small>` : ''}</h2>
       <p><b>Ne istiyor?</b> ${R.istiyor}</p><p><b>Soru tipi:</b> ${kac(R.tip)}</p>
       ${R.kalip.length ? `<p class="yol-alt">Soruda bu ifadeyi görünce:</p><ul class="kalip">${R.kalip.map((k) => `<li><span class="en-k" lang="en">${kac(k.en)}</span> → ${kac(k.tr)}${k.ipucu ? ` · <b>${kac(k.ipucu)}</b>` : ''}</li>`).join('')}</ul>` : ''}
+      ${(R.eslesme || []).length ? `<details open class="esles"><summary>Sorudan formüle: hangi ifadeden ne anladık?</summary><p class="yol-alt">Soru metnindeki altı çizili ifadelere dokun (bilgisayarda imleci üstüne getir): ne anlaşıldığı ve formülde nereye girdiği açılır.</p><div class="tablo-kap"><table class="esles-t"><thead><tr><th>Sorudaki ifade</th><th>Ne anladık?</th><th>Formülde</th></tr></thead><tbody>${R.eslesme.map((e) => `<tr><td><span class="es-k">${kac(e.ifade)}</span></td><td>${kac(e.anlam)}</td><td><b>${kac(e.sembol)}</b>${e.deger ? ` = ${kac(e.deger)}` : ''}</td></tr>`).join('')}</tbody></table></div></details>` : ''}
       <details open><summary>Verilenler ne demek?</summary><ul>${R.veriler.map((v) => `<li><b>${kac(v.ne)}</b> → ${kac(v.anlam)}</li>`).join('')}</ul></details>
       ${R.formul.length ? `<details open><summary>Hangi formül, neden?</summary>${R.formul.map((f) => `<p><b>${kac(f.ad)}</b> — ${f.neden}</p>${f.tex}${f.terimler.length ? `<ul class="terim">${f.terimler.map((t) => `<li><b>${kac(t[0])}</b>: ${kac(t[1])}</li>`).join('')}</ul>` : ''}${bagHTML(K, f.kavram ? [f.kavram] : [], q.id)}`).join('')}</details>` : ''}
       ${R.kural ? `<p><b>Kullanılacak bilgi:</b> ${R.kural}</p>` : ''}
       <p class="plan"><b>Plan:</b> ${R.adimlar.map((a, i) => `<a href="#${K.id}/${q.id}/a${i + 1}">${i + 1} · ${kac(a.kisa)}</a>`).join(' → ')}</p>
-      ${R.tuzak ? `<p class="tuzak">⚠️ <b>Tuzak:</b> ${R.tuzak}</p>` : ''}</section>`;
+      ${R.tuzak ? `<p class="tuzak">⚠️ <b>Tuzak:</b> ${R.tuzak}</p>` : ''}
+      ${(R.oz || []).length ? `<div class="oz-cozum" id="oz"><h3>📝 Sınav kâğıdına yaz — en kısa çözüm</h3><ol>${R.oz.map((x) => `<li>${x}</li>`).join('')}</ol></div>` : ''}</section>`;
   }
   function rehberAdim(K, q, a, i) {
     return `<li data-i="${i}" id="a${i + 1}" hidden><p class="adim-bas"><b>${i + 1} · ${kac(a.kisa)}</b></p>
       <p><b>Ne yapıyoruz?</b> ${a.ne}</p>${a.nasil ? `<p class="nasil">${a.nasil}</p>` : ''}${a.sonuc ? `<p class="sonuc">→ <b>${a.sonuc}</b></p>` : ''}
       ${a.neden ? `<details class="neden"><summary>Neden böyle?</summary><p>${a.neden}</p></details>` : ''}${bagHTML(K, a.kavram ? [a.kavram] : [], q.id)}</li>`;
+  }
+  function esleIsaretle(kok, liste) {
+    if (!kok) return;
+    for (const e of liste) {
+      const ifade = (e.ifade || '').trim(); if (!ifade) continue;
+      const tip = `${e.anlam} → ${e.sembol}${e.deger ? ' = ' + e.deger : ''}`;
+      const w = document.createTreeWalker(kok, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.parentElement.closest('svg,.katex,.en-ip,button') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
+      let d; while ((d = w.nextNode())) {
+        let i = d.nodeValue.indexOf(ifade); if (i < 0) i = d.nodeValue.toLocaleLowerCase('tr').indexOf(ifade.toLocaleLowerCase('tr')); if (i + ifade.length > d.nodeValue.length) i = -1;
+        if (i < 0) continue;
+        const orta = d.splitText(i); orta.splitText(ifade.length);
+        const s = document.createElement('span'); s.className = 'en-ip es-ip'; s.tabIndex = 0; s.dataset.tr = tip; s.textContent = orta.nodeValue;
+        orta.replaceWith(s); break;
+      }
+    }
   }
   let ipRx = null, ipKitap = '';
   function ipucuEkle(kok, K) {
@@ -152,6 +169,7 @@
       ${(q.kavram || []).length ? `<h3>Bu sorudaki kavramlar</h3>${bagHTML(K, q.kavram, q.id)}` : `<p class="yok">Bu sorunun kavram bağları hazırlanıyor; kitabın bölüm özetine <a href="#${K.id}/bol/${q.bolum}">buradan</a> bakabilirsin.</p>`}</div>
       </article></div></div>`;
     texDoldur(ana, K);
+    if (R && (R.eslesme || []).length) esleIsaretle($('.soru-govde', ana), R.eslesme);
     ipucuEkle(ana.querySelector('.soru-kart'), K);
     $$('table', ana).forEach((t) => { if (!t.parentElement.classList.contains('tablo-kap')) { const k = document.createElement('div'); k.className = 'tablo-kap'; t.before(k); k.append(t); } });
     const lis = $$('#adimlar > li'), btn = $('#adim-ac');
@@ -304,8 +322,8 @@
         const am = /^a(\d+)$/.exec(parca[2] || '');
         if (am) acikAdim[`${K.id}/${sid}`] = +am[1];
         soruGoster(K, K.sorular[sid] || soruSirasi(K)[0]);
-        if (am || parca[2] === 'yol') {
-          const hedef = $(am ? `#a${am[1]}` : '#yol');
+        if (am || parca[2] === 'yol' || parca[2] === 'oz') {
+          const hedef = $(am ? `#a${am[1]}` : parca[2] === 'oz' ? ($('#oz') ? '#oz' : '#yol') : '#yol');
           if (hedef) { hedef.classList.add('vurgu'); setTimeout(() => hedef.scrollIntoView({ block: 'start', behavior: 'smooth' }), 60); sonSayfa = sayfa; return kPart ? cekmeceAc(K, ...kPart.split('/').slice(0, 2), parca[1]) : cekmeceKapat(); }
         }
       }

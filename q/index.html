@@ -2,6 +2,6 @@
 (function(){var K={'316':'mto316','342':'mto342e','323':'mto323','303':'mto303e','302':'mto302e'},P={t:'tanim',f:'formul',d:'diyagram',n:'anim',i:'ispat',k:'kod'};
 var p=decodeURIComponent(location.hash.slice(1)).split('.'),kid=K[p[0]],n=p[1],h=p[2]||'s',hedef='../ders-kitapligi/';
 if(kid){hedef+='#'+kid+(n?'/S'+n:'');var m=/^([tfdnik])(\d+)$/.exec(h);
-if(h==='y')hedef+='/yol';else if(/^a\d+$/.test(h))hedef+='/'+h;else if(m){var l=((window.QH||{})[kid]||{})['S'+n]||[],k=l[+m[2]-1];if(k)hedef+='/k/'+k+'/'+P[m[1]];}}
+if(h==='y')hedef+='/yol';else if(h==='o')hedef+='/oz';else if(/^a\d+$/.test(h))hedef+='/'+h;else if(m){var l=((window.QH||{})[kid]||{})['S'+n]||[],k=l[+m[2]-1];if(k)hedef+='/k/'+k+'/'+P[m[1]];}}
 document.getElementById('m').innerHTML='Açılmazsa <a href="'+hedef+'">buraya dokun</a>.';location.replace(hedef);})();
 </script></body></html>
