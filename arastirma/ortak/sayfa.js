@@ -160,6 +160,11 @@
       bh.innerHTML = '<b>Bu hafta: ' + ad + '</b> — <a href="#' + ADIM[hafta] + '"></a><br><span></span>';
       bh.querySelector('a').textContent = $('h2 .tr', kart) ? $('h2 .tr', kart).textContent : $('h2', kart).textContent;
       bh.querySelector('span').textContent = yz ? 'Yazacağın: ' + yz.textContent : ''; bh.hidden = false;
+      var ek = null; try { ek = JSON.parse(bh.dataset.ek || 'null'); } catch (e) {}
+      if (ek && ek[hafta]) {   // o haftaya özel eş zamanlı sayfa (ör. W8 sayfa sayfa anlatım)
+        var eb = d.createElement('a'); eb.href = ek[hafta][0]; eb.textContent = ek[hafta][1]; eb.className = 'bu-hafta-ek';
+        bh.appendChild(d.createElement('br')); bh.appendChild(eb);
+      }
     }
     var hb = $('#bu-hafta-bag'); if (hb) { hb.href = 'ing201a/#' + ADIM[hafta]; var ha = $('#bu-hafta-ad'); if (ha) ha.textContent = ad + ': yazacağın şey ve sınıfta olacaklar'; }
     var sat = $('tr[data-yaz="' + YAZ[hafta] + '"]'); if (sat) sat.classList.add('bu-hafta-satir');
