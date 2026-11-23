@@ -1,6 +1,6 @@
 /* ING201A · W8 · PARAGRAPH A v4 — PDF ile eş zamanlı anlatım verisi. Sayfa numaraları PDF'teki (ve reMarkable'daki) ile birebir.
    Alanlar: s = PDF sayfası · b = bölüm (0 = kapak) · t = başlık · an = anlatım maddeleri · yap = şimdi yap · kal = [İngilizce kalıp, Türkçesi] · pod = podcast hedefi.
-   Biçim: **kalın**, *italik*. Kaynak md: ereader-studio/_kaynak/ing201a-w8/01-ING201A-W8-PARAGRAF-A.md + 05-ING201A-W8-PROJE-YAZIM-rM.md */
+   Biçim: **kalın**, *italik*. */
 window.BOLUMLER = [
   { b: 1, ad: "Bugün derste ne olacak?", s: 3, pod: "w8-p1" },
   { b: 2, ad: "Proje ve kanıtların", s: 12, pod: "w8-p2" },
@@ -11,7 +11,7 @@ window.BOLUMLER = [
 window.ANLATI = [
   { s: 1, b: 0, t: "Kapak",
     an: ["Defter dört podcast bölümüyle aynı sırada ilerler; Bölüm 5 proje yazımı için ektir.",
-         "Bu sayfa defterin her sayfası için kısa anlatım verir: PDF'te sayfayı çevirdikçe burada aynı numaraya geç (← → tuşları, kaydırma ya da alttaki düğmeler).",
+         "Bu sayfa defterin her sayfası için kısa anlatım verir: PDF'te sayfayı çevirdikçe burada aynı numaraya geç (← → tuşları, telefonda parmakla sağa sola çekme ya da alttaki düğmeler).",
          "Yazma kutuları: s.4, 9, 15, 22, 24, 28, 31, 33, 35."] },
   { s: 2, b: 0, t: "İç kapak",
     an: ["Başlık sayfası. İçerik s.3'te başlar: Bölüm 1 · Bugün derste ne olacak?"] },
@@ -19,7 +19,7 @@ window.ANLATI = [
   { s: 3, b: 1, t: "Bugün derste ne olacak?",
     an: ["Bugün Paragraph A'yı geri bildirimle **baştan** yazıyorsun: sınıfta, süreli, el yazısıyla, yaklaşık **250 kelime**.",
          "Geçen hafta A1 ve A2'yi ayrı ayrı yazdın. Bugün ikisi tek paragraf olur, sonuna **concluding sentence** eklenir.",
-         "Hocanın kuralı: *Do not write your paragraphs at home.* Evdeki tek ödev **not alma formu**; cümleler sınıfta kurulur.",
+         "Ders kuralı: *Do not write your paragraphs at home.* Evdeki tek ödev **not alma formu**; cümleler sınıfta kurulur.",
          "Masada: basılı ve kanıtı vurgulu kaynaklar, not alma formu, topic outline, geçen haftaki geri bildirimli kâğıt, kurşun kalem, silgi. Kâğıt sınıfta verilir.",
          "İlk üç parça: **topic sentence** (iddia) → **major support 1** (kendi nedenin, kaynaksız) → **evidence A1 + atıf**, ardından 1–2 cümle **analysis**."] },
   { s: 4, b: 1, t: "Altı parçanın devamı + ilk kutu",
@@ -130,14 +130,14 @@ window.ANLATI = [
          "Sayfanın özü: bulgular *shown, reported, indicated*; kaynaklar *cited*; kesinlik yumuşatılır, asla artırılmaz."],
     yap: ["Kutuya üç fiil yaz."] },
   { s: 23, b: 3, t: "Paraphrase practice and checklist",
-    an: ["Teslimden önce kontrol listesi (hocanınkiyle aynı):",
+    an: ["Teslimden önce kontrol listesi (ders belgesindekiyle aynı):",
          "Tek açık fikir · iddia içeren topic sentence · her kanıt nedenden sonra · kanıt paraphrase + (Author, year).",
          "Ayrıntı doğru (yer, sayı, kesinlik) · her kanıttan sonra 1–2 cümle analiz · geçiş ve akademik kelime, *says / talks about* yok.",
          "Sonuç cümlesi · yaklaşık 250 kelime · dil bilgisi, yazım, noktalama.",
          "Sınıfta son birkaç dakikayı bu liste için ayır."] },
   { s: 24, b: 3, t: "Kutu: paraphrase alıştırması",
     an: ["Alıştırma: bir cümleyi oku, makaleyi kapat, fikri hafızadan kendi yapınla yaz, sonra açıp Accuracy'yi kontrol et.",
-         "**Hoca kuralı:** paragrafın kendisi evde yazılmaz. Bu alıştırmayı A1 kanıt cümlesiyle değil, makalenin **başka bir altı çizili cümlesiyle** yap.",
+         "**Ders kuralı:** paragrafın kendisi evde yazılmaz. Bu alıştırmayı A1 kanıt cümlesiyle değil, makalenin **başka bir altı çizili cümlesiyle** yap.",
          "Sayfanın özü: paraphrase = aynı anlam, aynı sayı, aynı kesinlik; kelimeler ve yapı senin."],
     yap: ["Kanıt dışı bir altı çizili cümleyle bir kez dene."] },
 
@@ -151,7 +151,7 @@ window.ANLATI = [
          "**Kalıplar:** One important reason that … · This means that … · A study conducted by … found that … · This is important because … · In short, …",
          "**Önce geri bildirim:** geçen haftaki kâğıtta işaretlenen iki hatayı ilk önce düzelt.",
          "**Gelecek hafta:** aynı yapı B paragrafında (Hess & Boers, Patakchi Yousefi), midterm %30.",
-         "**Getir (hocanın listesi):** basılı ve kanıtı vurgulu kaynaklar, not alma formu, topic outline, geçen haftaki A1/A2 kâğıdı, kurşun kalem, silgi."] },
+         "**Getir (ders belgesindeki liste):** basılı ve kanıtı vurgulu kaynaklar, not alma formu, topic outline, geçen haftaki A1/A2 kâğıdı, kurşun kalem, silgi."] },
 
   { s: 27, b: 5, t: "5.1 · Paragrafın iskeleti: proje nereye girer?",
     an: ["Bölüm 5 proje bilgisini paragraf yuvalarına yerleştirir; cümleleri sen kurarsın.",
@@ -161,7 +161,7 @@ window.ANLATI = [
          "**Analysis yuvası:** bulgunun projendeki karşılığı — *This finding suggests that …* · **Concluding:** *In short, …* · *To conclude, …*"] },
   { s: 28, b: 5, t: "Kaynakların rolü + kutu",
     an: ["**Hangi kaynak hangi rolde:** sorun → Yucel & Onen (2014) · yöntem → Rojas-Campos et al. (2023) · fizik girdisi → Hess & Boers (2022) · hidrolojiye etki → Patakchi Yousefi et al. (2024).",
-         "Kutu: topic sentence için kalıp seçimi. **Hoca kuralı gereği** buraya tam cümle değil, seçtiğin kalıp ve anahtar kelimeler.",
+         "Kutu: topic sentence için kalıp seçimi. **Ders kuralı gereği** buraya tam cümle değil, seçtiğin kalıp ve anahtar kelimeler.",
          "Sayfanın özü: yuva sırası iddia → neden → atıflı kanıt → analiz → sonuç; kalıp hazır, içerik senin."],
     yap: ["Kalıbı seç; boşluklar için yalnız anahtar kelime not et."] },
   { s: 29, b: 5, t: "5.2 · Proje sözlüğü (1)",
@@ -197,7 +197,7 @@ window.ANLATI = [
          "**Kontrol:** her kanıttan sonra 1–2 cümle analiz var mı · proje terimleri doğru mu (bias, post-processing, input set, lead time, MAE) · sonuç yeni kelimelerle mi · ~250 kelime mi?"] },
   { s: 35, b: 5, t: "Kutu: kalıp alıştırması",
     an: ["Kutu: bir kalıp seçip boşlukları projenden doldurma alıştırması.",
-         "**Hoca kuralı:** paragraf cümleleri evde yazılmaz. Buraya kalıbı ve boşluklara gelecek **anahtar kelimeleri** yaz; tam cümleyi sınıfta kur.",
+         "**Ders kuralı:** paragraf cümleleri evde yazılmaz. Buraya kalıbı ve boşluklara gelecek **anahtar kelimeleri** yaz; tam cümleyi sınıfta kur.",
          "Sayfanın özü: kalıp + proje terimi + doğru atıf + analiz = sınavda proje paragrafı."],
     yap: ["Bir kalıp + anahtar kelimeler; sonra kontrol listesiyle bak."] }
 ];

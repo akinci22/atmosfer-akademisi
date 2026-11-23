@@ -130,7 +130,7 @@
     var kal = $('kal'); kal.hidden = !x.kal;
     if (x.kal) kal.innerHTML = '<b>Kalıplar</b>' + x.kal.map(function (k) { return '<p><span class="en">' + esc(k[0]) + '</span><span class="tr">' + esc(k[1]) + '</span></p>'; }).join('');
     var pod = $('pod');
-    if (bo) { pod.hidden = false; pod.href = '../podcast/#' + bo.pod; pod.textContent = '🎧 Bölüm ' + bo.b + ' podcasti'; } else { pod.hidden = true; }
+    if (bo) { pod.hidden = false; pod.href = '../podcast/#' + bo.pod; pod.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;margin-right:6px"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></svg>Bölüm ' + bo.b + ' podcasti'; } else { pod.hidden = true; }
     $('pdfs').href = '../defter/ING201A_W8_PARAGRAF-A_v4.pdf#page=' + n;
     $('ok').checked = !!ok[n];
     $('onc').disabled = n === 1; $('snr').disabled = n === N;
