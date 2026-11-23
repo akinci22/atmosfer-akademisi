@@ -37,9 +37,9 @@ h3{font-size:19px;margin:1.1em 0 .4em}
 @media(min-width:1000px){.kitap-yer{grid-template-columns:290px minmax(0,1fr)}}
 .dizin{font-size:15px}
 @media(min-width:1000px){.dizin{position:sticky;top:calc(var(--ust-h) + 12px);max-height:calc(100svh - var(--ust-h) - 24px);overflow:auto;padding-right:6px}}
-@media(max-width:999px){.dizin{border:1px solid var(--cizgi);border-radius:12px;padding:10px 14px}.dizin:not(.acik) .dizin-ic{display:none}}
+
 .dizin-ac{display:none;width:100%;text-align:left;background:none;border:0;padding:4px 0;font-weight:600;cursor:pointer}
-@media(max-width:999px){.dizin-ac{display:block}}
+
 .dizin h4{font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:var(--ikincil);margin:14px 0 4px}
 .dizin a{display:flex;justify-content:space-between;gap:8px;padding:5px 8px;border-radius:8px;text-decoration:none;color:var(--yazi);line-height:1.35}
 .dizin a span.pdf{color:var(--ikincil);font-size:13px;white-space:nowrap}
@@ -158,3 +158,55 @@ ol.ispat li.yeni{animation:gel .35s ease}
 .oz-cozum{border:2px solid #111;border-radius:10px;padding:10px 16px;margin:14px 0}
 .oz-cozum h3{margin:0 0 6px}
 .oz-cozum.vurgu,.oz-cozum:target{box-shadow:0 0 0 4px #ffd54f}
+
+/* ---- sade okuma (23 Kas): ferah tipografi, katlanır içindekiler, az çerçeve, tam ekran ---- */
+body{font-size:18px;line-height:1.7}
+@media(min-width:1000px){body{font-size:19px}}
+@media(min-width:1600px){body{font-size:20px}}
+p{margin:1em 0}li{margin:.6em 0}li>p{margin:.4em 0}ul,ol{margin:1em 0}
+h3{margin:1.6em 0 .5em}
+.dizin{font-size:16px}
+.dizin details summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:.45em}
+.dizin details summary::-webkit-details-marker{display:none}
+.dizin details summary::before{content:"";flex:none;width:.45em;height:.45em;margin:0 .3em 0 .15em;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);transition:transform .15s}
+.dizin details[open]>summary::before{transform:rotate(45deg)}
+.dizin .ic{border-top:1px solid var(--cizgi);border-bottom:1px solid var(--cizgi)}
+.dizin .ic>summary{min-height:48px;font-weight:600}
+.dizin .say{color:var(--ikincil);font-weight:400;font-size:.9em}
+.dizin .bl>summary{min-height:44px;font-size:13.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ikincil);font-weight:600;line-height:1.35;padding:4px 0}
+.dizin .bl-ic{padding:0 0 8px 1em}
+.dizin a{min-height:44px;align-items:center;padding:6px 8px;line-height:1.35}
+@media(min-width:1000px){.kitap-yer:has(>.dizin .ic:not([open])){grid-template-columns:auto minmax(0,1fr)}.kitap-yer{column-gap:48px}}
+.takip{background:var(--zemin);border:0;border-bottom:1px solid var(--cizgi);border-radius:0;padding:8px 0;margin-bottom:22px}
+.kucuk{min-height:44px;display:inline-flex;align-items:center;text-decoration:none}
+.takip .sag{flex-wrap:wrap}
+.soru-kart{max-width:800px}
+.soru-govde{background:none;border:0;border-left:3px solid var(--cizgi);border-radius:0;padding:2px 0 2px 1.1em;margin:1em 0 1.4em}
+.pdf-etiket{border:0;padding:0}
+.yol{border:0;border-top:1px solid var(--cizgi);border-bottom:1px solid var(--cizgi);border-radius:0;background:none;padding:14px 0;margin:28px 0}
+.oz,.oz-cozum{border:0;border-left:3px solid var(--acc);background:var(--yuzey);border-radius:0 8px 8px 0;padding:10px 18px;margin:1.6em 0}
+ol.adimlar>li{padding:10px 0 18px 22px;margin:0 0 1.4em}
+ol.adimlar>li p{margin:.5em 0}
+.bag{background:none;border:1px solid var(--cizgi)}
+.bag button{border-color:var(--cizgi);min-height:36px}
+.tex-blok{margin:1.2em 0;padding:.4em 0;text-align:center}
+.yaz{border-width:1px}
+@media(max-width:600px){.takip label{width:100%}.tex-blok{text-align:left}}
+/* tam ekran: tek ince şerit; içerik ortada okunur genişlikte */
+.hud{position:fixed;z-index:40;top:0;left:0;right:0;display:flex;align-items:center;gap:6px;padding:calc(4px + env(safe-area-inset-top,0px)) max(8px,env(safe-area-inset-right,0px)) 4px max(8px,env(safe-area-inset-left,0px));background:color-mix(in srgb,var(--zemin) 97%,transparent);border-bottom:1px solid var(--cizgi);font-size:15px;transition:opacity .25s,transform .25s}
+.hud.sakin{opacity:0;transform:translateY(-100%);pointer-events:none}
+.hud button,.hud a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;min-width:44px;padding:0 10px;border:1px solid transparent;border-radius:8px;background:none;color:var(--yazi);font:inherit;text-decoration:none;cursor:pointer}
+.hud button:hover,.hud a:hover{border-color:var(--cizgi)}
+.hud [data-k=once],.hud [data-k=sonra]{font-size:24px;line-height:1}
+.hud button:disabled{opacity:.35;cursor:default}
+.hud-ad{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;color:var(--ikincil)}
+html.tam .ust,html.tam .takip{display:none}
+html.tam main{max-width:48rem;padding-top:64px;padding-bottom:30vh}
+html.tam .kitap-yer{display:block}
+html.tam .dizin{position:static;max-height:none;overflow:visible;padding:0}
+html.tam .dizin .ic{display:none}
+html.tam .dizin .ic[open]{display:block;position:fixed;z-index:35;top:0;left:0;bottom:0;width:min(400px,88vw);overflow:auto;background:var(--zemin);border:0;border-right:1px solid var(--cizgi);padding:calc(56px + env(safe-area-inset-top,0px)) 14px 24px}
+html.tam .vurgu{scroll-margin-top:72px}
+@media(min-width:900px){html.tam body{font-size:21px}}
+@media(max-width:480px){.hud{gap:2px}.hud button,.hud a{padding:0 8px;font-size:14px}.hud-ad{font-size:13px}}
+.tex-satir{display:inline-block;max-width:100%;overflow-x:auto;overflow-y:hidden;vertical-align:middle}.tex-satir svg.mj{max-width:none}
