@@ -119,3 +119,7 @@ tr:target{background:#fffbe6}
 .dis{font-size:15.5px;margin:10px 0 0}
 .ams{font-size:13px;margin-left:6px}
 .defter{display:inline-block;font-size:12.5px;font-weight:600;color:#6b4f00;background:#fff4cc;border:1px solid #f0d77a;border-radius:6px;padding:0 7px;margin-right:8px;vertical-align:3px;letter-spacing:.01em}
+.proje-bag{margin:12px 0;font-size:17px;font-weight:600}
+.proje-bag a{display:inline-block;border:2px solid var(--uyari);background:var(--uyari-zemin);color:#7c3a00;border-radius:12px;padding:8px 14px;text-decoration:none}
+.proje-bag.kucuk-bag{font-size:15px;font-weight:500}
+.proje-bag.kucuk-bag a{border-width:1px;padding:4px 10px}
