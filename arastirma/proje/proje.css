@@ -66,9 +66,17 @@ u[lang]{text-decoration-thickness:2px;text-underline-offset:3px;font-style:norma
 .bag-liste{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:6px 8px}
 .bag-liste a{display:inline-block;border:1px solid var(--cizgi);border-radius:999px;padding:3px 12px;text-decoration:none;font-size:15.5px;background:#fff}
 .bag-liste a:hover{border-color:var(--odak)}
-.defter{display:inline-block;font-size:12.5px;font-weight:600;color:#6b4f00;background:#fff4cc;border:1px solid #f0d77a;border-radius:6px;padding:0 7px;text-decoration:none;letter-spacing:.01em;line-height:1.7;white-space:nowrap}
-.defter:hover{border-color:var(--uyari);color:#4a3600}
-h1 .defter,h2 .defter,h3 .defter,h4 .defter,h5 .defter{vertical-align:middle;margin-left:8px}
+/* «Defterde s. N ↗»: öteki sayfalardaki mavi bağ biçimi (TUR 3) */
+a.defter{display:inline-block;margin-left:10px;font-size:15.5px;font-weight:400;line-height:1.4;letter-spacing:0;color:var(--odak);background:none;border:0;padding:0;text-decoration:none;white-space:nowrap;vertical-align:middle}
+a.defter:hover{text-decoration:underline;text-underline-offset:3px}
+/* ortak şablon düzeni (TUR 3): ortalı kap + solda yapışkan bölüm listesi; akordeon yalnız telefonda; sağ şerit yok */
+.proje-sayfa .sayfa-bas{max-width:1000px}
+.proje-sayfa .kap{max-width:none;margin:0;padding-inline:0}
+.proje-sayfa .icerik{max-width:1000px}
+.proje-sayfa .icerik>.bolum:first-child{border-top:0;padding-top:0}
+.serit{display:none}
+@media (min-width:1041px){.proje-sayfa .icindekiler{display:none}}
+@media (max-width:1040px){.proje-sayfa .yan{display:none}}
 /* formül kartı */
 .fk{border-top:1px solid var(--cizgi);padding-top:14px;margin-top:16px}
 .fk:first-child{border-top:0;margin-top:0}

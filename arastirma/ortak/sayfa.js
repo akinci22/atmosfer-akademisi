@@ -50,7 +50,7 @@
   if (ic && matchMedia('(max-width: 1040px)').matches) ic.open = false;
   var navA = $$('.yan .ic a');
   if (ic) ic.addEventListener('click', function (ev) { if (ev.target.closest('a') && matchMedia('(max-width: 1040px)').matches) ic.open = false; });
-  var bolumler = $$('.icerik > .kart[id]');
+  var bolumler = navA.map(function (a) { return d.getElementById(a.getAttribute('href').slice(1)); }).filter(Boolean);
   function etkinBul() {
     var y = 100, son = null;
     for (var i = 0; i < bolumler.length; i++) { if (bolumler[i].getBoundingClientRect().top - y <= 0) son = bolumler[i]; else break; }
