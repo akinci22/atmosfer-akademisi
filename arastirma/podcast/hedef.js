@@ -5,5 +5,10 @@ window.PODCAST = [
   { id: 'w8-p2', ad: 'Bölüm 2 · Proje: ne yapmak istiyorum?', pdf: 'ING201A W8 · s. 12', url: '' },
   { id: 'w8-p3', ad: 'Bölüm 3 · Akademik İngilizce: altı parça, iki dilde', pdf: 'ING201A W8 · s. 17', url: 'https://drive.google.com/file/d/1nFCXVeb9pXeoHWtpQgRv_gnoxViyEnmj/view' },
   { id: 'w8-p4', ad: 'Bölüm 4 · Dersten önce aklında kalacaklar', pdf: 'ING201A W8 · s. 25', url: 'https://drive.google.com/file/d/1VAvUUxHEkpqbXbwk5Y0-a7xAklo8ni29/view' },
-  { id: 'w8-p5', ad: 'Bölüm 5 · Paragrafın iskeleti (proje)', pdf: 'ING201A W8 · s. 27', url: '' }
+  { id: 'w8-p5', ad: 'Bölüm 5 · Paragrafın iskeleti (proje)', pdf: 'ING201A W8 · s. 27', url: '' },
+  { id: 'prj-p1', ad: 'Proje 1 · Amaç: ne yapmak istiyorum?', pdf: 'Proje sayfası: Amaç ve araştırma soruları', site: '../proje/#amac', url: '' },
+  { id: 'prj-p2', ad: 'Proje 2 · Makalelerden aldıklarım', pdf: 'Proje sayfası: Kaynakça', site: '../proje/#kaynakca', url: '' },
+  { id: 'prj-p3', ad: 'Proje 3 · Projeyi nasıl yapacağım?', pdf: 'Proje sayfası: İzlenecek yol', site: '../proje/#yol', url: '' },
+  { id: 'prj-p4', ad: 'Proje 4 · Bütün ana bilgi hatları', pdf: 'Proje sayfası: Bilinmesi gereken ön bilgiler', site: '../proje/#bilgi', url: '' },
+  { id: 'prj-p5', ad: 'Proje 5 · Ayrıntılı anlatımın tamamı', pdf: 'Proje sayfasının tamamı', site: '../proje/#icindekiler', url: '' }
 ];
