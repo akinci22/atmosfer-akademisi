@@ -527,8 +527,12 @@ ${konu ? `<section><h2 class="sv-etiket">Konu</h2><p class="sv-yan-k">${esc(konu
     const dogruDeger = () => { try { return hesapla(q.cevap, deg); } catch (e) { return NaN; } };
     const gid = 'g' + Math.random().toString(36).slice(2, 8);
     return {
-      html: `<div class="sv-soru">${metin(q.soru, deg)}</div><div class="sv-giris"><label class="sv-etiket" for="${gid}">Cevabın</label><div class="sv-g-k"><input id="${gid}" class="sv-g" type="text" inputmode="decimal" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" placeholder="ör. 12,5"><span class="sv-birim">${metin(q.birim || '')}</span></div></div>`,
-      bagla(k) { inp = k.querySelector('input'); },
+      html: `<div class="sv-soru">${metin(q.soru, deg)}</div><div class="sv-giris"><label class="sv-etiket" for="${gid}">Cevabın</label><div class="sv-g-k"><input id="${gid}" class="sv-g" type="text" inputmode="decimal" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" placeholder="ör. 12,5"><button type="button" class="sv-dug sv-isaret" aria-label="İşareti değiştir (eksi / artı)" title="İşareti değiştir">±</button><span class="sv-birim">${metin(q.birim || '')}</span></div></div>`,
+      bagla(k) {
+        inp = k.querySelector('input');
+        const isr = k.querySelector('.sv-isaret');
+        if (isr) isr.addEventListener('click', () => { if (inp.readOnly) return; const v = inp.value.trim(); inp.value = /^[-−]/.test(v) ? v.replace(/^[-−]\s*/, '') : '−' + v; inp.focus(); });
+      },
       al: () => (inp.value.trim() ? inp.value.trim() : null),
       koy: (c) => { if (c != null) inp.value = c; },
       denetle(c) {
@@ -933,7 +937,7 @@ ${yanlis.length ? `<h3>Yanlış ve boş sorular</h3><ol class="sv-y-l">${yanlis.
     if (!aktif) return;
     const k = e.key;
     if (k === 'Enter') {
-      if (t && t.closest && t.closest('a, summary, .sv-ust button, [data-e], .sv-yuva, .sv-cip, [data-y], .sv-d-harita button, .sv-a-tb')) return;
+      if (t && t.closest && t.closest('a, summary, .sv-ust button, [data-e], .sv-yuva, .sv-cip, [data-y], .sv-d-harita button, .sv-a-tb, .sv-isaret')) return;
       e.preventDefault(); aktif.enter(t); return;
     }
     if (k === 'ArrowRight') { e.preventDefault(); aktif.sonraki(); return; }

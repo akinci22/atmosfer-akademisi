@@ -100,6 +100,7 @@ kbd{font:12px/1 ui-monospace,Consolas,monospace;color:var(--s);border:1px solid 
 .sv-g.ok{border-color:var(--ok);background:var(--ok2)}
 .sv-g.hata{border-color:var(--hata);background:var(--hata2)}
 .sv-birim{font-size:19px;color:var(--s)}
+.sv-isaret{min-width:48px;min-height:54px;padding:0;font-size:22px;font-weight:500;color:var(--s)}
 
 /* kavram farkı */
 .sv-kavlar{display:flex;flex-wrap:wrap;gap:6px 14px;margin:-4px 0 12px;font-size:15px;font-weight:650;color:var(--s)}
