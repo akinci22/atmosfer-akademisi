@@ -3,7 +3,7 @@
 
   {"klasor": "mto316", "kod": "MTO316", "ad": "Hidrometeoroloji", "cozum": true, "cozumSoru": 45, "calis": true, "soru": 256},
 
-  {"klasor": "mto388", "kod": "MTO388", "ad": "Coğrafi Bilgi Bilimi", "cozum": false, "cozumSoru": 0, "calis": false, "soru": 0},
+  {"klasor": "mto388", "kod": "MTO388", "ad": "Coğrafi Bilgi Bilimi (CBS)", "cozum": true, "cozumSoru": 19, "calis": true, "soru": 251},
 
   {"klasor": "mto342e", "kod": "MTO342E", "ad": "Bulut ve Yağış Fiziği", "cozum": true, "cozumSoru": 46, "calis": false, "soru": 0},
 
