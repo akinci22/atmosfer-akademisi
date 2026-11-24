@@ -53,7 +53,7 @@ h1 { flex: none; margin: 0; font-size: clamp(1.7rem, 1.2rem + 1.6vw, 2.4rem); li
 html:not(.fare) .cipler { overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; }
 html:not(.fare) .cipler::-webkit-scrollbar { display: none; }
 /* dokunmatik: çip satırı taşıyorsa taşan kenar beyaza söner (kesik çip «devamı var» diye okunur). Uçlardaki 1 px'lik nöbetçiler
-   IntersectionObserver ile izlenir (kaydırırken yerleşim okuma yok); maske yalnız taşan yanda açılır. */
+   IntersectionObserver ile izlenir (şerit kayarken yerleşim okuma yok); maske yalnız taşan yanda açılır. */
 html:not(.fare) .cipler { --cs: 0px; --ce: 0px; -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--cs), #000 calc(100% - var(--ce)), transparent); mask-image: linear-gradient(to right, transparent, #000 var(--cs), #000 calc(100% - var(--ce)), transparent); }
 html:not(.fare) .cipler[data-sol] { --cs: 44px; }
 html:not(.fare) .cipler[data-sag] { --ce: 44px; }
@@ -275,8 +275,8 @@ html:not(.fare) .raf-serit > li.net .kac { opacity: 1; }
         <li><a class="kart" href="./hava-analizi-proje-rehberi/" data-ara="proje rehberi brifing sunumu proje raporu ne isteniyor adım adım saat katmanlar synop mekanizma siklon"><span class="kg"><img src="./kapak/kart-hava-analizi-proje-rehberi.webp" alt="" width="480" height="300" decoding="async" loading="lazy"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-site"/></svg><b>Hava analizi proje rehberi</b></span><span class="kac">Brifing ve rapor: adım adım</span></a></li>
         <li><a class="kart" href="./sinoptik-brifing/#synop" data-ara="synop çözücü istanbul grup kısım istasyon modeli brifing atölyesi"><span class="kg"><img src="./kapak/kart-brifing-synop.webp" alt="" width="480" height="300" decoding="async" loading="lazy"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-arac"/></svg><b>Brifingde SYNOP</b></span><span class="kac">İstanbul mesajı, grup grup</span></a></li>
       </ul>
-      <button type="button" class="raf-ok sol" tabindex="-1" aria-label="Hava Analizi ve Öngörü: geri kaydır"><svg class="simge" aria-hidden="true"><use href="#s-sol"/></svg></button>
-      <button type="button" class="raf-ok sag" tabindex="-1" aria-label="Hava Analizi ve Öngörü: ileri kaydır"><svg class="simge" aria-hidden="true"><use href="#s-sag"/></svg></button>
+      <button type="button" class="raf-ok sol" tabindex="-1" aria-label="Hava Analizi ve Öngörü: önceki kartlar"><svg class="simge" aria-hidden="true"><use href="#s-sol"/></svg></button>
+      <button type="button" class="raf-ok sag" tabindex="-1" aria-label="Hava Analizi ve Öngörü: sonraki kartlar"><svg class="simge" aria-hidden="true"><use href="#s-sag"/></svg></button>
     </div>
   </section>
 
@@ -295,8 +295,8 @@ html:not(.fare) .raf-serit > li.net .kac { opacity: 1; }
         <li><a class="kart" href="./hidrometeoroloji-quiz/" data-ara="ödev quiz hazırlık hafta konu olası sorular formül kartı hidrograf hec-hms özet"><span class="kg"><img src="./kapak/kart-hidrometeoroloji-quiz.webp" alt="" width="480" height="300" decoding="async" loading="lazy"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-site"/></svg><b>Ödev ve quiz hazırlığı</b></span><span class="kac">Hafta hafta konular, olası sorular</span></a></li>
         <li><a class="kart" href="./ders-kitapligi/" data-ara="ders kitaplığı kitaplık kitap kitaplar soru çözüm çözümleri soru-çözüm kitabı sınav vize final hazırlık pdf eş zamanlı takip adım adım kavram tanım diyagram formül türetim animasyon bulut fiziği hidrometeoroloji atmosfer kimyası cfd sinoptik synop harita analizi kavram atlası mto 342e mto 316 mto 323 mto 302e mto 303e"><span class="kg"><img src="./kapak/kart-ders-kitapligi.webp" alt="" width="480" height="300" decoding="async" loading="lazy"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-site"/></svg><b>Ders Kitaplığı</b></span><span class="kac">Soru-çözüm kitapları</span></a></li>
       </ul>
-      <button type="button" class="raf-ok sol" tabindex="-1" aria-label="Hidrometeoroloji: geri kaydır"><svg class="simge" aria-hidden="true"><use href="#s-sol"/></svg></button>
-      <button type="button" class="raf-ok sag" tabindex="-1" aria-label="Hidrometeoroloji: ileri kaydır"><svg class="simge" aria-hidden="true"><use href="#s-sag"/></svg></button>
+      <button type="button" class="raf-ok sol" tabindex="-1" aria-label="Hidrometeoroloji: önceki kartlar"><svg class="simge" aria-hidden="true"><use href="#s-sol"/></svg></button>
+      <button type="button" class="raf-ok sag" tabindex="-1" aria-label="Hidrometeoroloji: sonraki kartlar"><svg class="simge" aria-hidden="true"><use href="#s-sag"/></svg></button>
     </div>
   </section>
 
@@ -313,8 +313,8 @@ html:not(.fare) .raf-serit > li.net .kac { opacity: 1; }
         <li><a class="kart" href="./bulut-fizigi-rehberi/#p1" data-ara="part 1 part i gökyüzü fotoğraf bulut tanıma gözlem era5 sıcaklık nem kart"><span class="kg"><img src="./kapak/kart-bulut-p1.webp" alt="" width="480" height="300" decoding="async" loading="lazy"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-arac"/></svg><b>Gökyüzü gözlemi</b></span><span class="kac">Part I: fotoğraftan bulut tanıma</span></a></li>
         <li><a class="kart" href="./bulut-fizigi-rehberi/#p2" data-ara="part 2 part ii hesap skew-t radyosonde wyoming parsel lcl lfc cape denklem kod"><span class="kg"><img src="./kapak/kart-bulut-p2.webp" alt="" width="480" height="300" decoding="async" loading="lazy"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-arac"/></svg><b>Hesap ve Skew-T</b></span><span class="kac">Part II: parsel, LCL, Skew-T</span></a></li>
       </ul>
-      <button type="button" class="raf-ok sol" tabindex="-1" aria-label="Bulut ve Yağış Fiziği: geri kaydır"><svg class="simge" aria-hidden="true"><use href="#s-sol"/></svg></button>
-      <button type="button" class="raf-ok sag" tabindex="-1" aria-label="Bulut ve Yağış Fiziği: ileri kaydır"><svg class="simge" aria-hidden="true"><use href="#s-sag"/></svg></button>
+      <button type="button" class="raf-ok sol" tabindex="-1" aria-label="Bulut ve Yağış Fiziği: önceki kartlar"><svg class="simge" aria-hidden="true"><use href="#s-sol"/></svg></button>
+      <button type="button" class="raf-ok sag" tabindex="-1" aria-label="Bulut ve Yağış Fiziği: sonraki kartlar"><svg class="simge" aria-hidden="true"><use href="#s-sag"/></svg></button>
     </div>
   </section>
 
@@ -329,8 +329,8 @@ html:not(.fare) .raf-serit > li.net .kac { opacity: 1; }
         <li><a class="kart" href="./cbs/" data-ara="cbs coğrafi bilgi sistemleri gis qgis harita yapımı making a map uygulama 1 natural earth japonya tokyo iç harita baskı düzeni yerleşim ölçek çubuğu kuzey oku lejant ızgara grid izdüşüm projeksiyon epsg pdf png dışa aktar rehber adım adım gerçek ekran mto 388"><span class="kg"><img src="./kapak/kart-cbs.webp" alt="" width="480" height="300" decoding="async" loading="lazy"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-arac"/></svg><b>CBS · QGIS ile harita</b></span><span class="kac">Japonya haritası: 28 adım</span></a></li>
         <li><a class="kart" href="./cbs/uygulama2.html" data-ara="cbs coğrafi bilgi sistemleri gis qgis vektör stili basic vector styling uygulama 2 santral power plant enerji yenilenebilir yenilenemez fosil yakıt csv sınırlandırılmış metin delimited text kurala bağlı rule based kategorize ifade expression darker log10 kapasite boyut sembol işaretçi üçgen katman biçimlendirme rehber adım adım gerçek ekran mto 388"><span class="kg"><img src="./kapak/kart-cbs2.webp" alt="" width="480" height="300" decoding="async" loading="lazy"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-arac"/></svg><b>CBS · QGIS ile vektör stili</b></span><span class="kac">Dünyanın santralleri: 16 adım</span></a></li>
       </ul>
-      <button type="button" class="raf-ok sol" tabindex="-1" aria-label="Coğrafi Bilgi Sistemleri: geri kaydır"><svg class="simge" aria-hidden="true"><use href="#s-sol"/></svg></button>
-      <button type="button" class="raf-ok sag" tabindex="-1" aria-label="Coğrafi Bilgi Sistemleri: ileri kaydır"><svg class="simge" aria-hidden="true"><use href="#s-sag"/></svg></button>
+      <button type="button" class="raf-ok sol" tabindex="-1" aria-label="Coğrafi Bilgi Sistemleri: önceki kartlar"><svg class="simge" aria-hidden="true"><use href="#s-sol"/></svg></button>
+      <button type="button" class="raf-ok sag" tabindex="-1" aria-label="Coğrafi Bilgi Sistemleri: sonraki kartlar"><svg class="simge" aria-hidden="true"><use href="#s-sag"/></svg></button>
     </div>
   </section>
 
@@ -362,8 +362,8 @@ html:not(.fare) .raf-serit > li.net .kac { opacity: 1; }
         <li><a class="kart" href="./cfd-temelleri/" data-ara="cfd denklem terim sözlüğü dns les rans rk3 openfoam hesaplamalı akışkanlar"><span class="kg"><img src="./kapak/kart-cfd-temelleri.webp" alt="" width="480" height="300" decoding="async" loading="lazy"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-site"/></svg><b>CFD temelleri</b></span><span class="kac">Sekiz denklem ve terim sözlüğü</span></a></li>
         <li><a class="kart" href="./cfd-temelleri/#openfoam-pratigi-ve-lid-driven-cavity" data-ara="kapaklı kutu lid-driven cavity openfoam akış çizgisi girdap reynolds cfd"><span class="kg"><img src="./kapak/kart-cfd-kavite.webp" alt="" width="480" height="300" decoding="async" loading="lazy"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-arac"/></svg><b>Kapaklı kutu akışı</b></span><span class="kac">Lid-driven cavity ve OpenFOAM</span></a></li>
       </ul>
-      <button type="button" class="raf-ok sol" tabindex="-1" aria-label="Hesaplamalı Akışkanlar Dinamiği: geri kaydır"><svg class="simge" aria-hidden="true"><use href="#s-sol"/></svg></button>
-      <button type="button" class="raf-ok sag" tabindex="-1" aria-label="Hesaplamalı Akışkanlar Dinamiği: ileri kaydır"><svg class="simge" aria-hidden="true"><use href="#s-sag"/></svg></button>
+      <button type="button" class="raf-ok sol" tabindex="-1" aria-label="Hesaplamalı Akışkanlar Dinamiği: önceki kartlar"><svg class="simge" aria-hidden="true"><use href="#s-sol"/></svg></button>
+      <button type="button" class="raf-ok sag" tabindex="-1" aria-label="Hesaplamalı Akışkanlar Dinamiği: sonraki kartlar"><svg class="simge" aria-hidden="true"><use href="#s-sag"/></svg></button>
     </div>
   </section>
 
@@ -390,14 +390,14 @@ html:not(.fare) .raf-serit > li.net .kac { opacity: 1; }
         <li><a class="kart" href="./akademi/#/ansiklopedi" data-ara="ansiklopedi sözlük terim formül tanım sembol birim ingilizce tipik değer türetim çözülmüş örnek üç boyutlu şekil"><span class="kg"><img src="./kapak/kart-ansiklopedi.webp" alt="" width="480" height="300" decoding="async" loading="lazy"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-sayfa"/></svg><b>Ansiklopedi</b></span><span class="kac">356 terim, 113 formül, 16 3B şekil</span></a></li>
         <li><a class="kart" href="./akademi/#/kod" data-dersler="MTO 223|MTO 463" data-ara="kod programlama grads ncl ferret fortran python matlab r linux nwp sayısal hava tahmini model görselleştirme kabuk konsol"><span class="kg"><img src="./kapak/kart-kod.webp" alt="" width="480" height="300" decoding="async" loading="lazy"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-sayfa"/></svg><b>Kod atölyesi</b></span><span class="kac">44 kod örneği, tarayıcıda konsol</span></a></li>
         <li><a class="kart" href="./akademi/#/havacilik" data-dersler="MTO 304" data-ara="havacılık metar taf sigmet swc pilot uçuş meydan kod çözücü buzlanma türbülans oraj sis"><span class="kg"><img src="./kapak/kart-havacilik.webp" alt="" width="480" height="300" decoding="async" loading="lazy"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-sayfa"/></svg><b>Havacılık meteorolojisi</b></span><span class="kac">METAR, TAF, SIGMET, SWC kartı</span></a></li>
-        <li><a class="kart" href="./akademi/#/ogren" data-dersler="MTO 337E|MTO 340" data-ara="dersler atmosfer dinamiği dinamik coriolis jeostrofik termal rüzgâr vortisite rossby ekman hidrostatik denklem terim ders kartı kaydırıcı etkileşimli şekil"><span class="kg"><img src="./kapak/kart-dersler.webp" alt="" width="480" height="300" decoding="async" loading="lazy"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-sayfa"/></svg><b>Dinamik ders kartları</b></span><span class="kac">20 kart: denklem ve terimler</span></a></li>
+        <li><a class="kart" href="./akademi/#/ogren" data-dersler="MTO 337E|MTO 340" data-ara="dersler atmosfer dinamiği dinamik coriolis jeostrofik termal rüzgâr vortisite rossby ekman hidrostatik denklem terim ders kartı sürgü etkileşimli şekil"><span class="kg"><img src="./kapak/kart-dersler.webp" alt="" width="480" height="300" decoding="async" loading="lazy"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-sayfa"/></svg><b>Dinamik ders kartları</b></span><span class="kac">20 kart: denklem ve terimler</span></a></li>
         <li><a class="kart" href="./akademi/#/konular" data-ara="konu omurga köprü ders zinciri"><span class="kg"><img src="./kapak/kart-konular.webp" alt="" width="480" height="300" decoding="async" loading="lazy"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-sayfa"/></svg><b>Konular</b></span><span class="kac">Bir fikrin dersten derse yolu</span></a></li>
         <li><a class="kart" href="./akademi/#/kaynaklar" data-ara="veri kaynak era5 open-meteo radyosonda sonda skew-t metar arşivi lisans site rehber"><span class="kg"><img src="./kapak/kart-kaynaklar.webp" alt="" width="480" height="300" decoding="async" loading="lazy"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-sayfa"/></svg><b>Kaynaklar ve veri</b></span><span class="kac">Veriyi nereden, nasıl alacağın</span></a></li>
         <li><a class="kart" href="./akademi/#/canli" data-ara="radar uydu canlı gerçek renk"><span class="kg"><img src="./kapak/kart-canli.webp" alt="" width="480" height="300" decoding="async" loading="lazy"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-sayfa"/></svg><b>Canlı atmosfer</b></span><span class="kac">Radar ve uydu, ders gözüyle</span></a></li>
         <li><a class="kart" href="./akademi/#/kariyer" data-ara="kariyer iş sektör meslek kamu havacılık enerji su yurt dışı temsilcilik"><span class="kg"><img src="./kapak/kart-kariyer.webp" alt="" width="480" height="300" decoding="async" loading="lazy"></span><span class="kad"><svg class="simge" aria-hidden="true"><use href="#s-sayfa"/></svg><b>Kariyer</b></span><span class="kac">Hangi bilgi hangi işte değerli</span></a></li>
       </ul>
-      <button type="button" class="raf-ok sol" tabindex="-1" aria-label="Müfredatın tamamı: geri kaydır"><svg class="simge" aria-hidden="true"><use href="#s-sol"/></svg></button>
-      <button type="button" class="raf-ok sag" tabindex="-1" aria-label="Müfredatın tamamı: ileri kaydır"><svg class="simge" aria-hidden="true"><use href="#s-sag"/></svg></button>
+      <button type="button" class="raf-ok sol" tabindex="-1" aria-label="Müfredatın tamamı: önceki kartlar"><svg class="simge" aria-hidden="true"><use href="#s-sol"/></svg></button>
+      <button type="button" class="raf-ok sag" tabindex="-1" aria-label="Müfredatın tamamı: sonraki kartlar"><svg class="simge" aria-hidden="true"><use href="#s-sag"/></svg></button>
     </div>
   </section>
   <p class="bos" id="bos" hidden><span>Eşleşen bölüm yok. Başka bir kelime dene: «SYNOP», «bulut», «HEC-HMS».</span><button type="button" id="temizle">Aramayı temizle</button></p>
@@ -497,7 +497,7 @@ html:not(.fare) .raf-serit > li.net .kac { opacity: 1; }
       if (!fare) li.scrollIntoView({ inline: 'start', block: 'nearest', behavior: 'smooth' });
     });
     // dokunmatik: başa yaslanan (kapağın hemen yanındaki) kart net. Gözlem şeridi o kartın ortasında 8 px'lik bir çizgi;
-    // ölçü yalnız boyut değişince okunur (kaydırırken yerleşim okuma yok).
+    // ölçü yalnız boyut değişince okunur (şerit kayarken yerleşim okuma yok).
     let net = null, netOlcu = '';
     const netKur = () => {
       const ilk = [...s.children].find((li) => !li.hidden); if (!ilk) return;
