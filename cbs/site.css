@@ -20,6 +20,11 @@ a{color:var(--odak)}
 .geri{display:inline-flex;align-items:center;gap:4px;text-decoration:none;color:var(--yazi);padding:6px 10px 6px 4px;border-radius:10px;font-size:16px}
 .geri:hover{background:var(--yuzey)}
 .ust-ad{font-size:17px}
+.uyg-sec{display:flex;gap:4px;margin-left:6px}
+.uyg-sec a{font-size:14px;line-height:1.2;text-decoration:none;color:var(--soluk);padding:5px 11px;border-radius:999px;white-space:nowrap;border:1px solid transparent}
+.uyg-sec a:hover{background:var(--yuzey)}
+.uyg-sec a[aria-current]{background:var(--odak-zemin);color:var(--odak);border-color:var(--odak);font-weight:600}
+.uyg-sec a:focus-visible{outline:2px solid var(--odak);outline-offset:2px}
 .ust-ders{margin-left:auto;font-size:14px;color:var(--soluk);border:1px solid var(--cizgi);border-radius:999px;padding:2px 10px;white-space:nowrap}
 .cipler{position:relative}
 .cip-ic{display:flex;gap:8px;overflow-x:auto;padding-block:8px;scrollbar-width:none}
@@ -152,4 +157,11 @@ h3{font-size:clamp(20px,1.7vw,24px);line-height:1.25;margin:3px 0 0}
   .ucluk span{padding-top:0}
   .ust-ad{font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   body{font-size:17px}
+}
+@media (max-width:560px){
+  .ust-ic{gap:8px}
+  .geri span{display:none}
+  .uyg-sec{margin-left:0}
+  .uyg-sec a{padding:5px 8px;font-size:13px}
+  .ust-ders{display:none}
 }

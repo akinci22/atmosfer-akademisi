@@ -2,7 +2,9 @@
 (function () {
   'use strict';
   var V = window.CBS, $ = function (s, k) { return (k || document).querySelector(s); };
-  var ANAHTAR = 'cbs.u1.bitti', ANAHTAR_L = 'cbs.u1.liste';
+  /* aynı motor iki sayfada: veri dosyası onek (çapa) ve anahtar (ilerleme) verir; yoksa Uygulama-1 */
+  var ON = V.onek || 'uygulama1', AK = V.anahtar || 'cbs.u1';
+  var ANAHTAR = AK + '.bitti', ANAHTAR_L = AK + '.liste';
   function oku(a) { try { return JSON.parse(localStorage.getItem(a) || '[]'); } catch (e) { return []; } }
   function yaz(a, d) { try { localStorage.setItem(a, JSON.stringify(d)); } catch (e) { /* özel pencere */ } }
   var bitti = oku(ANAHTAR), liste = oku(ANAHTAR_L);
@@ -25,7 +27,7 @@
   /* ---------- kurulum ---------- */
   var asamaKap = $('#asamalar'), no = 0, html = '';
   V.asamalar.forEach(function (a, ai) {
-    html += '<section class="kap asama" id="uygulama1-' + a.id + '" data-asama="' + a.id + '"><div class="asama-bas"><span class="asama-no">' + (ai + 1) +
+    html += '<section class="kap asama" id="' + ON + '-' + a.id + '" data-asama="' + a.id + '"><div class="asama-bas"><span class="asama-no">' + (ai + 1) +
       '</span><h2>' + e(a.uzun) + '</h2><p class="asama-ozet">' + e(a.ozet) + '</p></div><div class="adimlar">';
     V.adimlar.forEach(function (d) {
       if (d.f !== a.id) return;
@@ -42,7 +44,7 @@
       var den = d.liste ? '<ul class="denetim">' + d.liste.map(function (s, i) {
         return '<li><label><input type="checkbox" data-liste="' + i + '"' + (liste.indexOf(i) >= 0 ? ' checked' : '') + '><span>' + e(s) + '</span></label></li>';
       }).join('') + '</ul>' : '';
-      html += '<article class="adim-kart' + (gorsel ? '' : ' yalniz') + '" id="uygulama1-a' + no + '" data-no="' + no + '"><div class="adim-yazi">' +
+      html += '<article class="adim-kart' + (gorsel ? '' : ' yalniz') + '" id="' + ON + '-a' + no + '" data-no="' + no + '"><div class="adim-yazi">' +
         '<div class="adim-ust"><span class="adim-no">' + no + '</span><h3>' + e(d.baslik) + '</h3></div>' +
         '<p class="yol">' + e(d.yol) + '</p>' +
         '<ul class="ucluk"><li><span>NE YAPIYORUM</span><div>' + e(d.ne) + '</div></li><li><span>NEREDE</span><div>' + e(d.nerede) +
@@ -59,7 +61,7 @@
   $('#adim-sayi').textContent = TOPLAM;
 
   $('#cipler').innerHTML = V.asamalar.map(function (a, i) {
-    return '<a class="cip" href="#uygulama1-' + a.id + '" data-cip="' + a.id + '"><b>' + (i + 1) + '</b>' + e(a.ad) + ' <small></small></a>';
+    return '<a class="cip" href="#' + ON + '-' + a.id + '" data-cip="' + a.id + '"><b>' + (i + 1) + '</b>' + e(a.ad) + ' <small></small></a>';
   }).join('') + '<a class="cip" href="#hatalar" data-cip="hatalar"><b>?</b>Hatalar</a><a class="cip" href="#bitmis" data-cip="bitmis"><b>✓</b>Bitmiş harita</a>';
 
   $('#hata-liste').innerHTML = V.hatalar.map(function (h) {
@@ -108,8 +110,8 @@
   });
   $('#devam').addEventListener('click', function () {
     var hedef = null;
-    for (var i = 1; i <= TOPLAM; i++) if (bitti.indexOf(i) < 0) { hedef = $('#uygulama1-a' + i); break; }
-    (hedef || $('#uygulama1')).scrollIntoView({ behavior: 'smooth', block: 'start' });
+    for (var i = 1; i <= TOPLAM; i++) if (bitti.indexOf(i) < 0) { hedef = $('#' + ON + '-a' + i); break; }
+    (hedef || $('#' + ON)).scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
   ciz();
 
@@ -144,6 +146,10 @@
     }, { rootMargin: '-130px 0px -55% 0px' });
     document.querySelectorAll('.asama, #hatalar, #bitmis').forEach(function (s) { io.observe(s); });
   }
+  /* sayfa dibinde son bölüm kısa kalırsa gözlemci ondan önceki bölümü seçer; dipte son çip etkin */
+  window.addEventListener('scroll', function () {
+    if (Math.ceil(scrollY + innerHeight) >= document.documentElement.scrollHeight - 2) etkin('bitmis');
+  }, { passive: true });
 
   /* ---------- büyütme ---------- */
   var isik = $('#isik'), isikImg = $('img', isik);
@@ -294,6 +300,102 @@
       }
       k.addEventListener('click', function (o) { var b = o.target.closest('[data-a]'); if (b) c4(+b.dataset.a); });
       c4(5);
+    }
+    ,
+    /* ---------- Uygulama-2 açıklayıcıları ---------- */
+    kural: function (k) {
+      var YAKIT = [['Hydro', 7155], ['Solar', 5929], ['Wind', 5188], ['Gas', 3922], ['Coal', 2390], ['Oil', 2290], ['Biomass', 1396],
+        ['Waste', 1087], ['Nuclear', 198], ['Geothermal', 189], ['Storage', 58], ['Other', 44], ['Cogeneration', 41], ['Petcoke', 13], ['Wave and Tidal', 10]];
+      var KUR = [
+        { ad: 'Renewable fuel', renk: '#2b9348', liste: ['Biomass', 'Geothermal', 'Hydro', 'Solar', 'Wind', 'Storage', 'Wave and Tidal'], yazi: 'IN (Hydro, Solar, Wind, Biomass, Geothermal, Storage, Wave and Tidal)' },
+        { ad: 'Non-renewable fuel', renk: '#c0392b', liste: ['Coal', 'Gas', 'Nuclear', 'Oil', 'Petcoke'], yazi: 'IN (Coal, Gas, Nuclear, Oil, Petcoke)' },
+        { ad: 'Other', renk: '#7a7a7a', liste: null, yazi: 'ELSE · üsttekilerin yakalamadığı her şey' }
+      ];
+      var say = {}; YAKIT.forEach(function (y) { say[y[0]] = y[1]; });
+      function kuralBul(y) { for (var i = 0; i < KUR.length; i++) if (!KUR[i].liste || KUR[i].liste.indexOf(y) >= 0) return i; }
+      var top = KUR.map(function () { return 0; });
+      YAKIT.forEach(function (y) { top[kuralBul(y[0])] += y[1]; });
+      var svg = '<svg viewBox="0 0 640 250" role="img" aria-label="Seçilen yakıt türünün üç kuraldan hangisine düştüğü">' +
+        '<g font-family="system-ui,Segoe UI,Arial" font-size="17">';
+      KUR.forEach(function (r, i) {
+        var y = 14 + i * 78;
+        svg += '<g class="kr" data-i="' + i + '"><rect x="150" y="' + y + '" width="476" height="64" rx="10" fill="#fff" stroke="#c9d0da" stroke-width="1.5"/>' +
+          '<path d="M176 ' + (y + 44) + 'l12-22 12 22z" fill="' + r.renk + '" stroke="#14181f" stroke-opacity=".35"/>' +
+          '<text x="214" y="' + (y + 28) + '" font-weight="700" fill="#14181f">' + r.ad + '</text>' +
+          '<text x="214" y="' + (y + 50) + '" font-size="12.5" fill="#5a6472">' + r.yazi + '</text></g>';
+      });
+      svg += '<g fill="#5a6472" font-size="14"><text x="72" y="24" text-anchor="middle">satır</text><text x="72" y="42" text-anchor="middle">yukarıdan</text><text x="72" y="60" text-anchor="middle">aşağı</text></g>' +
+        '<path d="M72 74v150m-8-10l8 10 8-10" stroke="#5a6472" stroke-width="1.75" fill="none" stroke-linecap="round"/>' +
+        '<circle class="top" cx="128" cy="46" r="9" fill="#1d4ed8"/></g></svg>';
+      k.innerHTML = '<h4>Hangi kural yakalar? <small>bir yakıt seç</small></h4>' + svg +
+        '<div class="arac-yan"><div class="secenek" role="group" aria-label="Yakıt türü">' +
+        YAKIT.map(function (y) { return '<button type="button" data-y="' + y[0] + '" aria-pressed="false">' + y[0] + '</button>'; }).join('') + '</div>' +
+        '<div class="okuma">' + okuma('sant', 'Bu yakıtta santral') + okuma('kural', 'Yakalayan kural') + okuma('top', 'Bu kuralda toplam') + '</div>' +
+        '<p>Bir santral ilk tutan kurala girer. ELSE kuralı en altta durur; listede adı geçmeyen her yakıtı toplar.</p></div>';
+      function sec(y) {
+        var i = kuralBul(y);
+        k.querySelectorAll('.kr').forEach(function (g) {
+          var b = +g.dataset.i === i;
+          $('rect', g).setAttribute('stroke', b ? KUR[i].renk : '#c9d0da');
+          $('rect', g).setAttribute('stroke-width', b ? 3.5 : 1.5);
+          g.style.opacity = b ? 1 : .55;
+        });
+        $('.top', k).setAttribute('cy', 46 + i * 78);
+        $('.top', k).setAttribute('fill', KUR[i].renk);
+        k.querySelectorAll('[data-y]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.y === y)); });
+        yansit(k, { sant: bin(say[y]), kural: KUR[i].ad, top: bin(top[i]) });
+      }
+      k.addEventListener('click', function (o) { var b = o.target.closest('[data-y]'); if (b) sec(b.dataset.y); });
+      sec('Waste');
+    },
+    boyut: function (k) {
+      var MM = 30;                                   /* çizimde 1 mm = 30 birim */
+      k.innerHTML = '<h4>log10("capacity_mw") + 1 <small>kapasiteyi değiştir</small></h4>' +
+        '<svg viewBox="0 0 640 240" role="img" aria-label="Kapasiteye göre üçgen boyu: logaritmik ve doğrusal ölçek">' +
+        '<g font-family="system-ui,Arial" font-size="16" fill="#5a6472"><text x="170" y="24" text-anchor="middle">log ölçek (ödevdeki)</text><text x="470" y="24" text-anchor="middle">doğrusal olsaydı</text></g>' +
+        '<path d="M320 34v196" stroke="#e3e6eb"/><path d="M20 210h600" stroke="#e3e6eb"/>' +
+        '<path class="lg" fill="#2b9348" stroke="#1e6a33" stroke-width="2"/><path class="dg" fill="#c9d0da" stroke="#8a94a3" stroke-width="2"/>' +
+        '<g font-family="system-ui,Arial" font-size="19" font-weight="700" fill="#14181f"><text class="tl" x="170" y="232" text-anchor="middle"></text><text class="td" x="470" y="232" text-anchor="middle"></text></g></svg>' +
+        '<div class="arac-yan"><label>Kapasite (MW)<input type="range" min="0" max="4.352" step="0.004" value="2" aria-label="Kapasite, logaritmik"></label>' +
+        '<div class="okuma">' + okuma('mw', 'Kapasite') + okuma('log', 'log10(MW) + 1') + okuma('dog', 'Doğrusal boy') + '</div>' +
+        '<p>Veride 1 MW ile 22 500 MW arası var. Doğrusal boyda küçük santrallerin hepsi aynı minik nokta olur; log ölçekte her 10 kat büyüme 1 mm ekler.</p></div>';
+      var g = $('input', k);
+      function uc(cx, s) { var a = s * MM, h = a * .87; return 'M' + (cx - a / 2) + ' 210L' + cx + ' ' + (210 - h) + 'L' + (cx + a / 2) + ' 210Z'; }
+      function c5() {
+        var mw = Math.round(Math.pow(10, +g.value)), sl = Math.log(mw) / Math.LN10 + 1, sd = 1 + 4.352 * (mw - 1) / 22499;
+        $('.lg', k).setAttribute('d', uc(170, sl)); $('.dg', k).setAttribute('d', uc(470, sd));
+        $('.tl', k).textContent = tr(sl, 2) + ' mm'; $('.td', k).textContent = tr(sd, 2) + ' mm';
+        yansit(k, { mw: bin(mw) + ' MW', log: tr(sl, 2) + ' mm', dog: tr(sd, 2) + ' mm' });
+      }
+      g.addEventListener('input', c5); c5();
+    },
+    koyu: function (k) {
+      var REN = [['#2b9348', 'yeşil'], ['#c0392b', 'kırmızı'], ['#7a7a7a', 'gri'], ['#e39b2d', 'turuncu']];
+      k.innerHTML = '<h4>darker(@symbol_color, 130) <small>dolgu rengini değiştir</small></h4>' +
+        '<svg viewBox="0 0 640 210" role="img" aria-label="Dolgu rengi ve ondan türeyen daha koyu kontur">' +
+        '<path class="u" d="M220 180L320 30L420 180Z" stroke-width="12" stroke-linejoin="round"/>' +
+        '<g font-family="system-ui,Arial" font-size="16" fill="#5a6472"><text class="oran" x="470" y="80">kontur = dolgu ÷ 1,3</text><text x="470" y="104">(parlaklık)</text></g></svg>' +
+        '<div class="arac-yan"><div class="secenek" role="group" aria-label="Dolgu rengi">' +
+        REN.map(function (r, i) { return '<button type="button" data-r="' + i + '" aria-pressed="' + (i === 0) + '">' + r[1] + '</button>'; }).join('') + '</div>' +
+        '<label>Koyulaştırma oranı<input type="range" min="100" max="250" step="5" value="130" aria-label="darker oranı"></label>' +
+        '<div class="okuma">' + okuma('dol', 'Dolgu') + okuma('kon', 'Kontur') + okuma('v', 'Parlaklık (V)') + '</div>' +
+        '<p>Kontur rengi elle seçilmiyor, dolgudan hesaplanıyor. Kural rengini değiştirdiğinde kontur da kendiliğinden uyar.</p></div>';
+      var ri = 0, g = $('input', k);
+      function hex(r, g2, b) { return '#' + [r, g2, b].map(function (v) { return ('0' + Math.round(v).toString(16)).slice(-2); }).join(''); }
+      function koyulas(h, f) {                       /* Qt QColor::darker: HSV değerini f/100'e böl */
+        var r = parseInt(h.substr(1, 2), 16), g2 = parseInt(h.substr(3, 2), 16), b = parseInt(h.substr(5, 2), 16);
+        var mx = Math.max(r, g2, b), m = mx * 100 / f / mx;
+        return { h: hex(r * m, g2 * m, b * m), v1: mx / 255, v2: mx * 100 / f / 255 };
+      }
+      function c6() {
+        var f = +g.value, c = REN[ri][0], s = koyulas(c, f);
+        $('.u', k).setAttribute('fill', c); $('.u', k).setAttribute('stroke', s.h);
+        $('.oran', k).textContent = 'kontur = dolgu ÷ ' + tr(f / 100, 2);
+        k.querySelectorAll('[data-r]').forEach(function (b) { b.setAttribute('aria-pressed', String(+b.dataset.r === ri)); });
+        yansit(k, { dol: c, kon: s.h, v: '%' + Math.round(s.v1 * 100) + ' → %' + Math.round(s.v2 * 100) });
+      }
+      k.addEventListener('click', function (o) { var b = o.target.closest('[data-r]'); if (b) { ri = +b.dataset.r; c6(); } });
+      g.addEventListener('input', c6); c6();
     }
   };
   document.querySelectorAll('[data-arac]').forEach(function (k) { ARAC[k.dataset.arac](k); });

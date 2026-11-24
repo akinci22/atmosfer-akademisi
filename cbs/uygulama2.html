@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="tr" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CBS Uygulamaları · QGIS vektör stili · MTO 388 · Atmosfer Akademisi</title>
+<meta name="description" content="QGIS ile vektör stili adım adım: dünya santralleri CSV'si, kurala bağlı üç sınıf (yenilenebilir, yenilenemez, diğer), hesaplanan kontur rengi ve kapasiteye göre logaritmik üçgen boyu. Gerçek program ekranları ve küçük etkileşimli açıklayıcılarla.">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231d4ed8'/%3E%3Cpath d='M6 9l7-3 6 3 7-3v17l-7 3-6-3-7 3z' fill='none' stroke='%23fff' stroke-width='2' stroke-linejoin='round'/%3E%3Cpath d='M13 6v17M19 9v17' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<header class="ust" id="ust">
+  <div class="kap ust-ic">
+    <a class="geri" href="../" aria-label="Atmosfer Akademisi ana sayfası">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Akademi</span>
+    </a>
+    <strong class="ust-ad">CBS Uygulamaları</strong>
+    <nav class="uyg-sec" aria-label="Uygulamalar"><a href="./">1 · Harita</a><a href="uygulama2.html" aria-current="page">2 · Stil</a></nav>
+    <span class="ust-ders">MTO 388</span>
+  </div>
+  <nav class="cipler" aria-label="Bu sayfada">
+    <div class="kap cip-ic" id="cipler"></div>
+    <div class="ilerleme" aria-hidden="true"><i id="ilerleme-cubuk"></i></div>
+  </nav>
+</header>
+<main id="ana">
+  <section class="kap giris" id="uygulama2">
+    <div class="giris-yazi">
+      <p class="ust-etiket">Uygulama-2 · Basic vector styling</p>
+      <h1>QGIS ile vektör stili: dünyanın santralleri</h1>
+      <ul class="giris-madde">
+        <li>29 910 santral, <b id="adim-sayi">16</b> kısa adım: renk yakıt sınıfını, üçgen boyu kapasiteyi gösterir.</li>
+        <li>Her adımda gerçek program ekranı; kırmızı numara, yanındaki maddeyle eşleşir.</li>
+        <li>Bitirdiğin adımı işaretle; kaldığın yer bu tarayıcıda durur.</li>
+      </ul>
+      <p class="durum-satir"><span id="durum-yazi">0 / 16 adım</span> <button class="dugme-ince" id="devam" type="button">Kaldığım yere git</button></p>
+    </div>
+    <button class="giris-gorsel buyut" type="button" data-buyut="img/u2-son-avrupa.webp" aria-label="Avrupa görünümünü büyüt">
+      <img src="img/u2-kapak.webp" width="960" height="600" alt="Avrupa'daki santraller: yeşil yenilenebilir, kırmızı yenilenemez üçgenler, boyları kapasiteye göre">
+      <span class="gorsel-not">Hedef: bu görünüm</span>
+    </button>
+  </section>
+  <div id="asamalar"></div>
+  <section class="kap bolum" id="hatalar">
+    <h2>Sık yapılan hatalar</h2>
+    <div class="hata-liste" id="hata-liste"></div>
+  </section>
+  <section class="kap bolum" id="bitmis">
+    <h2>Bitmiş harita</h2>
+    <div class="bitmis-ic">
+      <button class="buyut bitmis-gorsel" type="button" data-buyut="img/u2-harita.webp" aria-label="Bitmiş haritayı büyüt">
+        <img src="img/u2-harita.webp" width="1600" height="1040" loading="lazy" alt="Dünya santralleri haritası: yeşil yenilenebilir, kırmızı yenilenemez, gri diğer; üçgen boyu kapasiteye göre">
+      </button>
+      <ul class="bitmis-madde">
+        <li><b>Kara</b> açık gri dolgu, saydam kontur</li>
+        <li><b>Santraller</b> üçgen, kontur = darker(@symbol_color, 130)</li>
+        <li><b>Renk</b> kurala bağlı: Renewable · Non-renewable · Other (Else)</li>
+        <li><b>Boyut</b> log10("capacity_mw") + 1 mm</li>
+        <li><b>KRS</b> EPSG:4326 - WGS 84</li>
+        <li><b>Veri</b> WRI Global Power Plant Database v1.2.0 · Natural Earth</li>
+      </ul>
+    </div>
+  </section>
+</main>
+<footer class="alt"><div class="kap">CBS Uygulamaları · MTO 388 · <a href="../">Atmosfer Akademisi</a> · Veri: WRI Global Power Plant Database, Natural Earth · Yazılım: QGIS 3.44</div></footer>
+<div class="isik" id="isik" hidden><button class="isik-kapat" type="button" aria-label="Kapat">Kapat</button><img alt=""></div>
+<noscript><p style="padding:24px">Adım kartları için JavaScript gerekli.</p></noscript>
+<script src="boyut.js"></script>
+<script src="veri2.js"></script>
+<script src="app.js"></script>
+<script src="odak.js" defer></script>
+</body>
+</html>
