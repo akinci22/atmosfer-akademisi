@@ -48,7 +48,8 @@ p, li, dd { text-wrap: pretty; }
 .tema-d svg { width: 18px; height: 18px; }
 .tema-d:hover { border-color: var(--ink3); }
 .ust-ilerleme { height: 2px; background: var(--acc); transform-origin: 0 50%; transform: scaleX(0); }
-@media (max-width: 1099px) { .ust-toc { display: inline-block; } .ust-nav { display: none; } .ust-ders { display: none; } }
+@media (max-width: 1099px) { .ust-toc { display: inline-block; } .ust-nav { margin-left: 12px; gap: 0; } .ust-nav a:not(.ust-portfoy) { display: none; } .ust-portfoy { font-size: 14px; } .ust-ders { display: none; } }
+@media (max-width: 480px) { .ust-ic { gap: 8px; } .ust-toc { padding: 6px 10px; font-size: 14px; } .ust-nav { margin-left: 2px; } .ust-portfoy { font-size: 13px; } }
 
 /* yerleşim */
 .sayfa { box-sizing: content-box; display: grid; grid-template-columns: 248px minmax(0, 1fr); gap: 40px; max-width: 1440px; margin: 0 auto; padding-inline: max(var(--kenar), env(safe-area-inset-left, 0px)) max(var(--kenar), env(safe-area-inset-right, 0px)); }

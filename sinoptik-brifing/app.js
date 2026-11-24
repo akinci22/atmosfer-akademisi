@@ -117,7 +117,7 @@
   // ───────── üst çubuk + içindekiler
   function ustCubuk() {
     const u = $('#ust');
-    u.innerHTML = `<div class="ust-ic"><a class="ust-marka" href="../">Atmosfer Akademisi</a><span class="ust-ayrac">/</span><span class="ust-ders">MTO 302E · Brifing Atölyesi</span><nav class="ust-nav"><a href="../ders-kitapligi/#mto302e">Soru çözümü (PDF)</a><a href="../harita-okulu/">Harita Okulu</a><a href="../hava-analizi-proje-rehberi/">Proje Rehberi</a><a class="ust-portfoy" href="https://akinci22.github.io/hakkimda/" target="_blank" rel="noopener">Portföyüm ↗</a></nav></div>`;
+    u.innerHTML = `<div class="ust-ic"><a class="ust-marka" href="../">Atmosfer Akademisi</a><span class="ust-ayrac">/</span><span class="ust-ders">MTO 302E · Brifing Atölyesi</span><nav class="ust-nav"><a href="../ders-kitapligi/#mto302e">Soru çözümü (PDF)</a><a href="../harita-okulu/">Harita Okulu</a><a href="../hava-analizi-proje-rehberi/">Proje Rehberi</a><a class="ust-portfoy" href="https://akinci22.github.io/hakkimda/" target="_blank" rel="noopener" aria-label="akinci22 (yeni sekmede açılır)">akinci22 ↗</a></nav></div>`;
     const ic = u.querySelector('.ust-ic'); const tb = btn('ust-toc', 'İçindekiler', () => document.body.classList.toggle('toc-acik')); ic.insertBefore(tb, ic.querySelector('.ust-nav'));
     // tema: varsayılan açık; koyu yalnız bu düğmeyle (seçim tarayıcıda kalır, sistem ayarı izlenmez)
     const AY = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5Z"/></svg>';
