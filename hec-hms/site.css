@@ -57,7 +57,6 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .sim-bolum { max-width: 1632px; margin: 0 auto; padding: 8px max(16px, env(safe-area-inset-left, 0px)) 0; }
 .sim-alan { display: grid; grid-template-columns: minmax(0, 1fr) clamp(340px, 28vw, 420px); gap: 16px; height: calc(var(--vh) - var(--ust-h) - 16px); min-height: 440px; }
 .sim-alan.izle { grid-template-columns: minmax(0, 1fr) clamp(380px, 33vw, 420px); }
-.sim-alan.izle .pn-sec { max-height: 30%; }
 .sim-alan.izle .iz-serit { margin-top: 6px; }
 .sim-alan.izle .iz-h { margin-top: 8px; }
 .sim-alan.izle .pn-ust { padding: 8px 12px; }
@@ -80,10 +79,31 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .pn-mod.secik { background: var(--yuzey); color: var(--ink); box-shadow: 0 1px 3px rgba(17, 24, 39, .14); }
 
 /* seçim listesi: kategori satırı + o kategorinin öğeleri (masaüstünde panelin üstü, kategori satırı yapışkan) */
-.pn-sec { position: relative; flex: 0 1 auto; max-height: 50%; overflow: auto; overscroll-behavior: contain; padding: 0 12px 12px; border-bottom: 1px solid var(--line); }
+/* masaüstü (D35): tek satır tetik «Kategori › Öğe ▾»; basınca iç içe kutu açılır (solda kategoriler, sağda o kategorinin öğeleri),
+   okuma alanını aşağı itmez, üstüne açılır; öğe seçince kapanır */
+.pn-sec { position: relative; z-index: 5; flex: none; padding: 8px 12px; border-bottom: 1px solid var(--line); }
 .pn-sec:empty { display: none; }
-.sec-kat { position: sticky; top: 0; z-index: 1; display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 0; background: var(--bg2); }
-.sec-oge { display: flex; flex-wrap: wrap; gap: 8px; }
+.sec-ac { display: flex; align-items: center; gap: 6px; width: 100%; min-height: 44px; padding: 0 10px 0 12px; border-radius: 10px; background: var(--yuzey); box-shadow: inset 0 0 0 1px var(--line2); font-size: 15px; color: var(--ink); text-align: left; }
+.sec-ac:hover, .sec-ac[aria-expanded="true"] { box-shadow: inset 0 0 0 1.5px var(--acc); }
+.sec-k { flex: none; display: inline-flex; align-items: baseline; gap: 5px; font-weight: 650; color: var(--ink2); white-space: nowrap; }
+.sec-k i { font-style: normal; font-size: 13px; font-weight: 650; color: var(--ink3); font-variant-numeric: tabular-nums; }
+.sec-ac svg { flex: none; width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; color: var(--ink3); }
+.sec-o { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 650; color: var(--acc-ink); }
+.sec-ac.bos .sec-o { font-weight: 500; color: var(--ink3); }
+.sec-ac[aria-expanded="true"] .sec-asagi { transform: rotate(180deg); }
+.sec-pop { position: absolute; left: 8px; right: 8px; top: calc(100% - 2px); display: grid; grid-template-columns: minmax(118px, 38%) minmax(0, 1fr); max-height: min(62vh, 560px); border-radius: 12px; background: var(--bg2); box-shadow: 0 0 0 1px var(--line2), 0 14px 34px rgba(17, 24, 39, .18); overflow: hidden; animation: secGir .16s ease-out; }
+@keyframes secGir { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .sec-pop { animation: none; } }
+.sec-kat { display: flex; flex-direction: column; gap: 2px; padding: 8px 6px; overflow: auto; overscroll-behavior: contain; background: var(--yuzey); border-right: 1px solid var(--line); scrollbar-width: thin; }
+.sec-oge { display: flex; flex-direction: column; align-items: stretch; gap: 4px; padding: 8px; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+.sec-kat .sk { justify-content: space-between; min-height: 38px; border-radius: 8px; box-shadow: none; background: none; }
+.sec-kat .sk:hover { background: var(--bg2); box-shadow: none; }
+.sec-kat .sk.secik { background: var(--acc); }
+.sec-oge .so { min-height: 40px; padding: 6px 10px; border-radius: 8px; box-shadow: none; background: none; }
+.sec-oge .so:hover { background: var(--yuzey); box-shadow: inset 0 0 0 1px var(--line2); }
+.sec-oge .so.secik, .sec-oge .so.so-adim.simdi { background: var(--acc-soft); box-shadow: inset 0 0 0 1.5px var(--acc); }
+.sec-oge .so-g { margin: 8px 4px 2px; font-size: 13px; text-transform: none; color: var(--ink3); }
+.sec-oge .so-g:first-child { margin-top: 2px; }
 .sk { display: inline-flex; align-items: center; gap: 6px; min-height: 38px; padding: 0 12px; border-radius: 999px; font-size: 15px; font-weight: 600; color: var(--ink2); background: var(--yuzey); box-shadow: inset 0 0 0 1px var(--line2); white-space: nowrap; transition: background .15s, color .15s, box-shadow .15s; }
 .sk span { font-size: 15px; font-weight: 650; color: var(--ink3); font-variant-numeric: tabular-nums; }
 .sk:hover { color: var(--ink); box-shadow: inset 0 0 0 1px var(--acc); }

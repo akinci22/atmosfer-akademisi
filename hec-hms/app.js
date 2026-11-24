@@ -118,6 +118,7 @@
   /* ---------------------------------------------------------------- mod ve durum */
   let mod = 'kesif', odev = null, adim = 0, mik = 0, sonAc = null;
   let kesKat = 0, kesSec = null, odakHd = null, fazGor = null; // seçim listesi durumu
+  let secAcik = false; // masaüstü: kategori → öğe açılır kutusu (kapalıyken tek satır)
   const HMS = () => window.HMS;
   function ileriSar(liste) { liste.forEach((m) => { if (m.oto) m.oto.forEach((x) => HMS().yap(x.yap || x.hd, { doldur: true, sag: x.sag, cizme: true })); else HMS().yap(m.yap || m.hd, { doldur: true, sag: m.sag, cizme: true }); }); }
   const tumMikro = (o, kadar) => o.adimlar.slice(0, kadar == null ? o.adimlar.length : kadar).flatMap((a) => a.mikro);
@@ -185,7 +186,8 @@
         if (o.g && o.g !== g0) { g0 = o.g; oge += `<span class="so-g">${kac(o.g)}</span>`; }
         oge += `<button type="button" class="so${o.i === kesSec ? ' secik' : ''}" data-oge="${o.i}" data-k="${kac(o.k)}" aria-pressed="${o.i === kesSec}">${kac(o.et)}</button>`;
       });
-      return { kat, oge, et: 'Programın bölümleri' };
+      const so = kesSec != null && KOGE[kesSec] && KOGE[kesSec].kat === kesKat ? KOGE[kesSec] : null;
+      return { kat, oge, et: 'Programın bölümleri', kad: KESIF[kesKat].ad, kn: KESIF[kesKat].ogeler.length, oad: so ? so.et : 'Bir parça seç', bos: !so };
     }
     const o = mod === 'izle' ? (iz && iz.o) : odev; if (!o) return null;
     const N = o.adimlar.length;
@@ -198,7 +200,8 @@
       const a = o.adimlar[i], d = i < simdi ? ' bitti' : i === simdi ? ' simdi' : '';
       oge += `<button type="button" class="so so-adim${d}" data-faz-adim="${i}" title="${i + 1}. ${kac(a.baslik)}" aria-label="Adım ${i + 1}: ${kac(a.baslik)}"${i === simdi ? ' aria-current="step"' : ''}><b>${i + 1}</b>${kac(a.kisa)}</button>`;
     }
-    return { kat, oge, et: `${o.ad} aşamaları` };
+    const sa = simdi < N && simdi >= fs[gf].bas && simdi < fs[gf].son ? o.adimlar[simdi] : null;
+    return { kat, oge, et: `${o.ad} aşamaları`, kad: fs[gf].kisa, kn: fs[gf].son - fs[gf].bas, oad: sa ? `${simdi + 1}. ${sa.kisa}` : (simdi >= N ? 'Bitti' : 'Bir adım seç'), bos: !sa };
   }
   function yatayOrtala(kutu, el) {
     if (!kutu) return;
@@ -211,15 +214,15 @@
     if (genis()) {
       sk.innerHTML = ''; so.innerHTML = '';
       if (!ps) return;
-      ps.innerHTML = v ? `<div class="sec-kat" role="group" aria-label="${kac(v.et)}">${v.kat}</div><div class="sec-oge" role="group" aria-label="Seçenekler">${v.oge}</div>` : '';
-      const s = ps.querySelector('.so.secik, .so.simdi');
+      ps.innerHTML = v ? `<button type="button" class="sec-ac${v.bos ? ' bos' : ''}" aria-expanded="${secAcik}" aria-controls="secpop" title="${kac(v.et)}: kategori ve öğe seç"><span class="sec-k">${kac(v.kad)}<i>${v.kn}</i></span><svg class="sec-ok" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg><span class="sec-o">${kac(v.oad)}</span><svg class="sec-asagi" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>`
+        + `<div class="sec-pop" id="secpop"${secAcik ? '' : ' hidden'}><div class="sec-kat" role="group" aria-label="${kac(v.et)}">${v.kat}</div><div class="sec-oge" role="group" aria-label="Seçenekler">${v.oge}</div></div>` : '';
+      const s = secAcik && ps.querySelector('.so.secik, .so.simdi');
       if (s) {
-        /* seçili öğe görünsün; mümkünse üstündeki grup adıyla birlikte (yapışkan kategori satırının altında yarım kalmasın) */
-        const kh = ps.querySelector('.sec-kat').offsetHeight, gor = ps.clientHeight - kh;
+        /* seçili öğe görünsün; mümkünse üstündeki grup adıyla birlikte */
+        const ko = ps.querySelector('.sec-oge');
         let g = s.previousElementSibling; while (g && !g.classList.contains('so-g')) g = g.previousElementSibling;
-        const ust = g && s.offsetTop + s.offsetHeight - g.offsetTop < gor - 8 ? g.offsetTop - 4 : s.offsetTop - 6;
-        if (ust - kh < ps.scrollTop) ps.scrollTop = ust - kh;
-        else if (s.offsetTop + s.offsetHeight > ps.scrollTop + ps.clientHeight) ps.scrollTop = Math.min(ust - kh, s.offsetTop + s.offsetHeight - ps.clientHeight + 8);
+        const ust = g && s.offsetTop + s.offsetHeight - g.offsetTop < ko.clientHeight - 8 ? g.offsetTop - 4 : s.offsetTop - 6;
+        if (ust < ko.scrollTop || s.offsetTop + s.offsetHeight > ko.scrollTop + ko.clientHeight) ko.scrollTop = Math.max(0, ust);
       }
     } else {
       if (ps) ps.innerHTML = '';
@@ -783,6 +786,10 @@
   const sahneEkranda = () => { const r = $('#benzetim').getBoundingClientRect(); return r.bottom >= ustH() + 40 && r.top <= window.innerHeight - 40; };
   function olaylar() {
     document.addEventListener('click', (e) => {
+      const sa = e.target.closest('.sec-ac');
+      if (sa) { secAcik = !secAcik; secimCiz(); if (secAcik && e.detail === 0) { const b = $('#secpop .sk.secik'); if (b) b.focus({ preventScroll: true }); } return; }
+      if (secAcik && !e.target.closest('#secpop')) { secAcik = false; secimCiz(); }
+      if (e.target.closest('#secpop [data-oge], #secpop [data-faz-adim]')) secAcik = false;
       const ib0 = e.target.closest('[data-isik]');
       if (ib0) { isikAc(ib0.dataset.isik, ib0); return; }
       if (e.target.closest('.isik-kapat') || e.target.id === 'isik' || e.target.closest('#isik figure')) { isikKapat(); return; }
@@ -861,7 +868,7 @@
       else if (e.key === ' ' && !(t && t.closest && t.closest('button, a'))) { e.preventDefault(); if (iz.oynuyor) izDur(); else izOynat(); }
     });
     document.addEventListener('visibilitychange', () => { if (document.hidden && iz && iz.oynuyor) izDur(); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') isikKapat(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { isikKapat(); if (secAcik) { secAcik = false; secimCiz(); const b = $('.sec-ac'); if (b) b.focus(); } } });
     let gz = 0; window.addEventListener('scroll', () => { if (gz) return; gz = requestAnimationFrame(() => { gz = 0; gezintiIzle(); }); }, { passive: true });
     /* telefonda «Tümü» ↔ «Yakınlaş» */
     $('#buyut').addEventListener('click', () => {
