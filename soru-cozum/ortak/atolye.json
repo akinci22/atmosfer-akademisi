@@ -9,7 +9,7 @@
 
   {"klasor": "mto303e", "kod": "MTO303E", "ad": "Hesaplamalı Akışkanlar Dinamiği", "cozum": true, "cozumSoru": 48, "calis": false, "soru": 0},
 
-  {"klasor": "mto302e", "kod": "MTO302E", "ad": "Sinoptik Meteoroloji · Harita Analizi", "cozum": true, "cozumSoru": 9, "calis": false, "soru": 0},
+  {"klasor": "mto302e", "kod": "MTO302E", "ad": "Hava Analizi ve Öngörü I", "cozum": true, "cozumSoru": 9, "calis": true, "soru": 222},
 
   {"klasor": "mto323", "kod": "MTO323", "ad": "Atmosfer Kimyası", "cozum": true, "cozumSoru": 44, "calis": false, "soru": 0},
 
