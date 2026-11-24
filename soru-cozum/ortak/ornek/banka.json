@@ -33,7 +33,7 @@
    "terimler": [
     {"s": "p", "ad": "Basınç", "birim": "Pa (1 hPa = 100 Pa)", "ne": "Havanın birim alana uyguladığı kuvvet.", "alternatif": [{"ne": "Su buharının kısmi basıncı $e$", "ne_zaman": "Yalnız su buharı için: $e = \\rho_v R_v T$."}]},
     {"s": "\\rho", "ad": "Yoğunluk", "birim": "kg/m³", "ne": "Birim hacimdeki hava kütlesi.", "alternatif": [{"ne": "Özgül hacim $\\alpha = 1/\\rho$", "ne_zaman": "Birim kütle başına yazımda: $p\\,\\alpha = R_d\\,T$."}]},
-    {"s": "R_d", "ad": "Kuru havanın gaz sabiti", "birim": "J kg⁻¹ K⁻¹", "ne": "Evrensel gaz sabitinin kuru havanın molar kütlesine bölümü: $R^*/M_d \\approx 287$.", "alternatif": [{"ne": "$R_v \\approx 461{,}5$ J kg⁻¹ K⁻¹", "ne_zaman": "Su buharı için."}, {"ne": "$R^* = 8{,}314$ J mol⁻¹ K⁻¹", "ne_zaman": "Mol başına yazımda ($pV = nR^*T$)."}]},
+    {"s": "R_d", "ad": "Kuru havanın gaz sabiti ($R^*/M_d$)", "birim": "J kg⁻¹ K⁻¹", "ne": "Evrensel gaz sabitinin kuru havanın molar kütlesine bölümü: $R^*/M_d \\approx 287$.", "alternatif": [{"ne": "$R_v \\approx 461{,}5$ J kg⁻¹ K⁻¹", "ne_zaman": "Su buharı için."}, {"ne": "$R^* = 8{,}314$ J mol⁻¹ K⁻¹", "ne_zaman": "Mol başına yazımda ($pV = nR^*T$)."}]},
     {"s": "T", "ad": "Mutlak sıcaklık", "birim": "K", "ne": "Kelvin cinsinden sıcaklık: T(K) = t(°C) + 273,15.", "alternatif": [{"ne": "Sanal sıcaklık $T_v$", "ne_zaman": "Nemli hava için, $R_d$'yi değiştirmeden."}]}
    ]},
   {"id": "magnus", "ad": "Doymuş buhar basıncı (Magnus tipi)", "tex": "e_s = 6{,}112\\,\\exp\\!\\left(\\dfrac{17{,}62\\,T}{243{,}12 + T}\\right)", "birimler": "$e_s$ hPa · T °C (su yüzeyi, yaklaşık −45 ile 60 °C)", "konu": "termo", "kaynak": "wmo8 Bölüm 4",

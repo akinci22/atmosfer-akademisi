@@ -95,6 +95,8 @@
       return texMi ? `{${sayiTex(v, bic)}}` : sayiDuz(v, bic);
     });
   }
+  // HTML alamayan yerler (option, title) için: $…$ sınırlayıcılarını ve TeX komut ters bölüsünü at
+  const duzMetin = (s) => String(s == null ? '' : s).replace(/\$\$?([^$]*)\$\$?/g, '$1').replace(/\\([A-Za-z]+)/g, '$1').replace(/[{}]/g, '');
   function duz(s, deg) {
     if (deg) s = yerDoldur(s, deg, false);
     return esc(s).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
@@ -790,12 +792,12 @@ ${konu ? `<section><h2 class="sv-etiket">Konu</h2><p class="sv-yan-k">${esc(konu
   function terimUst(q) {
     const f = FORM.get(q.formul); if (!f) return '';
     const ti = terimBul(f, q.terim), ts = ti >= 0 ? f.terimler[ti].s : q.terim;
-    return `<div class="sv-tf"><p class="sv-etiket">${esc(f.ad || 'Formül')}</p><div class="sv-tf-f">${formulHtml(f, ti, false, q.terim)}</div><p class="sv-tf-t">Odaktaki terim: <span class="sv-tf-s">${texSembol(q.terim)}</span> · <a href="#atlas/${encodeURIComponent(f.id)}/${encodeURIComponent(ts)}">Formül atlasında aç</a></p></div>`;
+    return `<div class="sv-tf"><p class="sv-etiket">${metin(f.ad || 'Formül')}</p><div class="sv-tf-f">${formulHtml(f, ti, false, q.terim)}</div><p class="sv-tf-t">Odaktaki terim: <span class="sv-tf-s">${texSembol(q.terim)}</span> · <a href="#atlas/${encodeURIComponent(f.id)}/${encodeURIComponent(ts)}">Formül atlasında aç</a></p></div>`;
   }
   function terimKart(t) {
     if (!t) return '';
     const alt = (t.alternatif || []);
-    return `<div class="sv-tk"><p class="sv-tk-s"><span class="sv-tk-sm">${texSembol(t.s)}</span><span class="sv-tk-ad">${esc(t.ad || '')}</span></p><dl class="sv-tk-dl"><div><dt>Birim</dt><dd>${metin(t.birim || '—')}</dd></div><div><dt>Ne?</dt><dd>${metin(t.ne || '')}</dd></div></dl><h3 class="sv-tk-h">Yerine ne konabilir?</h3>${alt.length ? `<ul class="sv-altl">${alt.map((a) => `<li><p class="sv-alt-ne">${metin(a.ne)}</p><p class="sv-alt-z"><span class="sv-soluk">Ne zaman:</span> ${metin(a.ne_zaman)}</p></li>`).join('')}</ul>` : '<p class="sv-soluk">Bu terimin yerine konan yaygın bir başka büyüklük yok.</p>'}</div>`;
+    return `<div class="sv-tk"><p class="sv-tk-s"><span class="sv-tk-sm">${texSembol(t.s)}</span><span class="sv-tk-ad">${metin(t.ad || '')}</span></p><dl class="sv-tk-dl"><div><dt>Birim</dt><dd>${metin(t.birim || '—')}</dd></div><div><dt>Ne?</dt><dd>${metin(t.ne || '')}</dd></div></dl><h3 class="sv-tk-h">Yerine ne konabilir?</h3>${alt.length ? `<ul class="sv-altl">${alt.map((a) => `<li><p class="sv-alt-ne">${metin(a.ne)}</p><p class="sv-alt-z"><span class="sv-soluk">Ne zaman:</span> ${metin(a.ne_zaman)}</p></li>`).join('')}</ul>` : '<p class="sv-soluk">Bu terimin yerine konan yaygın bir başka büyüklük yok.</p>'}</div>`;
   }
 
   // ---------- formül atlası
@@ -820,14 +822,14 @@ ${konu ? `<section><h2 class="sv-etiket">Konu</h2><p class="sv-yan-k">${esc(konu
     const iliskili = B.sorular.filter((q) => q.kanal === 'terim' && q.formul === f.id);
     const konuSay = f.konu ? B.sorular.filter((q) => q.konu === f.konu).length : 0;
     ana.innerHTML = `<div class="sv-atlas">
-<nav class="sv-a-l" aria-label="Formüller">${[...gruplar].map(([g, xs]) => `<p class="sv-a-g">${esc(g)}</p>${xs.map((x) => `<button type="button" class="sv-a-fb" data-f="${esc(x.id)}" aria-pressed="${x.id === f.id}">${esc(x.ad || x.id)}</button>`).join('')}`).join('')}</nav>
-<div class="sv-a-sec"><label class="sv-etiket" for="sv-a-s">Formül (${fl.length})</label><select id="sv-a-s">${[...gruplar].map(([g, xs]) => `<optgroup label="${esc(g)}">${xs.map((x) => `<option value="${esc(x.id)}"${x.id === f.id ? ' selected' : ''}>${esc(x.ad || x.id)}</option>`).join('')}</optgroup>`).join('')}</select></div>
+<nav class="sv-a-l" aria-label="Formüller">${[...gruplar].map(([g, xs]) => `<p class="sv-a-g">${esc(g)}</p>${xs.map((x) => `<button type="button" class="sv-a-fb" data-f="${esc(x.id)}" aria-pressed="${x.id === f.id}">${metin(x.ad || x.id)}</button>`).join('')}`).join('')}</nav>
+<div class="sv-a-sec"><label class="sv-etiket" for="sv-a-s">Formül (${fl.length})</label><select id="sv-a-s">${[...gruplar].map(([g, xs]) => `<optgroup label="${esc(g)}">${xs.map((x) => `<option value="${esc(x.id)}"${x.id === f.id ? ' selected' : ''}>${esc(duzMetin(x.ad || x.id))}</option>`).join('')}</optgroup>`).join('')}</select></div>
 <section class="sv-a-d" aria-live="polite">
-<h2 class="sv-a-h">${esc(f.ad || f.id)}</h2>
+<h2 class="sv-a-h">${metin(f.ad || f.id)}</h2>
 <div class="sv-a-f">${formulHtml(f, ti, true)}</div>
 ${f.birimler ? `<p class="sv-a-b"><span class="sv-etiket">Birimler</span> ${metin(f.birimler)}</p>` : ''}
 <p class="sv-a-ip">Formüldeki bir terime ya da aşağıdaki simgelerden birine dokun.</p>
-<div class="sv-a-t" role="group" aria-label="Terimler">${tl.map((t, i) => `<button type="button" class="sv-a-tb" data-t="${i}" aria-pressed="${i === ti}" title="${esc(t.ad || '')}">${texSembol(t.s)}</button>`).join('')}</div>
+<div class="sv-a-t" role="group" aria-label="Terimler">${tl.map((t, i) => `<button type="button" class="sv-a-tb" data-t="${i}" aria-pressed="${i === ti}" title="${esc(duzMetin(t.ad || ''))}">${texSembol(t.s)}</button>`).join('')}</div>
 ${terimKart(tl[ti])}
 <div class="sv-a-alt">${kaynakHtml(f.kaynak)}${f.konu && KONU.has(f.konu) ? `<p class="sv-a-k"><button type="button" class="sv-dug sv-ikinci" data-e="konu-git" data-konu="${esc(f.konu)}">${esc(KONU.get(f.konu).ad)} · ${konuSay} soru${ikon('sag')}</button></p>` : ''}</div>
 ${iliskili.length ? `<div class="sv-a-q"><h3>Bu formülün terim soruları</h3><ul>${iliskili.map((q) => `<li><a href="#${esc(q.id)}">${texSembol(q.terim)}<span>${esc(String(q.soru || '').replace(/\$[^$]*\$/g, '…').slice(0, 90))}</span></a></li>`).join('')}</ul></div>` : ''}
