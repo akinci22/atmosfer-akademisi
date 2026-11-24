@@ -162,6 +162,9 @@ kbd{font:12px/1 ui-monospace,Consolas,monospace;color:var(--s);border:1px solid 
 .sv-tf-t{margin:2px 0 0;font-size:15px}
 .sv-tf-s{display:inline-block;padding:0 6px;border-radius:6px;background:#dbe6fd}
 .sv-t-on{color:var(--m);background:#dbe6fd;border-radius:4px;box-shadow:0 0 0 3px #dbe6fd}
+/* KaTeX'in vlist/pstrut katmanları kesrin paydasını ve kök içini örter: tıklama yalnız terimlere geçsin */
+.sv-a-f .katex .vlist,.sv-a-f .katex .pstrut{pointer-events:none}
+.sv-a-f .sv-t,.sv-a-f .sv-t *{pointer-events:auto}
 .sv-a-f .sv-t{cursor:pointer;border-bottom:2px dotted #94a3b8}
 .sv-a-f .sv-t:hover{background:var(--m2)}
 
