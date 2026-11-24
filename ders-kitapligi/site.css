@@ -193,13 +193,25 @@ ol.adimlar>li p{margin:.5em 0}
 .yaz{border-width:1px}
 @media(max-width:600px){.takip label{width:100%}.tex-blok{text-align:left}}
 /* tam ekran: tek ince şerit; içerik ortada okunur genişlikte */
-.hud{position:fixed;z-index:40;top:0;left:0;right:0;display:flex;align-items:center;gap:6px;padding:calc(4px + env(safe-area-inset-top,0px)) max(8px,env(safe-area-inset-right,0px)) 4px max(8px,env(safe-area-inset-left,0px));background:color-mix(in srgb,var(--zemin) 97%,transparent);border-bottom:1px solid var(--cizgi);font-size:15px;transition:opacity .25s,transform .25s}
-.hud.sakin{opacity:0;transform:translateY(-100%);pointer-events:none}
+.hud{position:fixed;z-index:40;top:0;left:0;right:0;display:flex;justify-content:center;padding:calc(4px + env(safe-area-inset-top,0px)) max(8px,env(safe-area-inset-right,0px)) 4px max(8px,env(safe-area-inset-left,0px));background:color-mix(in srgb,var(--zemin) 97%,transparent);border-bottom:1px solid var(--cizgi);font-size:15px;transition:background-color .3s,border-color .3s}
+.hud-ic{flex:1;min-width:0;display:flex;align-items:center;gap:6px;animation:hudAc .22s ease-out}
 .hud button,.hud a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;min-width:44px;padding:0 10px;border:1px solid transparent;border-radius:8px;background:none;color:var(--yazi);font:inherit;text-decoration:none;cursor:pointer}
 .hud button:hover,.hud a:hover{border-color:var(--cizgi)}
-.hud [data-k=once],.hud [data-k=sonra]{font-size:24px;line-height:1}
+.hud .hs{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.hud .he{margin-left:6px}
+.hud [data-k=kalem][aria-pressed=true]{border-color:var(--acc);color:var(--acc);background:var(--acc-zemin)}
 .hud button:disabled{opacity:.35;cursor:default}
 .hud-ad{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;color:var(--ikincil)}
+/* 3 sn sonra sade hap: yalnız simgeler + soru no ve konu (küçük, tok); imleç/dokunuşla açılır */
+.hud.sakin{background:transparent;border-bottom-color:transparent;pointer-events:none}
+.hud.sakin .hud-ic{flex:0 1 auto;max-width:min(620px,calc(100vw - 16px));gap:0;padding:1px 5px;pointer-events:auto;border:1px solid var(--cizgi);border-radius:999px;background:color-mix(in srgb,var(--zemin) 90%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 2px 12px rgb(0 0 0/.07);animation:hudKucul .28s ease-out}
+.hud.sakin .he,.hud.sakin .hud-ders{display:none}
+.hud.sakin button,.hud.sakin a{min-height:32px;min-width:32px;padding:0 6px;border-radius:999px}
+.hud.sakin .hs{width:16px;height:16px;stroke-width:2.4}
+.hud.sakin .hud-ad{flex:0 1 auto;padding:0 6px;font-size:13px;font-weight:650;letter-spacing:.01em;color:var(--yazi)}
+@keyframes hudAc{from{opacity:.4;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@keyframes hudKucul{from{opacity:.3;transform:scale(.96)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.hud-ic,.hud.sakin .hud-ic{animation:none}}
 html.tam .ust,html.tam .takip{display:none}
 html.tam main{max-width:48rem;padding-top:64px;padding-bottom:30vh}
 html.tam .kitap-yer{display:block}
@@ -208,5 +220,6 @@ html.tam .dizin .ic{display:none}
 html.tam .dizin .ic[open]{display:block;position:fixed;z-index:35;top:0;left:0;bottom:0;width:min(400px,88vw);overflow:auto;background:var(--zemin);border:0;border-right:1px solid var(--cizgi);padding:calc(56px + env(safe-area-inset-top,0px)) 14px 24px}
 html.tam .vurgu{scroll-margin-top:72px}
 @media(min-width:900px){html.tam body{font-size:21px}}
-@media(max-width:480px){.hud{gap:2px}.hud button,.hud a{padding:0 8px;font-size:14px}.hud-ad{font-size:13px}}
+@media(max-width:640px){.hud .he,.hud .hud-ders{display:none}}
+@media(max-width:480px){.hud-ic{gap:2px}.hud button,.hud a{padding:0 8px;font-size:14px}.hud-ad{font-size:13px}}
 .tex-satir{display:inline-block;max-width:100%;overflow-x:auto;overflow-y:hidden;vertical-align:middle}.tex-satir svg.mj{max-width:none}

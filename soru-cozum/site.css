@@ -75,11 +75,23 @@ pre{overflow-x:auto;background:var(--ince);border-radius:8px;padding:10px 12px;f
 }
 @media(min-width:1600px){body{font-size:20px}}
 /* Tam ekran: sade okuma; tek ince üst şerit (HUD) */
-.hud{position:fixed;z-index:30;top:0;left:0;right:0;display:flex;align-items:center;gap:6px;padding:calc(4px + env(safe-area-inset-top,0px)) max(8px,env(safe-area-inset-right,0px)) 4px max(8px,env(safe-area-inset-left,0px));background:rgba(255,255,255,.97);border-bottom:1px solid var(--c);font-size:15px;transition:opacity .25s,transform .25s}
-.hud.sakin{opacity:0;transform:translateY(-100%);pointer-events:none}
-.hud .dug{border-color:transparent;padding:0 10px}
+.hud{position:fixed;z-index:30;top:0;left:0;right:0;display:flex;justify-content:center;padding:calc(4px + env(safe-area-inset-top,0px)) max(8px,env(safe-area-inset-right,0px)) 4px max(8px,env(safe-area-inset-left,0px));background:rgba(255,255,255,.97);border-bottom:1px solid var(--c);font-size:15px;transition:background-color .3s,border-color .3s}
+.hud-ic{flex:1;min-width:0;display:flex;align-items:center;gap:6px;animation:hudAc .22s ease-out}
+.hud .dug{border-color:transparent;padding:0 10px;gap:6px}
+.hud .hs{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.hud [data-k=kalem][aria-pressed=true]{border-color:var(--m);color:var(--m);background:#eef3fd}
 .hud .dug:hover{border-color:var(--c)}
 .hud-ad{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;color:var(--s)}
+/* 3 sn sonra sade hap: yalnız simgeler + soru no ve konu (küçük, tok); imleç/dokunuşla açılır */
+.hud.sakin{background:transparent;border-bottom-color:transparent;pointer-events:none}
+.hud.sakin .hud-ic{flex:0 1 auto;max-width:min(620px,calc(100vw - 16px));gap:0;padding:1px 5px;pointer-events:auto;border:1px solid var(--c);border-radius:999px;background:rgba(255,255,255,.9);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 2px 12px rgb(0 0 0/.07);animation:hudKucul .28s ease-out}
+.hud.sakin .he,.hud.sakin .hud-ders{display:none}
+.hud.sakin .dug{min-height:32px;min-width:32px;padding:0 6px;border-radius:999px}
+.hud.sakin .hs{width:16px;height:16px;stroke-width:2.4}
+.hud.sakin .hud-ad{flex:0 1 auto;padding:0 6px;font-size:13px;font-weight:650;letter-spacing:.01em;color:var(--y)}
+@keyframes hudAc{from{opacity:.4;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@keyframes hudKucul{from{opacity:.3;transform:scale(.96)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.hud-ic,.hud.sakin .hud-ic{animation:none}}
 html.tam,html.tam body{background:#fff}
 html.tam .ust,html.tam .alt-bilgi,html.tam .araclar{display:none}
 html.tam .duzen{display:block;max-width:46rem;padding-top:60px;padding-bottom:30vh}
@@ -90,5 +102,6 @@ html.tam .ic[open]{display:block;position:fixed;z-index:25;top:0;left:0;bottom:0
 html.tam .soru,html.tam .kisim{scroll-margin-top:64px}
 html.tam .soru:target>header{margin-left:-14px}
 @media(min-width:900px){html.tam body{font-size:21px}}
-@media(max-width:480px){.hud{gap:2px}.hud .dug{padding:0 8px;font-size:14px}.hud-ad{font-size:13px}}
-.hud [data-k=once],.hud [data-k=sonra]{font-size:24px;line-height:1}.hud .dug:disabled{opacity:.35;cursor:default}
+@media(max-width:640px){.hud .he,.hud .hud-ders{display:none}}
+@media(max-width:480px){.hud-ic{gap:2px}.hud .dug{padding:0 8px;font-size:14px}.hud-ad{font-size:13px}}
+.hud .dug:disabled{opacity:.35;cursor:default}

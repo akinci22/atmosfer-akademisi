@@ -7,7 +7,8 @@
   const sorular = [...d.querySelectorAll('main article.soru')];
   const bls = [...ic.querySelectorAll('details.bl')];
   const linkler = [...ic.querySelectorAll('a[href^="#s"]')];
-  const hudAd = hud.querySelector('.hud-ad');
+  const hudDers = hud.querySelector('.hud-ders'), hudKisa = hud.querySelector('.hud-kisa');
+  const kod = ((d.querySelector('.ust .kod') || {}).textContent || '').trim();
   const dug = (k) => hud.querySelector(`[data-k="${k}"]`);
   const ANAH = 'sc-ic:' + location.pathname;
   let tam = false, hazir = false;
@@ -44,7 +45,12 @@
   function hudYaz() {
     if (!tam) return;
     const k = simdiki(), q = sorular[Math.max(0, k)];
-    if (q) { const no = q.querySelector('header .no'), t = q.querySelector('h2'); hudAd.textContent = (no ? no.textContent.replace(/^.*·\s*/, '') : '') + (t ? ' · ' + t.textContent : ''); }
+    if (q) {
+      const no = q.querySelector('header .no'), t = q.querySelector('h2');
+      const n = no ? no.textContent.replace(/^.*·\s*/, '').replace(/^Soru\s+/, 'S') : '';
+      hudDers.textContent = kod ? kod + ' · ' : '';
+      hudKisa.textContent = n + (t ? (n ? ' · ' : '') + t.textContent : '');
+    }
     dug('once').disabled = k <= 0; dug('sonra').disabled = k >= sorular.length - 1;
   }
   function git(yon) {
@@ -54,17 +60,23 @@
     if (location.hash !== '#' + q.id) location.hash = q.id; else q.scrollIntoView();
   }
 
-  // --- HUD: 2 sn hareketsizlikte gizlen, hareketle geri gel
+  // --- HUD: 3 sn sonra sade şerit (simgeler + kısa başlık); imleç üste gelince ya da dokununca açılır
   let zaman = 0;
+  function sadele() {
+    const fareUstte = matchMedia('(hover:hover)').matches && hud.matches(':hover');
+    if (tam && !ic.open && !fareUstte && !hud.querySelector(':focus-visible')) hud.classList.add('sakin');
+    else if (tam) zaman = setTimeout(sadele, 1500);
+  }
   function goster() {
     if (!tam) return;
     hud.classList.remove('sakin');
     clearTimeout(zaman);
-    zaman = setTimeout(() => {
-      const fareUstte = matchMedia('(hover:hover)').matches && hud.matches(':hover');
-      if (tam && !ic.open && !fareUstte && !hud.querySelector(':focus-visible')) hud.classList.add('sakin');
-    }, 2000);
+    zaman = setTimeout(sadele, 3000);
   }
+  // kalem: tam ekranla birlikte görünür; düğme durumu
+  const kalem = () => window.__kalem;
+  window.__kalemKolon = () => d.querySelector('main') || d.body;
+  d.addEventListener('kalem', (e) => { const b = dug('kalem'); if (b) b.setAttribute('aria-pressed', String(!!(e.detail && e.detail.acik))); });
 
   // --- tam ekran (Fullscreen API; yoksa sabit tam pencere katmanı)
   function konumAl() { const k = Math.max(0, simdiki()), q = sorular[k]; if (!q) return null; const r = q.getBoundingClientRect(); return { q, oran: r.height ? Math.min(1, Math.max(0, -r.top / r.height)) : 0 }; }
@@ -75,7 +87,7 @@
     tam = true; h.classList.add('tam'); hud.hidden = false;
     ic.open = false;
     if (h.requestFullscreen && !d.fullscreenElement) h.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
-    requestAnimationFrame(() => { konumVer(p); hudYaz(); goster(); });
+    requestAnimationFrame(() => { konumVer(p); hudYaz(); goster(); if (kalem()) kalem().goster(true); });
     d.addEventListener('fullscreenchange', function bir() { d.removeEventListener('fullscreenchange', bir); if (tam) requestAnimationFrame(() => konumVer(p)); });
   }
   function kapat() {
@@ -83,6 +95,7 @@
     const p = konumAl();
     tam = false; h.classList.remove('tam'); hud.hidden = true; hud.classList.remove('sakin');
     clearTimeout(zaman);
+    if (kalem()) kalem().goster(false);
     const v2 = oku(); ic.open = !!(v2 && v2.a);
     if (d.fullscreenElement && d.exitFullscreen) d.exitFullscreen().catch(() => {});
     requestAnimationFrame(() => konumVer(p));
@@ -98,13 +111,27 @@
     else if (k === 'once') git(-1);
     else if (k === 'sonra') git(1);
     else if (k === 'kapat') kapat();
+    else if (k === 'kalem' && kalem()) kalem().cevir();
     goster();
   });
+  // sade şeritte: imleç üstüne gelince / dokununca / klavyeyle odaklanınca açılır
+  hud.addEventListener('pointerenter', goster);
+  hud.addEventListener('pointerdown', goster);
+  hud.addEventListener('focusin', goster);
   // tam ekranda içindekilerden seçince çekmece kapanır; çekmece dışına dokununca kapanır
   ic.addEventListener('click', (e) => { if (tam && e.target.closest('a[href^="#"]')) ic.open = false; });
   d.addEventListener('click', (e) => { if (tam && ic.open && !ic.contains(e.target) && !hud.contains(e.target)) ic.open = false; });
 
-  for (const ev of ['mousemove', 'pointerdown', 'touchstart', 'wheel']) addEventListener(ev, goster, { passive: true });
+  // imleç ekranın üst kenarına yaklaşınca açılır; dokunmatikte içeriğe kısa dokunuş açar (çekme/çizim açmaz)
+  addEventListener('mousemove', (e) => { if (tam && e.clientY < 72) goster(); }, { passive: true });
+  let dokun = null;
+  addEventListener('pointerdown', (e) => { dokun = e.pointerType === 'mouse' ? null : { x: e.clientX, y: e.clientY, t: Date.now() }; }, { passive: true });
+  addEventListener('pointerup', (e) => {
+    const b = dokun; dokun = null;
+    if (!tam || !b || Date.now() - b.t > 350 || Math.abs(e.clientX - b.x) + Math.abs(e.clientY - b.y) > 12) return;
+    if (e.target.closest && e.target.closest('a,button,summary,input,textarea,select,.kalem-katman,.kalem-panel')) return;
+    goster();
+  }, { passive: true });
   let bekle = false;
   addEventListener('scroll', () => { if (bekle) return; bekle = true; requestAnimationFrame(() => { bekle = false; hudYaz(); if (ic.open && !tam) isaretle(false); }); }, { passive: true });
 
@@ -115,7 +142,7 @@
     const k = e.key;
     if (k === 'f' || k === 'F') { e.preventDefault(); if (tam) kapat(); else ac(); return; }
     if (!tam) return;
-    goster();
+    if (k === 'Escape' || k === 't' || k === 'T' || k === 'ArrowRight' || k === 'ArrowLeft' || k === 'Tab') goster();
     if (k === 'Escape') { e.preventDefault(); if (ic.open) ic.open = false; else kapat(); }
     else if (k === 't' || k === 'T') { e.preventDefault(); ic.open = !ic.open; if (ic.open) { const a = ic.querySelector('a[aria-current]'); if (a) a.focus({ preventScroll: false }); } }
     else if ((k === 'ArrowRight' || k === 'ArrowLeft') && !(t.closest && t.closest('.fk,.tk,pre'))) { e.preventDefault(); git(k === 'ArrowRight' ? 1 : -1); }
