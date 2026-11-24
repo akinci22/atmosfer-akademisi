@@ -184,7 +184,7 @@ html:not(.fare) .raf-serit > li.net .kac { opacity: 1; }
 @media (max-width: 420px) { .marka { font-size: 17px; } a.folio { height: 36px; padding: 0 10px; gap: 4px; font-size: 14px; } }
 @media (max-width: 380px) { .akd { font-size: 15px; gap: 4px; } .tumu { font-size: 15px; padding: 0 12px; } }
 /* eş zamanlı soru çözümü şeridi — beş kitap her filtrede görünür (Ders Kitaplığı) */
-.ezc { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-top: 18px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 16px; background: var(--odak-zemin); }
+.ezc { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px 10px; margin-top: 18px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 16px; background: var(--odak-zemin); }
 .ezc-bas { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 6px; margin-right: 4px; color: var(--odak); font-size: 17px; font-weight: 700; text-decoration: none; border-radius: 10px; white-space: nowrap; }
 .ezc-bas small { font-size: 15px; font-weight: 500; color: var(--ink2); }
 .ezc-bas:hover { text-decoration: underline; text-underline-offset: 5px; }
@@ -192,7 +192,16 @@ html:not(.fare) .raf-serit > li.net .kac { opacity: 1; }
 .ezc-k b { font-weight: 700; }
 .ezc-k span { color: var(--ink2); }
 .ezc-k:hover { border-color: var(--renk); }
-@media (max-width: 640px) { .ezc { padding: 8px; gap: 8px; } .ezc-bas { width: 100%; } .ezc-k { flex: 1 1 calc(50% - 8px); padding: 0 10px; font-size: 15px; } }
+/* Sınav atölyesi (25 Kas): ders kartının altında küçük ikinci bağ — kart + bağ tek çerçevede (.ezc-g) */
+.ezc-g { display: inline-flex; flex-direction: column; justify-content: center; border: 1px solid var(--line2); border-left: 4px solid var(--renk); border-radius: 12px; background: #ffffff; transition: border-color var(--t5-hizli) var(--t5-egri); }
+.ezc-g:hover { border-color: var(--renk); }
+.ezc-g .ezc-k { min-height: 40px; border: 0; border-radius: 10px 10px 0 0; background: none; }
+.ezc-s { display: flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border-top: 1px dashed var(--line2); border-radius: 0 0 10px 10px; color: var(--odak); font-size: 15px; font-weight: 600; line-height: 1.2; text-decoration: none; white-space: nowrap; }
+.ezc-s i { font-style: normal; font-weight: 500; color: var(--ink2); }
+.ezc-s i::before { content: "· "; }
+.ezc-s::after { content: "→"; margin-left: auto; padding-left: 4px; }
+.ezc-s:hover { background: var(--odak-zemin); text-decoration: underline; text-underline-offset: 4px; }
+@media (max-width: 640px) { .ezc { padding: 8px; gap: 8px; } .ezc-bas { width: 100%; } .ezc-k { flex: 1 1 calc(50% - 8px); padding: 0 10px; font-size: 15px; } .ezc-g { flex: 1 1 calc(50% - 8px); min-width: 0; } .ezc-g .ezc-k { flex: 0 0 auto; } .ezc-s { padding: 0 10px; } .ezc-s i { display: none; } }
 </style>
 </head>
 <body>
@@ -247,11 +256,12 @@ html:not(.fare) .raf-serit > li.net .kac { opacity: 1; }
   </div>
   <nav class="ezc" aria-label="Soru çözümü, PDF ile eş zamanlı">
     <a class="ezc-bas" href="./ders-kitapligi/"><svg class="simge" aria-hidden="true"><use href="#s-ogren"/></svg>Soru çözümü <small>PDF ile eş zamanlı</small></a>
-    <a class="ezc-k" href="./ders-kitapligi/#mto302e" style="--renk: var(--c302)"><b>MTO 302E</b><span>SYNOP</span></a>
-    <a class="ezc-k" href="./ders-kitapligi/#mto316" style="--renk: var(--c316)"><b>MTO 316</b><span>Hidro</span></a>
-    <a class="ezc-k" href="./ders-kitapligi/#mto342e" style="--renk: var(--c229)"><b>MTO 229E</b><span>Bulut</span></a>
+    <span class="ezc-g" style="--renk: var(--c302)"><a class="ezc-k" href="./ders-kitapligi/#mto302e"><b>MTO 302E</b><span>SYNOP</span></a><a class="ezc-s" href="./soru-cozum/mto302e/calis/" title="MTO 302E sınav atölyesi: 222 soru">Sınav atölyesi<i>222 soru</i></a></span>
+    <span class="ezc-g" style="--renk: var(--c316)"><a class="ezc-k" href="./ders-kitapligi/#mto316"><b>MTO 316</b><span>Hidro</span></a><a class="ezc-s" href="./soru-cozum/mto316/calis/" title="MTO 316 sınav atölyesi: 256 soru">Sınav atölyesi<i>256 soru</i></a></span>
+    <span class="ezc-g" style="--renk: var(--c229)"><a class="ezc-k" href="./ders-kitapligi/#mto342e"><b>MTO 229E</b><span>Bulut</span></a><a class="ezc-s" href="./soru-cozum/mto342e/calis/" title="MTO 229E · MTO 342E sınav atölyesi: 259 soru">Sınav atölyesi<i>259 soru</i></a></span>
     <a class="ezc-k" href="./ders-kitapligi/#mto323" style="--renk: #be185d"><b>MTO 323</b><span>Kimya</span></a>
-    <a class="ezc-k" href="./ders-kitapligi/#mto303e" style="--renk: var(--c303)"><b>MTO 303E</b><span>CFD</span></a>
+    <span class="ezc-g" style="--renk: var(--c303)"><a class="ezc-k" href="./ders-kitapligi/#mto303e"><b>MTO 303E</b><span>CFD</span></a><a class="ezc-s" href="./soru-cozum/mto303e/calis/" title="MTO 303E sınav atölyesi: 246 soru">Sınav atölyesi<i>246 soru</i></a></span>
+    <span class="ezc-g" style="--renk: #15803d"><a class="ezc-k" href="./soru-cozum/mto388/"><b>MTO 388</b><span>CBS</span></a><a class="ezc-s" href="./soru-cozum/mto388/calis/" title="MTO 388 sınav atölyesi: 251 soru">Sınav atölyesi<i>251 soru</i></a></span>
     <a class="ezc-k" href="./arastirma/defterler/" style="--renk: #1d4ed8"><b>Defterler</b><span>tüm eş zamanlı PDF'ler</span></a>
   </nav>
   <p class="gizli" id="durum" role="status" aria-live="polite"></p>
