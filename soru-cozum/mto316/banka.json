@@ -2830,7 +2830,7 @@
    "konu": "hazne",
    "zorluk": 2,
    "fener": "Net akışı alana bölüp yıllık derinliğe çevir: 1 yıl = 3,1536×10⁷ s.",
-   "aciklama": "(2,0 − 1,5) × 3,1536×10⁷ / 50×10⁶ = 0,315 m/yıl → dh/dt = 0,8 − 1,2 + 0,315 = -0,085 m/yıl: göl yavaşça alçalıyor. −0,400 akışı, +0,315 yağış–buharlaşmayı unutmaktır.",
+   "aciklama": "(2,0 − 1,5) × 3,1536×10⁷ / 50×10⁶ = 0,315 m/yıl → dh/dt = 0,8 − 1,2 + 0,315 = −0,085 m/yıl: göl yavaşça alçalıyor. −0,400 akışı, +0,315 yağış–buharlaşmayı unutmaktır.",
    "kaynak": "ders · 7. hafta",
    "etiket": [
     "sayisal",
@@ -2838,7 +2838,7 @@
    ],
    "soru": "Göl: P = 0,8 m/yıl, E = 1,2 m/yıl, Qᵢₙ = 2,0 m³/s, Qₒᵤₜ = 1,5 m³/s, A = 50 km². Seviye değişim hızı dh/dt?",
    "secenekler": [
-    "-0,085 m/yıl",
+    "−0,085 m/yıl",
     "−0,400 m/yıl",
     "+0,315 m/yıl",
     "+0,085 m/yıl"
@@ -6582,13 +6582,13 @@
    "konu": "hazne",
    "zorluk": 2,
    "fener": "Hangi terimler eksi işaretli? Büyüklüklerini kıyasla.",
-   "aciklama": "Net akış -536 mm, buharlaşma −174 mm: ikisi de seviyeyi düşürüyor, büyük pay bırakımda. Δh = 0 için bırakım ≈ 8,7 m³/s'ye indirilmelidir.",
+   "aciklama": "Net akış −536 mm, buharlaşma −174 mm: ikisi de seviyeyi düşürüyor, büyük pay bırakımda. Δh = 0 için bırakım ≈ 8,7 m³/s'ye indirilmelidir.",
    "kaynak": "ders · 7. hafta",
    "etiket": [
     "yorum",
     "sayisal"
    ],
-   "durum": "20 km²'lik bir haznenin yağışsız bir yaz ayı (31 gün): tava 8 mm/gün, Kₚ = 0,7, giriş 10 m³/s, bırakım 14 m³/s. Hesap: göl buharlaşması 174 mm, net akış -536 mm → seviye -709 mm.",
+   "durum": "20 km²'lik bir haznenin yağışsız bir yaz ayı (31 gün): tava 8 mm/gün, Kₚ = 0,7, giriş 10 m³/s, bırakım 14 m³/s. Hesap: göl buharlaşması 174 mm, net akış −536 mm → seviye −709 mm.",
    "soru": "İşletmeci ne sonuç çıkarmalı?",
    "secenekler": [
     "Seviye kaybının çoğu girişi aşan bırakımdan, kalanı buharlaşmadan geliyor; bırakım kısılmalı",
