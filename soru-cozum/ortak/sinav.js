@@ -703,11 +703,46 @@ ${konu ? `<section><h2 class="sv-etiket">Konu</h2><p class="sv-yan-k">${esc(konu
   const KANAL = { test: secenekli, yorum: secenekli, terim: secenekli, dy: dyKur, sayisal: sayisalKur, fark: farkKur, bosluk: boslukKur, esle: esleKur, sirala: siralaKur };
 
   // ---------- formül: terimleri tıklanır/vurgulu sar
+  // Terim sembolü TeX ("\bar{Q}", "A_i") ya da Unicode düz metin ("Q̄", "Aᵢ", "X̄ₙ₋₁, σₙ₋₁") olabilir: ikisi de formülde bulunur.
+  const ALT_H = { '₀': '0', '₁': '1', '₂': '2', '₃': '3', '₄': '4', '₅': '5', '₆': '6', '₇': '7', '₈': '8', '₉': '9', '₊': '+', '₋': '-', '₌': '=', '₍': '(', '₎': ')', 'ₐ': 'a', 'ₑ': 'e', 'ₒ': 'o', 'ₓ': 'x', 'ₕ': 'h', 'ₖ': 'k', 'ₗ': 'l', 'ₘ': 'm', 'ₙ': 'n', 'ₚ': 'p', 'ₛ': 's', 'ₜ': 't', 'ᵢ': 'i', 'ᵣ': 'r', 'ᵤ': 'u', 'ᵥ': 'v', 'ⱼ': 'j' };
+  const UST_H = { '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9', '⁺': '+', '⁻': '-', 'ⁿ': 'n', 'ⁱ': 'i' };
+  const YUNAN = { 'Δ': '\\Delta', 'δ': '\\delta', 'σ': '\\sigma', 'Σ': '\\Sigma', 'ε': '\\varepsilon', 'ϵ': '\\epsilon', 'Λ': '\\Lambda', 'λ': '\\lambda', 'φ': '\\phi', 'ϕ': '\\phi', 'Φ': '\\Phi', 'ρ': '\\rho', 'θ': '\\theta', 'Θ': '\\Theta', 'α': '\\alpha', 'β': '\\beta', 'γ': '\\gamma', 'Γ': '\\Gamma', 'μ': '\\mu', 'π': '\\pi', 'Π': '\\Pi', 'τ': '\\tau', 'ω': '\\omega', 'Ω': '\\Omega', 'ψ': '\\psi', 'Ψ': '\\Psi', 'η': '\\eta', 'ν': '\\nu', 'κ': '\\kappa', 'χ': '\\chi', 'ζ': '\\zeta', 'ξ': '\\xi' };
+  const parcala = (s) => String(s == null ? '' : s).split(/,\s+|\s+ve\s+|;\s*/).map((x) => x.trim()).filter(Boolean);
+  function uniTex(p) {
+    let out = '';
+    const ch = [...String(p).normalize('NFD')];
+    for (let i = 0; i < ch.length; i++) {
+      const c = ch[i];
+      if (c === '̄' || c === '̅') { const m = /(\\[A-Za-z]+|.)$/.exec(out); if (m) out = out.slice(0, m.index) + '\\bar{' + m[1] + '}'; continue; }
+      if (ALT_H[c]) { let s = ''; while (i < ch.length && ALT_H[ch[i]]) { s += ALT_H[ch[i]]; i++; } i--; out += '_{' + s + '}'; continue; }
+      if (UST_H[c]) { let s = ''; while (i < ch.length && UST_H[ch[i]]) { s += UST_H[ch[i]]; i++; } i--; out += '^{' + s + '}'; continue; }
+      if (YUNAN[c]) { out += YUNAN[c]; if (i + 1 < ch.length && /[A-Za-z]/.test(ch[i + 1])) out += ' '; continue; }
+      out += c;
+    }
+    return out.normalize('NFC').replace(/(\d),(\d)/g, '$1{,}$2');
+  }
+  const UNI_RE = /[̄̅₀-ₜᵢ-ᵥⱼ⁰-ⁿ¹²³Α-Ωα-ωϕϵ]/;
+  // terim simgesini göster: Unicode yazımı TeX'e çevrilerek çizilir
+  const texSembol = (s) => (UNI_RE.test(String(s)) ? tex(parcala(s).map(uniTex).join(',\\;')) : tex(s));
   function varyant(s) {
-    const v = new Set([s]);
-    v.add(s.replace(/_\{([A-Za-z0-9])\}/g, '_$1')); v.add(s.replace(/_([A-Za-z0-9])(?![A-Za-z0-9{])/g, '_{$1}'));
-    v.add(s.replace(/\^\{([A-Za-z0-9])\}/g, '^$1'));
+    const pp = parcala(s); if (pp.length > 1) pp.push(String(s).trim());
+    const v = new Set();
+    for (const p of pp) {
+      const ad = [p]; const u = uniTex(p);
+      ad.push(u, u.replace(/\\varepsilon/g, '\\epsilon'), u.replace(/\\phi/g, '\\varphi'));
+      let m = /^([A-Za-z])\(([^()]+)\)$/.exec(p); if (m) ad.push(`${m[1]}_{${m[2]}}`);
+      m = /^([A-Za-z]{1,3})\/([A-Za-z]{1,3})$/.exec(p); if (m) ad.push(`\\frac{${m[1]}}{${m[2]}}`, `\\dfrac{${m[1]}}{${m[2]}}`);
+      if (/^[A-Za-z]{2,4}$/.test(p)) ad.push(`${p[0]}_{${p.slice(1)}}`);
+      for (const a of ad) { v.add(a); v.add(a.replace(/_\{([A-Za-z0-9])\}/g, '_$1')); v.add(a.replace(/_([A-Za-z0-9])(?![A-Za-z0-9{])/g, '_{$1}')); v.add(a.replace(/\^\{([A-Za-z0-9])\}/g, '^$1')); }
+    }
     return [...v].filter(Boolean);
+  }
+  // terim sorusundaki simge, formüldeki terimlerden birinin tamamı ya da parçası olabilir ("b" → "a, b")
+  function terimBul(f, sembol) {
+    const tl = (f && f.terimler) || [], s = String(sembol == null ? '' : sembol).trim();
+    let i = tl.findIndex((t) => t && String(t.s).trim() === s);
+    if (i < 0) i = tl.findIndex((t) => t && parcala(t.s).includes(s));
+    return i;
   }
   function terimSar(t, terimler, vurgu, hepsi) {
     const aday = [];
@@ -721,7 +756,7 @@ ${konu ? `<section><h2 class="sv-etiket">Konu</h2><p class="sv-yan-k">${esc(konu
         if (!t.startsWith(a.v, j)) continue;
         const once = t[j - 1], once2 = t[j - 2], sonra = t[j + a.v.length];
         if (harf(a.v[0]) && (harf(once) || once === '\\')) continue;
-        if (once === '_' || once === '^' || (once === '{' && (once2 === '_' || once2 === '^'))) continue;
+        if (once === '_' || (once === '{' && once2 === '_')) continue; // alt simge sembolün parçası; üst simge (üs) terim olabilir
         if (harf(a.v[a.v.length - 1]) && harf(sonra)) continue;
         if (sonra === '_' || sonra === "'") continue;
         es = a; break;
@@ -732,9 +767,10 @@ ${konu ? `<section><h2 class="sv-etiket">Konu</h2><p class="sv-yan-k">${esc(konu
     }
     return out;
   }
-  function formulHtml(f, vurgu, hepsi) {
+  function formulHtml(f, vurgu, hepsi, ozel) {
     const ham = String(f.tex || '');
-    const sarili = terimSar(ham, f.terimler || [], vurgu, hepsi);
+    // ozel: terim sorusunda yalnız sorulan simge vurgulanır (çok simgeli terimin bir parçası olabilir)
+    const sarili = ozel != null ? terimSar(ham, [{ s: ozel }], 0, false) : terimSar(ham, f.terimler || [], vurgu, hepsi);
     if (window.katex) {
       try { return window.katex.renderToString(sarili, Object.assign({}, TEX_OPT, { displayMode: true, throwOnError: true })); } catch (e) { /* sarma bozdu: düz çiz */ }
     }
@@ -742,13 +778,13 @@ ${konu ? `<section><h2 class="sv-etiket">Konu</h2><p class="sv-yan-k">${esc(konu
   }
   function terimUst(q) {
     const f = FORM.get(q.formul); if (!f) return '';
-    const ti = (f.terimler || []).findIndex((t) => t.s === q.terim);
-    return `<div class="sv-tf"><p class="sv-etiket">${esc(f.ad || 'Formül')}</p><div class="sv-tf-f">${formulHtml(f, ti, false)}</div><p class="sv-tf-t">Odaktaki terim: <span class="sv-tf-s">${tex(q.terim)}</span> · <a href="#atlas/${encodeURIComponent(f.id)}/${encodeURIComponent(q.terim)}">Formül atlasında aç</a></p></div>`;
+    const ti = terimBul(f, q.terim), ts = ti >= 0 ? f.terimler[ti].s : q.terim;
+    return `<div class="sv-tf"><p class="sv-etiket">${esc(f.ad || 'Formül')}</p><div class="sv-tf-f">${formulHtml(f, ti, false, q.terim)}</div><p class="sv-tf-t">Odaktaki terim: <span class="sv-tf-s">${texSembol(q.terim)}</span> · <a href="#atlas/${encodeURIComponent(f.id)}/${encodeURIComponent(ts)}">Formül atlasında aç</a></p></div>`;
   }
   function terimKart(t) {
     if (!t) return '';
     const alt = (t.alternatif || []);
-    return `<div class="sv-tk"><p class="sv-tk-s"><span class="sv-tk-sm">${tex(t.s)}</span><span class="sv-tk-ad">${esc(t.ad || '')}</span></p><dl class="sv-tk-dl"><div><dt>Birim</dt><dd>${metin(t.birim || '—')}</dd></div><div><dt>Ne?</dt><dd>${metin(t.ne || '')}</dd></div></dl><h3 class="sv-tk-h">Yerine ne konabilir?</h3>${alt.length ? `<ul class="sv-altl">${alt.map((a) => `<li><p class="sv-alt-ne">${metin(a.ne)}</p><p class="sv-alt-z"><span class="sv-soluk">Ne zaman:</span> ${metin(a.ne_zaman)}</p></li>`).join('')}</ul>` : '<p class="sv-soluk">Bu terimin yerine konan yaygın bir başka büyüklük yok.</p>'}</div>`;
+    return `<div class="sv-tk"><p class="sv-tk-s"><span class="sv-tk-sm">${texSembol(t.s)}</span><span class="sv-tk-ad">${esc(t.ad || '')}</span></p><dl class="sv-tk-dl"><div><dt>Birim</dt><dd>${metin(t.birim || '—')}</dd></div><div><dt>Ne?</dt><dd>${metin(t.ne || '')}</dd></div></dl><h3 class="sv-tk-h">Yerine ne konabilir?</h3>${alt.length ? `<ul class="sv-altl">${alt.map((a) => `<li><p class="sv-alt-ne">${metin(a.ne)}</p><p class="sv-alt-z"><span class="sv-soluk">Ne zaman:</span> ${metin(a.ne_zaman)}</p></li>`).join('')}</ul>` : '<p class="sv-soluk">Bu terimin yerine konan yaygın bir başka büyüklük yok.</p>'}</div>`;
   }
 
   // ---------- formül atlası
@@ -767,7 +803,7 @@ ${konu ? `<section><h2 class="sv-etiket">Konu</h2><p class="sv-yan-k">${esc(konu
     if (!fl.length) { ana.innerHTML = '<section class="sv-bosm"><h2>Formül atlası</h2><p>Bu derste henüz formül yok.</p></section>'; hashYaz('atlas'); return; }
     const f = FORM.get(S.atlas.f) || fl[0];
     const tl = f.terimler || [];
-    let ti = tl.findIndex((t) => t.s === S.atlas.t); if (ti < 0) ti = 0;
+    let ti = S.atlas.t != null ? terimBul(f, S.atlas.t) : 0; if (ti < 0) ti = 0;
     const gruplar = new Map();
     for (const x of fl) { const g = (KONU.get(x.konu) || {}).ad || 'Diğer'; if (!gruplar.has(g)) gruplar.set(g, []); gruplar.get(g).push(x); }
     const iliskili = B.sorular.filter((q) => q.kanal === 'terim' && q.formul === f.id);
@@ -780,10 +816,10 @@ ${konu ? `<section><h2 class="sv-etiket">Konu</h2><p class="sv-yan-k">${esc(konu
 <div class="sv-a-f">${formulHtml(f, ti, true)}</div>
 ${f.birimler ? `<p class="sv-a-b"><span class="sv-etiket">Birimler</span> ${metin(f.birimler)}</p>` : ''}
 <p class="sv-a-ip">Formüldeki bir terime ya da aşağıdaki simgelerden birine dokun.</p>
-<div class="sv-a-t" role="group" aria-label="Terimler">${tl.map((t, i) => `<button type="button" class="sv-a-tb" data-t="${i}" aria-pressed="${i === ti}" title="${esc(t.ad || '')}">${tex(t.s)}</button>`).join('')}</div>
+<div class="sv-a-t" role="group" aria-label="Terimler">${tl.map((t, i) => `<button type="button" class="sv-a-tb" data-t="${i}" aria-pressed="${i === ti}" title="${esc(t.ad || '')}">${texSembol(t.s)}</button>`).join('')}</div>
 ${terimKart(tl[ti])}
 <div class="sv-a-alt">${kaynakHtml(f.kaynak)}${f.konu && KONU.has(f.konu) ? `<p class="sv-a-k"><button type="button" class="sv-dug sv-ikinci" data-e="konu-git" data-konu="${esc(f.konu)}">${esc(KONU.get(f.konu).ad)} · ${konuSay} soru${ikon('sag')}</button></p>` : ''}</div>
-${iliskili.length ? `<div class="sv-a-q"><h3>Bu formülün terim soruları</h3><ul>${iliskili.map((q) => `<li><a href="#${esc(q.id)}">${tex(q.terim)}<span>${esc(String(q.soru || '').replace(/\$[^$]*\$/g, '…').slice(0, 90))}</span></a></li>`).join('')}</ul></div>` : ''}
+${iliskili.length ? `<div class="sv-a-q"><h3>Bu formülün terim soruları</h3><ul>${iliskili.map((q) => `<li><a href="#${esc(q.id)}">${texSembol(q.terim)}<span>${esc(String(q.soru || '').replace(/\$[^$]*\$/g, '…').slice(0, 90))}</span></a></li>`).join('')}</ul></div>` : ''}
 </section></div>`;
     hashYaz('atlas/' + encodeURIComponent(f.id) + (S.atlas.t ? '/' + encodeURIComponent(S.atlas.t) : ''));
     if (terimOdak) { const b = ana.querySelector('.sv-a-tb[aria-pressed="true"]'); if (b) b.focus({ preventScroll: true }); }
