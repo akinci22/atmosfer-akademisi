@@ -74,6 +74,12 @@ html:not(.fare) .cip { padding: 0 14px; }
 .cip:active, .tumu:active { transform: scale(.98); }
 .cip.daha { border-style: dashed; }
 .cip.daha[aria-expanded="true"] { background: var(--surface); border-style: solid; }
+/* çipte yalnız ders kodu; ders adı ve sayı imleç gelince (ya da seçiliyken) yumuşakça açılır */
+.cip b + span, .cip i { display: inline-block; max-width: 0; overflow: hidden; opacity: 0; margin-left: -8px; padding-left: 0; border-left-width: 0; vertical-align: middle; white-space: nowrap; transition: max-width var(--t5-orta) var(--t5-egri), opacity var(--t5-orta) linear, margin-left var(--t5-orta) var(--t5-egri), padding-left var(--t5-orta) var(--t5-egri); }
+.cip:hover b + span, .cip:focus-visible b + span, .cip[aria-pressed="true"] b + span { max-width: 16em; opacity: 1; margin-left: 0; padding-left: 8px; border-left-width: 1px; }
+.cip:hover i, .cip:focus-visible i, .cip[aria-pressed="true"] i { max-width: 3em; opacity: 1; margin-left: 0; }
+.tumu { letter-spacing: .06em; }
+.tumu[aria-pressed="false"] .simge, .tumu[aria-pressed="false"] i { display: none; }
 .tumu { flex: none; align-self: flex-start; margin-left: auto; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border: 1px solid var(--odak); border-radius: 999px; background: #ffffff; color: var(--odak); font-family: inherit; font-size: 16px; font-weight: 650; line-height: 1; white-space: nowrap; cursor: pointer; transition: transform var(--t5-hizli) var(--t5-egri); }
 .tumu:hover { background: var(--odak-zemin); }
 .tumu i { font-style: normal; font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; padding: 3px 7px; border-radius: 999px; background: var(--odak-zemin); }
@@ -237,7 +243,7 @@ html:not(.fare) .raf-serit > li.net .kac { opacity: 1; }
       <button type="button" class="cip ek" data-id="k-MTO 463" aria-pressed="false" hidden><b>MTO 463</b><i>1</i></button>
       <span class="cip-uc son" aria-hidden="true"></span>
     </nav>
-    <button type="button" class="tumu" id="tumu" aria-pressed="false"><svg class="simge" aria-hidden="true"><use href="#s-sayfa"/></svg><span class="t-ac">Tümünü göster</span><span class="t-kapa uz" hidden>Yalnız öne çıkanlar</span><span class="t-kapa kisa" hidden>Öne çıkanlar</span><i>+21</i></button>
+    <button type="button" class="tumu" id="tumu" aria-pressed="false"><svg class="simge" aria-hidden="true"><use href="#s-sayfa"/></svg><span class="t-ac">TÜMÜ</span><span class="t-kapa uz" hidden>Yalnız öne çıkanlar</span><span class="t-kapa kisa" hidden>Öne çıkanlar</span><i>+21</i></button>
   </div>
   <nav class="ezc" aria-label="Soru çözümü, PDF ile eş zamanlı">
     <a class="ezc-bas" href="./ders-kitapligi/"><svg class="simge" aria-hidden="true"><use href="#s-ogren"/></svg>Soru çözümü <small>PDF ile eş zamanlı</small></a>
