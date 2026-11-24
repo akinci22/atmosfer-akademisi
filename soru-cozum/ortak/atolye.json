@@ -7,7 +7,7 @@
 
   {"klasor": "mto342e", "kod": "MTO 229E · MTO 342E", "ad": "Bulut ve Yağış Fiziği", "cozum": true, "cozumSoru": 46, "calis": true, "soru": 259},
 
-  {"klasor": "mto303e", "kod": "MTO303E", "ad": "Hesaplamalı Akışkanlar Dinamiği", "cozum": true, "cozumSoru": 48, "calis": false, "soru": 0},
+  {"klasor": "mto303e", "kod": "MTO303E", "ad": "Hesaplamalı Akışkanlar Dinamiği", "cozum": true, "cozumSoru": 48, "calis": true, "soru": 246},
 
   {"klasor": "mto302e", "kod": "MTO302E", "ad": "Hava Analizi ve Öngörü I", "cozum": true, "cozumSoru": 9, "calis": true, "soru": 222},
 
