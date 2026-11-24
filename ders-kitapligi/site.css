@@ -223,3 +223,7 @@ html.tam .vurgu{scroll-margin-top:72px}
 @media(max-width:640px){.hud .he,.hud .hud-ders{display:none}}
 @media(max-width:480px){.hud-ic{gap:2px}.hud button,.hud a{padding:0 8px;font-size:14px}.hud-ad{font-size:13px}}
 .tex-satir{display:inline-block;max-width:100%;overflow-x:auto;overflow-y:hidden;vertical-align:middle}.tex-satir svg.mj{max-width:none}
+/* tur 7 HUD (D15): çekmece sekmeleri sığmazsa alt satıra geçer (yatay çubuk yok); yapışkan şekil/formül kutusu ile sekme çubuğu arasında içerik görünmesin (kabın üst iç boşluğu ilk öğeye taşındı) */
+.ck-sekme{flex-wrap:wrap;overflow-x:visible;scrollbar-width:none}
+.ck-ic{padding-top:0}
+.ck-ic>:first-child{margin-top:14px}
