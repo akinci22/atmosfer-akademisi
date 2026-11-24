@@ -1,0 +1,17 @@
+{"aciklama": "Soru çözümleri giriş sayfası (soru-cozum/index.html) bu listeyi okur. Her ders YALNIZ kendi satırını değiştirir: calis true olunca «Sınav atölyesi →» bağı görünür; kartı olmayan ders (cozum/calis true) için kart eklenir. Satırı elle değil kur.mjs ile güncelle.",
+ "dersler": [
+
+  {"klasor": "mto316", "kod": "MTO316", "ad": "Hidrometeoroloji", "cozum": true, "cozumSoru": 45, "calis": false, "soru": 0},
+
+  {"klasor": "mto388", "kod": "MTO388", "ad": "Coğrafi Bilgi Bilimi", "cozum": false, "cozumSoru": 0, "calis": false, "soru": 0},
+
+  {"klasor": "mto342e", "kod": "MTO342E", "ad": "Bulut ve Yağış Fiziği", "cozum": true, "cozumSoru": 46, "calis": false, "soru": 0},
+
+  {"klasor": "mto303e", "kod": "MTO303E", "ad": "Hesaplamalı Akışkanlar Dinamiği", "cozum": true, "cozumSoru": 48, "calis": false, "soru": 0},
+
+  {"klasor": "mto302e", "kod": "MTO302E", "ad": "Sinoptik Meteoroloji · Harita Analizi", "cozum": true, "cozumSoru": 9, "calis": false, "soru": 0},
+
+  {"klasor": "mto323", "kod": "MTO323", "ad": "Atmosfer Kimyası", "cozum": true, "cozumSoru": 44, "calis": false, "soru": 0},
+
+  {"klasor": "_son", "calis": false}
+ ]}

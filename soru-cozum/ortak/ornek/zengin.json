@@ -1,0 +1,18 @@
+{
+ "s1": {
+  "varyant": ["Alan hektar verilir: $Q = C\\,i\\,A/360$ kullanılır.", "Havzada iki arazi kullanımı vardır: önce alan ağırlıklı $C$ bulunur.", "Şiddet verilmez, IDF bağıntısı ve toplanma süresi verilir: önce $i(t_c)$ hesaplanır."],
+  "yorum": "19,5 m³/s, yağış toplanma süresi boyunca sürerse çıkışta görülecek en büyük debidir. $C$ ya da $i$ iki katına çıkarsa pik de iki katına çıkar; kentleşme $C$'yi büyüterek aynı yağıştan daha büyük taşkın üretir.",
+  "hata": ["0,278 katsayısını unutmak ya da alanı m²'ye çevirip yine 0,278 ile çarpmak.", "Şiddeti toplanma süresinden farklı bir süre için okumak."],
+  "formuller": ["rasyonel"],
+  "kaynak": "cmm",
+  "pratik": ["ornek-sayisal-001", "ornek-terim-001", "ornek-yorum-001"]
+ },
+ "s2": {
+  "varyant": ["Sıcaklık yerine sanal sıcaklık verilir: aynı formül nemli hava için geçerli olur.", "Yoğunluk verilir, basınç ya da sıcaklık sorulur: aynı denklem ters çözülür."],
+  "yorum": "1,17 kg/m³, deniz seviyesindeki tipik 1,2 kg/m³ değerinin biraz altındadır: basınç düşük olduğu için hava daha seyrektir.",
+  "hata": ["Sıcaklığı kelvine çevirmeden (°C ile) hesaplamak.", "hPa'yı Pa'ya çevirmemek: sonuç 100 kat küçük çıkar."],
+  "formuller": ["ideal-gaz"],
+  "kaynak": "wh 3",
+  "pratik": ["ornek-sayisal-002", "ornek-terim-002"]
+ }
+}
