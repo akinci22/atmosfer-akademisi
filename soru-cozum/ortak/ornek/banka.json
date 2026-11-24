@@ -3,10 +3,10 @@
  "ad": "Hidroloji ve termodinamik (motor örneği)",
  "klasor": "ornek",
  "konular": [
-  {"id": "su-butcesi", "ad": "Su bütçesi ve hidrolojik döngü", "hafta": 1, "bag": [{"ad": "MTO316 soru çözümleri", "url": "../../../mto316/"}]},
-  {"id": "yagis", "ad": "Alansal yağış", "hafta": 2, "bag": [{"ad": "MTO316 soru çözümleri", "url": "../../../mto316/"}]},
+  {"id": "su-butcesi", "ad": "Su bütçesi ve hidrolojik döngü", "hafta": 1, "bag": [{"ad": "MTO316 soru çözümleri", "url": "../../mto316/"}]},
+  {"id": "yagis", "ad": "Alansal yağış", "hafta": 2, "bag": [{"ad": "MTO316 soru çözümleri", "url": "../../mto316/"}]},
   {"id": "akis", "ad": "Yüzey akışı ve pik debi", "hafta": 3},
-  {"id": "termo", "ad": "Gaz yasası ve nem", "hafta": 4, "bag": [{"ad": "Ders Kitaplığı", "url": "../../../../ders-kitapligi/"}]}
+  {"id": "termo", "ad": "Gaz yasası ve nem", "hafta": 4, "bag": [{"ad": "Ders Kitaplığı", "url": "../../../ders-kitapligi/"}]}
  ],
  "kaynaklar": [
   {"id": "cmm", "kunye": "Chow, V. T., Maidment, D. R. ve Mays, L. W. (1988). Applied Hydrology. McGraw-Hill."},

@@ -161,6 +161,9 @@
 
   // ---------- veri
   let B = null, ana = null, aktif = null, denemeZaman = 0;
+  // banka.json'daki bağlar banka'nın klasörüne göre yazılır (çözüm sayfasıyla aynı düzey): ../../akademi/#/… gibi
+  let TABAN = location.href;
+  const bagCoz = (u) => { try { return new URL(u, TABAN).href; } catch (e) { return u; } };
   const KONU = new Map(), FORM = new Map(), KAYNAK = new Map(), SORU = new Map();
   let YANLIS = {}, DURUM = {};
   const S = { mod: 'pratik', kanal: 'hepsi', konu: 'hepsi', zorluk: 0, liste: [], i: 0, oturum: { d: 0, y: 0 }, deneme: null, atlas: { f: null, t: null }, ayar: { n: 20, sure: 30 } };
@@ -173,6 +176,7 @@
 
   function basla(b) {
     B = b; KLASOR = b.klasor || 'ders';
+    try { TABAN = new URL(kok.dataset.banka || '../banka.json', location.href).href; } catch (e) { /* göreli kalsın */ }
     (b.konular || []).forEach((k) => KONU.set(k.id, k));
     (b.formuller || []).forEach((f) => FORM.set(f.id, f));
     (b.kaynaklar || []).forEach((k) => KAYNAK.set(k.id, k));
@@ -358,7 +362,7 @@ ${konu ? `<section><h2 class="sv-etiket">Konu</h2><p class="sv-yan-k">${esc(konu
     const g = new Set(), out = [];
     const ekle = (b) => { if (b && b.url && !g.has(b.url)) { g.add(b.url); out.push(b); } };
     (q.bag || []).forEach(ekle); ((KONU.get(q.konu) || {}).bag || []).forEach(ekle);
-    return out.length ? `<ul class="sv-baglar">${out.map((b) => `<li><a href="${esc(b.url)}" target="_blank" rel="noopener">${ikon('bag')}<span>${esc(b.ad)}</span></a></li>`).join('')}</ul>` : '';
+    return out.length ? `<ul class="sv-baglar">${out.map((b) => `<li><a href="${esc(bagCoz(b.url))}" target="_blank" rel="noopener">${ikon('bag')}<span>${esc(b.ad)}</span></a></li>`).join('')}</ul>` : '';
   }
   function kaynakHtml(k) {
     if (!k) return '';
@@ -903,7 +907,7 @@ ${iliskili.length ? `<div class="sv-a-q"><h3>Bu formülün terim soruları</h3><
 <p class="sv-puan"><b>${dogru}</b> / ${n} doğru <span class="sv-yuzde">%${yuzde}</span></p>
 <p class="sv-cubuk sv-cubuk-b"><i style="width:${yuzde}%"></i></p>
 <p class="sv-soluk">Süre ${dk} dk ${sn} sn · boş ${bos} · yanlış ${n - dogru - bos}</p>
-${zayif.length ? `<h3>Zayıf yönler</h3><ul class="sv-zayif">${zayif.map(([k, v]) => { const ko = KONU.get(k) || { ad: k }; return `<li><p><b>${esc(ko.ad)}</b> <span class="sv-soluk">${v.d}/${v.n}</span></p>${(ko.bag || []).length ? `<ul class="sv-baglar">${ko.bag.map((b) => `<li><a href="${esc(b.url)}" target="_blank" rel="noopener">${ikon('bag')}<span>${esc(b.ad)}</span></a></li>`).join('')}</ul>` : ''}<p><button type="button" class="sv-dug sv-ikinci" data-e="konu-git" data-konu="${esc(k)}">Bu konuyu çalış${ikon('sag')}</button></p></li>`; }).join('')}</ul>` : `<p class="sv-not">${ikon('tik')}Zayıf konu yok: her konuda en az %60.</p>`}
+${zayif.length ? `<h3>Zayıf yönler</h3><ul class="sv-zayif">${zayif.map(([k, v]) => { const ko = KONU.get(k) || { ad: k }; return `<li><p><b>${esc(ko.ad)}</b> <span class="sv-soluk">${v.d}/${v.n}</span></p>${(ko.bag || []).length ? `<ul class="sv-baglar">${ko.bag.map((b) => `<li><a href="${esc(bagCoz(b.url))}" target="_blank" rel="noopener">${ikon('bag')}<span>${esc(b.ad)}</span></a></li>`).join('')}</ul>` : ''}<p><button type="button" class="sv-dug sv-ikinci" data-e="konu-git" data-konu="${esc(k)}">Bu konuyu çalış${ikon('sag')}</button></p></li>`; }).join('')}</ul>` : `<p class="sv-not">${ikon('tik')}Zayıf konu yok: her konuda en az %60.</p>`}
 <h3>Konu bazında</h3><ul class="sv-dagilim">${konuL.map(([k, v]) => `<li><span class="sv-dg-ad">${esc((KONU.get(k) || { ad: k }).ad)}</span><span class="sv-cubuk"><i style="width:${(100 * v.d / v.n).toFixed(0)}%"></i></span><span class="sv-dg-n">${v.d}/${v.n}</span></li>`).join('')}</ul>
 <h3>Kanal bazında</h3><ul class="sv-dagilim">${[...kanal].map(([k, v]) => `<li><span class="sv-dg-ad">${KANAL_AD[k]}</span><span class="sv-cubuk"><i style="width:${(100 * v.d / v.n).toFixed(0)}%"></i></span><span class="sv-dg-n">${v.d}/${v.n}</span></li>`).join('')}</ul>
 ${yanlis.length ? `<h3>Yanlış ve boş sorular</h3><ol class="sv-y-l">${yanlis.map(({ q, s }) => `<li><button type="button" class="sv-y-b" data-e="incele" data-id="${esc(q.id)}"><span class="sv-y-k">${KANAL_AD[q.kanal]} · ${s.bos ? 'boş' : s.puan > 0 ? 'kısmen' : 'yanlış'}</span><span class="sv-y-m">${esc(ozet(q))}</span>${ikon('sag')}</button></li>`).join('')}</ol>` : ''}
