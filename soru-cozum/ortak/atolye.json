@@ -1,7 +1,7 @@
 {"aciklama": "Soru çözümleri giriş sayfası (soru-cozum/index.html) bu listeyi okur. Her ders YALNIZ kendi satırını değiştirir: calis true olunca «Sınav atölyesi →» bağı görünür; kartı olmayan ders (cozum/calis true) için kart eklenir. Satırı elle değil kur.mjs ile güncelle.",
  "dersler": [
 
-  {"klasor": "mto316", "kod": "MTO316", "ad": "Hidrometeoroloji", "cozum": true, "cozumSoru": 45, "calis": false, "soru": 0},
+  {"klasor": "mto316", "kod": "MTO316", "ad": "Hidrometeoroloji", "cozum": true, "cozumSoru": 45, "calis": true, "soru": 256},
 
   {"klasor": "mto388", "kod": "MTO388", "ad": "Coğrafi Bilgi Bilimi", "cozum": false, "cozumSoru": 0, "calis": false, "soru": 0},
 

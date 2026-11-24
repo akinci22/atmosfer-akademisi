@@ -1,0 +1,922 @@
+{
+ "s1": {
+  "varyant": [
+   "Debi yerine yıllık akış hacmi (10⁶ m³) verilir: önce alana bölüp mm bul.",
+   "ET verilir, ortalama debi sorulur: Q̄ = (P − ET)·A/Δt.",
+   "Alan mi², debi cfs verilir: önce SI'ya çevir."
+  ],
+  "yorum": "ET/P ≈ 0,67: yağışın üçte ikisi atmosfere döner; akış katsayısı 0,33 bu iklim için olağan. C > 0,6 ise kentleşmiş ya da kayalık bir havza düşün.",
+  "hata": [
+   "km²'yi 10⁶ ile çarpmamak (1000 kat hata).",
+   "Yılı 365 × 86 400 s yerine 365 × 24 s almak."
+  ],
+  "formuller": [
+   "su-butcesi",
+   "debi-derinlik"
+  ],
+  "kaynak": "rs 1.6 · ders içeriği, 2. hafta",
+  "pratik": [
+   "316-sayisal-001",
+   "316-test-004",
+   "316-dy-001"
+  ]
+ },
+ "s2": {
+  "varyant": [
+   "ΔS verilir, ET sorulur: ET = P − R − ΔS.",
+   "Yeraltı kaybı (G) eklenir: işaretini kontrol hacmine göre koy.",
+   "Süre 28 ya da 31 gün olur: saniyeyi yeniden hesapla."
+  ],
+  "yorum": "+36 mm: o ay havzada su birikti (toprak nemi, yeraltı suyu). Kurak bir ayda aynı hesap negatif çıkar; kısa dönemde ΔS = 0 alınmaz.",
+  "hata": [
+   "Kısa dönemde de ΔS = 0 almak.",
+   "Debiyi derinliğe çevirmeden mm ile toplamak."
+  ],
+  "formuller": [
+   "su-butcesi",
+   "debi-derinlik"
+  ],
+  "kaynak": "ders · 2. hafta",
+  "pratik": [
+   "316-sayisal-002",
+   "316-yorum-001",
+   "316-test-005"
+  ]
+ },
+ "s3": {
+  "varyant": [
+   "Atmosferdeki su ve buharlaşma verilir, kalış süresi sorulur (aynı oran).",
+   "Okyanustan karaya nem taşınımı sorulur: kara akışı ile aynı (36)."
+  ],
+  "yorum": "≈ 11 gün: atmosfer suyu çok hızlı yenilenir; bir fırtınanın yağışını büyük ölçüde son günlerin buharlaşması ve nem taşınımı besler.",
+  "hata": [
+   "Depo yerine akıyı paya koymak.",
+   "Yılı güne çevirmeyi unutmak."
+  ],
+  "formuller": [
+   "su-butcesi"
+  ],
+  "kaynak": "rs 1.6 · ders içeriği, 2. hafta",
+  "pratik": [
+   "316-sayisal-005",
+   "316-dy-002"
+  ]
+ },
+ "s4": {
+  "varyant": [
+   "Hacim verilir, derinlik sorulur: R = V/A.",
+   "Tepe debisi değil ortalama debi istenir: süreye böl.",
+   "cfs ↔ m³/s ve in ↔ mm dönüşümü eklenir."
+  ],
+  "yorum": "50 m³/s ortalama debidir; tepe bunun birkaç katı olabilir. Aynı hacim daha kısa sürede boşalırsa debi büyür.",
+  "hata": [
+   "mm'yi metreye çevirmeden çarpmak (1000 kat hata).",
+   "cfs'yi m³/s'ye bölerek çevirmek."
+  ],
+  "formuller": [
+   "debi-derinlik"
+  ],
+  "kaynak": "ders · 7. hafta",
+  "pratik": [
+   "316-sayisal-003",
+   "316-sayisal-004",
+   "316-test-002",
+   "316-test-003",
+   "316-test-050"
+  ]
+ },
+ "s5": {
+  "varyant": [
+   "Karıştırılan çiftlerden biri tek başına sorulur (ör. interflow mu baseflow mu?).",
+   "Sıra karışık verilir, doğru sıraya dizilir."
+  ],
+  "yorum": "Akış, kayıplar (tutulma, çukur, toprak nemi, sızma) dolduktan sonra kalan yağıştır; bu yüzden ilk yağış çoğu kez akış üretmez.",
+  "hata": [
+   "İnfiltrasyon ile perkolasyonu karıştırmak.",
+   "Ara akışı taban akışı sanmak."
+  ],
+  "formuller": [],
+  "kaynak": "rs 15.5 · ders içeriği, 2. hafta",
+  "pratik": [
+   "316-sirala-002",
+   "316-fark-001",
+   "316-fark-002",
+   "316-fark-003"
+  ]
+ },
+ "s6": {
+  "varyant": [
+   "RR verilir, dBZ sorulur: log₁₀ al.",
+   "Z–R bağıntısı (Z = 200R^1,6) ile çözülmesi istenir.",
+   "+X dBZ artışın şiddeti kaç katına çıkardığı sorulur."
+  ],
+  "yorum": "Her 16 dBZ yaklaşık 10 kat şiddet demektir. 55 dBZ üstünde dolu şüphesi vardır; bağıntı şiddeti abartır.",
+  "hata": [
+   "dBZ'yi Z gibi doğrusal kullanmak.",
+   "Logaritmayı ters çevirirken 0,0625'e bölmeyi unutmak."
+  ],
+  "formuller": [
+   "dbz"
+  ],
+  "kaynak": "stull · ders içeriği, 3. hafta",
+  "pratik": [
+   "316-sayisal-033",
+   "316-test-032",
+   "316-yorum-013",
+   "316-dy-029"
+  ]
+ },
+ "s7": {
+  "varyant": [
+   "Çap biçimi (Λ = 4100·RR^−0,21) verilir: değerler yarıya iner.",
+   "İki şiddet için belli çaptaki damla oranı karşılaştırılır."
+  ],
+  "yorum": "Şiddet arttıkça Λ küçülür; iri damla payı artar. Hacmi az sayıda iri damla taşır.",
+  "hata": [
+   "r'yi mm yazmak (e^−5848 ≈ 0).",
+   "Yarıçap ve çap biçimlerini karıştırmak."
+  ],
+  "formuller": [
+   "marshall-palmer"
+  ],
+  "kaynak": "ders · 3. hafta",
+  "pratik": [
+   "316-sayisal-036",
+   "316-dy-032"
+  ]
+ },
+ "s8": {
+  "varyant": [
+   "Katman sayısı artar (üç katman).",
+   "q yerine karışma oranı verilir (≈ aynı).",
+   "PW ile yağış arasındaki fark yorum olarak sorulur."
+  ],
+  "yorum": "PW yalnız o anki olası sudur; yakınsama ile fırtına PW'nin katlarını yağdırabilir.",
+  "hata": [
+   "hPa ile hesaplayıp 100 kat küçük sonuç bulmak.",
+   "g/kg'yi kg/kg'ye çevirmemek."
+  ],
+  "formuller": [
+   "pw"
+  ],
+  "kaynak": "rs 3.10 · ders içeriği, 3. hafta",
+  "pratik": [
+   "316-sayisal-035",
+   "316-test-035",
+   "316-dy-030"
+  ]
+ },
+ "s9": {
+  "varyant": [
+   "Farklı süre–derinlik çiftleriyle sınıflandırma.",
+   "Tür tanımları eşleştirme olarak gelir."
+  ],
+  "yorum": "Kısa sürede az yağış bile yüksek şiddet olabilir; sınıf sınırları yaklaşık bir kıyastır.",
+  "hata": [
+   "Derinliği doğrudan şiddet sanmak.",
+   "Sleet ile donan yağmuru karıştırmak."
+  ],
+  "formuller": [],
+  "kaynak": "ams · ders içeriği, 3. hafta",
+  "pratik": [
+   "316-sayisal-034",
+   "316-test-033",
+   "316-test-034",
+   "316-fark-016",
+   "316-dy-031"
+  ]
+ },
+ "s10": {
+  "varyant": [
+   "Ağırlıklar hazır verilir, P̄ = ΣwP istenir.",
+   "Bir ölçer veri vermez: poligonlar yeniden düşünülür.",
+   "Harita verilir, alanlar ızgara sayımıyla bulunur."
+  ],
+  "yorum": "Thiessen > aritmetik: geniş poligonlu ve dış ölçerler yağışlı. Fark %10'u aşarsa ölçer dağılımı düzensizdir.",
+  "hata": [
+   "Dış ölçeri aritmetiğe katmak.",
+   "Thiessen'de dış ölçeri tamamen atmak."
+  ],
+  "formuller": [
+   "thiessen"
+  ],
+  "kaynak": "rs 9.7 · ders içeriği, 4. hafta",
+  "pratik": [
+   "316-sayisal-006",
+   "316-sayisal-007",
+   "316-test-007",
+   "316-yorum-003",
+   "316-dy-005"
+  ]
+ },
+ "s11": {
+  "varyant": [
+   "Tepe değeri verilmez: en içteki şeride tahmin yazılır.",
+   "Uç şeritte dış eğri yok: ölçer ortalaması kullanılır."
+  ],
+  "yorum": "Sonuç en düşük ve en yüksek eğri arasında kalmalı. İzohiyet orografiyi yansıtır ama çizen kişiye bağlıdır.",
+  "hata": [
+   "En içteki şeride tepe yerine eğri değerini yazmak.",
+   "Alanları değil eğri sayısını ağırlık almak."
+  ],
+  "formuller": [
+   "izohiyet"
+  ],
+  "kaynak": "rs 9.7 · ders içeriği, 4. hafta",
+  "pratik": [
+   "316-sayisal-008",
+   "316-test-009",
+   "316-test-008"
+  ]
+ },
+ "s12": {
+  "varyant": [
+   "Beş ölçerle ve %5 hatayla aynı hesap.",
+   "Cᵥ doğrudan verilir.",
+   "Popülasyon σ ile çözülmesi istenir."
+  ],
+  "yorum": "N = 52: yağış çok değişken, ağ çok seyrek. Hata yarıya inerse N dört katına çıkar.",
+  "hata": [
+   "Kareyi unutmak.",
+   "σ'yı n'e bölüp bunu yazmamak.",
+   "N'yi aşağı yuvarlamak."
+  ],
+  "formuller": [
+   "optimum-olcer"
+  ],
+  "kaynak": "rs 9.5.2 · ders içeriği, 4. hafta",
+  "pratik": [
+   "316-sayisal-010",
+   "316-sayisal-011",
+   "316-test-012",
+   "316-yorum-004"
+  ]
+ },
+ "s13": {
+  "varyant": [
+   "Bölge alanları farklı verilir; mevcut ölçerler değişir.",
+   "Yuvarlamadan önceki paylar istenir."
+  ],
+  "yorum": "Yuvarlamalar yüzünden bölgelerin toplamı N'yi aşabilir; dağlık bölgeye öncelik pratikte yaygındır.",
+  "hata": [
+   "Mevcut ölçerleri çıkarmayı unutmak.",
+   "Payı aşağı yuvarlamak."
+  ],
+  "formuller": [
+   "optimum-olcer"
+  ],
+  "kaynak": "rs 9.5.2 · ders içeriği, 4. hafta",
+  "pratik": [
+   "316-sayisal-012",
+   "316-test-011",
+   "316-sirala-006"
+  ]
+ },
+ "s14": {
+  "varyant": [
+   "Eğimler doğrudan verilir.",
+   "Hangi dönemin güvenilir olduğu tersine verilir.",
+   "Dönem toplamlarından eğim hesaplatılır."
+  ],
+  "yorum": "Katsayı 0,82: eski dönemde ölçer komşularına göre %22 fazla ölçüyormuş. Katsayı 1'e çok yakınsa düzeltme gereksiz.",
+  "hata": [
+   "Katsayıyı ters kurmak (1,10/0,90).",
+   "Katsayıyı güvenilir döneme uygulamak."
+  ],
+  "formuller": [
+   "cift-kutle"
+  ],
+  "kaynak": "rs 9.8 · ders içeriği, 6. hafta",
+  "pratik": [
+   "316-sayisal-014",
+   "316-sayisal-015",
+   "316-test-016",
+   "316-yorum-005"
+  ]
+ },
+ "s15": {
+  "varyant": [
+   "Doğru/yanlış biçiminde: «çift kütle eksik veriyi doldurur».",
+   "Kırılma nedeni seçmeli sorulur."
+  ],
+  "yorum": "Kırılma iklimden değil ölçümden gelir; iklim değişseydi komşular da değişirdi.",
+  "hata": [
+   "Çift kütleyi eksik veri doldurma yöntemi sanmak.",
+   "Kısa seriyle karar vermek."
+  ],
+  "formuller": [
+   "cift-kutle",
+   "normal-oran"
+  ],
+  "kaynak": "rs 9.8",
+  "pratik": [
+   "316-dy-011",
+   "316-dy-012",
+   "316-fark-006",
+   "316-test-015"
+  ]
+ },
+ "s16": {
+  "varyant": [
+   "Farklı süre çiftleri (15 ve 45 dk).",
+   "Derinlik verilir, şiddet sorulur.",
+   "Üçüncü süre aralığın dışında: uyarı istenir."
+  ],
+  "yorum": "Süre uzadıkça şiddet düşer; bağıntıyı 5–120 dk dışına taşırmak güvenilmez.",
+  "hata": [
+   "Derinlik için t'yi dakika bırakmak.",
+   "b'yi negatif bulup sorgulamamak."
+  ],
+  "formuller": [
+   "idf-kisa"
+  ],
+  "kaynak": "rs 9.10 · ders içeriği, 6. hafta",
+  "pratik": [
+   "316-sayisal-016",
+   "316-test-017",
+   "316-yorum-006"
+  ]
+ },
+ "s17": {
+  "varyant": [
+   "t dakika olarak verilir: C değişir, n değişmez.",
+   "Log–log grafikten eğim okunur."
+  ],
+  "yorum": "n 0 ile 1 arasında olmalı; n ≥ 1 veri ya da birim hatasıdır.",
+  "hata": [
+   "C'nin birimini t'den bağımsız sanmak.",
+   "log₁₀ ile ln'i karıştırmak (n değişmez ama C yanlış olur)."
+  ],
+  "formuller": [
+   "idf-uzun"
+  ],
+  "kaynak": "rs 9.10 · ders içeriği, 6. hafta",
+  "pratik": [
+   "316-sayisal-017",
+   "316-sayisal-018"
+  ]
+ },
+ "s18": {
+  "varyant": [
+   "Risk ve ömür verilir, T sorulur.",
+   "Hiç aşılmama olasılığı sorulur.",
+   "n = T özel durumu (≈ %63)."
+  ],
+  "yorum": "%10 risk için T ömrün yaklaşık 10 katıdır; düşük risk pahalıdır.",
+  "hata": [
+   "Olasılıkları toplamak (30/100 = %30).",
+   "«T yılda kesin olur» sanmak."
+  ],
+  "formuller": [
+   "risk"
+  ],
+  "kaynak": "rs 11.3",
+  "pratik": [
+   "316-sayisal-019",
+   "316-sayisal-020",
+   "316-test-018",
+   "316-test-020",
+   "316-yorum-007"
+  ]
+ },
+ "s19": {
+  "varyant": [
+   "Başka bir alan çiftiyle k ve n yeniden istenir.",
+   "Bulunan bağıntıyla yeni alanda P istenir."
+  ],
+  "yorum": "Tablo değeri (48 cm) ile 49,0 cm yakın: bağıntı veriye iyi uyuyor; farklı çiftler farklı n verebilir.",
+  "hata": [
+   "İç logaritmada log₁₀ kullanmak.",
+   "P = Pₘ satırını kullanmak."
+  ],
+  "formuller": [
+   "horton-alan"
+  ],
+  "kaynak": "rs 9.11 · ders içeriği, 6. hafta",
+  "pratik": [
+   "316-sayisal-021",
+   "316-sayisal-022",
+   "316-test-021"
+  ]
+ },
+ "s20": {
+  "varyant": [
+   "Pₘ değişir; iki nokta farklı alanlardan verilir.",
+   "n'nin fiziksel anlamı yorum olarak sorulur."
+  ],
+  "yorum": "n küçükse derinlik alanla yavaş azalır (geniş, düzgün yağış); büyükse hızlı (dar konvektif çekirdek).",
+  "hata": [
+   "ln 0 tanımsızlığını görmemek.",
+   "A'yı farklı birimde girip k'yı karşılaştırmak."
+  ],
+  "formuller": [
+   "horton-alan"
+  ],
+  "kaynak": "rs 9.11",
+  "pratik": [
+   "316-sayisal-022",
+   "316-dy-019",
+   "316-test-022"
+  ]
+ },
+ "s21": {
+  "varyant": [
+   "Derinlik verilir, süre sorulur (üs 1/0,475).",
+   "Rekor tablosundaki değer zarfla karşılaştırılır."
+  ],
+  "yorum": "Zarf bir üst çizgidir; yeni bir rekor onu aşabilir. Süre 6 kat uzayınca derinlik yalnız ≈ 2,3 kat arttı.",
+  "hata": [
+   "D'ye dakika yazmak.",
+   "Derinlik ile ortalama şiddeti karıştırmak."
+  ],
+  "formuller": [
+   "zarf"
+  ],
+  "kaynak": "rs 8.6 · ders içeriği, 7. hafta",
+  "pratik": [
+   "316-sayisal-023",
+   "316-test-025",
+   "316-dy-024"
+  ]
+ },
+ "s22": {
+  "varyant": [
+   "Seri kısaltılır (6–8 değer).",
+   "Örneklem σ ile çözülmesi istenir.",
+   "Yalnız Kₘ sorulur."
+  ],
+  "yorum": "PMP gözlenen maksimumun ≈ 2,7 katı: fiziksel üst sınır mertebesinde.",
+  "hata": [
+   "Kₘ'de tüm seriyi, PMP'de kısa seriyi kullanmak.",
+   "Hangi σ'nın kullanıldığını yazmamak."
+  ],
+  "formuller": [
+   "hershfield"
+  ],
+  "kaynak": "rs 10.7.3 · ders içeriği, 7. hafta",
+  "pratik": [
+   "316-sayisal-024",
+   "316-sayisal-025",
+   "316-test-023",
+   "316-sirala-003"
+  ]
+ },
+ "s23": {
+  "varyant": [
+   "PMP verilir, Kₘ sorulur.",
+   "Aykırı değer çıkarılınca PMP'nin değişimi yorumlatılır."
+  ],
+  "yorum": "Tek bir aykırı değer hem Kₘ'yi hem σₙ'yi büyütür ve PMP'yi katlar; önce değerin gerçekliği sınanır.",
+  "hata": [
+   "Aykırı değeri sınamadan PMP'yi kesin sonuç saymak."
+  ],
+  "formuller": [
+   "hershfield"
+  ],
+  "kaynak": "rs 10.7.3",
+  "pratik": [
+   "316-sayisal-024",
+   "316-yorum-009",
+   "316-test-026"
+  ]
+ },
+ "s24": {
+  "varyant": [
+   "PMP ile PW ya da 100 yıllık yağış farkı sorulur.",
+   "Birim dönüşümü (kg/m² ↔ mm) sorulur."
+  ],
+  "yorum": "PMP risk kabul edilmeyen yapılar içindir; yüksek PMP sel sayısının çok olacağı anlamına gelmez.",
+  "hata": [
+   "PMP'yi T yıllık yağışla karıştırmak.",
+   "Kısa veriden PMP'yi bölge için temsilî saymak."
+  ],
+  "formuller": [
+   "hershfield"
+  ],
+  "kaynak": "rs 10.6 · ders içeriği, 7. hafta",
+  "pratik": [
+   "316-fark-008",
+   "316-dy-020",
+   "316-dy-023",
+   "316-test-024"
+  ]
+ },
+ "s25": {
+  "varyant": [
+   "Alan hektar verilir (10 000 ha = 10⁸ m²).",
+   "Buharlaşma tava değeri olarak verilir: Kₚ ile çarp.",
+   "Dolma süresi yerine belirli bir sürede yükselme sorulur."
+  ],
+  "yorum": "Bırakılabilecek debi, boş göldeki dolma akısına eşittir; kurak yılda E büyür, bırakım kısılır.",
+  "hata": [
+   "Terimleri farklı birimlerle toplamak.",
+   "Ara toplamı yanlış yazmak (1,15 yerine 1,05)."
+  ],
+  "formuller": [
+   "hazne"
+  ],
+  "kaynak": "ders · 7. hafta",
+  "pratik": [
+   "316-sayisal-027",
+   "316-sayisal-028",
+   "316-test-027",
+   "316-test-028"
+  ]
+ },
+ "s26": {
+  "varyant": [
+   "Yağışlı bir kış ayı: P büyük, E küçük.",
+   "Seviyeyi sabit tutan bırakım sorulur."
+  ],
+  "yorum": "Yazın buharlaşma yüzlerce mm olabilir; seviyeyi korumak için bırakım girişin altına iner.",
+  "hata": [
+   "Tava değerini doğrudan göl değeri almak.",
+   "Net akışı aylık hacme çevirmemek."
+  ],
+  "formuller": [
+   "hazne",
+   "tava"
+  ],
+  "kaynak": "ders · 7. hafta",
+  "pratik": [
+   "316-sayisal-029",
+   "316-yorum-011"
+  ]
+ },
+ "s27": {
+  "varyant": [
+   "Tava türü değişir (gömülü, yüzen).",
+   "Yıllık değerden günlük ortalama sorulur."
+  ],
+  "yorum": "Göl tavadan az buharlaştırır (Kₚ < 1); bitki örtüsü için katsayı > 1 olabilir.",
+  "hata": [
+   "Tava değerini Kₚ'ye bölmek.",
+   "Tava değerini bitkili alanın ET'si sanmak."
+  ],
+  "formuller": [
+   "tava"
+  ],
+  "kaynak": "rs 13.3 · rs 13.5.5",
+  "pratik": [
+   "316-sayisal-031",
+   "316-test-029",
+   "316-esle-003"
+  ]
+ },
+ "s28": {
+  "varyant": [
+   "Bağıl nem yerine çiy noktası verilir.",
+   "Rüzgâr başka yükseklikte ölçülmüştür."
+  ],
+  "yorum": "E rüzgârla doğrusal artar; nem artınca buhar açığı küçülür. İkisi birlikte değişirse çarpımı hesapla.",
+  "hata": [
+   "e₂ için su yüzeyinin eₛ'ini kullanmak.",
+   "cm/gün'ü mm'ye çevirmemek."
+  ],
+  "formuller": [
+   "harbeck"
+  ],
+  "kaynak": "rs 13.5.4 · ders içeriği, 7. hafta",
+  "pratik": [
+   "316-sayisal-030",
+   "316-test-030",
+   "316-yorum-012",
+   "316-dy-027"
+  ]
+ },
+ "s29": {
+  "varyant": [
+   "W/m² verilir, mm/gün sorulur (ters yön).",
+   "Lᵥ J/kg olarak verilir."
+  ],
+  "yorum": "≈ 1 mm/gün ≈ 28 W/m²; buharlaşma enerji sınırlıdır.",
+  "hata": [
+   "Kalori–joule dönüşümünü atlamak.",
+   "Güne değil saate bölmek."
+  ],
+  "formuller": [],
+  "kaynak": "ders · 7. hafta",
+  "pratik": [
+   "316-sayisal-032"
+  ]
+ },
+ "s30": {
+  "varyant": [
+   "Taban akışı eğimli bir çizgiyle ayrılır.",
+   "Gecikme yerine tepe zamanı sorulur."
+  ],
+  "yorum": "C = 0,47: olay için orta düzey; doymuş ya da kentleşmiş havzada daha büyük çıkar.",
+  "hata": [
+   "Hacmi taban akışı dahil hesaplamak.",
+   "Yağışın ağırlık merkezini yanlış almak."
+  ],
+  "formuller": [
+   "debi-derinlik"
+  ],
+  "kaynak": "rs 15.7 · mar",
+  "pratik": [
+   "316-sayisal-003",
+   "316-fark-004",
+   "316-yorum-019"
+  ]
+ },
+ "s31": {
+  "varyant": [
+   "Bir olay betimlenir, mekanizma sorulur.",
+   "Havza biçimi ile hidrograf eşleştirilir."
+  ],
+  "yorum": "Kısa şiddetli yağış + beton → Hortonian; uzun yağış + doymuş vadi → Dunne.",
+  "hata": [
+   "İki mekanizmayı yalnız şiddete göre ayırmak."
+  ],
+  "formuller": [],
+  "kaynak": "mar · ders içeriği, 5. hafta",
+  "pratik": [
+   "316-fark-009",
+   "316-test-043",
+   "316-yorum-019",
+   "316-dy-037"
+  ]
+ },
+ "s32": {
+  "varyant": [
+   "IDF a/(t + b) yerine C/tⁿ verilir.",
+   "Alan km² verilir: 0,278 katsayısı.",
+   "Kentleşme senaryosu: C ve Tc birlikte değişir."
+  ],
+  "yorum": "Park asfaltlanınca tepe ≈ 1,7 kat: boru büyütme ya da gecikme haznesi gerekir.",
+  "hata": [
+   "I'yı yağış süresiyle okumak.",
+   "A'yı km² yazıp 360'a bölmek."
+  ],
+  "formuller": [
+   "rasyonel",
+   "idf-kisa"
+  ],
+  "kaynak": "rs 15.9.1 · ders içeriği, 5. hafta",
+  "pratik": [
+   "316-sayisal-037",
+   "316-test-038",
+   "316-terim-001",
+   "316-terim-002"
+  ]
+ },
+ "s33": {
+  "varyant": [
+   "Alan km² verilir, metrik biçim istenir.",
+   "Yöntemin sınırı yorum olarak sorulur."
+  ],
+  "yorum": "Büyük havzada yağış düzgün değildir, depolama tepeyi düşürür; hidrograf yöntemi gerekir.",
+  "hata": [
+   "İngiliz biriminde de 360'a bölmek.",
+   "acre'ı hektar sanmak."
+  ],
+  "formuller": [
+   "rasyonel"
+  ],
+  "kaynak": "rs 15.9.1",
+  "pratik": [
+   "316-sayisal-038",
+   "316-yorum-014",
+   "316-dy-033",
+   "316-terim-003"
+  ]
+ },
+ "s34": {
+  "varyant": [
+   "Iₐ ikinci saatin ortasında dolar.",
+   "Geçirimsiz pay eklenir (o kısım kayıpsız akar)."
+  ],
+  "yorum": "Fazla yağış toplamın yarısından az: ilk yağış Iₐ'yı doldurdu. Islak toprakta Iₐ küçültülür.",
+  "hata": [
+   "fc'yi Iₐ dolmadan düşmek.",
+   "Iₐ'yı her saat yeniden uygulamak."
+  ],
+  "formuller": [],
+  "kaynak": "hms · ders içeriği, 5. hafta",
+  "pratik": [
+   "316-sayisal-043"
+  ]
+ },
+ "s35": {
+  "varyant": [
+   "R değişir; tepe ve zamanı karşılaştırılır.",
+   "Δt 0,5 h verilir."
+  ],
+  "yorum": "R büyüyünce tepe düşer ve gecikir, hacim aynı kalır.",
+  "hata": [
+   "CA'da 0,5Δt'yi unutmak.",
+   "Eski çıkışı çarpmayı atlamak."
+  ],
+  "formuller": [
+   "clark"
+  ],
+  "kaynak": "hms · ders içeriği, 5. hafta",
+  "pratik": [
+   "316-sayisal-048",
+   "316-test-045",
+   "316-terim-018"
+  ]
+ },
+ "s36": {
+  "varyant": [
+   "Debi verilir, geçen süre sorulur.",
+   "Çok katmanlı hazne."
+  ],
+  "yorum": "k büyükse çekilme yavaş, kuyruk uzun; olaydan günler sonra bile taban akışı baskın kalabilir.",
+  "hata": [
+   "t ve k'yı farklı birimlerde kullanmak.",
+   "Katmanları ayrı çekmeyi unutmak."
+  ],
+  "formuller": [
+   "dogrusal-hazne"
+  ],
+  "kaynak": "hms · ders içeriği, 5. hafta",
+  "pratik": [
+   "316-sayisal-047",
+   "316-dy-041"
+  ]
+ },
+ "s37": {
+  "varyant": [
+   "Lag yerine Muskingum verilir: tepe sönümlenir.",
+   "Saatlik yağış 10 dk adımda istenir."
+  ],
+  "yorum": "Lag yalnız öteler; sönümleme için depolama tabanlı öteleme gerekir.",
+  "hata": [
+   "Lag'ın tepeyi düşürdüğünü sanmak.",
+   "Saatlik toplamı her adıma tekrar yazmak."
+  ],
+  "formuller": [
+   "muskingum"
+  ],
+  "kaynak": "hms · ders içeriği, 5. hafta",
+  "pratik": [
+   "316-test-046",
+   "316-yorum-018",
+   "316-sayisal-046",
+   "316-terim-019"
+  ]
+ },
+ "s38": {
+  "varyant": [
+   "Model tepe erken ve küçük verilir: ters ayar.",
+   "NSE ya da PBIAS değerleri yorumlatılır."
+  ],
+  "yorum": "Hacim doğruysa kayıplara değil şekle dokunulur: tepe için R, zamanlama için Tc.",
+  "hata": [
+   "Hacim doğruyken Iₐ ya da fc'yi değiştirmek.",
+   "Hatanın paydasına model değerini koymak."
+  ],
+  "formuller": [
+   "clark"
+  ],
+  "kaynak": "hms",
+  "pratik": [
+   "316-sayisal-049",
+   "316-yorum-016",
+   "316-dy-043"
+  ]
+ },
+ "s39": {
+  "varyant": [
+   "Komşu kotları farklı bir DEM.",
+   "Eşik büyütülür: alt havza sayısı azalır."
+  ],
+  "yorum": "Akış en dik inişe gider; çapraz komşuda uzaklık √2 kat.",
+  "hata": [
+   "En alçak komşuyu en dik iniş sanmak.",
+   "Çukur doldurmayı atlamak."
+  ],
+  "formuller": [],
+  "kaynak": "hms",
+  "pratik": [
+   "316-sirala-004"
+  ]
+ },
+ "s40": {
+  "varyant": [
+   "Model türleri örnekle eşleştirilir.",
+   "BH varsayımlarından biri yanlış verilir."
+  ],
+  "yorum": "HEC-HMS yarı-dağılıdır; BH doğrusallık, süperpozisyon ve zamanla değişmezlik varsayar.",
+  "hata": [
+   "HEC-HMS'yi tamamen dağılı sanmak."
+  ],
+  "formuller": [
+   "bh-konvolusyon"
+  ],
+  "kaynak": "mar · rs 15.9.3",
+  "pratik": [
+   "316-fark-012",
+   "316-test-047",
+   "316-dy-039"
+  ]
+ },
+ "s41": {
+  "varyant": [
+   "AMC III koşulunda CN dönüştürülür.",
+   "Iₐ = 0,05S ile karşılaştırma.",
+   "İnç birimiyle çözüm."
+  ],
+  "yorum": "CN 75 → 90: aynı yağıştan akış ≈ 2 kat; kentleşme ya da ıslak toprak etkisi.",
+  "hata": [
+   "P ≤ Iₐ iken formülü uygulamak.",
+   "S'yi inç formülüyle bulup mm sanmak."
+  ],
+  "formuller": [
+   "scs-cn"
+  ],
+  "kaynak": "cmm Bl. 5",
+  "pratik": [
+   "316-sayisal-040",
+   "316-test-040",
+   "316-test-041",
+   "316-yorum-015",
+   "316-terim-004",
+   "316-terim-005"
+  ]
+ },
+ "s42": {
+  "varyant": [
+   "Saat sayısı ve değerleri değişir.",
+   "W-indeksi de istenir."
+  ],
+  "yorum": "φ = 14,7 mm/h orta geçirgenlik; φ > W çünkü zayıf saatler dışarıda.",
+  "hata": [
+   "Zayıf saatleri denkleme katmak.",
+   "Sonucu denetlememek."
+  ],
+  "formuller": [
+   "phi"
+  ],
+  "kaynak": "cmm Bl. 5",
+  "pratik": [
+   "316-sayisal-041",
+   "316-test-042",
+   "316-fark-013"
+  ]
+ },
+ "s43": {
+  "varyant": [
+   "Üç saatlik fazla yağış.",
+   "Farklı süreli BH istenir: S-eğrisi."
+  ],
+  "yorum": "Hacim kontrolü (30 mm) hesabın doğruluğunu gösterir; tepe iki darbenin bindiği saatte.",
+  "hata": [
+   "İkinci darbeyi ötelememek.",
+   "mm'yi BH birimine bölmeyi unutmak."
+  ],
+  "formuller": [
+   "bh-konvolusyon"
+  ],
+  "kaynak": "rs 15.9.3 · cmm Bl. 7",
+  "pratik": [
+   "316-sayisal-044",
+   "316-sayisal-045",
+   "316-yorum-017",
+   "316-test-048"
+  ]
+ },
+ "s44": {
+  "varyant": [
+   "Normaller %10'un altında farklı: basit ortalama.",
+   "Dört komşu verilir."
+  ],
+  "yorum": "Normali yüksek komşu küçültülür; sonuç basit ortalamadan farklıysa yöntem gerekliydi.",
+  "hata": [
+   "Oranı ters kurmak.",
+   "Çift kütleyle boşluk doldurmaya çalışmak."
+  ],
+  "formuller": [
+   "normal-oran"
+  ],
+  "kaynak": "rs 9.6",
+  "pratik": [
+   "316-sayisal-013",
+   "316-test-013",
+   "316-test-014",
+   "316-yorum-020"
+  ]
+ },
+ "s45": {
+  "varyant": [
+   "Kısa seri: K(T) tablodan.",
+   "Risk ve ömürle T bulunup Gumbel uygulanır."
+  ],
+  "yorum": "T yıllık değer PMP'den küçüktür; K seçilen riskten gelir.",
+  "hata": [
+   "ln ln adımında işaret hatası.",
+   "Hershfield Kₘ'yi Gumbel K(T) sanmak."
+  ],
+  "formuller": [
+   "gumbel"
+  ],
+  "kaynak": "rs 11.13 · rs 11.14",
+  "pratik": [
+   "316-sayisal-026",
+   "316-fark-018",
+   "316-terim-017"
+  ]
+ }
+}
