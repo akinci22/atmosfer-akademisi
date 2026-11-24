@@ -194,6 +194,7 @@
     iskelet();
     hashIsle(true);
     addEventListener('hashchange', () => hashIsle(false));
+    let rz = 0; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => sigdir(ana), 150); }, { passive: true });
     d.addEventListener('keydown', tus);
     d.addEventListener('click', (e) => { if (!e.target.closest('.sv-sec')) panelKapat(); });
     window.__sinav = { S, B, hesapla, degerSec, sayiOku, sayiDuz, metin, aktif: () => aktif }; // sınama kancası
@@ -321,6 +322,15 @@
   function pratik() { S.mod = 'pratik'; const q = S.liste[S.i]; S.liste = listeKur(); S.i = Math.max(0, S.liste.indexOf(q)); ustGuncelle(); goster(); }
   function modYanlis() { S.mod = 'yanlis'; S.liste = listeKur(); S.i = 0; ustGuncelle(); goster(); }
 
+  // geniş formülü kutuya sığdır (en çok %62'ye küçült; yine sığmazsa parmakla çekilir)
+  function sigdir(kap) {
+    if (!kap) return;
+    kap.querySelectorAll('.sv-a-f, .sv-tf-f, .sv-kart .katex-display, .sv-tk .katex-display').forEach((el) => {
+      el.style.fontSize = '';
+      const w = el.clientWidth, sw = el.scrollWidth;
+      if (w > 0 && sw > w + 1) { const fs = parseFloat(getComputedStyle(el).fontSize) || 18; el.style.fontSize = (fs * Math.max(0.62, (w - 2) / sw)).toFixed(2) + 'px'; }
+    });
+  }
   // ---------- ana alan
   function goster(odakla) {
     clearInterval(denemeZaman);
@@ -409,6 +419,7 @@ ${konu ? `<section><h2 class="sv-etiket">Konu</h2><p class="sv-yan-k">${esc(konu
       : `<div class="sv-eylem"><button type="button" class="sv-dug sv-ana-dug" data-e="kontrol">${ikon('tik')}<span class="sv-ke">Kontrol</span></button><button type="button" class="sv-dug sv-fener-d" data-e="fener" aria-expanded="false" title="Bilgi feneri (F)">${ikon('fener')}<span class="sv-et">Bilgi feneri</span></button>${q.kanal === 'sayisal' ? `<button type="button" class="sv-dug" data-e="yeni" title="Yeni sayılar">${ikon('yenile')}<span class="sv-et">Yeni sayılar</span></button>` : ''}<button type="button" class="sv-dug sv-ikinci" data-e="goster" title="Çözümü göster">${ikon('goz')}<span class="sv-et">Çözümü göster</span></button><span class="sv-ara"></span><button type="button" class="sv-dug sv-ok-d" data-e="once" aria-label="Önceki soru" title="Önceki (←)">${ikon('sol')}</button><button type="button" class="sv-dug sv-ok-d" data-e="sonra" aria-label="Sonraki soru" title="Sonraki (→)">${ikon('sag')}</button></div>`;
     art.innerHTML = `${kafa}<div class="sv-govde">${g.html}</div><p class="sv-uyari" role="status" hidden></p>${sinavda ? '' : `<div class="sv-fener" hidden><p class="sv-fener-b">${ikon('fener')}<span>Bilgi feneri</span></p><div class="sv-fener-m">${metin(q.fener, deg)}</div></div><div class="sv-sonuc" aria-live="polite" hidden></div>`}${eylem}${sinavda ? '' : `<footer class="sv-kf">${kaynakHtml(q.kaynak)}${bagListe(q)}</footer>`}`;
     ayar.kap.appendChild(art);
+    requestAnimationFrame(() => sigdir(art));
     const govde = art.querySelector('.sv-govde');
     g.bagla(govde);
     const uyariEl = art.querySelector('.sv-uyari');
@@ -821,6 +832,7 @@ ${terimKart(tl[ti])}
 <div class="sv-a-alt">${kaynakHtml(f.kaynak)}${f.konu && KONU.has(f.konu) ? `<p class="sv-a-k"><button type="button" class="sv-dug sv-ikinci" data-e="konu-git" data-konu="${esc(f.konu)}">${esc(KONU.get(f.konu).ad)} · ${konuSay} soru${ikon('sag')}</button></p>` : ''}</div>
 ${iliskili.length ? `<div class="sv-a-q"><h3>Bu formülün terim soruları</h3><ul>${iliskili.map((q) => `<li><a href="#${esc(q.id)}">${texSembol(q.terim)}<span>${esc(String(q.soru || '').replace(/\$[^$]*\$/g, '…').slice(0, 90))}</span></a></li>`).join('')}</ul></div>` : ''}
 </section></div>`;
+    sigdir(ana);
     hashYaz('atlas/' + encodeURIComponent(f.id) + (S.atlas.t ? '/' + encodeURIComponent(S.atlas.t) : ''));
     if (terimOdak) { const b = ana.querySelector('.sv-a-tb[aria-pressed="true"]'); if (b) b.focus({ preventScroll: true }); }
   }

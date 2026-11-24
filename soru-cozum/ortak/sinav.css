@@ -95,7 +95,7 @@ kbd{font:12px/1 ui-monospace,Consolas,monospace;color:var(--s);border:1px solid 
 /* sayısal giriş */
 .sv-giris{margin:6px 0 0}
 .sv-g-k{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
-.sv-g{width:min(260px,100%);min-height:54px;padding:8px 14px;border:1.5px solid var(--c2);border-radius:12px;background:#fff;font:inherit;font-size:21px;font-variant-numeric:tabular-nums;color:var(--y)}
+.sv-g{flex:1 1 150px;min-width:0;max-width:260px;width:auto;min-height:54px;padding:8px 14px;border:1.5px solid var(--c2);border-radius:12px;background:#fff;font:inherit;font-size:21px;font-variant-numeric:tabular-nums;color:var(--y)}
 .sv-g:focus{border-color:var(--m);outline:none;box-shadow:0 0 0 3px rgb(29 78 216/.18)}
 .sv-g.ok{border-color:var(--ok);background:var(--ok2)}
 .sv-g.hata{border-color:var(--hata);background:var(--hata2)}
@@ -157,6 +157,8 @@ kbd{font:12px/1 ui-monospace,Consolas,monospace;color:var(--s);border:1px solid 
 .sv-tf-f::-webkit-scrollbar,.sv-a-f::-webkit-scrollbar{display:none}
 .sv-tf-f{font-size:1.2em}
 .sv-tf-f .katex-display,.sv-a-f .katex-display{margin:.4em 0}
+.sv-kart .katex-display,.sv-tk .katex-display{max-width:100%;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+.sv-kart .katex-display::-webkit-scrollbar,.sv-tk .katex-display::-webkit-scrollbar{display:none}
 .sv-tf-t{margin:2px 0 0;font-size:15px}
 .sv-tf-s{display:inline-block;padding:0 6px;border-radius:6px;background:#dbe6fd}
 .sv-t-on{color:var(--m);background:#dbe6fd;border-radius:4px;box-shadow:0 0 0 3px #dbe6fd}
@@ -322,6 +324,8 @@ kbd{font:12px/1 ui-monospace,Consolas,monospace;color:var(--s);border:1px solid 
   .sv-et{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
   .sv-eylem .sv-dug{padding:0 11px}
   .sv-eylem .sv-ana-dug{padding:0 18px}
+  .sv-eylem .sv-dug:not(.sv-ana-dug){min-width:42px;padding:0 9px}
+  .sv-eylem .sv-ana-dug{padding:0 14px}
   .sv-a-f{font-size:1.25em}
   .sv-esle li{grid-template-columns:minmax(0,1fr)}
   .sv-dagilim li{grid-template-columns:minmax(0,1fr) 70px 44px;gap:8px;font-size:15px}
@@ -329,6 +333,8 @@ kbd{font:12px/1 ui-monospace,Consolas,monospace;color:var(--s);border:1px solid 
   .sv-tk-dl div{grid-template-columns:minmax(0,1fr);gap:0}
 }
 @media(max-width:420px){
+  .sv-eylem [data-e="once"]{display:none}
+  .sv-eylem{gap:5px}
   .sv-mod .sv-i{display:none}
   .sv-dd{padding:3px 6px 4px 10px}
   .sv-dd-d{font-size:14px}
