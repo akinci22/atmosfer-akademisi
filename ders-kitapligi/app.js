@@ -5,7 +5,9 @@
      #mto342e/S3               soru
      #mto342e/bol/K1-THETA-TV  bölümün konu sayfaları
      #mto342e/S3/k/theta/ispat soru açıkken konu çekmecesi (kavram · parça)
-     #mto342e/S3/k/_atlas      çekmecede kitabın atlası (· /k/_bol/<id> bölüm · /k/_sozluk[/<en>[~<en2>]] sözlük)  */
+     #mto342e/S3/k/_atlas      çekmecede kitabın atlası (· /k/_bol/<id> bölüm · /k/_sozluk[/<en>[~<en2>]] sözlük)
+     DK323 (kimya / hesap verisi olan kitapta): /k/_tur[/<id>] · /k/_tepkime[/<id>] · /k/_dongu[/<id>] · /k/_hesap[/<araç>[/<hazır>]]
+                               · kavram parçaları /k/<kavram>/kimya · /k/<kavram>/hesap[/<araç>]  */
 (function () {
   const $ = (s, k = document) => k.querySelector(s);
   const $$ = (s, k = document) => [...k.querySelectorAll(s)];
@@ -150,7 +152,7 @@
       const kel = [...tr.keys()].sort((a, b) => b.length - a.length).map((e) => e.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
       ipRx = { rx: new RegExp(`(?<![\\p{L}\\p{N}])(${kel.join('|')})(?![\\p{L}\\p{N}])`, 'giu'), tr };
     }
-    const w = document.createTreeWalker(kok, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.parentElement.closest('svg,button,code,pre,.en-ip,summary,.dizin,.takip,a,.es,.kr,.dil-terim,.ip-kart,.sz-kart,.kendin') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
+    const w = document.createTreeWalker(kok, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.parentElement.closest('svg,button,code,pre,.en-ip,summary,.dizin,.takip,a,.es,.kr,.dil-terim,.ip-kart,.sz-kart,.kendin,.hs,.dg,.tk-bas,.tk-denk,.soru-ek') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
     const dugumler = []; while (w.nextNode()) dugumler.push(w.currentNode);
     for (const d of dugumler) {
       const t = d.nodeValue; ipRx.rx.lastIndex = 0;
@@ -196,6 +198,7 @@
       </article></div></div>`;
     texDoldur(ana, K);
     dilSoruEkle(K, q);
+    soruEkEkle(K, q);
     if (R && (R.eslesme || []).length) esleIsaretle($('.soru-govde', ana), R.eslesme);
     ipucuEkle(ana.querySelector('.soru-kart'), K);
     $$('table', ana).forEach((t) => { if (!t.parentElement.classList.contains('tablo-kap')) { const k = document.createElement('div'); k.className = 'tablo-kap'; t.before(k); k.append(t); } });
@@ -276,7 +279,7 @@
   const dilK = (K, id) => (K && K.dil && K.dil.kavram && K.dil.kavram[id]) || null;
   const dilS = (K, id) => (K && K.dil && K.dil.soru && K.dil.soru[id]) || null;
   const szBul = (K, en) => (K.sozluk || []).find((x) => x.en.toLowerCase() === String(en || '').trim().toLowerCase());
-  const parcaVar = (K, k, p) => p === 'sorular' || (p === 'dil' ? !!dilK(K, k.id) : !!(k.parcalar && k.parcalar[p]));
+  const parcaVar = (K, k, p) => p === 'sorular' || (p === 'dil' ? !!dilK(K, k.id) : p === 'kimya' ? kimyaVar(K, k.id) : p === 'hesap' ? kavramHesap(K, k.id).length > 0 : !!(k.parcalar && k.parcalar[p]));
   // çekmece içi bağ: ana sayfa değişse de doğru yere gider (tıklamada o anki ana sayfaya eklenir)
   const ckBag = (kp, ic, sinif = '') => `<a href="#${kac(ckDurum ? ckDurum.onEk : '')}/k/${kac(kp)}" data-ck="${kac(kp)}"${sinif ? ` class="${sinif}"` : ''}>${ic}</a>`;
 
@@ -402,11 +405,11 @@
     const s = szBul(K, el.dataset.en || el.textContent); if (!s) return false;
     const taban = location.hash.split('/k/')[0] || `#${K.id}`;
     const git = (kp, ad) => `<button type="button" data-git="${kac(`${taban}/k/${kp}`)}">${ad}</button>`;
-    const kv = (s.kavram || []).map((id) => kavramBul(K, id)).filter(Boolean);
+    const kv = kvSira(K, s.kavram), tu = turEn(K, s.en);
     ipKart.innerHTML = `<div class="ip-bas"><b lang="en">${kac(s.en)}</b>${s.tur ? `<span class="tur">${kac(s.tur)}</span>` : ''}${s.oku ? `<span class="oku">${kac(s.oku)}</span>` : ''}${s.ipa ? `<span class="ipa" lang="en">/${kac(s.ipa)}/</span>` : ''}<button type="button" class="ip-x" aria-label="Kapat">×</button></div>
       <p class="ip-tr"><i>${kac(s.tr)}</i></p>${(s.es || []).length ? `<p><span class="yok">Birlikte:</span> <span lang="en">${s.es.map(kac).join(' · ')}</span></p>` : ''}
       ${s.fark ? `<p class="sz-fark"><b>Fark:</b> ${kac(s.fark)}</p>` : ''}${s.ornek ? ciftHTML(s.ornek) : ''}
-      <div class="ip-dug">${(s.bak || []).map((b) => git(`_sozluk/${s.en}~${b}`, `Karşılaştır: <span lang="en">${kac(b)}</span>`)).join('')}${kv.map((k) => git(`${k.id}/tanim`, `Kavrama git: ${kac(k.sembol)} · ${kac(k.ad)}`)).join('')}${git(`_sozluk/${s.en}`, 'Sözlükte aç')}</div>`;
+      <div class="ip-dug">${(s.bak || []).map((b) => git(`_sozluk/${s.en}~${b}`, `Karşılaştır: <span lang="en">${kac(b)}</span>`)).join('')}${tu ? git(`_tur/${tu.id}`, `Türü aç: ${kac(tu.f)}`) : ''}${kv.map((k) => git(`${k.id}/tanim`, `Kavrama git: ${kac(k.sembol)} · ${kac(k.ad)}`)).join('')}${git(`_sozluk/${s.en}`, 'Sözlükte aç')}</div>`;
     ipKart.hidden = false; ipHedef = el;
     const r = el.getBoundingClientRect(), w = Math.min(380, innerWidth - 16);
     ipKart.style.width = `${w}px`; ipKart.style.left = `${Math.min(Math.max(8, r.left), innerWidth - w - 8)}px`; ipKart.style.top = '0px';
@@ -424,14 +427,21 @@
     $('#kirinti').innerHTML = [[kac(K.kod), '_atlas'], ...parcalar].map(([ad, kp]) => (kp ? ckBag(kp, ad) : `<span>${ad}</span>`)).join(' <span class="ayrac" aria-hidden="true">›</span> ');
   }
   const siraHTML = (o, orta, s) => `${o ? ckBag(o[0], `‹ <span class="sira-ad">${o[1]}</span>`, 'sira-bag') : '<span class="sira-bos"></span>'}<span class="sira-orta yok">${orta}</span>${s ? ckBag(s[0], `<span class="sira-ad">${s[1]}</span> ›`, 'sira-bag sag') : '<span class="sira-bos"></span>'}`;
-  const ustSekme = (K, sec) => [['_atlas', 'Atlas', 'atlas'], ['_sozluk', `Sözlük (${(K.sozluk || []).length})`, 'sozluk']].map(([kp, ad, id]) => `<button type="button" role="tab" aria-selected="${sec === id}" data-ck="${kp}">${ad}</button>`).join('');
+  const ustSekme = (K, sec) => [['_atlas', 'Atlas', 'atlas'], ...(turlar(K).length ? [['_tur', 'Türler', 'tur']] : []), ...(tepkimeler(K).length ? [['_tepkime', 'Tepkimeler', 'tepkime']] : []), ...(donguler(K).length ? [['_dongu', 'Çevrimler', 'dongu']] : []), ...(HS(K).length ? [['_hesap', 'Hesap', 'hesap']] : []), ['_sozluk', `Sözlük (${(K.sozluk || []).length})`, 'sozluk']].map(([kp, ad, id]) => `<button type="button" role="tab" aria-selected="${sec === id}" data-ck="${kp}">${ad}</button>`).join('');
   function soruCip(K, sid, uzun) {
     const q = K.sorular[sid]; if (!q) return '';
     const simdi = ckDurum && ckDurum.qid === sid, s = simdi ? ' simdi' : '', ac = simdi ? ' aria-current="page"' : '';
     return uzun ? `<a class="soru-bag${s}" href="#${K.id}/${sid}" data-soru="${sid}"${ac}>${sid} · ${kac(q.baslik)} <span class="yok">s. ${q.pdf_soru ?? '—'}</span></a>`
       : `<a class="soru-cip${s}" href="#${K.id}/${sid}" data-soru="${sid}" title="${kac(q.baslik)} · PDF s. ${q.pdf_soru ?? '—'}" aria-label="${sid} · ${kac(q.baslik)}"${ac}>${sid}</a>`;
   }
-  const kavramSatir = (K, k) => `<li>${ckBag(`${k.id}/tanim`, `<span class="sem">${kac(k.sembol)}</span><span class="ad">${kac(k.ad)}</span>${k.en ? `<span class="en" lang="en">${kac(k.en)}</span>` : ''}${dilK(K, k.id) ? '<span class="dil-rozet" title="TR ↔ EN katmanı var">TR↔EN</span>' : ''}`, 'kv-sat')}</li>`;
+  const kavramSatir = (K, k) => `<li>${ckBag(`${k.id}/tanim`, `<span class="sem">${kac(k.sembol)}</span><span class="ad">${kac(k.ad)}</span>${k.en ? `<span class="en" lang="en">${kac(k.en)}</span>` : ''}${rozetHTML(K, k)}`, 'kv-sat')}</li>`;
+  // TR↔EN rozeti (DK316) aynen; kimya / hesap verisi olan kitapta rozetler bir kapta toplanır
+  const rozetHTML = (K, k) => {
+    const d = dilK(K, k.id) ? '<span class="dil-rozet" title="TR ↔ EN katmanı var">TR↔EN</span>' : '';
+    const km = kimyaVar(K, k.id) ? '<span class="dil-rozet kim-rozet" title="Kimya: türler, tepkimeler, çevrim">Kimya</span>' : '';
+    const hs = kavramHesap(K, k.id).length ? '<span class="dil-rozet hs-rozet" title="Hesap aracı var">Hesapla</span>' : '';
+    return km || hs ? `<span class="rozetler">${d}${km}${hs}</span>` : d;
+  };
   const bolumSorulari = (K, b) => b.ogeler.filter((o) => o.tur === 'soru').map((o) => o.id).filter((id) => K.sorular[id]);
 
   function atlasCk(K, ayni) {
@@ -439,7 +449,7 @@
     $('#ck-baslik').innerHTML = `${kac(K.kod)} · kavram atlası<small>${kac(K.ad)} · ${(K.kavramlar || []).length} kavram · ${Object.keys(K.sorular).length} soru</small>`;
     $('#ck-sira').innerHTML = ''; $('#ck-sekme').innerHTML = ustSekme(K, 'atlas');
     if (ayni) return;
-    ckIc.innerHTML = `<p class="ck-not">Bir bölüme, kavrama ya da soruya dokun; çekmece açık kalır. Kavram satırı: sembol · Türkçe ad · İngilizce ad.</p>${K.bolumler.filter((b) => bolumDolu(K, b)).map((b) => {
+    ckIc.innerHTML = `<p class="ck-not">Bir bölüme, kavrama ya da soruya dokun; çekmece açık kalır. Kavram satırı: sembol · Türkçe ad · İngilizce ad.</p>${atlasGirisHTML(K)}${K.bolumler.filter((b) => bolumDolu(K, b)).map((b) => {
       const kv = (K.kavramlar || []).filter((k) => k.bolum === b.id), sq = bolumSorulari(K, b);
       return `<section class="at-bol"><h3>${ckBag(`_bol/${b.id}`, kac(bolumAd(K, b)))} <span class="say">${kv.length} kavram · ${sq.length} soru</span></h3>${kv.length ? `<ul class="kv-liste">${kv.map((k) => kavramSatir(K, k)).join('')}</ul>` : ''}${sq.length ? `<div class="soru-cipler"><span class="yok">Sorular:</span> ${sq.map((s) => soruCip(K, s)).join('')}</div>` : ''}</section>`;
     }).join('')}`;
@@ -464,13 +474,14 @@
   }
   function szKart(K, s, ad) {
     if (!s) return `<div class="sz-kart"><p class="yok"><span lang="en">${kac(ad)}</span> sözlükte yok.</p></div>`;
-    const kv = (s.kavram || []).map((id) => kavramBul(K, id)).filter(Boolean);
+    const kv = kvSira(K, s.kavram), tu = turEn(K, s.en);
     return `<article class="sz-kart"><h3><span lang="en">${kac(s.en)}</span> ${s.tur ? `<span class="tur">${kac(s.tur)}</span>` : ''}</h3>
       ${s.oku || s.ipa ? `<p class="oku-sat">${s.oku ? `<span class="oku">${kac(s.oku)}</span>` : ''}${s.ipa ? ` <span class="ipa" lang="en">/${kac(s.ipa)}/</span>` : ''}</p>` : ''}
       <p class="sz-tr"><i>${kac(s.tr)}</i></p>
       ${(s.es || []).length ? `<p><span class="yok">Birlikte kullanılır:</span> <span lang="en">${s.es.map(kac).join(' · ')}</span></p>` : ''}
       ${s.fark ? `<p class="sz-fark"><b>Fark:</b> ${kac(s.fark)}</p>` : ''}${s.ornek ? ciftHTML(s.ornek) : ''}
       ${(s.bak || []).length ? `<p class="sz-dug"><span class="yok">Karşılaştır:</span> ${s.bak.map((x) => ckBag(`_sozluk/${s.en}~${x}`, `<span lang="en">${kac(s.en)} ↔ ${kac(x)}</span>`, 'soru-bag')).join(' ')}</p>` : ''}
+      ${tu ? `<p class="sz-dug"><span class="yok">Tür:</span> ${ckBag(`_tur/${tu.id}`, `Türü aç: <b>${kac(tu.f)}</b> · ${kac(iki(tu.ad).tr)}`, 'soru-bag')}</p>` : ''}
       ${kv.length ? `<p class="sz-dug"><span class="yok">Kavram:</span> ${kv.map((k) => ckBag(`${k.id}/${dilK(K, k.id) ? 'dil' : 'tanim'}`, `${kac(k.sembol)} · ${kac(k.ad)}`, 'soru-bag')).join(' ')}</p>` : ''}
       ${s.kaynak ? `<p class="yok sz-kaynak">Kaynak: ${kac(s.kaynak)}</p>` : ''}
       ${!s.tur && !s.fark && !s.ornek ? '<p class="yok">Bu terimin okunuşu, farkı ve örneği hazırlanıyor.</p>' : ''}</article>`;
@@ -494,24 +505,30 @@
     if (ayni) return;
     ckIc.innerHTML = b ? `<div class="sz-yan">${szKart(K, A, a)}${szKart(K, B, b)}</div>` : szKart(K, A, a);
   }
-  function kavramCk(K, kid, parca, ayni) {
+  function kavramCk(K, kid, parca, ayni, ek) {
     const k = kavramBul(K, kid);
     if (!k) return atlasCk(K, false);
     if (!parcaVar(K, k, parca)) parca = 'tanim';
     const D = dilK(K, k.id), b = K.bolumler.find((x) => x.id === k.bolum);
-    const parcaAd = parca === 'sorular' ? 'Sorular' : parca === 'dil' ? 'TR ↔ EN' : (PAD[parca] || 'Tanım');
+    const parcaAd = parca === 'sorular' ? 'Sorular' : parca === 'dil' ? 'TR ↔ EN' : parca === 'kimya' ? 'Kimya' : parca === 'hesap' ? 'Hesapla' : (PAD[parca] || 'Tanım');
     kirintiYaz(K, [...(b ? [[kac(bolumAd(K, b)), `_bol/${b.id}`]] : []), [`${kac(k.sembol)} ${kac(k.ad)}`, `${k.id}/tanim`], [parcaAd, `${k.id}/${parca}`]]);
-    $('#ck-baslik').innerHTML = `${kac(k.sembol)} · ${kac(k.ad)}<small lang="en">${kac(k.en || '')}</small>`;
+    $('#ck-baslik').innerHTML = `${kac(k.sembol)} · ${kac(k.ad)}<small lang="en">${kac(k.en || '')}</small><span class="ck-dar-sekme"> · ${kac(parcaAd)}</span>`;
     const L = K.kavramlar || [], i = L.indexOf(k), o = L[i - 1], s = L[i + 1], kp = (x) => `${x.id}/${parcaVar(K, x, parca) ? parca : 'tanim'}`;
     $('#ck-sira').innerHTML = siraHTML(o && [kp(o), `${kac(o.sembol)} ${kac(o.ad)}`], `kavram ${i + 1} / ${L.length}`, s && [kp(s), `${kac(s.sembol)} ${kac(s.ad)}`]);
     const parcalar = PARCA.filter(([p]) => k.parcalar && k.parcalar[p]), taban = `#${ckDurum.onEk}/k/${k.id}/`;
     const sekme = ([p, ad]) => `<button type="button" role="tab" aria-selected="${p === parca}" data-git="${kac(taban + p)}">${ad}</button>`;
-    $('#ck-sekme').innerHTML = [...parcalar.slice(0, 1), ...(D ? [['dil', 'TR ↔ EN']] : []), ...parcalar.slice(1), ['sorular', `Sorular (${k.sorular.length})`]].map(sekme).join('');
+    $('#ck-sekme').innerHTML = [...parcalar.slice(0, 1), ...(D ? [['dil', 'TR ↔ EN']] : []), ...(kimyaVar(K, k.id) ? [['kimya', 'Kimya']] : []), ...(kavramHesap(K, k.id).length ? [['hesap', 'Hesapla']] : []), ...parcalar.slice(1), ['sorular', `Sorular (${k.sorular.length})`]].map(sekme).join('');
     if (ayni) return;
     const ic = ckIc, P = k.parcalar[parca] || {};
     ckAdim = 1;
     if (parca === 'tanim') ic.innerHTML = P.html || '';
     else if (parca === 'dil') ic.innerHTML = dilKavramHTML(K, k);
+    else if (parca === 'kimya') { ic.innerHTML = kimyaKavramHTML(K, k); const d = kavramKimya(K, k.id).dongu[0]; if (d) donguKur(ic, K, d); }
+    else if (parca === 'hesap') {
+      const L = kavramHesap(K, k.id), h = L.find((x) => x.id === ek) || L[0];
+      ic.innerHTML = `${L.length > 1 ? `<div class="hs-secim" role="group" aria-label="Araç seç"><span class="yok">Araç:</span>${L.map((x) => ckBag(`${k.id}/hesap/${x.id}`, kac(iki(x.ad).tr), `kucuk${x === h ? ' simdi' : ''}`)).join('')}</div>` : ''}${hesapHTML(K, h, true)}<p class="dil-cagri">${ckBag('_hesap', 'Bütün araçlar: Hesap laboratuvarı →', 'soru-bag')}</p>`;
+      hesapKur(ic, h, null);
+    }
     else if (parca === 'diyagram') { ic.innerHTML = `<div class="sekil-kap" id="ck-sekil"></div>${P.html || ''}`; if (window.Sekil[P.sekil]) window.Sekil[P.sekil]($('#ck-sekil'), P.ayar || {}); buyutDugmesi(); }
     else if (parca === 'formul') {
       ic.innerHTML = `<div class="formul-kap" data-tex="${P.tex}"></div><p class="yok" style="margin:10px 0 0">Bir terime bas: formülde yanar, anlamı aşağıda.</p><div class="terim-list">${(P.terimler || []).map((t, j) => `<button type="button" aria-pressed="false" data-t="${j}">${kac(t.sembol)}</button>`).join('')}</div><div class="terim-kart" id="terim-kart" hidden></div>${P.html || ''}`;
@@ -556,6 +573,448 @@
     $$('[data-tex]', ic).length && texDoldur(ic, K);
   }
 
+  /* ---------- DK323: hesap laboratuvarı + kimya gezgini ----------
+     Veri (tools/ek_birlestir.mjs): K.hesap = {hesap: [araç]}, K.kimya = {aile, tur, tepkime, dongu}. Veri yoksa hiçbir şey görünmez.
+     Çekmece: _hesap · _hesap/<araç>[/<hazır sırası | soru>] · _tur · _tur/<id> · _tepkime · _tepkime/<id> · _dongu · _dongu/<id>
+     Kavram parçaları: <kavram>/kimya · <kavram>/hesap[/<araç>] */
+  const HS = (K) => (K && K.hesap && Array.isArray(K.hesap.hesap) ? K.hesap.hesap : []);
+  const KM = (K) => (K && K.kimya && typeof K.kimya === 'object' ? K.kimya : {});
+  const turlar = (K) => KM(K).tur || [];
+  const tepkimeler = (K) => KM(K).tepkime || [];
+  const donguler = (K) => KM(K).dongu || [];
+  const aileler = (K) => KM(K).aile || [];
+  const turBul = (K, id) => turlar(K).find((t) => t.id === id);
+  const tepkimeBul = (K, id) => tepkimeler(K).find((r) => r.id === id);
+  const donguBul = (K, id) => donguler(K).find((d) => d.id === id);
+  const hesapBul = (K, id) => HS(K).find((h) => h.id === id);
+  const icer = (o, alan, id) => Array.isArray(o[alan]) && o[alan].includes(id);
+  const kavramHesap = (K, kid) => HS(K).filter((h) => icer(h, 'kavram', kid));
+  const soruHesap = (K, sid) => HS(K).filter((h) => icer(h, 'soru', sid) || (h.hazir || []).some((z) => z.soru === sid));
+  const kavramKimya = (K, kid) => ({ tur: turlar(K).filter((t) => icer(t, 'kavram', kid)), tepkime: tepkimeler(K).filter((r) => icer(r, 'kavram', kid)), dongu: donguler(K).filter((d) => icer(d, 'kavram', kid)) });
+  const kimyaVar = (K, kid) => { const x = kavramKimya(K, kid); return x.tur.length + x.tepkime.length + x.dongu.length > 0; };
+  const iki = (o) => (o && typeof o === 'object' ? { tr: o.tr || '', en: o.en || '' } : { tr: String(o ?? ''), en: '' });
+  const ikiSat = (o) => { const x = iki(o); return `<span class="iki-tr">${kac(x.tr)}</span>${x.en ? ` <span class="iki-en" lang="en">${kac(x.en)}</span>` : ''}`; };
+  // kavram düğmeleri atlas sırasında (sözlük kartı, tür kartı, araçlar)
+  const kvSira = (K, ids) => { const L = K.kavramlar || []; return [...new Set(ids || [])].map((id) => kavramBul(K, id)).filter(Boolean).sort((a, b) => L.indexOf(a) - L.indexOf(b)); };
+  const enNorm = (s) => String(s || '').toLowerCase().replace(/\s*\(.*?\)\s*/g, ' ').replace(/\s+/g, ' ').trim();
+  const turEn = (K, en) => { const a = enNorm(en); return a ? turlar(K).find((t) => enNorm(iki(t.ad).en) === a) || null : null; };
+  const TIP_AD = { fotoliz: ['fotoliz', 'photolysis'], 'iki-cisim': ['iki cisimli', 'bimolecular'], 'uc-cisim': ['üç cisimli (M)', 'termolecular (M)'], heterojen: ['heterojen', 'heterogeneous'], 'sulu-denge': ['sulu denge', 'aqueous equilibrium'], cozunme: ['çözünme', 'dissolution'], notrlesme: ['nötrleşme', 'neutralization'], net: ['net tepkime', 'net reaction'] };
+  const tipAd = (t) => (TIP_AD[t] || [t || ''])[0];
+
+  /* sembol ve sayı yazımı: k_B → k<sub>B</sub>; TR'de ondalık virgül; bilim biçimi a × 10ⁿ */
+  const UST = { '-': '⁻', '+': '⁺', 0: '⁰', 1: '¹', 2: '²', 3: '³', 4: '⁴', 5: '⁵', 6: '⁶', 7: '⁷', 8: '⁸', 9: '⁹' };
+  const ALT_UST = { '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9', '⁻': '-', '⁺': '+' };
+  const ustYaz = (n) => String(n).replace(/[-+0-9]/g, (c) => UST[c]);
+  const semHTML = (s) => kac(s).replace(/_\{([^}]*)\}|_([\p{L}\p{N}]+)/gu, (m, a, b) => `<sub>${a ?? b}</sub>`).replace(/\^\{([^}]*)\}|\^(-?[\p{L}\p{N}.]+)/gu, (m, a, b) => `<sup>${a ?? b}</sup>`);
+  const ondalik = (v, b) => { const s = Math.abs(v).toFixed(Math.max(0, Math.min(10, b))); return (v < 0 && +s !== 0 ? '−' : '') + s.replace('.', ','); };
+  // bicim: bilim → «basamak» anlamlı basamak (a × 10ⁿ) · ondalik → «basamak» ondalık · yuzde → f kesir verir, %·100 yazılır
+  function sayiBicim(v, bicim, basamak) {
+    if (typeof v !== 'number' || !isFinite(v)) return '—';
+    const a = Math.abs(v);
+    if (bicim === 'yuzde') return `%${ondalik(v * 100, basamak ?? 1)}`;
+    if (bicim === 'bilim' || (bicim !== 'ondalik' && a !== 0 && (a >= 1e5 || a < 1e-3))) {
+      if (a === 0) return '0';
+      const b = Math.max(1, Math.min(8, basamak ?? 3));
+      let us = Math.floor(Math.log10(a)), m = (a / 10 ** us).toFixed(b - 1);
+      if (+m >= 10) { us++; m = (a / 10 ** us).toFixed(b - 1); }
+      return `${v < 0 ? '−' : ''}${m.replace('.', ',')}${us ? ` × 10${ustYaz(us)}` : ''}`;
+    }
+    return ondalik(v, basamak ?? (a === 0 ? 0 : Math.min(6, Math.max(0, 2 - Math.floor(Math.log10(a))))));
+  }
+  // oran: üç anlamlı basamak (2,00 · 0,500 · 40,0)
+  const oranYaz = (x) => { if (typeof x !== 'number' || !isFinite(x)) return '—'; const a = Math.abs(x); if (a === 0) return '0'; if (a >= 1e5 || a < 1e-3) return sayiBicim(x, 'bilim', 3); return ondalik(x, Math.max(0, 2 - Math.floor(Math.log10(a)))); };
+  const kisaSayi = (v) => { if (typeof v !== 'number' || !isFinite(v)) return String(v ?? ''); const a = Math.abs(v); return a !== 0 && (a >= 1e5 || a < 1e-3) ? sayiBicim(v, 'bilim', 4).replace(/(,\d*?)0+( ×|$)/, '$1$2').replace(/,( ×|$)/, '$1') : String(+v.toPrecision(6)).replace('.', ',').replace('-', '−'); };
+  const girdiYaz = (v) => { if (typeof v !== 'number' || !isFinite(v)) return ''; const a = Math.abs(v); if (a !== 0 && (a >= 1e5 || a < 1e-3)) { const [m, e] = v.toExponential(3).split('e'); return `${String(+m).replace('.', ',')}e${+e}`; } return String(+v.toPrecision(6)).replace('.', ','); };
+  // «2,45e-12», «2.45E-12», «2,45 × 10⁻¹²», «2,45x10^-12» hepsi okunur
+  function sayiOku(s) {
+    const t = String(s ?? '').trim().replace(/[−–]/g, '-').replace(/\s+/g, '').replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺]/g, (c) => ALT_UST[c]).replace(',', '.');
+    const m = /^([+-]?(?:\d+\.?\d*|\.\d+))(?:[eE]([+-]?\d+)|[×x*·]10\^?([+-]?\d+))?$/.exec(t);
+    return m ? +`${m[1]}e${m[2] ?? m[3] ?? 0}` : NaN;
+  }
+
+  /* --- hesap laboratuvarı: f = JS ifadesi (girdi, sabit, önceki çıktı kimlikleri + aşağıdaki adlar; Math.* de geçer) --- */
+  const MATEMATIK = { exp: Math.exp, log: Math.log, ln: Math.log, log10: Math.log10, log2: Math.log2, sqrt: Math.sqrt, cbrt: Math.cbrt, pow: Math.pow, abs: Math.abs, min: Math.min, max: Math.max, round: Math.round, floor: Math.floor, ceil: Math.ceil, sin: Math.sin, cos: Math.cos, tan: Math.tan, PI: Math.PI, E: Math.E };
+  const HFN = new WeakMap(), HDEG = {};
+  const nesneli = (g) => (g.secenek || []).some((s) => s && s.deger && typeof s.deger === 'object');
+  function hesapFn(h) {
+    let F = HFN.get(h); if (F) return F;
+    const ek = new Set();
+    (h.girdi || []).forEach((g) => { if (nesneli(g)) g.secenek.forEach((s) => { if (s && s.deger && typeof s.deger === 'object') Object.keys(s.deger).forEach((a) => ek.add(a)); }); });
+    const adlar = [...new Set([...Object.keys(MATEMATIK), ...(h.sabit || []).map((s) => s.id), ...(h.girdi || []).map((g) => g.id), ...ek, ...(h.cikti || []).map((o) => o.id)])];
+    const fns = (h.cikti || []).map((o) => { try { return new Function(...adlar, `"use strict";return (${o.f});`); } catch (e) { return () => NaN; } });
+    F = { adlar, fns }; HFN.set(h, F); return F;
+  }
+  function hesapCalis(h, v) {
+    const { adlar, fns } = hesapFn(h), c = { ...MATEMATIK }, out = {};
+    (h.sabit || []).forEach((s) => { c[s.id] = s.deger; });
+    (h.girdi || []).forEach((g) => { const x = v[g.id]; if (nesneli(g)) { const s = g.secenek[x] || g.secenek[0]; if (s && s.deger && typeof s.deger === 'object') Object.assign(c, s.deger); } c[g.id] = x; });
+    (h.cikti || []).forEach((o, i) => { let r; try { r = fns[i](...adlar.map((a) => c[a])); } catch (e) { r = NaN; } c[o.id] = out[o.id] = typeof r === 'number' ? r : NaN; });
+    return out;
+  }
+  const girdiVars = (g) => (g.vars ?? (nesneli(g) ? 0 : ((g.secenek || [])[0] || {}).deger ?? g.min ?? 0));
+  function hesapDurum(h) {
+    if (!HDEG[h.id]) HDEG[h.id] = { v: Object.fromEntries((h.girdi || []).map((g) => [g.id, girdiVars(g)])), A: null, hz: -1, son: null };
+    return HDEG[h.id];
+  }
+  function hazirUygula(h, d, i) {
+    const z = (h.hazir || [])[i]; if (!z) return;
+    (h.girdi || []).forEach((g) => { d.v[g.id] = (z.deger || {})[g.id] ?? girdiVars(g); });
+    d.hz = i;
+  }
+  const hazirSira = (h, x) => { if (x == null || x === '') return null; if (/^\d+$/.test(x)) return +x < (h.hazir || []).length ? +x : null; const i = (h.hazir || []).findIndex((z) => z.soru === x); return i >= 0 ? i : null; };
+  const esitMi = (a, b) => a === b || (typeof a === 'number' && typeof b === 'number' && Math.abs(a - b) <= 1e-9 * Math.max(Math.abs(a), Math.abs(b)));
+  const hazirEtkin = (h, d) => { const z = (h.hazir || [])[d.hz]; return !!z && (h.girdi || []).every((g) => esitMi(d.v[g.id], (z.deger || {})[g.id] ?? girdiVars(g))); };
+  const girdiDeger = (g, v) => ((g.secenek || []).length ? kac(iki((nesneli(g) ? g.secenek[v] : g.secenek.find((s) => esitMi(s.deger, v)))?.ad).tr || String(v)) : `${kisaSayi(v)}${g.birim ? ' ' + kac(g.birim) : ''}`);
+  // formül metni: girdi / sabit / çıktı sembolleri terim olarak işaretlenir (değişen girdi parlar)
+  function formulHTML(h) {
+    const S = [...(h.cikti || []).map((o) => [o.sembol || o.id, o.id, 'c']), ...(h.girdi || []).map((g) => [g.sembol || g.id, g.id, 'g']), ...(h.sabit || []).map((s) => [s.sembol || s.id, s.id, 's'])].filter((x) => x[0]).sort((a, b) => b[0].length - a[0].length);
+    const t = String(h.formul || ''), sinir = (c) => !c || !/[\p{L}\p{N}_₀-₉ₐ-ₜ]/u.test(c);
+    let out = '', duz = '';
+    for (let i = 0; i < t.length;) {
+      const m = S.find(([s]) => t.startsWith(s, i) && sinir(t[i - 1]) && sinir(t[i + s.length]));
+      if (m) { out += semHTML(duz); duz = ''; out += `<span class="hf-t hf-${m[2]}" data-s="${kac(m[1])}">${semHTML(m[0])}</span>`; i += m[0].length; } else { duz += t[i]; i++; }
+    }
+    return out + semHTML(duz);
+  }
+  function girdiHTML(h, g) {
+    const uid = `hs-${h.id}-${g.id}`, ad = iki(g.ad);
+    const etiket = `<label for="${kac(uid)}"><span class="hs-sem">${semHTML(g.sembol || g.id)}</span> <span class="hs-gad">${kac(ad.tr)}</span>${ad.en ? ` <i class="hs-gen" lang="en">${kac(ad.en)}</i>` : ''}</label>`;
+    if ((g.secenek || []).length) return `<div class="hs-g" data-g="${kac(g.id)}">${etiket}<div class="hs-g-sat"><select id="${kac(uid)}" class="hs-sec">${g.secenek.map((s, i) => { const x = iki(s.ad); return `<option value="${i}">${kac(x.tr)}${x.en ? ` · ${kac(x.en)}` : ''}</option>`; }).join('')}</select>${g.birim ? `<span class="hs-birim">${kac(g.birim)}</span>` : ''}</div></div>`;
+    const lg = !!g.log && g.min > 0 && g.max > 0, a = lg ? Math.log10(g.min) : +g.min, b = lg ? Math.log10(g.max) : +g.max;
+    const adim = lg ? (b - a) / 400 : (+g.adim > 0 ? +g.adim : (b - a) / 200);
+    return `<div class="hs-g" data-g="${kac(g.id)}">${etiket}<div class="hs-g-sat"><input type="range" class="hs-sur" min="${a}" max="${b}" step="${adim}" aria-label="${kac(ad.tr)}: sürgü${lg ? ' (logaritmik ölçek)' : ''}"${lg ? ' data-log="1"' : ''}><input type="text" id="${kac(uid)}" class="hs-sayi" inputmode="decimal" autocomplete="off" spellcheck="false"><span class="hs-birim">${kac(g.birim || '')}</span></div><span class="hs-ara yok">${kisaSayi(+g.min)} – ${kisaSayi(+g.max)}${lg ? ' · log ölçek' : ''}</span></div>`;
+  }
+  function hesapHTML(K, h, baslik) {
+    const ad = iki(h.ad), kv = kvSira(K, h.kavram);
+    const sq = [...new Set([...(h.soru || []), ...(h.hazir || []).map((z) => z.soru).filter(Boolean)])].filter((s) => K.sorular[s]);
+    return `<section class="hs" data-hs="${kac(h.id)}" aria-label="Hesap aracı: ${kac(ad.tr)}">
+      ${baslik ? `<h3 class="hs-bas">${kac(ad.tr)}${ad.en ? ` <small lang="en">${kac(ad.en)}</small>` : ''}</h3>` : ''}
+      <div class="hs-ust"><div class="hs-formul">${formulHTML(h)}</div>
+        <div class="hs-cikti">${(h.cikti || []).map((o) => `<div class="hs-c" data-c="${kac(o.id)}"><span class="hs-cust"><span class="hs-csem">${semHTML(o.sembol || o.id)}</span> = <output class="hs-deger"></output> <span class="hs-birim">${kac(o.birim || '')}</span></span><span class="hs-cad">${kac(iki(o.ad).tr)}${iki(o.ad).en ? ` · <i lang="en">${kac(iki(o.ad).en)}</i>` : ''}</span><span class="hs-kitap" hidden></span><span class="hs-oran" hidden></span></div>`).join('')}</div></div>
+      ${(h.hazir || []).length ? `<div class="hs-hazir" role="group" aria-label="Hazır değerler: kitaptaki sorular"><span class="yok">Hazır:</span>${h.hazir.map((z, i) => `<button type="button" class="kucuk" data-hz="${i}" aria-pressed="false">${kac(z.ad)}</button>`).join('')}</div>` : ''}
+      <div class="hs-girdiler">${(h.girdi || []).map((g) => girdiHTML(h, g)).join('')}</div>
+      <div class="hs-ab"><button type="button" class="kucuk hs-sabitle" aria-pressed="false">A'yı sabitle → B ile karşılaştır</button><button type="button" class="kucuk hs-basa">Başa al</button></div>
+      <div class="hs-kars" aria-live="polite" hidden></div>
+      ${(h.sabit || []).length ? `<p class="hs-sabitler"><span class="yok">Sabitler:</span> ${h.sabit.map((s) => `<span class="hs-sb">${semHTML(s.sembol || s.id)} = ${kisaSayi(s.deger)} ${kac(s.birim || '')} <i class="yok">(${kac(iki(s.ad).tr)})</i></span>`).join(' · ')}</p>` : ''}
+      ${(h.yorum || []).length ? `<h4 class="hs-h4">Ne değişirse ne olur?</h4>${h.yorum.map((y) => ciftHTML(iki(y))).join('')}` : ''}
+      ${kv.length || sq.length ? `<div class="ilgili">${kv.map((k) => ckBag(`${k.id}/tanim`, `${kac(k.sembol)} · ${kac(k.ad)}`, 'soru-bag')).join('')}${sq.map((s) => soruCip(K, s)).join('')}</div>` : ''}
+    </section>`;
+  }
+  function hesapKur(kok, h, hz) {
+    const sek = $$('.hs', kok).find((x) => x.dataset.hs === h.id); if (!sek) return;
+    const d = hesapDurum(h), G = h.girdi || [];
+    if (hz != null) { hazirUygula(h, d, hz); d.son = null; }
+    const kutu = (gid) => $$('.hs-g', sek).find((x) => x.dataset.g === gid);
+    let ilk = true;
+    function girdiGoster(g, kaynak) {
+      const k = kutu(g.id); if (!k) return;
+      const v = d.v[g.id], sur = $('.hs-sur', k), say = $('.hs-sayi', k), sec = $('.hs-sec', k);
+      if (sec) { sec.value = String(nesneli(g) ? v : Math.max(0, g.secenek.findIndex((s) => esitMi(s.deger, v)))); return; }
+      if (sur && kaynak !== sur) sur.value = String(sur.dataset.log ? Math.log10(Math.max(v, 1e-300)) : v);
+      if (say && kaynak !== say) { say.value = girdiYaz(v); say.removeAttribute('aria-invalid'); }
+    }
+    const yak = (gid) => $$('.hf-t', sek).forEach((x) => x.classList.toggle('on', !!gid && x.dataset.s === gid));
+    function guncelle() {
+      const c = hesapCalis(h, d.v), etkin = hazirEtkin(h, d), z = etkin ? h.hazir[d.hz] : null, Ac = d.A ? hesapCalis(h, d.A) : null;
+      (h.cikti || []).forEach((o) => {
+        const k = $$('.hs-c', sek).find((x) => x.dataset.c === o.id); if (!k) return;
+        const yeni = sayiBicim(c[o.id], o.bicim, o.basamak), out = $('.hs-deger', k);
+        if (out.textContent !== yeni) { out.textContent = yeni; if (!ilk) { k.classList.remove('yeni'); void k.offsetWidth; k.classList.add('yeni'); } }
+        const kt = $('.hs-kitap', k), b = z && z.beklenen ? z.beklenen[o.id] : undefined;
+        if (typeof b === 'number') { const ok = Math.abs(c[o.id] - b) <= 0.005 * Math.abs(b); kt.hidden = false; kt.className = `hs-kitap ${ok ? 'dogru' : 'yanlis'}`; kt.textContent = `kitapta: ${sayiBicim(b, o.bicim, o.basamak)} ${ok ? '✓' : '✗'}`; } else kt.hidden = true;
+        const or = $('.hs-oran', k);
+        if (Ac) { const a = Ac[o.id]; or.hidden = false; or.textContent = `B/A = ${a ? oranYaz(c[o.id] / a) : '—'}`; } else or.hidden = true;
+      });
+      $$('.hs-hazir button', sek).forEach((x) => x.setAttribute('aria-pressed', String(etkin && +x.dataset.hz === d.hz)));
+      const kars = $('.hs-kars', sek), sb = $('.hs-sabitle', sek);
+      sb.setAttribute('aria-pressed', String(!!d.A)); sb.textContent = d.A ? 'A’yı bırak' : 'A’yı sabitle → B ile karşılaştır';
+      if (Ac) {
+        const deg = G.filter((g) => !esitMi(d.A[g.id], d.v[g.id]));
+        kars.hidden = false;
+        kars.innerHTML = `<p class="hs-kars-b"><b>A</b> sabitlenen · <b>B</b> şimdiki değerler${deg.length ? ` · değişen: ${deg.map((g) => `${semHTML(g.sembol || g.id)} ${girdiDeger(g, d.A[g.id])} → ${girdiDeger(g, d.v[g.id])}`).join(', ')}` : ' · bir girdiyi değiştir, B/A oranı görünür'}</p><div class="tablo-kap"><table class="hs-kt"><thead><tr><th scope="col">Çıktı</th><th scope="col">A</th><th scope="col">B</th><th scope="col">B/A</th></tr></thead><tbody>${(h.cikti || []).map((o) => `<tr><th scope="row">${semHTML(o.sembol || o.id)}</th><td>${sayiBicim(Ac[o.id], o.bicim, o.basamak)}</td><td>${sayiBicim(c[o.id], o.bicim, o.basamak)}</td><td><b>${Ac[o.id] ? oranYaz(c[o.id] / Ac[o.id]) : '—'}</b></td></tr>`).join('')}</tbody></table></div>`;
+      } else { kars.hidden = true; kars.innerHTML = ''; }
+      ilk = false;
+    }
+    G.forEach((g) => {
+      const k = kutu(g.id); if (!k) return;
+      const sur = $('.hs-sur', k), say = $('.hs-sayi', k), sec = $('.hs-sec', k);
+      const degisti = (kaynak) => { d.son = g.id; girdiGoster(g, kaynak); yak(g.id); guncelle(); };
+      if (sur) sur.addEventListener('input', () => { const x = +sur.value; let v = sur.dataset.log ? 10 ** x : x; v = sur.dataset.log ? +v.toPrecision(3) : (+g.adim > 0 ? +(Math.round(v / g.adim) * g.adim).toPrecision(12) : +v.toPrecision(6)); d.v[g.id] = v; degisti(sur); });
+      if (say) {
+        say.addEventListener('input', () => { const v = sayiOku(say.value); if (!isFinite(v) || (sur && sur.dataset.log && v <= 0)) { say.setAttribute('aria-invalid', 'true'); return; } say.removeAttribute('aria-invalid'); d.v[g.id] = v; degisti(say); });
+        say.addEventListener('change', () => girdiGoster(g, null));
+        say.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); girdiGoster(g, null); } });
+      }
+      if (sec) sec.addEventListener('change', () => { const i = +sec.value; d.v[g.id] = nesneli(g) ? i : g.secenek[i].deger; degisti(sec); });
+      [sur, say, sec].forEach((x) => x && x.addEventListener('focus', () => yak(g.id)));
+    });
+    const hzKap = $('.hs-hazir', sek);
+    if (hzKap) hzKap.addEventListener('click', (e) => { const b = e.target.closest('[data-hz]'); if (!b) return; hazirUygula(h, d, +b.dataset.hz); d.son = null; G.forEach((g) => girdiGoster(g, null)); yak(null); guncelle(); });
+    $('.hs-sabitle', sek).addEventListener('click', () => { d.A = d.A ? null : { ...d.v }; guncelle(); });
+    $('.hs-basa', sek).addEventListener('click', () => { G.forEach((g) => { d.v[g.id] = girdiVars(g); }); d.hz = -1; d.son = null; G.forEach((g) => girdiGoster(g, null)); yak(null); guncelle(); });
+    G.forEach((g) => girdiGoster(g, null)); yak(d.son); guncelle();
+  }
+  function hesapCk(K, ne, ayni) {
+    const L = HS(K);
+    if (!L.length) return atlasCk(K, ayni);
+    $('#ck-sekme').innerHTML = ustSekme(K, ne ? '' : 'hesap');
+    const [id, hz] = String(ne || '').split('/'), h = id ? hesapBul(K, id) : null;
+    if (!h) {
+      kirintiYaz(K, [['Hesap laboratuvarı', null]]);
+      $('#ck-baslik').innerHTML = `Hesap laboratuvarı<small>${L.length} araç · sürgüyle oyna, kitaptaki değerle karşılaştır</small>`;
+      $('#ck-sira').innerHTML = '';
+      if (ayni) return;
+      const bolOf = (x) => { const k = kvSira(K, x.kavram)[0]; return k ? k.bolum : ''; };
+      const gruplar = [...K.bolumler.map((b) => [bolumAd(K, b), L.filter((x) => bolOf(x) === b.id)]), ['Genel araçlar', L.filter((x) => !bolOf(x))]].filter(([, l]) => l.length);
+      ckIc.innerHTML = `<p class="ck-not">Bir araca dokun: girdiyi sürgüyle ya da kutuya yazarak değiştir, çıktı anında güncellenir. «Hazır» düğmeleri kitaptaki sorunun değerlerini getirir ve sonucu kitapla karşılaştırır.</p>${gruplar.map(([bas, l]) => `<section class="at-bol"><h3>${kac(bas)} <span class="say">${l.length} araç</span></h3><ul class="kv-liste">${l.map((x) => `<li>${ckBag(`_hesap/${x.id}`, `<span class="ad">${kac(iki(x.ad).tr)}</span><span class="en" lang="en">${kac(iki(x.ad).en)}</span><span class="hs-lf">${semHTML(x.formul || '')}</span>`, 'kv-sat')}</li>`).join('')}</ul></section>`).join('')}`;
+      return;
+    }
+    kirintiYaz(K, [['Hesap laboratuvarı', '_hesap'], [kac(iki(h.ad).tr), null]]);
+    $('#ck-baslik').innerHTML = `${kac(iki(h.ad).tr)}<small lang="en">${kac(iki(h.ad).en)}</small>`;
+    const i = L.indexOf(h), o = L[i - 1], s = L[i + 1];
+    $('#ck-sira').innerHTML = siraHTML(o && [`_hesap/${o.id}`, kac(iki(o.ad).tr)], `araç ${i + 1} / ${L.length}`, s && [`_hesap/${s.id}`, kac(iki(s.ad).tr)]);
+    if (ayni) return;
+    ckIc.innerHTML = hesapHTML(K, h, false);
+    hesapKur(ckIc, h, hazirSira(h, hz));
+  }
+
+  /* --- kimya gezgini: tür kartı, tepkime kartı, çevrim çizimi (SVG; düğüm = tür, ok = tepkime; adım adım) --- */
+  function turEsle(K) { // formül ve «ara» yazımı → tür (önce f)
+    if (turEsle.K === K) return turEsle.m;
+    const m = new Map();
+    turlar(K).forEach((t) => { if (t.f && !m.has(t.f)) m.set(t.f, t); });
+    turlar(K).forEach((t) => (t.ara || []).forEach((a) => { if (a && !m.has(a)) m.set(a, t); }));
+    turEsle.K = K; turEsle.m = m; return m;
+  }
+  // denklem: içindeki türler tür kartına bağlanır (katsayı ve faz eki korunur; hν, M düz yazı)
+  function denkHTML(K, r) {
+    const m = turEsle(K), ic = [...(r.sol || []), ...(r.sag || [])].map((id) => turBul(K, id)).filter(Boolean);
+    return String(r.denk || '').split(/(\s*(?:→|⟶|⇌|⇄|↔|=)\s*)/).map((yan, j) => (j % 2 ? `<span class="dk-ok">${kac(yan.trim())}</span>` : yan.split(/(\s\+\s)/).map((p, i) => {
+      if (i % 2) return ' + ';
+      const x = /^(\s*\d+(?:[.,]\d+)?\s*)?(.*?)(\s*\((?:g|aq|s|l|k)\))?\s*$/u.exec(p) || [];
+      const kat = x[1] || '', ad = (x[2] || '').trim(), faz = x[3] || '';
+      const t = ic.find((u) => u.f === ad || (u.ara || []).includes(ad)) || m.get(ad);
+      const govde = `${kac(kat)}${kac(ad)}${kac(faz)}`;
+      return t ? ckBag(`_tur/${t.id}`, govde, 'dk-tur') : `<span class="dk-p">${govde}</span>`;
+    }).join(''))).join(' ');
+  }
+  const turCip = (K, t, simdi) => ckBag(`_tur/${t.id}`, `<span class="f">${kac(t.f)}</span><span class="ad">${kac(iki(t.ad).tr)}</span>`, `tur-cip${simdi ? ' simdi' : ''}`);
+  const tepkimeSatir = (K, r, rol) => `<li data-r="${kac(r.id)}">${ckBag(`_tepkime/${r.id}`, `<span class="tp-id">${kac(r.id)}</span><span class="tp-denk">${kac(r.denk)}</span><span class="tp-alt">${kac(iki(r.ad).tr)}${r.tip ? ` · ${kac(tipAd(r.tip))}` : ''}${rol ? ` · <b>${kac(rol)}</b>` : ''}${r.kitapta === false ? ' · <i>kitap dışı adım</i>' : ''}</span>`, 'tp-sat')}</li>`;
+  const kavramCipleri = (K, ids, parca) => { const kv = kvSira(K, ids); return kv.length ? `<h3>Kavramlar</h3><div class="ilgili">${kv.map((k) => ckBag(`${k.id}/${parca && parcaVar(K, k, parca) ? parca : 'tanim'}`, `${kac(k.sembol)} · ${kac(k.ad)}`, 'soru-bag')).join('')}</div>` : ''; };
+  const soruCipleri = (K, ids) => { const s = (ids || []).filter((x) => K.sorular[x]); return s.length ? `<h3>Sorular</h3><p class="ck-not">Dokun: ana sayfada o soru açılır, çekmece açık kalır.</p><div class="ilgili">${s.map((x) => soruCip(K, x, true)).join('')}</div>` : ''; };
+  function turKartHTML(K, t) {
+    const ad = iki(t.ad), sn = iki(t.sinif);
+    const ail = (t.aile || []).map((a) => aileler(K).find((x) => x.id === a)).filter(Boolean);
+    const icTp = tepkimeler(K).filter((r) => icer(r, 'sol', t.id) || icer(r, 'sag', t.id));
+    const dg = donguler(K).filter((d) => (d.dugum || []).some((x) => x.tur === t.id));
+    const sz = (K.sozluk || []).find((s) => turEn(K, s.en) === t);
+    const tpCip = (ids) => (ids || []).map((id) => tepkimeBul(K, id)).filter(Boolean).map((r) => ckBag(`_tepkime/${r.id}`, `<b>${kac(r.id)}</b> ${kac(r.denk)}`, 'tp-cip')).join('');
+    const yol = (liste, bas) => ((liste || []).length ? `<h3>${bas}</h3><ul class="tk-liste">${liste.map((u) => `<li>${ciftHTML(iki(u))}${(u.tepkime || []).length ? `<div class="tp-cipler">${tpCip(u.tepkime)}</div>` : ''}</li>`).join('')}</ul>` : '');
+    const rolu = (r) => (icer(r, 'sol', t.id) && icer(r, 'sag', t.id) ? 'iki yanda' : icer(r, 'sol', t.id) ? 'harcanır' : 'oluşur');
+    return `<article class="tk">
+      <div class="tk-bas"><span class="tk-f">${kac(t.f)}</span><div class="tk-adlar"><p class="tk-ad"><b>${kac(ad.tr)}</b>${ad.en ? ` <span lang="en">${kac(ad.en)}</span>` : ''}</p>${t.oku || t.ipa ? `<p class="oku-sat">${t.oku ? `<span class="oku">${kac(t.oku)}</span>` : ''}${t.ipa ? ` <span class="ipa" lang="en">/${kac(t.ipa)}/</span>` : ''}</p>` : ''}${sn.tr ? `<p class="tk-sinif"><span class="tur">${kac(sn.tr)}</span>${sn.en ? ` <span class="tur" lang="en">${kac(sn.en)}</span>` : ''}</p>` : ''}</div></div>
+      ${t.emin === false ? '<p class="tk-emin">Bu kartın bazı bilgileri denetimde.</p>' : ''}
+      ${ail.map((a) => `<div class="tk-aile"><p><span class="yok">Aile:</span> <b>${kac(iki(a.ad).tr)}</b>${iki(a.ad).en ? ` <i lang="en">${kac(iki(a.ad).en)}</i>` : ''}</p><div class="tur-cipler">${(a.uye || []).map((id) => turBul(K, id)).filter(Boolean).map((u) => turCip(K, u, u === t)).join('')}</div>${a.not ? ciftHTML(iki(a.not)) : ''}</div>`).join('')}
+      ${(t.omur || []).length ? `<h3>Ömür</h3><div class="tablo-kap"><table class="tk-omur"><thead><tr><th scope="col">Nerede</th><th scope="col">Ömür</th><th scope="col">Kaynak</th></tr></thead><tbody>${t.omur.map((o) => `<tr><td>${ikiSat(o.yer)}</td><td><b>${kac(iki(o.deger).tr)}</b>${iki(o.deger).en ? ` <span class="iki-en" lang="en">${kac(iki(o.deger).en)}</span>` : ''}</td><td class="yok">${kac(o.kaynak || '')}</td></tr>`).join('')}</tbody></table></div>` : ''}
+      ${yol(t.uretim, 'Üretim · nereden gelir?')}${yol(t.yutak, 'Yutak · nereye gider?')}
+      ${(t.bilgi || []).length ? `<h3>Bilgi</h3>${t.bilgi.map((b) => ciftHTML(iki(b))).join('')}` : ''}
+      ${icTp.length ? `<h3>İçinde geçtiği tepkimeler <span class="say">${icTp.length}</span></h3><ul class="tp-liste">${icTp.map((r) => tepkimeSatir(K, r, rolu(r))).join('')}</ul>` : ''}
+      ${dg.length ? `<h3>Çevrimler</h3><div class="ilgili">${dg.map((d) => ckBag(`_dongu/${d.id}`, `${kac(iki(d.ad).tr)} · çizim →`, 'soru-bag')).join('')}</div>` : ''}
+      ${kavramCipleri(K, t.kavram, 'kimya')}${soruCipleri(K, t.soru)}
+      ${(t.bak || []).length ? `<h3>Yan yana bak</h3><div class="tur-cipler">${t.bak.map((id) => turBul(K, id)).filter(Boolean).map((u) => turCip(K, u)).join('')}</div>` : ''}
+      ${sz ? `<p>${ckBag(`_sozluk/${sz.en}`, `Sözlükte: <span lang="en">${kac(sz.en)}</span> · ${kac(sz.tr)}`, 'soru-bag')}</p>` : ''}
+      ${t.kaynak ? `<p class="yok sz-kaynak">Kaynak: ${kac(t.kaynak)}</p>` : ''}</article>`;
+  }
+  function tepkimeKartHTML(K, r) {
+    const ad = iki(r.ad), rol = iki(r.rol), T = TIP_AD[r.tip];
+    const tl = (ids) => (ids || []).map((id) => turBul(K, id)).filter(Boolean).map((u) => turCip(K, u)).join('');
+    const dg = (r.dongu || []).map((id) => donguBul(K, id)).filter(Boolean);
+    const kEt = r.tip === 'fotoliz' ? 'Fotoliz hızı' : /denge|cozunme/.test(r.tip || '') ? 'Sabit' : 'Hız sabiti';
+    return `<article class="tk tp-kart">
+      <div class="tk-denk" aria-label="Denklem">${denkHTML(K, r)}</div>
+      <p class="tk-ad"><b>${kac(ad.tr)}</b>${ad.en ? ` <span lang="en">${kac(ad.en)}</span>` : ''}</p>
+      <p class="tk-sinif">${T ? `<span class="tur">${kac(T[0])}</span> <span class="tur" lang="en">${kac(T[1])}</span>` : r.tip ? `<span class="tur">${kac(r.tip)}</span>` : ''}${rol.tr ? ` <span class="tur">${kac(rol.tr)}</span>${rol.en ? ` <span class="tur" lang="en">${kac(rol.en)}</span>` : ''}` : ''}</p>
+      <dl class="tp-dl">${r.k ? `<dt>${kEt}</dt><dd>${kac(r.k)}</dd>` : ''}<dt>Kitapta</dt><dd>${r.kitapta === false ? `yok: çevrimi kapatan standart adım${r.kaynak ? ` (kaynak: ${kac(r.kaynak)})` : ''}` : 'var'}</dd></dl>
+      ${r.not ? ciftHTML(iki(r.not)) : ''}
+      ${(r.sol || []).length ? `<h3>Harcanan türler</h3><div class="tur-cipler">${tl(r.sol)}</div>` : ''}
+      ${(r.sag || []).length ? `<h3>Oluşan türler</h3><div class="tur-cipler">${tl(r.sag)}</div>` : ''}
+      ${dg.length ? `<h3>Çevrimler</h3><div class="ilgili">${dg.map((d) => ckBag(`_dongu/${d.id}`, `${kac(iki(d.ad).tr)} · çizim →`, 'soru-bag')).join('')}</div>` : ''}
+      ${kavramCipleri(K, r.kavram, 'kimya')}${soruCipleri(K, r.soru)}</article>`;
+  }
+  const f1 = (x) => (Math.round(x * 10) / 10).toString();
+  const dgAdim = {};
+  function donguSVG(K, d) {
+    const W = 640, OL = 6.4, dug = d.dugum || [];
+    const ymax = Math.max(40, ...dug.map((x) => +x.y || 0)), H = Math.round(ymax * OL + 112);
+    const P = new Map();
+    dug.forEach((x) => { const t = turBul(K, x.tur), f = t ? t.f : x.tur; P.set(x.tur, { x: Math.max(8, Math.min(92, +x.x || 0)) * OL, y: (+x.y || 0) * OL + 44, hw: Math.max(40, 14 + 9 * [...f].length), hh: 30, t, f, ust: (+x.y || 0) < 35 }); });
+    const grup = new Map(), anah = (o) => [o.den, o.ya].sort().join('|');
+    (d.ok || []).forEach((o, i) => { const a = anah(o); if (!grup.has(a)) grup.set(a, []); grup.get(a).push(i); });
+    const sinir = (N, ux, uy) => Math.min(ux ? N.hw / Math.abs(ux) : 1e9, uy ? N.hh / Math.abs(uy) : 1e9);
+    const uc = (N, hx, hy, pay) => { const vx = hx - N.x, vy = hy - N.y, l = Math.hypot(vx, vy) || 1, ux = vx / l, uy = vy / l, s = sinir(N, ux, uy) + pay; return [N.x + ux * s, N.y + uy * s]; };
+    const oklar = (d.ok || []).map((o, i) => {
+      const A = P.get(o.den), B = P.get(o.ya); if (!A || !B || A === B) return '';
+      const g = grup.get(anah(o)), j = g.indexOf(i), n = g.length, kanon = [o.den, o.ya].sort()[0] === o.den ? 1 : -1;
+      const dx = B.x - A.x, dy = B.y - A.y, L = Math.hypot(dx, dy) || 1, px = -dy / L, py = dx / L;
+      const kay = n === 1 ? 0 : (j - (n - 1) / 2) * 44 * kanon;
+      const cx = (A.x + B.x) / 2 + px * kay * 2, cy = (A.y + B.y) / 2 + py * kay * 2;
+      const [x1, y1] = uc(A, cx, cy, 4), [x2, y2] = uc(B, cx, cy, 5);
+      const tx = x2 - cx, ty = y2 - cy, tl = Math.hypot(tx, ty) || 1, ax = tx / tl, ay = ty / tl, bx = x2 - ax * 15, by = y2 - ay * 15;
+      const yol = kay ? `M${f1(x1)} ${f1(y1)} Q${f1(cx)} ${f1(cy)} ${f1(bx)} ${f1(by)}` : `M${f1(x1)} ${f1(y1)} L${f1(bx)} ${f1(by)}`;
+      const lx = 0.25 * x1 + 0.5 * cx + 0.25 * x2, ly = 0.25 * y1 + 0.5 * cy + 0.25 * y2, et = String(o.tepkime || ''), ew = 22 + 12 * et.length, r = tepkimeBul(K, et);
+      return `<g class="dg-ok" data-r="${kac(et)}" data-ck="_tepkime/${kac(et)}" role="link" tabindex="0" aria-label="${kac(`${et}: ${r ? r.denk : ''} (tepkime kartı)`)}"><path class="dg-vur" d="${yol}"/><path class="dg-yol" d="${yol}"/><polygon class="dg-uc" points="${f1(x2)},${f1(y2)} ${f1(bx - ay * 8)},${f1(by + ax * 8)} ${f1(bx + ay * 8)},${f1(by - ax * 8)}"/><g class="dg-et"><rect x="${f1(lx - ew / 2)}" y="${f1(ly - 17)}" width="${f1(ew)}" height="34" rx="17"/><text x="${f1(lx)}" y="${f1(ly)}">${kac(et)}</text></g></g>`;
+    }).join('');
+    const dugumler = [...P.entries()].map(([id, N]) => `<g class="dg-dugum" data-tur="${kac(id)}" data-ck="_tur/${kac(id)}" role="link" tabindex="0" aria-label="${kac(`${N.f}${N.t ? ' · ' + iki(N.t.ad).tr : ''} (tür kartı)`)}"><rect x="${f1(N.x - N.hw)}" y="${f1(N.y - N.hh)}" width="${f1(2 * N.hw)}" height="${f1(2 * N.hh)}" rx="${f1(N.hh)}"/><text class="dg-f" x="${f1(N.x)}" y="${f1(N.y)}">${kac(N.f)}</text>${N.t ? `<text class="dg-ad" x="${f1(N.x)}" y="${f1(N.ust ? N.y - N.hh - 18 : N.y + N.hh + 18)}">${kac(iki(N.t.ad).tr)}</text>` : ''}</g>`).join('');
+    return `<svg class="dg-svg" viewBox="0 0 ${W} ${H}" role="group" aria-label="${kac(iki(d.ad).tr)}: çevrim çizimi">${oklar}${dugumler}</svg>`;
+  }
+  function donguHTML(K, d) {
+    const sira = [...new Set([...(d.adim || []).flatMap((s) => s.tepkime || []), ...(d.ok || []).map((o) => o.tepkime)])].map((id) => tepkimeBul(K, id)).filter(Boolean);
+    const n = (d.adim || []).length;
+    return `<section class="dg" data-dg="${kac(d.id)}"><div class="dg-kap">${donguSVG(K, d)}</div>
+      ${n ? `<div class="dg-kontrol" role="group" aria-label="Adım adım"><button type="button" class="kucuk dg-geri" aria-label="Önceki adım" title="Önceki adım (←)">◀</button><button type="button" class="dugme dg-oynat" aria-pressed="false">Oynat</button><button type="button" class="kucuk dg-ileri" aria-label="Sonraki adım" title="Sonraki adım (→)">▶</button><span class="dg-say yok" aria-live="polite"></span></div>` : ''}
+      <div class="dg-aciklama"></div>
+      ${sira.length ? `<h4 class="dg-h4">Bu çevrimin tepkimeleri</h4><ul class="tp-liste dg-tp">${sira.map((r) => tepkimeSatir(K, r)).join('')}</ul>` : ''}
+      ${d.net ? `<div class="dg-net"><p class="dg-net-d"><span class="yok">Net:</span> <b>${kac(d.net.denk || '')}</b></p>${d.net.tr || d.net.en ? ciftHTML(iki(d.net)) : ''}</div>` : ''}</section>`;
+  }
+  function donguKur(kok, K, d) {
+    const sek = $$('.dg', kok).find((x) => x.dataset.dg === d.id); if (!sek) return;
+    const A = d.adim || [], geri = $('.dg-geri', sek), ileri = $('.dg-ileri', sek), oyn = $('.dg-oynat', sek);
+    let i = Math.min(dgAdim[d.id] ?? -1, A.length - 1), zaman = 0;
+    const turSet = (ids) => { const s = new Set(); ids.forEach((id) => { const r = tepkimeBul(K, id); if (r) [...(r.sol || []), ...(r.sag || [])].forEach((t) => s.add(t)); }); return s; };
+    function ciz() {
+      const R = i >= 0 ? new Set(A[i].tepkime || []) : null, T = R ? turSet([...R]) : null;
+      $$('.dg-ok', sek).forEach((g) => { const on = !!R && R.has(g.dataset.r); g.classList.toggle('on', on); g.classList.toggle('sonuk', !!R && !on); });
+      $$('.dg-dugum', sek).forEach((g) => { const on = !!T && T.has(g.dataset.tur); g.classList.toggle('on', on); g.classList.toggle('sonuk', !!T && !on); });
+      $$('.dg-tp li', sek).forEach((li) => li.classList.toggle('on', !!R && R.has(li.dataset.r)));
+      $('.dg-aciklama', sek).innerHTML = i < 0
+        ? `<p class="dg-genel">${A.length ? `${A.length} adım: ◀ ▶ ile adım adım ilerle ya da «Oynat»a bas. ` : ''}Düğüme dokun: tür kartı; oka ya da etikete dokun: tepkime kartı.</p>`
+        : `<p class="dg-adim-d"><span class="dg-no">${i + 1}</span>${(A[i].tepkime || []).map((id) => { const r = tepkimeBul(K, id); return `<b>${kac(id)}</b> ${kac(r ? r.denk : '')}`; }).join(' · ')}</p>${ciftHTML(iki(A[i]))}`;
+      if (A.length) { $('.dg-say', sek).textContent = i < 0 ? 'Genel bakış' : `Adım ${i + 1} / ${A.length}`; geri.disabled = i < 0; ileri.disabled = i >= A.length - 1; }
+      dgAdim[d.id] = i;
+    }
+    const dur = () => { if (zaman) clearInterval(zaman); zaman = 0; if (oyn) { oyn.textContent = 'Oynat'; oyn.setAttribute('aria-pressed', 'false'); } };
+    if (A.length) {
+      geri.addEventListener('click', () => { dur(); if (i > -1) { i--; ciz(); } });
+      ileri.addEventListener('click', () => { dur(); if (i < A.length - 1) { i++; ciz(); } });
+      oyn.addEventListener('click', () => {
+        if (zaman) { dur(); return; }
+        if (i >= A.length - 1) i = -1;
+        oyn.textContent = 'Durdur'; oyn.setAttribute('aria-pressed', 'true');
+        i++; ciz();
+        zaman = setInterval(() => { if (!sek.isConnected || i >= A.length - 1) { dur(); return; } i++; ciz(); }, 2600);
+      });
+      sek.addEventListener('keydown', (e) => { if (e.altKey || e.ctrlKey || e.metaKey) return; if (e.key === 'ArrowRight') { e.preventDefault(); ileri.click(); } else if (e.key === 'ArrowLeft') { e.preventDefault(); geri.click(); } });
+    }
+    animTutucu = { dur };
+    ciz();
+  }
+  function kimyaKavramHTML(K, k) {
+    const x = kavramKimya(K, k.id), d = x.dongu[0];
+    let h = '';
+    if (d) h += `<h3 class="dg-bas">${kac(iki(d.ad).tr)}${iki(d.ad).en ? ` <small lang="en">${kac(iki(d.ad).en)}</small>` : ''}</h3>${donguHTML(K, d)}${x.dongu.length > 1 ? `<p class="ilgili"><span class="yok">Öbür çevrimler:</span> ${x.dongu.slice(1).map((y) => ckBag(`_dongu/${y.id}`, kac(iki(y.ad).tr), 'soru-bag')).join('')}</p>` : ''}`;
+    if (x.tur.length) h += `<h3>Bu kavramın türleri</h3><div class="tur-cipler">${x.tur.map((t) => turCip(K, t)).join('')}</div>`;
+    if (x.tepkime.length) h += `<h3>Bu kavramın tepkimeleri</h3><ul class="tp-liste">${x.tepkime.map((r) => tepkimeSatir(K, r)).join('')}</ul>`;
+    return `${h}<p class="dil-cagri">${ckBag('_tur', 'Bütün türler →', 'soru-bag')} ${ckBag('_tepkime', 'Bütün tepkimeler →', 'soru-bag')}</p>`;
+  }
+  function turCk(K, id, ayni) {
+    const T = turlar(K);
+    if (!T.length) return atlasCk(K, ayni);
+    $('#ck-sekme').innerHTML = ustSekme(K, id ? '' : 'tur');
+    const t = id ? turBul(K, id) : null;
+    if (!t) {
+      kirintiYaz(K, [['Türler', null]]);
+      $('#ck-baslik').innerHTML = `Türler<small>${T.length} tür · aileye göre · formül · Türkçe · İngilizce</small>`;
+      $('#ck-sira').innerHTML = '';
+      if (ayni) return;
+      const gruplar = aileler(K).map((a) => [a, T.filter((u) => icer(u, 'aile', a.id))]).filter(([, l]) => l.length);
+      const aileli = new Set(gruplar.flatMap(([, l]) => l)), diger = T.filter((u) => !aileli.has(u));
+      const bolum = (bas, not, l) => `<section class="at-bol"><h3>${bas} <span class="say">${l.length}</span></h3>${not}<ul class="kv-liste">${l.map((u) => `<li>${ckBag(`_tur/${u.id}`, `<span class="sem tur-f">${kac(u.f)}</span><span class="ad">${kac(iki(u.ad).tr)}</span><span class="en" lang="en">${kac(iki(u.ad).en)}</span>`, 'kv-sat')}</li>`).join('')}</ul></section>`;
+      ckIc.innerHTML = `<p class="ck-not">Bir türe dokun: kartı açılır (ömür, üretim, yutak, tepkimeler, çevrimler). Çekmece açık kalır.</p>${gruplar.map(([a, l]) => bolum(`${kac(iki(a.ad).tr)}${iki(a.ad).en ? ` <i class="yok" lang="en">${kac(iki(a.ad).en)}</i>` : ''}`, a.not ? `<p class="tk-not">${kac(iki(a.not).tr)}</p>` : '', l)).join('')}${diger.length ? bolum(gruplar.length ? 'Öbür türler' : 'Türler', '', diger) : ''}`;
+      return;
+    }
+    kirintiYaz(K, [['Türler', '_tur'], [kac(t.f), null]]);
+    $('#ck-baslik').innerHTML = `${kac(t.f)} · ${kac(iki(t.ad).tr)}<small lang="en">${kac(iki(t.ad).en)}</small>`;
+    const i = T.indexOf(t), o = T[i - 1], s = T[i + 1];
+    $('#ck-sira').innerHTML = siraHTML(o && [`_tur/${o.id}`, kac(o.f)], `tür ${i + 1} / ${T.length}`, s && [`_tur/${s.id}`, kac(s.f)]);
+    if (ayni) return;
+    ckIc.innerHTML = turKartHTML(K, t);
+  }
+  const tpSuz = { tip: '', aile: '' };
+  function tepkimeListeHTML(K) {
+    const L = tepkimeler(K), turAile = (id) => (turBul(K, id) || {}).aile || [];
+    const uy = L.filter((r) => (!tpSuz.tip || r.tip === tpSuz.tip) && (!tpSuz.aile || [...(r.sol || []), ...(r.sag || [])].some((id) => turAile(id).includes(tpSuz.aile))));
+    return `<p class="tp-say yok" aria-live="polite">${uy.length} / ${L.length} tepkime</p><ul class="tp-liste">${uy.map((r) => tepkimeSatir(K, r)).join('') || '<li class="yok">Bu süzgeçle tepkime yok.</li>'}</ul>`;
+  }
+  function tepkimeCk(K, id, ayni) {
+    const L = tepkimeler(K);
+    if (!L.length) return atlasCk(K, ayni);
+    $('#ck-sekme').innerHTML = ustSekme(K, id ? '' : 'tepkime');
+    const r = id ? tepkimeBul(K, id) : null;
+    if (!r) {
+      kirintiYaz(K, [['Tepkimeler', null]]);
+      $('#ck-baslik').innerHTML = `Tepkimeler<small>${L.length} tepkime · tipe ve aileye göre süz</small>`;
+      $('#ck-sira').innerHTML = '';
+      if (ayni) return;
+      const tipler = Object.keys(TIP_AD).filter((t) => L.some((x) => x.tip === t)).concat([...new Set(L.map((x) => x.tip).filter((t) => t && !TIP_AD[t]))]);
+      const ail = aileler(K).filter((a) => L.some((x) => [...(x.sol || []), ...(x.sag || [])].some((u) => icer(turBul(K, u) || {}, 'aile', a.id))));
+      const grup = (alan, ad, liste) => `<div class="tp-suz" role="group" aria-label="${ad}"><span class="yok">${ad}:</span>${[['', 'Tümü'], ...liste].map(([v, a]) => `<button type="button" class="kucuk" data-tp="${alan}" data-v="${kac(v)}" aria-pressed="${tpSuz[alan] === v}">${kac(a)}</button>`).join('')}</div>`;
+      ckIc.innerHTML = `${grup('tip', 'Tip', tipler.map((t) => [t, tipAd(t)]))}${ail.length ? grup('aile', 'Aile', ail.map((a) => [a.id, iki(a.ad).tr])) : ''}<div class="tp-sonuc">${tepkimeListeHTML(K)}</div>`;
+      return;
+    }
+    kirintiYaz(K, [['Tepkimeler', '_tepkime'], [kac(r.id), null]]);
+    $('#ck-baslik').innerHTML = `${kac(r.id)} · ${kac(iki(r.ad).tr)}<small lang="en">${kac(iki(r.ad).en)}</small>`;
+    const i = L.indexOf(r), o = L[i - 1], s = L[i + 1];
+    $('#ck-sira').innerHTML = siraHTML(o && [`_tepkime/${o.id}`, kac(o.id)], `tepkime ${i + 1} / ${L.length}`, s && [`_tepkime/${s.id}`, kac(s.id)]);
+    if (ayni) return;
+    ckIc.innerHTML = tepkimeKartHTML(K, r);
+  }
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('.tp-suz button[data-tp]'); if (!b || !ckDurum) return;
+    const alan = b.dataset.tp; tpSuz[alan] = b.dataset.v === tpSuz[alan] ? '' : b.dataset.v;
+    $$(`.tp-suz button[data-tp="${alan}"]`, ckIc).forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.v === tpSuz[alan])));
+    const s = $('.tp-sonuc', ckIc); if (s) s.innerHTML = tepkimeListeHTML(ckDurum.K);
+  });
+  function donguCk(K, id, ayni) {
+    const L = donguler(K);
+    if (!L.length) return atlasCk(K, ayni);
+    $('#ck-sekme').innerHTML = ustSekme(K, id ? '' : 'dongu');
+    const d = id ? donguBul(K, id) : null;
+    if (!d) {
+      kirintiYaz(K, [['Çevrimler', null]]);
+      $('#ck-baslik').innerHTML = `Çevrimler<small>${L.length} çevrim · adım adım çizim</small>`;
+      $('#ck-sira').innerHTML = '';
+      if (ayni) return;
+      ckIc.innerHTML = `<p class="ck-not">Bir çevrime dokun: çizimi açılır (düğüm = tür, ok = tepkime); «Oynat» ile adım adım izle.</p><ul class="kv-liste">${L.map((x) => `<li>${ckBag(`_dongu/${x.id}`, `<span class="ad">${kac(iki(x.ad).tr)}</span><span class="en" lang="en">${kac(iki(x.ad).en)}</span><span class="say">${(x.dugum || []).length} tür · ${new Set((x.ok || []).map((o) => o.tepkime)).size} tepkime · ${(x.adim || []).length} adım</span>`, 'kv-sat')}</li>`).join('')}</ul>`;
+      return;
+    }
+    kirintiYaz(K, [['Çevrimler', '_dongu'], [kac(iki(d.ad).tr), null]]);
+    $('#ck-baslik').innerHTML = `${kac(iki(d.ad).tr)}<small lang="en">${kac(iki(d.ad).en)}</small>`;
+    const i = L.indexOf(d), o = L[i - 1], s = L[i + 1];
+    $('#ck-sira').innerHTML = siraHTML(o && [`_dongu/${o.id}`, kac(iki(o.ad).tr)], `çevrim ${i + 1} / ${L.length}`, s && [`_dongu/${s.id}`, kac(iki(s.ad).tr)]);
+    if (ayni) return;
+    ckIc.innerHTML = `${donguHTML(K, d)}${kavramCipleri(K, d.kavram, 'kimya')}`;
+    donguKur(ckIc, K, d);
+  }
+  // atlasın üstünde giriş kutuları (yalnız kimya / hesap verisi olan kitapta)
+  function atlasGirisHTML(K) {
+    if (!turlar(K).length && !tepkimeler(K).length && !donguler(K).length && !HS(K).length) return '';
+    const kutu = (kp, ad, n, alt) => ckBag(kp, `<b>${ad}</b><span class="say">${n}</span><span class="at-alt">${alt}</span>`, 'at-kutu');
+    return `<div class="at-giris">${[turlar(K).length && kutu('_tur', 'Türler', turlar(K).length, 'formül · ad · ömür · tepkimeler'), tepkimeler(K).length && kutu('_tepkime', 'Tepkimeler', tepkimeler(K).length, 'tipe ve aileye göre'), donguler(K).length && kutu('_dongu', 'Çevrimler', donguler(K).length, 'adım adım çizim'), HS(K).length && kutu('_hesap', 'Hesap laboratuvarı', HS(K).length, 'sürgüyle hesapla, kitapla karşılaştır'), (K.sozluk || []).length && kutu('_sozluk', 'Sözlük', K.sozluk.length, 'TR ↔ EN terimler')].filter(Boolean).join('')}</div>`;
+  }
+  // soru sayfası: «Bu soruda: O₃ · NO» tür çipleri + «Hesapla» düğmeleri (çekmeceyi açar; ana sayfa yerinde kalır)
+  function soruEkEkle(K, q) {
+    const T = turlar(K).filter((t) => icer(t, 'soru', q.id)), H2 = soruHesap(K, q.id), govde = $('.soru-govde', ana);
+    if ((!T.length && !H2.length) || !govde) return;
+    const taban = `#${K.id}/${q.id}/k/`;
+    govde.insertAdjacentHTML('afterend', `<div class="soru-ek">${T.length ? `<p class="soru-ek-sat"><span class="yok">Bu soruda:</span> ${T.map((t) => `<button type="button" class="tur-cip" data-git="${kac(taban + '_tur/' + t.id)}" title="${kac(iki(t.ad).tr)} · ${kac(iki(t.ad).en)}"><span class="f">${kac(t.f)}</span><span class="ad">${kac(iki(t.ad).tr)}</span></button>`).join('')}</p>` : ''}${H2.length ? `<p class="soru-ek-sat"><span class="yok">Hesapla:</span> ${H2.map((h) => { const n = (h.hazir || []).findIndex((z) => z.soru === q.id); return `<button type="button" class="kucuk hs-ac" data-git="${kac(taban + '_hesap/' + h.id + (n >= 0 ? '/' + n : ''))}">${kac(iki(h.ad).tr)}${n >= 0 ? ` · ${kac(q.id)} değerleri` : ''}</button>`; }).join('')}</p>` : ''}</div>`);
+  }
+  // klavye: SVG içindeki bağ (düğüm / ok) Enter ya da boşlukla açılır
+  document.addEventListener('keydown', (e) => {
+    if ((e.key !== 'Enter' && e.key !== ' ') || !e.target.closest) return;
+    const g = e.target.closest('svg [data-ck][role=link]'); if (!g || !ckDurum) return;
+    e.preventDefault(); location.hash = `#${ckDurum.onEk}/k/${g.dataset.ck}`;
+  });
+
   /* --- aç / kapat / yönlendir --- */
   function cekmeceKapat() {
     if (animTutucu && animTutucu.dur) animTutucu.dur(); animTutucu = null;
@@ -577,11 +1036,15 @@
     if (bas === '_atlas') atlasCk(K, ayni);
     else if (bas === '_bol') bolumCk(K, kalan[0], ayni);
     else if (bas === '_sozluk') sozlukCk(K, kalan.join('/'), ayni);
-    else kavramCk(K, bas, kalan[0] || 'tanim', ayni);
+    else if (bas === '_tur') turCk(K, kalan[0] || '', ayni);
+    else if (bas === '_tepkime') tepkimeCk(K, kalan[0] || '', ayni);
+    else if (bas === '_dongu') donguCk(K, kalan[0] || '', ayni);
+    else if (bas === '_hesap') hesapCk(K, kalan.join('/'), ayni);
+    else kavramCk(K, bas, kalan[0] || 'tanim', ayni, kalan[1]);
     if (ayni) { $$('[data-soru]', ckIc).forEach((a) => { const on = a.dataset.soru === qid; a.classList.toggle('simdi', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); }); return; }
     krKur(ckIc);
     ipucuEkle(ckIc, K);
-    ckIc.scrollTop = 0;
+    ckIc.scrollTop = 0; ck.classList.remove('ck-dar');
     if (ilk) don.focus({ preventScroll: true });
     else if (!document.activeElement || document.activeElement === document.body || !document.activeElement.isConnected) $('#ck-baslik').focus({ preventScroll: true });
   }
@@ -615,6 +1078,17 @@
     return `${k.id}/${parcaVar(K, k, p) ? p : 'tanim'}`;
   }
 
+  /* --- dar ekranda küçülen başlık: içerik aşağı inince kırıntı · sıra · sekmeler gizlenir (başlık ≤ ekranın ~%30'u); başlığa dokun → başa --- */
+  ckIc.addEventListener('scroll', () => {
+    if (ckGenis()) { ck.classList.remove('ck-dar'); return; }
+    const y = ckIc.scrollTop, dar = ck.classList.contains('ck-dar');
+    if (!dar && y > 56) {
+      const gizli = ['#kirinti', '#ck-sira', '#ck-sekme', '#ck-baslik small'].reduce((t, s) => t + (($(s, ck) || {}).offsetHeight || 0), 0);
+      if (ckIc.scrollHeight - ckIc.clientHeight - gizli > 80) ck.classList.add('ck-dar');
+    } else if (dar && y < 6) ck.classList.remove('ck-dar');
+  }, { passive: true });
+  $('#ck-baslik').addEventListener('click', () => { if (ck.classList.contains('ck-dar')) { ck.classList.remove('ck-dar'); ckIc.scrollTo({ top: 0, behavior: 'smooth' }); } });
+
   /* --- Sabitle + genişlik (kenardan sürükle; 360 px – 60 vw; hatırlanır) --- */
   const sabitBtn = $('#ck-sabit');
   function sabitYaz() { sabitBtn.setAttribute('aria-pressed', String(sabit)); sabitBtn.title = sabit ? 'Sabit: soru değişince çekmece açık kalır. Dokun: soruya geçince kapansın.' : 'Sabitle: soru değişince çekmece açık kalsın.'; }
@@ -645,6 +1119,14 @@
     (K.kavramlar || []).forEach((k) => ekle({ t: 'Kavram', ad: `${k.sembol} · ${k.ad}`, alt: k.en, ck: `${k.id}/tanim`, n: `${k.ad} ${k.en || ''} ${k.sembol} ${k.id}` }));
     (K.sozluk || []).forEach((s) => ekle({ t: 'Terim', ad: s.en, alt: s.tr, ck: `_sozluk/${s.en}`, n: `${s.en} ${s.tr}` }));
     (K.kavramlar || []).forEach((k) => (dilK(K, k.id)?.terim || []).forEach((t) => ekle({ t: 'TR↔EN', ad: t.en, alt: `${t.tr} · ${k.ad}`, ck: `${k.id}/dil`, n: `${t.en} ${t.tr}` })));
+    // DK323: türler (ad, formül, yazımlar), tepkimeler (denklem, ad, tip), çevrimler, hesap araçları
+    if (turlar(K).length) ekle({ t: 'Kimya', ad: `Türler · ${turlar(K).length}`, ck: '_tur', n: 'türler tür species kimya' });
+    turlar(K).forEach((t) => ekle({ t: 'Tür', ad: `${t.f} · ${iki(t.ad).tr}`, alt: iki(t.ad).en, ck: `_tur/${t.id}`, n: `${iki(t.ad).tr} ${iki(t.ad).en} ${t.f} ${(t.ara || []).join(' ')} ${t.id} ${iki(t.sinif).tr} ${iki(t.sinif).en}` }));
+    if (tepkimeler(K).length) ekle({ t: 'Kimya', ad: `Tepkimeler · ${tepkimeler(K).length}`, ck: '_tepkime', n: 'tepkimeler reactions kimya' });
+    tepkimeler(K).forEach((r) => ekle({ t: 'Tepkime', ad: `${r.id} · ${r.denk}`, alt: iki(r.ad).tr, ck: `_tepkime/${r.id}`, n: `${iki(r.ad).tr} ${iki(r.ad).en} ${r.id} ${r.denk} ${tipAd(r.tip)} ${r.tip || ''}` }));
+    donguler(K).forEach((d) => ekle({ t: 'Çevrim', ad: iki(d.ad).tr, alt: iki(d.ad).en, ck: `_dongu/${d.id}`, n: `${iki(d.ad).tr} ${iki(d.ad).en} ${d.id} çevrim döngü cycle` }));
+    if (HS(K).length) ekle({ t: 'Hesap', ad: `Hesap laboratuvarı · ${HS(K).length} araç`, ck: '_hesap', n: 'hesap laboratuvarı hesapla calculator' });
+    HS(K).forEach((h) => ekle({ t: 'Hesap', ad: iki(h.ad).tr, alt: h.formul, ck: `_hesap/${h.id}`, n: `${iki(h.ad).tr} ${iki(h.ad).en} ${h.formul || ''} ${h.id}` }));
     soruSirasi(K).forEach((q) => ekle({ t: 'Soru', ad: `${q.id} · ${q.baslik}`, alt: `PDF s. ${q.pdf_soru ?? '—'}`, soru: q.id, n: `${q.id} ${q.baslik}` }));
     return araDizin;
   }
@@ -656,7 +1138,9 @@
     const q = norm(araInp.value);
     if (!q || !ckDurum) { araKapat(); return; }
     const goruldu = new Set();
-    araListe = araDizinKur(ckDurum.K).map((o) => ({ o, p: o.n.startsWith(q) ? 0 : o.n.includes(q) ? 1 : 9 })).filter((x) => x.p < 9)
+    // açık görünümün türü öne çıkar (Tepkimeler açıkken «ozon» önce tepkimeleri getirir)
+    const one = { _tur: 'Tür', _tepkime: 'Tepkime', _dongu: 'Çevrim', _hesap: 'Hesap' }[String(ckDurum.kPart || '').split('/')[0]];
+    araListe = araDizinKur(ckDurum.K).map((o) => { const m = o.n.startsWith(q) ? 0 : o.n.includes(q) ? 1 : 9; return { o, p: m === 9 ? 9 : m - (one && o.t === one ? 1.5 : 0) }; }).filter((x) => x.p < 9)
       .sort((a, b) => a.p - b.p).map((x) => x.o).filter((o) => { const a = o.ck || o.soru; if (goruldu.has(a + o.ad)) return false; goruldu.add(a + o.ad); return true; }).slice(0, 14);
     araSec = 0;
     araSonuc.innerHTML = araListe.length ? araListe.map((o, i) => `<div class="ck-s" role="option" id="ck-s-${i}" data-i="${i}" aria-selected="false"><span class="t">${kac(o.t)}</span><span class="a">${kac(o.ad)}</span>${o.alt ? `<span class="b">${kac(o.alt)}</span>` : ''}</div>`).join('') : '<p class="yok ck-s-yok">Eşleşen yok. Başka bir yazımı dene (Türkçe harf gerekmez).</p>';
