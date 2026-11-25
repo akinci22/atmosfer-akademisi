@@ -19,12 +19,16 @@
 </header>
 <main id="ana" tabindex="-1"></main>
 <aside class="cekmece" id="cekmece" aria-hidden="true" aria-labelledby="ck-baslik" hidden>
+  <div class="ck-tutamak" id="ck-tutamak" role="separator" aria-orientation="vertical" aria-label="Çekmece genişliği: sürükle ya da ← → (çift tık: varsayılan)" title="Sürükle: genişlik · çift tık: varsayılan" tabindex="0"></div>
   <div class="ck-ust">
     <button type="button" class="ck-don" id="ck-don">← Soruya dön</button>
-    <div class="ck-gez"><button type="button" id="ck-geri" aria-label="Geri">‹</button><button type="button" id="ck-ileri" aria-label="İleri">›</button></div>
+    <div class="ck-ara"><input id="ck-ara" type="search" placeholder="Süz: kavram, terim, soru" autocomplete="off" spellcheck="false" aria-label="Çekmecede süz: kavram, terim, soru (Türkçe harf gerekmez)" role="combobox" aria-autocomplete="list" aria-controls="ck-sonuc" aria-expanded="false"></div>
+    <div class="ck-gez"><button type="button" id="ck-geri" aria-label="Geri (Alt+←)" title="Geri (Alt+←)">‹<span class="ck-et">&nbsp;Geri</span></button><button type="button" id="ck-ileri" aria-label="İleri (Alt+→)" title="İleri (Alt+→)"><span class="ck-et">İleri&nbsp;</span>›</button><button type="button" class="ck-sabit" id="ck-sabit" aria-pressed="true">Sabitle</button></div>
+    <div class="ck-sonuc" id="ck-sonuc" role="listbox" aria-label="Süzgeç sonuçları" hidden></div>
   </div>
   <nav class="kirinti" id="kirinti" aria-label="Neredeyim"></nav>
-  <h2 id="ck-baslik"></h2>
+  <h2 id="ck-baslik" tabindex="-1"></h2>
+  <div class="ck-sira" id="ck-sira"></div>
   <div class="ck-sekme" id="ck-sekme" role="tablist"></div>
   <div class="ck-ic" id="ck-ic"></div>
 </aside>

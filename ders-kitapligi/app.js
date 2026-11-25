@@ -4,7 +4,8 @@
      #mto342e                  kitabın son bakılan sorusu
      #mto342e/S3               soru
      #mto342e/bol/K1-THETA-TV  bölümün konu sayfaları
-     #mto342e/S3/k/theta/ispat soru açıkken konu çekmecesi (kavram · parça)  */
+     #mto342e/S3/k/theta/ispat soru açıkken konu çekmecesi (kavram · parça)
+     #mto342e/S3/k/_atlas      çekmecede kitabın atlası (· /k/_bol/<id> bölüm · /k/_sozluk[/<en>[~<en2>]] sözlük)  */
 (function () {
   const $ = (s, k = document) => k.querySelector(s);
   const $$ = (s, k = document) => [...k.querySelectorAll(s)];
@@ -39,7 +40,7 @@
     });
     return bekleyen[kid];
   }
-  /* telefonda şekil ekrana sığınca yazılar küçülür: «büyüt» şekli okunur genişliğe çıkarır, yatay kaydırılır (tercih hatırlanır) */
+  /* telefonda şekil ekrana sığınca yazılar küçülür: «büyüt» şekli okunur genişliğe çıkarır, yana ötelenerek gezilir (tercih hatırlanır) */
   function buyutDugmesi() {
     const kap = $('#ck-sekil');
     if (!kap || !kap.querySelector('svg') || !matchMedia('(max-width:760px)').matches) return;
@@ -92,7 +93,7 @@
       const sorular = b.ogeler.filter((o) => o.tur === 'soru').map((o) => K.sorular[o.id]).filter(Boolean);
       const konu = b.ogeler.some((o) => o.tur !== 'soru');
       const burada = simdi === 'bol/' + b.id || sorular.some((q) => q.id === simdi);
-      return bl(K.id + '/' + b.id, kac(b.ad), sorular.length, `${konu ? `<a href="#${K.id}/bol/${b.id}" class="${simdi === 'bol/' + b.id ? 'simdi' : ''}">Konu özeti ve formüller<span class="pdf"></span></a>` : ''}${sorular.map((q) => `<a href="#${K.id}/${q.id}" class="${simdi === q.id ? 'simdi' : ''}" ${simdi === q.id ? 'aria-current="page"' : ''}><span>${q.id} · ${kac(q.baslik)}</span><span class="pdf">s. ${q.pdf_soru ?? '—'}</span></a>`).join('')}`, burada);
+      return bl(K.id + '/' + b.id, kac(bolumAd(K, b)), sorular.length, `${konu ? `<a href="#${K.id}/bol/${b.id}" class="${simdi === 'bol/' + b.id ? 'simdi' : ''}">Konu özeti ve formüller<span class="pdf"></span></a>` : ''}${sorular.map((q) => `<a href="#${K.id}/${q.id}" class="${simdi === q.id ? 'simdi' : ''}" ${simdi === q.id ? 'aria-current="page"' : ''}><span>${q.id} · ${kac(q.baslik)}</span><span class="pdf">s. ${q.pdf_soru ?? '—'}</span></a>`).join('')}`, burada);
     }).join('')}${(K.kavramlar || []).length ? bl(K.id + '/kavram', 'Kavram atlası', K.kavramlar.length, K.kavramlar.map((k) => `<a href="#${K.id}/${simdi && simdi.startsWith('S') ? simdi + '/' : ''}k/${k.id}/tanim"><span>${kac(k.sembol)} · ${kac(k.ad)}</span><span class="pdf">${k.sorular.length} soru</span></a>`).join(''), false) : ''}</div></details>`;
   }
   function takipHTML(K, q) {
@@ -149,17 +150,30 @@
       const kel = [...tr.keys()].sort((a, b) => b.length - a.length).map((e) => e.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
       ipRx = { rx: new RegExp(`(?<![\\p{L}\\p{N}])(${kel.join('|')})(?![\\p{L}\\p{N}])`, 'giu'), tr };
     }
-    const w = document.createTreeWalker(kok, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.parentElement.closest('svg,button,code,pre,.en-ip,summary,.dizin,.takip,a') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
+    const w = document.createTreeWalker(kok, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.parentElement.closest('svg,button,code,pre,.en-ip,summary,.dizin,.takip,a,.es,.kr,.dil-terim,.ip-kart,.sz-kart,.kendin') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
     const dugumler = []; while (w.nextNode()) dugumler.push(w.currentNode);
     for (const d of dugumler) {
       const t = d.nodeValue; ipRx.rx.lastIndex = 0;
       if (!ipRx.rx.test(t)) continue;
       const span = document.createElement('span');
-      span.innerHTML = kac(t).replace(ipRx.rx, (m) => `<span class="en-ip" tabindex="0" lang="en" data-tr="${kac(ipRx.tr.get(m.toLowerCase()) || '')}">${m}</span>`);
+      span.innerHTML = kac(t).replace(ipRx.rx, (m) => `<span class="en-ip" tabindex="0" lang="en" data-en="${kac(m.toLowerCase())}" data-tr="${kac(ipRx.tr.get(m.toLowerCase()) || '')}">${m}</span>`);
       d.replaceWith(...span.childNodes);
     }
   }
-  document.addEventListener('click', (e) => { const t = e.target.closest('.en-ip'); $$('.en-ip.acik').forEach((x) => { if (x !== t) x.classList.remove('acik'); }); if (t) t.classList.toggle('acik'); });
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('.en-ip');
+    $$('.en-ip.acik').forEach((x) => { if (x !== t) x.classList.remove('acik'); });
+    if (ipAcik() && !ipKart.contains(e.target) && t !== ipHedef) ipKapat();
+    if (!t) return;
+    if (t.dataset.en && !t.classList.contains('es-ip') && simdiK) { if (ipHedef === t) ipKapat(); else ipAc(t, simdiK); return; }
+    t.classList.toggle('acik');
+  });
+  document.addEventListener('keydown', (e) => {
+    if ((e.key !== 'Enter' && e.key !== ' ') || !e.target.classList) return;
+    const t = e.target;
+    if (t.classList.contains('en-ip') && t.dataset.en && !t.classList.contains('es-ip') && simdiK) { e.preventDefault(); if (ipHedef === t) ipKapat(); else ipAc(t, simdiK); }
+    else if (t.classList.contains('es') && t.closest('.cift')) { e.preventDefault(); esYak(t, true, !t.classList.contains('kilit')); }
+  });
   const acikAdim = {};
   function soruGoster(K, q) {
     document.title = `${q.id} · ${q.baslik} · ${K.kod}`;
@@ -181,6 +195,7 @@
       ${(q.kavram || []).length ? `<h3>Bu sorudaki kavramlar</h3>${bagHTML(K, q.kavram, q.id)}` : `<p class="yok">Bu sorunun kavram bağları hazırlanıyor; kitabın bölüm özetine <a href="#${K.id}/bol/${q.bolum}">buradan</a> bakabilirsin.</p>`}</div>
       </article></div></div>`;
     texDoldur(ana, K);
+    dilSoruEkle(K, q);
     if (R && (R.eslesme || []).length) esleIsaretle($('.soru-govde', ana), R.eslesme);
     ipucuEkle(ana.querySelector('.soru-kart'), K);
     $$('table', ana).forEach((t) => { if (!t.parentElement.classList.contains('tablo-kap')) { const k = document.createElement('div'); k.className = 'tablo-kap'; t.before(k); k.append(t); } });
@@ -201,10 +216,10 @@
   function bolumGoster(K, bid) {
     const b = K.bolumler.find((x) => x.id === bid);
     if (!b) return soruGoster(K, soruSirasi(K)[0]);
-    document.title = `${b.ad} · ${K.kod}`;
+    document.title = `${bolumAd(K, b)} · ${K.kod}`;
     const kv = (K.kavramlar || []).filter((k) => k.bolum === bid);
     ana.innerHTML = `<div class="kitap-yer"><nav class="dizin" aria-label="Bölümler ve sorular">${dizinHTML(K, 'bol/' + bid)}</nav><div>${takipHTML(K, null)}
-      <h1>${kac(b.ad)}</h1>
+      <h1>${kac(bolumAd(K, b))}</h1>
       ${kv.length ? `<h3>Bu bölümün kavramları</h3>${bagHTML(K, kv.map((k) => k.id), 'bol-' + bid)}` : ''}
       ${b.ogeler.filter((o) => o.tur !== 'soru').map((o) => `<section class="konu-sayfa"><h3>${kac(o.baslik)}</h3>${o.html}${o.oz ? `<div class="oz"><b>Öz:</b> ${o.oz.replace(/^<p>|<\/p>$/g, '')}</div>` : ''}</section>`).join('')}
       <h3>Bu bölümün soruları</h3><div class="ilgili">${b.ogeler.filter((o) => o.tur === 'soru').map((o) => `<a class="soru-bag" href="#${K.id}/${o.id}">${o.id} · ${kac(K.sorular[o.id]?.baslik)}</a>`).join('')}</div></div></div>`;
@@ -219,14 +234,14 @@
       if (e.key !== 'Enter') return;
       const v = inp.value.trim().toUpperCase().replace(/\s/g, '');
       let m = v.match(/^[SÇ](\d+)$/);
-      if (m && K.sorular[`S${+m[1]}`]) { location.hash = `#${K.id}/S${+m[1]}`; return; }
+      if (m && K.sorular[`S${+m[1]}`]) { anaGit(`#${K.id}/S${+m[1]}`); return; }
       m = v.match(/^(\d+)$/);
       if (m) {
         const s = +m[1], sira = soruSirasi(K);
         const tam = sira.find((q) => q.pdf_soru === s || q.pdf_cozum === s);
         const once = [...sira].reverse().find((q) => (q.pdf_soru ?? 1e9) <= s);
         const hedef = tam || once;
-        if (hedef) { location.hash = `#${K.id}/${hedef.id}`; return; }
+        if (hedef) { anaGit(`#${K.id}/${hedef.id}`); return; }
         $('#git-bilgi').textContent = `s. ${s} kapak/özet sayfası; ilk soru s. ${sira[0]?.pdf_soru}`;
         return;
       }
@@ -234,51 +249,288 @@
     });
   }
 
-  /* ---------- konu çekmecesi ---------- */
-  const ck = $('#cekmece'), perde = $('#perde');
-  let ckDurum = null, ckAdim = 0;
-  function cekmeceKapat() {
-    if (animTutucu && animTutucu.dur) animTutucu.dur(); animTutucu = null;
-    ck.hidden = true; perde.hidden = true; ck.setAttribute('aria-hidden', 'true'); ckDurum = null; document.body.classList.remove('ck-acik');
+  /* ---------- konu çekmecesi (DK316: kapanmadan gezinme) ----------
+     Çekmece adresi ana sayfanın arkasına eklenir: #<ana sayfa>/k/<çekmece>
+       <kavram>/<parça>           kavram (tanim · diyagram · formul · ispat · anim · kod · sorular · dil)
+       _atlas                     kitabın kavram atlası: bölümler, kavramlar, sorular
+       _bol/<bölüm-id>            bölüm görünümü
+       _sozluk · _sozluk/<en> · _sozluk/<en>~<en2>   sözlük, terim, iki terim yan yana
+     Geniş ekranda (≥ 1100 px) çekmece yana yerleşir; «Sabitle» açıkken soru değişince kapanmaz (/k/ eki korunur).
+     Dar ekranda tam ekran açılır; çekmecedeki soru bağı ana sayfayı değiştirir, çekmece açık kalır. */
+  const ck = $('#cekmece'), perde = $('#perde'), ckIc = $('#ck-ic');
+  let ckDurum = null, ckAdim = 0, simdiK = null;
+  const genisMq = matchMedia('(min-width:1100px)');
+  const ckGenis = () => genisMq.matches;
+  let sabit = oku('dk:sabit') !== '0';
+  const BOLUM_AD = {
+    mto316: { '00-HARITA': 'Vize nasıl bir sınav?', '01-A-SU-BUTCESI': 'A · Su bütçesi', '02-B-YAGIS-OLCUM': 'B · Yağış ve ölçüm', '03-C-EKSTREM-PMP': 'C · Ekstremler ve PMP', '04-D-HAZNE-BUHARLASMA': 'D · Hazne ve buharlaşma', '05-E-AKIS-HECHMS': 'E · Akış ve HEC-HMS', '06-F-EK-HESAPLAR': 'F · Ek hesaplar', '07-Z-SON-30-DAKIKA': 'Z · Son 30 dakika' },
+    mto323: { '00-harita': 'Kapsam', '01-birimler': '1 · Birimler', '02-sera-bulut': '2 · Sera etkisi ve bulutlar', '03-aerosol': '3 · Aerosol', '04-asit-pinatubo-enso': '4 · Asit yağmuru, Pinatubo, ENSO', '05-omur-kinetik': '5 · Ömür ve kinetik (ek)', '06-ozon': '6 · Ozon', '07-son': 'Son 30 dakika' },
+    mto303e: { '00-GIRIS': 'Nasıl çalışılır', 'A-TEMELLER-ODE': 'A · Temeller ve ODE', 'B-FARK-PDE-ELIPTIK': 'B · Fark yaklaşımı ve eliptik PDE', 'C-ZAMAN-SEMALARI': 'C · Zaman şemaları', 'D-CFD-PRATIK': 'D · CFD pratiği', 'E-SON-30-DAKIKA': 'E · Son 30 dakika' },
+  };
+  const bolumAd = (K, b) => (BOLUM_AD[K.id] || {})[b.id] || b.ad;
+  const bolumDolu = (K, b) => (K.kavramlar || []).some((k) => k.bolum === b.id) || b.ogeler.some((o) => o.tur === 'soru');
+  const TRH = { ç: 'c', ğ: 'g', ı: 'i', ö: 'o', ş: 's', ü: 'u', â: 'a', î: 'i', û: 'u' };
+  const norm = (s) => String(s ?? '').toLocaleLowerCase('tr').replace(/[çğıöşüâîû]/g, (c) => TRH[c]).normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/[^\p{L}\p{N}]+/gu, '');
+  // «S10'a dön», «S2'ye dön», «S6'ya dön»: sayının okunuşuna göre yönelme eki
+  const yonelme = (id) => { const m = /(\d+)$/.exec(id || ''), n = m ? +m[1] : 0, b = n % 10, o = Math.floor(n / 10) % 10; return `${id}'${b ? ['', 'e', 'ye', 'e', 'e', 'e', 'ya', 'ye', 'e', 'a'][b] : ['e', 'a', 'ye', 'a', 'a', 'ye', 'a', 'e', 'e', 'a'][o]}`; };
+  const dilK = (K, id) => (K && K.dil && K.dil.kavram && K.dil.kavram[id]) || null;
+  const dilS = (K, id) => (K && K.dil && K.dil.soru && K.dil.soru[id]) || null;
+  const szBul = (K, en) => (K.sozluk || []).find((x) => x.en.toLowerCase() === String(en || '').trim().toLowerCase());
+  const parcaVar = (K, k, p) => p === 'sorular' || (p === 'dil' ? !!dilK(K, k.id) : !!(k.parcalar && k.parcalar[p]));
+  // çekmece içi bağ: ana sayfa değişse de doğru yere gider (tıklamada o anki ana sayfaya eklenir)
+  const ckBag = (kp, ic, sinif = '') => `<a href="#${kac(ckDurum ? ckDurum.onEk : '')}/k/${kac(kp)}" data-ck="${kac(kp)}"${sinif ? ` class="${sinif}"` : ''}>${ic}</a>`;
+
+  /* --- TR ↔ EN gösterimi: cümle çifti, eşleşen ifadeler aynı renk; dokun ya da imleci getir → ikisi birlikte parlar --- */
+  const ES_RENK = 6;
+  function esIsle(metin, ifadeler, tr) {
+    const t = String(metin ?? ''), kucuk = tr ? t.toLocaleLowerCase('tr') : t.toLowerCase(), aralik = [];
+    for (const [s0, i] of ifadeler) {
+      const s = String(s0 || '').trim(); if (!s) continue;
+      let p = t.indexOf(s);
+      if (p < 0) p = kucuk.indexOf(tr ? s.toLocaleLowerCase('tr') : s.toLowerCase());
+      if (p < 0 || aralik.some(([a, b]) => p < b && p + s.length > a)) continue;
+      aralik.push([p, p + s.length, i]);
+    }
+    aralik.sort((x, y) => x[0] - y[0]);
+    let out = '', son = 0;
+    for (const [a, b, i] of aralik) { out += `${kac(t.slice(son, a))}<span class="es es${i % ES_RENK}" data-es="${i}" tabindex="0">${kac(t.slice(a, b))}</span>`; son = b; }
+    return out + kac(t.slice(son));
   }
-  function cekmeceAc(K, kid, parca, qid) {
+  function ciftHTML(c, sinif = '') {
+    const es = (c.es || []).filter((x) => Array.isArray(x) && x.length >= 2);
+    return `<div class="cift${sinif ? ' ' + sinif : ''}"><p class="tr" lang="tr">${esIsle(c.tr, es.map((x, i) => [x[0], i]), true)}</p><p class="en" lang="en">${esIsle(c.en, es.map((x, i) => [x[1], i]), false)}</p></div>`;
+  }
+  const esYak = (el, on, kilit) => { const c = el.closest('.cift'); if (!c) return; $$(`.es[data-es="${el.dataset.es}"]`, c).forEach((x) => { if (kilit !== undefined) x.classList.toggle('kilit', kilit); x.classList.toggle('yan', on || x.classList.contains('kilit')); }); };
+  const esHedef = (e) => e.target.closest && e.target.closest('.cift .es');
+  document.addEventListener('mouseover', (e) => { const s = esHedef(e); if (s) esYak(s, true); });
+  document.addEventListener('mouseout', (e) => { const s = esHedef(e); if (s) esYak(s, false); });
+  document.addEventListener('focusin', (e) => { const s = esHedef(e); if (s) esYak(s, true); });
+  document.addEventListener('focusout', (e) => { const s = esHedef(e); if (s) esYak(s, false); });
+  document.addEventListener('click', (e) => { const s = esHedef(e); if (s) esYak(s, true, !s.classList.contains('kilit')); });
+
+  /* --- karşılaştırma bloğu (Mihenk gibi): sütun başlığı → sütun öne çıkar + not; satır adı → satır parlar; Şunu bil; Kendini dene --- */
+  const KR = [];
+  function karsilastirHTML(kr) {
+    const n = KR.push(kr) - 1, sut = kr.sutun || [], sat = kr.satir || [];
+    return `<section class="kr" data-kr="${n}"><h3>${kac(kr.baslik || 'Karşılaştır')}</h3>
+      <p class="kr-ipucu">Bir sütun başlığına dokun: o terim öne çıkar, notu açılır. Bir satır adına dokun: o özellik yan yana parlar.</p>
+      <div class="tablo-kap"><table class="kr-t"><thead><tr><th scope="col"><span class="yok">Özellik</span></th>${sut.map((s, i) => `<th scope="col"><button type="button" class="kr-sut es${i % ES_RENK}" data-k="${i}" aria-pressed="false"><span lang="en">${kac(s.en)}</span><small>${kac(s.tr)}</small></button></th>`).join('')}</tr></thead>
+      <tbody>${sat.map((r, j) => `<tr data-r="${j}"><th scope="row"><button type="button" class="kr-sat" data-r="${j}" aria-pressed="false">${kac(r.ad)}</button></th>${sut.map((s, i) => `<td data-k="${i}">${kac((r.h || [])[i] ?? '')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+      <div class="kr-not" aria-live="polite" hidden></div>
+      ${(kr.bil || []).length ? `<div class="kr-bil"><h4>Şunu bil</h4><ul>${kr.bil.map((b) => `<li>${kac(b)}</li>`).join('')}</ul></div>` : ''}
+      ${(kr.dene || []).length ? `<div class="kr-dene" data-i="0"><h4>Kendini dene <small class="yok">· cümleye uyan terimi seç</small></h4><p class="kr-s" lang="en"></p><div class="kr-sec">${sut.map((s, i) => `<button type="button" class="kucuk" data-k="${i}" lang="en">${kac(s.en)}</button>`).join('')}</div><p class="kr-sonuc" aria-live="polite"></p><button type="button" class="kucuk kr-sonraki" hidden>Sonraki soru ›</button></div>` : ''}</section>`;
+  }
+  function deneYaz(kok) {
+    const kr = KR[+kok.dataset.kr], d = $('.kr-dene', kok); if (!kr || !d) return;
+    const i = (+d.dataset.i || 0) % kr.dene.length, q = kr.dene[i];
+    $('.kr-s', d).textContent = `${i + 1}/${kr.dene.length} · ${q.s}`;
+    const so = $('.kr-sonuc', d); so.textContent = ''; so.className = 'kr-sonuc';
+    $$('.kr-sec button', d).forEach((x) => { x.disabled = false; x.classList.remove('dogru', 'yanlis'); });
+    $('.kr-sonraki', d).hidden = true;
+  }
+  const krKur = (kok) => $$('.kr', kok).forEach(deneYaz);
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('.kr button'); if (!b) return;
+    const kok = b.closest('.kr'), kr = KR[+kok.dataset.kr]; if (!kr) return;
+    if (b.classList.contains('kr-sut')) {
+      const k = +b.dataset.k, on = b.getAttribute('aria-pressed') !== 'true';
+      $$('.kr-sut', kok).forEach((x) => x.setAttribute('aria-pressed', String(on && +x.dataset.k === k)));
+      $$('td[data-k]', kok).forEach((td) => { td.classList.toggle('on', on && +td.dataset.k === k); td.classList.toggle('sonuk', on && +td.dataset.k !== k); });
+      const s = kr.sutun[k], not = $('.kr-not', kok);
+      not.hidden = !on; not.innerHTML = on ? `<b lang="en">${kac(s.en)}</b> · <i>${kac(s.tr)}</i>${s.not ? ` — ${kac(s.not)}` : ''}` : '';
+    } else if (b.classList.contains('kr-sat')) {
+      const r = +b.dataset.r, on = b.getAttribute('aria-pressed') !== 'true';
+      $$('.kr-sat', kok).forEach((x) => x.setAttribute('aria-pressed', String(on && +x.dataset.r === r)));
+      $$('tbody tr', kok).forEach((tr) => tr.classList.toggle('on', on && +tr.dataset.r === r));
+    } else if (b.classList.contains('kr-sonraki')) {
+      const d = $('.kr-dene', kok); d.dataset.i = (+d.dataset.i || 0) + 1; deneYaz(kok);
+    } else if (b.closest('.kr-sec')) {
+      const d = $('.kr-dene', kok), q = kr.dene[(+d.dataset.i || 0) % kr.dene.length], dogru = +b.dataset.k === +q.c;
+      $$('.kr-sec button', d).forEach((x) => { x.disabled = true; if (+x.dataset.k === +q.c) x.classList.add('dogru'); });
+      if (!dogru) b.classList.add('yanlis');
+      const so = $('.kr-sonuc', d); so.className = `kr-sonuc ${dogru ? 'dogru' : 'yanlis'}`;
+      so.textContent = `${dogru ? 'Doğru.' : `Yanlış — doğrusu: ${(kr.sutun[q.c] || {}).en || ''}.`} ${q.neden || ''}`;
+      const sn = $('.kr-sonraki', d); sn.hidden = false; sn.textContent = kr.dene.length > 1 ? 'Sonraki soru ›' : 'Baştan';
+    }
+  });
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('.kendin-ac, .dil-tumu'); if (!b) return;
+    if (b.classList.contains('dil-tumu')) { const s = b.closest('.dil-blok'), ac = !s.classList.contains('tum'); s.classList.toggle('tum', ac); b.setAttribute('aria-expanded', String(ac)); b.textContent = ac ? 'Daha az göster' : `Tümünü göster (${$$('.cift', s).length})`; return; }
+    const en = b.nextElementSibling, ac = en.hidden; en.hidden = !ac; b.setAttribute('aria-expanded', String(ac)); b.textContent = ac ? 'Cevabı gizle' : 'Cevabı göster';
+  });
+
+  function dilKavramHTML(K, k) {
+    const D = dilK(K, k.id);
+    if (!D) return '<p class="yok">Bu kavram için TR ↔ EN katmanı hazırlanıyor.</p>';
+    const T = D.terim || [], szler = (K.sozluk || []).filter((s) => (s.kavram || []).includes(k.id));
+    let h = '<p class="dil-ipucu">Türkçe satır küçük ve eğik, İngilizcesi hemen altında. Aynı renkli ifadeler birbirinin karşılığı: birine dokun ya da imleci getir, ikisi birlikte parlar.</p>';
+    if (T.length) h += `<h3>Terimler</h3><div class="dil-kap"><table class="dil-terim"><thead><tr><th>TR</th><th>EN</th><th>Tür</th><th>Okunuş</th><th>Birlikte kullanılır</th></tr></thead><tbody>${T.map((t) => `<tr><td data-b="TR"><i>${kac(t.tr)}</i></td><td data-b="EN" lang="en"><b>${kac(t.en)}</b></td><td data-b="Tür">${kac(t.tur || '')}</td><td data-b="Okunuş">${t.oku ? `<span class="oku">${kac(t.oku)}</span>` : ''}${t.ipa ? ` <span class="ipa" lang="en">/${kac(t.ipa)}/</span>` : ''}</td><td data-b="Birlikte" lang="en">${(t.es || []).map(kac).join(' · ')}</td></tr>`).join('')}</tbody></table></div>`;
+    for (const kr of D.karsilastir || []) h += karsilastirHTML(kr);
+    if ((D.cumle || []).length) h += `<h3>Cümle cümle</h3>${D.cumle.map((c) => ciftHTML(c)).join('')}`;
+    if ((D.sinav || []).length) h += `<h3>Sınav kâğıdına İngilizce şöyle yaz</h3>${D.sinav.map((c) => ciftHTML(c, 'sinav')).join('')}`;
+    if ((D.kendin || []).length) h += `<h3>Kendin çevir</h3><p class="yok">Önce kendin düşün (ya da kâğıda yaz), sonra dokun.</p>${D.kendin.map((c) => `<div class="kendin"><p class="tr" lang="tr">${kac(c.tr)}</p><button type="button" class="kucuk kendin-ac" aria-expanded="false">Cevabı göster</button><p class="en" lang="en" hidden>${kac(c.en)}</p></div>`).join('')}`;
+    if (szler.length) h += `<h3>Sözlükte</h3><div class="ilgili">${szler.map((s) => ckBag(`_sozluk/${s.en}`, `<span lang="en">${kac(s.en)}</span> · ${kac(s.tr)}`, 'soru-bag')).join('')}</div>`;
+    return h;
+  }
+  // soru sayfası: soru metninin altında TR ↔ EN, yol haritasına kalıp eki, çözüm sonunda «Sınav kâğıdına İngilizce»
+  function dilSoruEkle(K, q) {
+    const D = dilS(K, q.id); if (!D) return;
+    const c = D.cift || [], govde = $('.soru-govde', ana);
+    let h = '';
+    if (c.length) h += `<section class="dil-blok" id="dil-cift" aria-labelledby="dil-cift-h"><h2 id="dil-cift-h">TR ↔ EN <small>soru cümle cümle</small></h2><p class="dil-ipucu">Aynı renkli ifadeler birbirinin karşılığı: birine dokun ya da imleci getir.</p>${c.map((x, i) => ciftHTML(x, i >= 2 ? 'fazla' : '')).join('')}${c.length > 2 ? `<button type="button" class="kucuk dil-tumu" aria-expanded="false">Tümünü göster (${c.length})</button>` : ''}</section>`;
+    for (const kr of D.karsilastir || []) h += karsilastirHTML(kr);
+    if (h && govde) govde.insertAdjacentHTML('afterend', h);
+    if ((D.kalip || []).length) {
+      const li = D.kalip.map((k) => `<li class="kalip-dil"><span class="en-k" lang="en">${kac(k.en)}</span> → ${kac(k.tr)}${k.ipucu ? ` · <b>${kac(k.ipucu)}</b>` : ''}</li>`).join('');
+      const ul = $('.yol ul.kalip', ana), yol = $('.yol', ana);
+      if (ul) ul.insertAdjacentHTML('beforeend', li);
+      else if (yol) $('h2', yol).insertAdjacentHTML('afterend', `<p class="yol-alt">Soruda bu ifadeyi görünce:</p><ul class="kalip">${li}</ul>`);
+      else if (govde) govde.insertAdjacentHTML('afterend', `<section class="dil-blok"><p class="yol-alt">Soruda bu ifadeyi görünce:</p><ul class="kalip">${li}</ul></section>`);
+    }
+    if ((D.yaz || []).length) $('#cozum-son', ana)?.insertAdjacentHTML('afterbegin', `<section class="dil-blok dil-yaz" id="dil-yaz"><h3>Sınav kâğıdına İngilizce</h3><p class="dil-ipucu">Çözümün kilit satırları; sayılar kitaptakiyle aynı.</p>${D.yaz.map((x) => ciftHTML(x, 'sinav')).join('')}</section>`);
+    krKur(ana);
+  }
+
+  /* --- zengin sözlük kartı: terime dokun → TR, tür, okunuş, fark, örnek, Karşılaştır, Kavrama git --- */
+  const ipKart = document.createElement('div');
+  ipKart.className = 'ip-kart'; ipKart.id = 'ip-kart'; ipKart.hidden = true; ipKart.setAttribute('role', 'dialog'); ipKart.setAttribute('aria-label', 'Terim');
+  document.body.append(ipKart);
+  let ipHedef = null;
+  const ipAcik = () => !ipKart.hidden;
+  function ipKapat() { ipKart.hidden = true; ipHedef = null; }
+  function ipAc(el, K) {
+    const s = szBul(K, el.dataset.en || el.textContent); if (!s) return false;
+    const taban = location.hash.split('/k/')[0] || `#${K.id}`;
+    const git = (kp, ad) => `<button type="button" data-git="${kac(`${taban}/k/${kp}`)}">${ad}</button>`;
+    const kv = (s.kavram || []).map((id) => kavramBul(K, id)).filter(Boolean);
+    ipKart.innerHTML = `<div class="ip-bas"><b lang="en">${kac(s.en)}</b>${s.tur ? `<span class="tur">${kac(s.tur)}</span>` : ''}${s.oku ? `<span class="oku">${kac(s.oku)}</span>` : ''}${s.ipa ? `<span class="ipa" lang="en">/${kac(s.ipa)}/</span>` : ''}<button type="button" class="ip-x" aria-label="Kapat">×</button></div>
+      <p class="ip-tr"><i>${kac(s.tr)}</i></p>${(s.es || []).length ? `<p><span class="yok">Birlikte:</span> <span lang="en">${s.es.map(kac).join(' · ')}</span></p>` : ''}
+      ${s.fark ? `<p class="sz-fark"><b>Fark:</b> ${kac(s.fark)}</p>` : ''}${s.ornek ? ciftHTML(s.ornek) : ''}
+      <div class="ip-dug">${(s.bak || []).map((b) => git(`_sozluk/${s.en}~${b}`, `Karşılaştır: <span lang="en">${kac(b)}</span>`)).join('')}${kv.map((k) => git(`${k.id}/tanim`, `Kavrama git: ${kac(k.sembol)} · ${kac(k.ad)}`)).join('')}${git(`_sozluk/${s.en}`, 'Sözlükte aç')}</div>`;
+    ipKart.hidden = false; ipHedef = el;
+    const r = el.getBoundingClientRect(), w = Math.min(380, innerWidth - 16);
+    ipKart.style.width = `${w}px`; ipKart.style.left = `${Math.min(Math.max(8, r.left), innerWidth - w - 8)}px`; ipKart.style.top = '0px';
+    const h = ipKart.offsetHeight; let y = r.bottom + 6;
+    if (y + h > innerHeight - 8 && r.top - h - 6 > 8) y = r.top - h - 6;
+    ipKart.style.top = `${Math.max(8, Math.min(y, innerHeight - h - 8))}px`;
+    return true;
+  }
+  ipKart.addEventListener('click', (e) => { if (e.target.closest('.ip-x')) { const h = ipHedef; ipKapat(); h?.focus?.(); } else if (e.target.closest('[data-git]')) ipKapat(); });
+  addEventListener('scroll', (e) => { if (ipAcik() && !ipKart.contains(e.target)) ipKapat(); }, true);
+  addEventListener('resize', () => { if (ipAcik()) ipKapat(); }, { passive: true });
+
+  /* --- çekmece görünümleri --- */
+  function kirintiYaz(K, parcalar) {
+    $('#kirinti').innerHTML = [[kac(K.kod), '_atlas'], ...parcalar].map(([ad, kp]) => (kp ? ckBag(kp, ad) : `<span>${ad}</span>`)).join(' <span class="ayrac" aria-hidden="true">›</span> ');
+  }
+  const siraHTML = (o, orta, s) => `${o ? ckBag(o[0], `‹ <span class="sira-ad">${o[1]}</span>`, 'sira-bag') : '<span class="sira-bos"></span>'}<span class="sira-orta yok">${orta}</span>${s ? ckBag(s[0], `<span class="sira-ad">${s[1]}</span> ›`, 'sira-bag sag') : '<span class="sira-bos"></span>'}`;
+  const ustSekme = (K, sec) => [['_atlas', 'Atlas', 'atlas'], ['_sozluk', `Sözlük (${(K.sozluk || []).length})`, 'sozluk']].map(([kp, ad, id]) => `<button type="button" role="tab" aria-selected="${sec === id}" data-ck="${kp}">${ad}</button>`).join('');
+  function soruCip(K, sid, uzun) {
+    const q = K.sorular[sid]; if (!q) return '';
+    const simdi = ckDurum && ckDurum.qid === sid, s = simdi ? ' simdi' : '', ac = simdi ? ' aria-current="page"' : '';
+    return uzun ? `<a class="soru-bag${s}" href="#${K.id}/${sid}" data-soru="${sid}"${ac}>${sid} · ${kac(q.baslik)} <span class="yok">s. ${q.pdf_soru ?? '—'}</span></a>`
+      : `<a class="soru-cip${s}" href="#${K.id}/${sid}" data-soru="${sid}" title="${kac(q.baslik)} · PDF s. ${q.pdf_soru ?? '—'}" aria-label="${sid} · ${kac(q.baslik)}"${ac}>${sid}</a>`;
+  }
+  const kavramSatir = (K, k) => `<li>${ckBag(`${k.id}/tanim`, `<span class="sem">${kac(k.sembol)}</span><span class="ad">${kac(k.ad)}</span>${k.en ? `<span class="en" lang="en">${kac(k.en)}</span>` : ''}${dilK(K, k.id) ? '<span class="dil-rozet" title="TR ↔ EN katmanı var">TR↔EN</span>' : ''}`, 'kv-sat')}</li>`;
+  const bolumSorulari = (K, b) => b.ogeler.filter((o) => o.tur === 'soru').map((o) => o.id).filter((id) => K.sorular[id]);
+
+  function atlasCk(K, ayni) {
+    kirintiYaz(K, [['Kavram atlası', null]]);
+    $('#ck-baslik').innerHTML = `${kac(K.kod)} · kavram atlası<small>${kac(K.ad)} · ${(K.kavramlar || []).length} kavram · ${Object.keys(K.sorular).length} soru</small>`;
+    $('#ck-sira').innerHTML = ''; $('#ck-sekme').innerHTML = ustSekme(K, 'atlas');
+    if (ayni) return;
+    ckIc.innerHTML = `<p class="ck-not">Bir bölüme, kavrama ya da soruya dokun; çekmece açık kalır. Kavram satırı: sembol · Türkçe ad · İngilizce ad.</p>${K.bolumler.filter((b) => bolumDolu(K, b)).map((b) => {
+      const kv = (K.kavramlar || []).filter((k) => k.bolum === b.id), sq = bolumSorulari(K, b);
+      return `<section class="at-bol"><h3>${ckBag(`_bol/${b.id}`, kac(bolumAd(K, b)))} <span class="say">${kv.length} kavram · ${sq.length} soru</span></h3>${kv.length ? `<ul class="kv-liste">${kv.map((k) => kavramSatir(K, k)).join('')}</ul>` : ''}${sq.length ? `<div class="soru-cipler"><span class="yok">Sorular:</span> ${sq.map((s) => soruCip(K, s)).join('')}</div>` : ''}</section>`;
+    }).join('')}`;
+  }
+  function bolumCk(K, bid, ayni) {
+    const b = K.bolumler.find((x) => x.id === bid);
+    if (!b) return atlasCk(K, false);
+    const kv = (K.kavramlar || []).filter((k) => k.bolum === b.id), sq = bolumSorulari(K, b);
+    kirintiYaz(K, [[kac(bolumAd(K, b)), `_bol/${b.id}`]]);
+    $('#ck-baslik').innerHTML = `${kac(bolumAd(K, b))}<small>${kv.length} kavram · ${sq.length} soru</small>`;
+    const dolu = K.bolumler.filter((x) => bolumDolu(K, x)), i = dolu.indexOf(b), o = dolu[i - 1], s = dolu[i + 1];
+    $('#ck-sira').innerHTML = siraHTML(o && [`_bol/${o.id}`, kac(bolumAd(K, o))], `${i + 1} / ${dolu.length} bölüm`, s && [`_bol/${s.id}`, kac(bolumAd(K, s))]);
+    $('#ck-sekme').innerHTML = ustSekme(K, '');
+    if (ayni) return;
+    const idler = new Set(kv.map((k) => k.id)), sz = (K.sozluk || []).filter((t) => (t.kavram || []).some((id) => idler.has(id)));
+    ckIc.innerHTML = `${kv.length ? `<h3>Kavramlar</h3><ul class="kv-liste">${kv.map((k) => kavramSatir(K, k)).join('')}</ul>` : ''}
+      ${sq.length ? `<h3>Sorular</h3><div class="ilgili">${sq.map((x) => soruCip(K, x, true)).join('')}</div>` : ''}
+      ${b.ogeler.some((x) => x.tur !== 'soru') ? `<p><a class="soru-bag" href="#${K.id}/bol/${b.id}" data-ana="bol/${b.id}">Bölümün konu özeti ve formülleri (ana sayfada) →</a></p>` : ''}
+      ${sz.length ? `<h3>Bu bölümün terimleri · TR ↔ EN</h3><div class="ilgili">${sz.map((t) => ckBag(`_sozluk/${t.en}`, `<span lang="en">${kac(t.en)}</span> · ${kac(t.tr)}`, 'soru-bag')).join('')}</div>` : ''}
+      ${b.ogeler.filter((x) => x.tur === 'terim').map((x) => `<section class="bol-terim"><h3>${kac(x.baslik)}</h3>${x.html}</section>`).join('')}`;
+    texDoldur(ckIc, K);
+  }
+  function szKart(K, s, ad) {
+    if (!s) return `<div class="sz-kart"><p class="yok"><span lang="en">${kac(ad)}</span> sözlükte yok.</p></div>`;
+    const kv = (s.kavram || []).map((id) => kavramBul(K, id)).filter(Boolean);
+    return `<article class="sz-kart"><h3><span lang="en">${kac(s.en)}</span> ${s.tur ? `<span class="tur">${kac(s.tur)}</span>` : ''}</h3>
+      ${s.oku || s.ipa ? `<p class="oku-sat">${s.oku ? `<span class="oku">${kac(s.oku)}</span>` : ''}${s.ipa ? ` <span class="ipa" lang="en">/${kac(s.ipa)}/</span>` : ''}</p>` : ''}
+      <p class="sz-tr"><i>${kac(s.tr)}</i></p>
+      ${(s.es || []).length ? `<p><span class="yok">Birlikte kullanılır:</span> <span lang="en">${s.es.map(kac).join(' · ')}</span></p>` : ''}
+      ${s.fark ? `<p class="sz-fark"><b>Fark:</b> ${kac(s.fark)}</p>` : ''}${s.ornek ? ciftHTML(s.ornek) : ''}
+      ${(s.bak || []).length ? `<p class="sz-dug"><span class="yok">Karşılaştır:</span> ${s.bak.map((x) => ckBag(`_sozluk/${s.en}~${x}`, `<span lang="en">${kac(s.en)} ↔ ${kac(x)}</span>`, 'soru-bag')).join(' ')}</p>` : ''}
+      ${kv.length ? `<p class="sz-dug"><span class="yok">Kavram:</span> ${kv.map((k) => ckBag(`${k.id}/${dilK(K, k.id) ? 'dil' : 'tanim'}`, `${kac(k.sembol)} · ${kac(k.ad)}`, 'soru-bag')).join(' ')}</p>` : ''}
+      ${s.kaynak ? `<p class="yok sz-kaynak">Kaynak: ${kac(s.kaynak)}</p>` : ''}
+      ${!s.tur && !s.fark && !s.ornek ? '<p class="yok">Bu terimin okunuşu, farkı ve örneği hazırlanıyor.</p>' : ''}</article>`;
+  }
+  function sozlukCk(K, ne, ayni) {
+    const sz = [...(K.sozluk || [])].sort((a, b) => a.en.localeCompare(b.en, 'en'));
+    $('#ck-sekme').innerHTML = ustSekme(K, ne ? '' : 'sozluk');
+    if (!ne) {
+      kirintiYaz(K, [['Sözlük', null]]);
+      $('#ck-baslik').innerHTML = `Sözlük · TR ↔ EN<small>${sz.length} terim · dokun: anlamı, okunuşu, karıştırılan terimle farkı</small>`;
+      $('#ck-sira').innerHTML = '';
+      if (ayni) return;
+      ckIc.innerHTML = `<ul class="sz-liste">${sz.map((s) => `<li>${ckBag(`_sozluk/${s.en}`, `<span class="en" lang="en">${kac(s.en)}</span>${s.tur ? `<span class="tur">${kac(s.tur)}</span>` : ''}<span class="tr">${kac(s.tr)}</span>`, 'sz-sat')}</li>`).join('')}</ul>`;
+      return;
+    }
+    const [a, b] = ne.split('~'), A = szBul(K, a), B = b ? szBul(K, b) : null;
+    kirintiYaz(K, [['Sözlük', '_sozluk'], [b ? `${kac(a)} ↔ ${kac(b)}` : kac(a), null]]);
+    $('#ck-baslik').innerHTML = b ? `<span lang="en">${kac(a)}</span> ↔ <span lang="en">${kac(b)}</span><small>iki terim yan yana</small>` : `<span lang="en">${kac(A ? A.en : a)}</span><small>${kac(A ? A.tr : 'sözlükte yok')}</small>`;
+    const i = A && !b ? sz.indexOf(A) : -1, o = sz[i - 1], s = i >= 0 ? sz[i + 1] : null;
+    $('#ck-sira').innerHTML = i >= 0 ? siraHTML(o && [`_sozluk/${o.en}`, kac(o.en)], `${i + 1} / ${sz.length}`, s && [`_sozluk/${s.en}`, kac(s.en)]) : '';
+    if (ayni) return;
+    ckIc.innerHTML = b ? `<div class="sz-yan">${szKart(K, A, a)}${szKart(K, B, b)}</div>` : szKart(K, A, a);
+  }
+  function kavramCk(K, kid, parca, ayni) {
     const k = kavramBul(K, kid);
-    if (!k) return cekmeceKapat();
-    const yeni = !ckDurum || ckDurum.kid !== kid || ckDurum.parca !== parca;
-    ckDurum = { kid, parca, qid };
-    if (animTutucu && animTutucu.dur) animTutucu.dur(); animTutucu = null;
-    ck.hidden = false; perde.hidden = false; ck.setAttribute('aria-hidden', 'false'); document.body.classList.add('ck-acik');
-    const donHedef = qid ? `#${K.id}/${qid}` : `#${K.id}`;
-    $('#ck-don').textContent = qid ? `← ${qid}'e dön` : '← Kitaba dön';
-    $('#ck-don').onclick = () => { location.hash = donHedef; };
-    $('#kirinti').innerHTML = `${qid ? `<a href="${donHedef}">${kac(K.kod)} · ${qid}</a> ›` : `<a href="#${K.id}">${kac(K.kod)}</a> ›`} <a href="#${K.id}/${qid ? qid + '/' : ''}k/${k.id}/tanim">${kac(k.sembol)} ${kac(k.ad)}</a> › <span>${PAD[parca] || 'Sorular'}</span>`;
-    $('#ck-baslik').innerHTML = `${kac(k.sembol)} · ${kac(k.ad)}<small>${kac(k.en || '')}</small>`;
-    const parcalar = PARCA.filter(([p]) => k.parcalar && k.parcalar[p]);
-    const taban = `#${K.id}/${qid ? qid + '/' : ''}k/${k.id}/`;
-    $('#ck-sekme').innerHTML = parcalar.map(([p, ad]) => `<button type="button" role="tab" aria-selected="${p === parca}" data-git="${taban}${p}">${ad}</button>`).join('') + `<button type="button" role="tab" aria-selected="${parca === 'sorular'}" data-git="${taban}sorular">Sorular (${k.sorular.length})</button>`;
-    const ic = $('#ck-ic');
-    const P = k.parcalar[parca] || {};
-    if (yeni) ckAdim = 1;
+    if (!k) return atlasCk(K, false);
+    if (!parcaVar(K, k, parca)) parca = 'tanim';
+    const D = dilK(K, k.id), b = K.bolumler.find((x) => x.id === k.bolum);
+    const parcaAd = parca === 'sorular' ? 'Sorular' : parca === 'dil' ? 'TR ↔ EN' : (PAD[parca] || 'Tanım');
+    kirintiYaz(K, [...(b ? [[kac(bolumAd(K, b)), `_bol/${b.id}`]] : []), [`${kac(k.sembol)} ${kac(k.ad)}`, `${k.id}/tanim`], [parcaAd, `${k.id}/${parca}`]]);
+    $('#ck-baslik').innerHTML = `${kac(k.sembol)} · ${kac(k.ad)}<small lang="en">${kac(k.en || '')}</small>`;
+    const L = K.kavramlar || [], i = L.indexOf(k), o = L[i - 1], s = L[i + 1], kp = (x) => `${x.id}/${parcaVar(K, x, parca) ? parca : 'tanim'}`;
+    $('#ck-sira').innerHTML = siraHTML(o && [kp(o), `${kac(o.sembol)} ${kac(o.ad)}`], `kavram ${i + 1} / ${L.length}`, s && [kp(s), `${kac(s.sembol)} ${kac(s.ad)}`]);
+    const parcalar = PARCA.filter(([p]) => k.parcalar && k.parcalar[p]), taban = `#${ckDurum.onEk}/k/${k.id}/`;
+    const sekme = ([p, ad]) => `<button type="button" role="tab" aria-selected="${p === parca}" data-git="${kac(taban + p)}">${ad}</button>`;
+    $('#ck-sekme').innerHTML = [...parcalar.slice(0, 1), ...(D ? [['dil', 'TR ↔ EN']] : []), ...parcalar.slice(1), ['sorular', `Sorular (${k.sorular.length})`]].map(sekme).join('');
+    if (ayni) return;
+    const ic = ckIc, P = k.parcalar[parca] || {};
+    ckAdim = 1;
     if (parca === 'tanim') ic.innerHTML = P.html || '';
+    else if (parca === 'dil') ic.innerHTML = dilKavramHTML(K, k);
     else if (parca === 'diyagram') { ic.innerHTML = `<div class="sekil-kap" id="ck-sekil"></div>${P.html || ''}`; if (window.Sekil[P.sekil]) window.Sekil[P.sekil]($('#ck-sekil'), P.ayar || {}); buyutDugmesi(); }
     else if (parca === 'formul') {
-      ic.innerHTML = `<div class="formul-kap" data-tex="${P.tex}"></div><p class="yok" style="margin:10px 0 0">Bir terime bas: formülde yanar, anlamı aşağıda.</p><div class="terim-list">${(P.terimler || []).map((t, i) => `<button type="button" aria-pressed="false" data-t="${i}">${kac(t.sembol)}</button>`).join('')}</div><div class="terim-kart" id="terim-kart" hidden></div>${P.html || ''}`;
+      ic.innerHTML = `<div class="formul-kap" data-tex="${P.tex}"></div><p class="yok" style="margin:10px 0 0">Bir terime bas: formülde yanar, anlamı aşağıda.</p><div class="terim-list">${(P.terimler || []).map((t, j) => `<button type="button" aria-pressed="false" data-t="${j}">${kac(t.sembol)}</button>`).join('')}</div><div class="terim-kart" id="terim-kart" hidden></div>${P.html || ''}`;
       texDoldur(ic, K);
-      const sec = (i) => {
-        const t = P.terimler[i];
-        $$('.terim-list button', ic).forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.t === i)));
+      const sec = (j) => {
+        const t = P.terimler[j];
+        $$('.terim-list button', ic).forEach((x) => x.setAttribute('aria-pressed', String(+x.dataset.t === j)));
         $$('.formul-kap .on', ic).forEach((e) => e.classList.remove('on'));
         $$(`.formul-kap .${CSS.escape(t.id)}`, ic).forEach((e) => e.classList.add('on'));
         const kk = $('#terim-kart'); kk.hidden = false;
         kk.innerHTML = `<b style="font-size:20px">${kac(t.sembol)}</b> — ${kac(t.ad)}<dl><dt>Birim</dt><dd>${kac(t.birim)}</dd><dt>Anlamı</dt><dd>${t.anlam || ''}</dd>${t.tipik ? `<dt>Tipik değer</dt><dd>${kac(t.tipik)}</dd>` : ''}</dl>`;
       };
-      $$('.terim-list button', ic).forEach((b) => b.addEventListener('click', () => sec(+b.dataset.t)));
+      $$('.terim-list button', ic).forEach((x) => x.addEventListener('click', () => sec(+x.dataset.t)));
       if ((P.terimler || []).length) sec(0);
     } else if (parca === 'ispat') {
       const n = (P.adimlar || []).length;
-      ic.innerHTML = `${P.html || ''}<ol class="ispat">${P.adimlar.map((a, i) => `<li data-i="${i}" ${i >= ckAdim ? 'hidden' : ''}><div class="tex-blok" data-tex="${a.tex}"></div>${a.html || ''}</li>`).join('')}</ol><div class="kare-gez"><button type="button" class="dugme" id="isp-sonraki">Sonraki adım</button><button type="button" class="dugme ikincil" id="isp-hepsi">Hepsini göster</button><span class="yok" id="isp-say"></span></div>`;
+      ic.innerHTML = `${P.html || ''}<ol class="ispat">${P.adimlar.map((a, j) => `<li data-i="${j}" ${j >= ckAdim ? 'hidden' : ''}><div class="tex-blok" data-tex="${a.tex}"></div>${a.html || ''}</li>`).join('')}</ol><div class="kare-gez"><button type="button" class="dugme" id="isp-sonraki">Sonraki adım</button><button type="button" class="dugme ikincil" id="isp-hepsi">Hepsini göster</button><span class="yok" id="isp-say"></span></div>`;
       texDoldur(ic, K);
-      const guncel = (yeniLi) => { $$('ol.ispat li', ic).forEach((li, i) => { const ac = i < ckAdim; if (ac && li.hidden && yeniLi) li.classList.add('yeni'); li.hidden = !ac; }); $('#isp-say').textContent = `${Math.min(ckAdim, n)} / ${n}`; $('#isp-sonraki').hidden = $('#isp-hepsi').hidden = ckAdim >= n; };
+      const guncel = (yeniLi) => { $$('ol.ispat li', ic).forEach((li, j) => { const ac = j < ckAdim; if (ac && li.hidden && yeniLi) li.classList.add('yeni'); li.hidden = !ac; }); $('#isp-say').textContent = `${Math.min(ckAdim, n)} / ${n}`; $('#isp-sonraki').hidden = $('#isp-hepsi').hidden = ckAdim >= n; };
       $('#isp-sonraki').addEventListener('click', () => { ckAdim++; guncel(true); $$('ol.ispat li', ic)[ckAdim - 1]?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); });
       $('#isp-hepsi').addEventListener('click', () => { ckAdim = n; guncel(true); });
       guncel(false);
@@ -286,33 +538,160 @@
       if (P.modul) { ic.innerHTML = `<div class="sekil-kap" id="ck-sekil"></div>${P.html || ''}`; if (window.Anim[P.modul]) animTutucu = window.Anim[P.modul]($('#ck-sekil'), P.ayar || {}); buyutDugmesi(); }
       else if (P.kareler) {
         const n = P.kareler.length;
-        const kare = (i) => { ic.innerHTML = `${P.html || ''}<div class="kare-gez"><button type="button" class="kucuk" id="kr-geri" ${i === 0 ? 'disabled' : ''}>‹ Önceki</button><b>${i + 1} / ${n}</b><button type="button" class="dugme" id="kr-ileri" ${i === n - 1 ? 'disabled' : ''}>Sonraki ›</button></div><div class="sekil-kap" id="ck-sekil"></div>${P.kareler[i].html || ''}`; const kk = P.kareler[i]; if (window.Sekil[kk.sekil]) window.Sekil[kk.sekil]($('#ck-sekil'), kk.ayar || {}); buyutDugmesi(); $('#kr-geri').onclick = () => kare(i - 1); $('#kr-ileri').onclick = () => kare(i + 1); };
+        const kare = (j) => { ic.innerHTML = `${P.html || ''}<div class="kare-gez"><button type="button" class="kucuk" id="kr-geri" ${j === 0 ? 'disabled' : ''}>‹ Önceki</button><b>${j + 1} / ${n}</b><button type="button" class="dugme" id="kr-ileri" ${j === n - 1 ? 'disabled' : ''}>Sonraki ›</button></div><div class="sekil-kap" id="ck-sekil"></div>${P.kareler[j].html || ''}`; const kk = P.kareler[j]; if (window.Sekil[kk.sekil]) window.Sekil[kk.sekil]($('#ck-sekil'), kk.ayar || {}); buyutDugmesi(); $('#kr-geri').onclick = () => kare(j - 1); $('#kr-ileri').onclick = () => kare(j + 1); };
         kare(0);
       }
     } else if (parca === 'kod') {
       const sat = P.kod.split('\n');
-      ic.innerHTML = `${P.html || ''}<pre class="kod" style="border-radius:12px">${sat.map((s, i) => `<span class="sat" data-s="${i + 1}"><span class="no">${i + 1}</span>${kac(s)}</span>`).join('')}</pre><h3>Satır satır</h3><ol class="ispat" style="counter-reset:none">${(P.satirlar || []).map(([no, a]) => `<li data-s="${no}" style="cursor:pointer"><b>Satır ${no}:</b> ${kac(a)}</li>`).join('')}</ol>`;
-      $$('ol.ispat li', ic).forEach((li) => { li.style.setProperty('--x', 1); li.addEventListener('click', () => { $$('pre.kod .sat', ic).forEach((s) => s.classList.toggle('on', s.dataset.s === li.dataset.s)); }); });
+      ic.innerHTML = `${P.html || ''}<pre class="kod" style="border-radius:12px">${sat.map((x, j) => `<span class="sat" data-s="${j + 1}"><span class="no">${j + 1}</span>${kac(x)}</span>`).join('')}</pre><h3>Satır satır</h3><ol class="ispat" style="counter-reset:none">${(P.satirlar || []).map(([no, a]) => `<li data-s="${no}" style="cursor:pointer"><b>Satır ${no}:</b> ${kac(a)}</li>`).join('')}</ol>`;
+      $$('ol.ispat li', ic).forEach((li) => { li.style.setProperty('--x', 1); li.addEventListener('click', () => { $$('pre.kod .sat', ic).forEach((x) => x.classList.toggle('on', x.dataset.s === li.dataset.s)); }); });
       $$('ol.ispat li', ic).forEach((li) => li.classList.add('kod-satir'));
     } else if (parca === 'sorular') {
-      ic.innerHTML = `<p>Bu kavramın geçtiği sorular (PDF sayfasıyla):</p><div class="ilgili">${k.sorular.map((s) => `<a class="soru-bag" href="#${K.id}/${s}">${s} · ${kac(K.sorular[s]?.baslik)} <span class="yok">s. ${K.sorular[s]?.pdf_soru ?? '—'}</span></a>`).join('')}</div>`;
+      ic.innerHTML = `<p>Bu kavramın geçtiği sorular (PDF sayfasıyla). Dokun: ana sayfada o soru açılır.</p><div class="ilgili">${k.sorular.map((x) => soruCip(K, x, true)).join('')}</div>`;
     }
     if ((k.dis || []).length) ic.insertAdjacentHTML('beforeend', `<h3>Akademi'de etkileşimli hâli</h3><div class="ilgili">${k.dis.map((d) => `<a class="soru-bag" href="${kac(d.url)}" target="_blank" rel="noopener">${kac(d.ad)} ↗</a>`).join('')}</div>`);
     const bag = (k.bag || []).map((id) => kavramBul(K, id)).filter(Boolean);
-    if (bag.length) ic.insertAdjacentHTML('beforeend', `<h3>İlgili kavramlar</h3><div class="ilgili">${bag.map((b) => `<button type="button" data-git="#${K.id}/${qid ? qid + '/' : ''}k/${b.id}/tanim">${kac(b.sembol)} · ${kac(b.ad)}</button>`).join('')}</div>`);
+    if (bag.length) ic.insertAdjacentHTML('beforeend', `<h3>İlgili kavramlar</h3><div class="ilgili">${bag.map((x) => ckBag(`${x.id}/tanim`, `${kac(x.sembol)} · ${kac(x.ad)}`, 'soru-bag')).join('')}</div>`);
+    if (D && parca !== 'dil') ic.insertAdjacentHTML('beforeend', `<p class="dil-cagri">${ckBag(`${k.id}/dil`, 'TR ↔ EN: bu kavramın İngilizcesi, karşılaştırma ve sınav kalıpları →', 'soru-bag')}</p>`);
     $$('[data-tex]', ic).length && texDoldur(ic, K);
-    if (yeni) ic.scrollTop = 0;
-    $('#ck-geri').disabled = history.length <= 1;
-    (yeni ? $('#ck-don') : null)?.focus({ preventScroll: true });
   }
+
+  /* --- aç / kapat / yönlendir --- */
+  function cekmeceKapat() {
+    if (animTutucu && animTutucu.dur) animTutucu.dur(); animTutucu = null;
+    ipKapat(); araKapat();
+    ck.hidden = true; perde.hidden = true; ck.setAttribute('aria-hidden', 'true'); ckDurum = null; document.body.classList.remove('ck-acik');
+  }
+  function ckGoster(K, kPart, onEk) {
+    const ilk = !ckDurum, ayni = !ilk && ckDurum.K === K && ckDurum.kPart === kPart;
+    const qm = /^[^/]+\/(S\d+)(?:\/|$)/.exec(onEk), qid = qm ? qm[1] : null;
+    ckDurum = { K, kPart, onEk, qid };
+    ck.hidden = false; perde.hidden = true; ck.setAttribute('aria-hidden', 'false'); document.body.classList.add('ck-acik');
+    const don = $('#ck-don');
+    don.textContent = qid ? `← ${yonelme(qid)} dön` : /\/bol\//.test(onEk) ? '← Bölüme dön' : '← Kitaba dön';
+    don.onclick = () => { location.hash = `#${onEk}`; };
+    $('#ck-geri').disabled = history.length <= 1;
+    sabitYaz();
+    if (!ayni) { if (animTutucu && animTutucu.dur) animTutucu.dur(); animTutucu = null; ipKapat(); araKapat(); }
+    const [bas, ...kalan] = kPart.split('/');
+    if (bas === '_atlas') atlasCk(K, ayni);
+    else if (bas === '_bol') bolumCk(K, kalan[0], ayni);
+    else if (bas === '_sozluk') sozlukCk(K, kalan.join('/'), ayni);
+    else kavramCk(K, bas, kalan[0] || 'tanim', ayni);
+    if (ayni) { $$('[data-soru]', ckIc).forEach((a) => { const on = a.dataset.soru === qid; a.classList.toggle('simdi', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); }); return; }
+    krKur(ckIc);
+    ipucuEkle(ckIc, K);
+    ckIc.scrollTop = 0;
+    if (ilk) don.focus({ preventScroll: true });
+    else if (!document.activeElement || document.activeElement === document.body || !document.activeElement.isConnected) $('#ck-baslik').focus({ preventScroll: true });
+  }
+  // ana sayfaya giden bağ: çekmece açık kalsın mı? (geniş ekranda Sabitle; dar ekranda çekmeceden basılan bağ)
+  function anaGit(hedef, icten) {
+    if (ckDurum && (ckGenis() ? sabit : !!icten)) location.hash = `${hedef}/k/${ckDurum.kPart}`;
+    else location.hash = hedef;
+  }
+  document.addEventListener('click', (e) => {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const t = e.target.closest('[data-ck],[data-soru],[data-ana]');
+    if (t && ckDurum) {
+      e.preventDefault();
+      if (t.dataset.ck) location.hash = `#${ckDurum.onEk}/k/${t.dataset.ck}`;
+      else anaGit(`#${ckDurum.K.id}/${t.dataset.soru || t.dataset.ana}`, true);
+      return;
+    }
+    if (!ckDurum || !ckGenis() || !sabit) return;
+    const a = e.target.closest('a[href^="#"]');
+    if (!a || ck.contains(a) || ipKart.contains(a)) return;
+    const h = a.getAttribute('href'), kid = ckDurum.K.id;
+    if (h.includes('/k/') || !(h === `#${kid}` || h.startsWith(`#${kid}/`))) return;
+    e.preventDefault(); location.hash = `${h}/k/${ckDurum.kPart}`;
+  });
+  // ‹ › kavram komşusu (atlas sırası); aynı parça varsa orada kalır
+  function kavramKomsu(yon) {
+    if (!ckDurum) return null;
+    const [bas, p = 'tanim'] = ckDurum.kPart.split('/'), K = ckDurum.K, L = K.kavramlar || [];
+    const i = L.findIndex((k) => k.id === bas); if (i < 0) return null;
+    const k = L[i + yon]; if (!k) return null;
+    return `${k.id}/${parcaVar(K, k, p) ? p : 'tanim'}`;
+  }
+
+  /* --- Sabitle + genişlik (kenardan sürükle; 360 px – 60 vw; hatırlanır) --- */
+  const sabitBtn = $('#ck-sabit');
+  function sabitYaz() { sabitBtn.setAttribute('aria-pressed', String(sabit)); sabitBtn.title = sabit ? 'Sabit: soru değişince çekmece açık kalır. Dokun: soruya geçince kapansın.' : 'Sabitle: soru değişince çekmece açık kalsın.'; }
+  sabitBtn.addEventListener('click', () => { sabit = !sabit; sakla('dk:sabit', sabit ? '1' : '0'); sabitYaz(); });
+  const tutamak = $('#ck-tutamak');
+  let ckGen = +oku('dk:ckgen') || 0;
+  const genSinir = (g) => Math.round(Math.max(360, Math.min(innerWidth * 0.6, g)));
+  function genUygula() { if (ckGen) document.documentElement.style.setProperty('--ck-gen', `${genSinir(ckGen)}px`); else document.documentElement.style.removeProperty('--ck-gen'); }
+  genUygula();
+  addEventListener('resize', genUygula, { passive: true });
+  tutamak.addEventListener('pointerdown', (e) => { if (!ckGenis()) return; e.preventDefault(); tutamak.setPointerCapture(e.pointerId); document.body.classList.add('ck-surukle'); });
+  tutamak.addEventListener('pointermove', (e) => { if (!tutamak.hasPointerCapture(e.pointerId)) return; ckGen = document.documentElement.clientWidth - e.clientX; genUygula(); });
+  const surBit = (e) => { if (tutamak.hasPointerCapture(e.pointerId)) tutamak.releasePointerCapture(e.pointerId); document.body.classList.remove('ck-surukle'); if (ckGen) { ckGen = genSinir(ckGen); sakla('dk:ckgen', String(ckGen)); } };
+  tutamak.addEventListener('pointerup', surBit); tutamak.addEventListener('pointercancel', surBit);
+  tutamak.addEventListener('dblclick', () => { ckGen = 0; genUygula(); sakla('dk:ckgen', ''); });
+  tutamak.addEventListener('keydown', (e) => { if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return; e.preventDefault(); ckGen = genSinir((ckGen || ck.getBoundingClientRect().width) + (e.key === 'ArrowLeft' ? 40 : -40)); genUygula(); sakla('dk:ckgen', String(ckGen)); });
+
+  /* --- süzgeç: yazdıkça süzer (Türkçe harf ve boşluk duyarsız; TR, EN, sembol); ↑ ↓ Enter; Esc temizler --- */
+  const araInp = $('#ck-ara'), araSonuc = $('#ck-sonuc');
+  let araDizin = null, araKitap = null, araSec = 0, araListe = [];
+  function araDizinKur(K) {
+    if (araKitap === K && araDizin) return araDizin;
+    araKitap = K; araDizin = [];
+    const ekle = (o) => araDizin.push({ ...o, n: norm(o.n) });
+    ekle({ t: 'Atlas', ad: `${K.kod} · kavram atlası`, ck: '_atlas', n: `atlas kavram atlası ${K.kod} ${K.ad}` });
+    ekle({ t: 'Sözlük', ad: `Sözlük · ${(K.sozluk || []).length} terim`, ck: '_sozluk', n: 'sözlük glossary terimler tr en' });
+    K.bolumler.filter((b) => bolumDolu(K, b)).forEach((b) => ekle({ t: 'Bölüm', ad: bolumAd(K, b), ck: `_bol/${b.id}`, n: `${bolumAd(K, b)} ${b.ad}` }));
+    (K.kavramlar || []).forEach((k) => ekle({ t: 'Kavram', ad: `${k.sembol} · ${k.ad}`, alt: k.en, ck: `${k.id}/tanim`, n: `${k.ad} ${k.en || ''} ${k.sembol} ${k.id}` }));
+    (K.sozluk || []).forEach((s) => ekle({ t: 'Terim', ad: s.en, alt: s.tr, ck: `_sozluk/${s.en}`, n: `${s.en} ${s.tr}` }));
+    (K.kavramlar || []).forEach((k) => (dilK(K, k.id)?.terim || []).forEach((t) => ekle({ t: 'TR↔EN', ad: t.en, alt: `${t.tr} · ${k.ad}`, ck: `${k.id}/dil`, n: `${t.en} ${t.tr}` })));
+    soruSirasi(K).forEach((q) => ekle({ t: 'Soru', ad: `${q.id} · ${q.baslik}`, alt: `PDF s. ${q.pdf_soru ?? '—'}`, soru: q.id, n: `${q.id} ${q.baslik}` }));
+    return araDizin;
+  }
+  function araKapat() { if (!araSonuc) return; araSonuc.hidden = true; araInp.setAttribute('aria-expanded', 'false'); araInp.removeAttribute('aria-activedescendant'); araListe = []; }
+  function araYaz() {
+    $$('.ck-s', araSonuc).forEach((x, i) => { x.setAttribute('aria-selected', String(i === araSec)); if (i === araSec) { araInp.setAttribute('aria-activedescendant', x.id); x.scrollIntoView({ block: 'nearest' }); } });
+  }
+  function araSuz() {
+    const q = norm(araInp.value);
+    if (!q || !ckDurum) { araKapat(); return; }
+    const goruldu = new Set();
+    araListe = araDizinKur(ckDurum.K).map((o) => ({ o, p: o.n.startsWith(q) ? 0 : o.n.includes(q) ? 1 : 9 })).filter((x) => x.p < 9)
+      .sort((a, b) => a.p - b.p).map((x) => x.o).filter((o) => { const a = o.ck || o.soru; if (goruldu.has(a + o.ad)) return false; goruldu.add(a + o.ad); return true; }).slice(0, 14);
+    araSec = 0;
+    araSonuc.innerHTML = araListe.length ? araListe.map((o, i) => `<div class="ck-s" role="option" id="ck-s-${i}" data-i="${i}" aria-selected="false"><span class="t">${kac(o.t)}</span><span class="a">${kac(o.ad)}</span>${o.alt ? `<span class="b">${kac(o.alt)}</span>` : ''}</div>`).join('') : '<p class="yok ck-s-yok">Eşleşen yok. Başka bir yazımı dene (Türkçe harf gerekmez).</p>';
+    araSonuc.hidden = false; araInp.setAttribute('aria-expanded', 'true'); araYaz();
+  }
+  function araGit(o) {
+    if (!o || !ckDurum) return;
+    araInp.value = ''; araKapat();
+    if (o.soru) anaGit(`#${ckDurum.K.id}/${o.soru}`, true); else location.hash = `#${ckDurum.onEk}/k/${o.ck}`;
+  }
+  araInp.addEventListener('input', araSuz);
+  araInp.addEventListener('focus', () => { if (araInp.value) araSuz(); });
+  araInp.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { if (!araListe.length) return; e.preventDefault(); araSec = (araSec + (e.key === 'ArrowDown' ? 1 : -1) + araListe.length) % araListe.length; araYaz(); }
+    else if (e.key === 'Enter') { e.preventDefault(); araGit(araListe[araSec]); }
+    else if (e.key === 'Escape') { if (araInp.value || !araSonuc.hidden) { e.preventDefault(); e.stopPropagation(); araInp.value = ''; araKapat(); } }
+  });
+  araSonuc.addEventListener('mousedown', (e) => e.preventDefault());
+  araSonuc.addEventListener('click', (e) => { const x = e.target.closest('.ck-s'); if (x) araGit(araListe[+x.dataset.i]); });
+  document.addEventListener('click', (e) => { if (!araSonuc.hidden && !e.target.closest('.ck-ust')) araKapat(); });
+
   $('#ck-geri').addEventListener('click', () => history.back());
   $('#ck-ileri').addEventListener('click', () => history.forward());
-  perde.addEventListener('click', () => { if (ckDurum) location.hash = ckDurum.qid ? location.hash.split('/k/')[0] : location.hash.split('/k/')[0]; });
   document.addEventListener('click', (e) => { const b = e.target.closest('[data-git]'); if (b) { e.preventDefault(); location.hash = b.dataset.git; } });
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && ckDurum) { location.hash = location.hash.split('/k/')[0]; return; }
-    if (/INPUT|TEXTAREA/.test(document.activeElement?.tagName) || ckDurum) return;
-    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { const a = $(`.takip .sag a:${e.key === 'ArrowLeft' ? 'first-of-type' : 'nth-last-of-type(2)'}`); if (a && a.textContent.trim().match(e.key === 'ArrowLeft' ? /^‹/ : /›$/)) location.hash = a.getAttribute('href'); }
+    const yaziyor = /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName);
+    if (e.key === 'Escape') {
+      if (ipAcik()) { const h = ipHedef; ipKapat(); h?.focus?.(); return; }
+      if (ckDurum) { location.hash = `#${ckDurum.onEk}`; return; }
+    }
+    if (yaziyor) return;
+    if (ckDurum && (e.key === '[' || e.key === ']') && !e.metaKey) { const kp = kavramKomsu(e.key === ']' ? 1 : -1); if (kp) { e.preventDefault(); location.hash = `#${ckDurum.onEk}/k/${kp}`; } return; }
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    if (ckDurum && (!ckGenis() || ck.contains(document.activeElement))) return;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { const a = $(`.takip .sag a:${e.key === 'ArrowLeft' ? 'first-of-type' : 'nth-last-of-type(2)'}`); if (a && a.textContent.trim().match(e.key === 'ArrowLeft' ? /^‹/ : /›$/)) anaGit(a.getAttribute('href')); }
   });
 
   /* ---------- tam ekran: sade okuma, tek ince üst şerit ---------- */
@@ -369,7 +748,7 @@
     const b = e.target.closest('[data-k]'); if (!b) return;
     const k = b.dataset.k;
     if (k === 'ic') icCevir();
-    else if (k === 'once' || k === 'sonra') { const a = takipBag(k === 'once' ? -1 : 1); if (a) location.hash = a.getAttribute('href'); }
+    else if (k === 'once' || k === 'sonra') { const a = takipBag(k === 'once' ? -1 : 1); if (a) anaGit(a.getAttribute('href')); }
     else if (k === 'kapat') tamKapat();
     else if (k === 'kalem' && kalem()) kalem().cevir();
     hudGoster();
@@ -416,6 +795,7 @@
     if (!kitapId) { cekmeceKapat(); sonSayfa = ''; return kitaplik(); }
     let K;
     try { K = await yukle(kitapId); } catch (e) { ana.innerHTML = `<p>Bu kitap bulunamadı. <a href="#">Kitaplığa dön</a></p>`; return; }
+    simdiK = K;
     const sayfa = onEk;
     if (sayfa !== sonSayfa) {
       sonSayfa = sayfa;
@@ -427,12 +807,12 @@
         soruGoster(K, K.sorular[sid] || soruSirasi(K)[0]);
         if (am || parca[2] === 'yol' || parca[2] === 'oz') {
           const hedef = $(am ? `#a${am[1]}` : parca[2] === 'oz' ? ($('#oz') ? '#oz' : '#yol') : '#yol');
-          if (hedef) { hedef.classList.add('vurgu'); setTimeout(() => hedef.scrollIntoView({ block: 'start', behavior: 'smooth' }), 60); sonSayfa = sayfa; return kPart ? cekmeceAc(K, ...kPart.split('/').slice(0, 2), parca[1]) : cekmeceKapat(); }
+          if (hedef) { hedef.classList.add('vurgu'); setTimeout(() => hedef.scrollIntoView({ block: 'start', behavior: 'smooth' }), 60); sonSayfa = sayfa; return kPart ? ckGoster(K, kPart, onEk) : cekmeceKapat(); }
         }
       }
       window.scrollTo({ top: 0 });
     }
-    if (kPart) { const [kid, p] = kPart.split('/'); cekmeceAc(K, kid, p || 'tanim', parca[1] && parca[1].startsWith('S') ? parca[1] : null); }
+    if (kPart) ckGoster(K, kPart, onEk);
     else cekmeceKapat();
   }
   window.addEventListener('hashchange', yonlendir);
