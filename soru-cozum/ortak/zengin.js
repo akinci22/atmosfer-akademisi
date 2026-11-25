@@ -7,10 +7,17 @@
   const KATEX = 'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/';
   const KANAL_AD = { test: 'Mini test', dy: 'Doğru / Yanlış', sayisal: 'Sayısal', yorum: 'Sonucu yorumla', fark: 'Kavram farkı', terim: 'Formül terimi', bosluk: 'Boşluk doldur', esle: 'Eşleştir', sirala: 'Sırala' };
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const al = (u) => fetch(u, { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
   const liste = (v) => (Array.isArray(v) ? v : v ? [v] : []);
+  // 25 Kas: «Sınav için» blokları parolalı — zengin.json.kilit / banka.json.kilit yalnız saklanan anahtarla çözülür
+  // (anahtar sınav atölyesinde ya da Defterler'de parola yazılınca saklanır). Anahtar yoksa hiçbir şey çizilmez, parola sorulmaz.
+  const KILIT_JS = new URL('kilit-ortak.js', d.currentScript ? d.currentScript.src : location.href).href;
+  const kilitAl = () => (window.akKilit ? Promise.resolve(window.akKilit) : new Promise((ok, no) => {
+    const s = d.createElement('script'); s.src = KILIT_JS; s.onload = () => ok(window.akKilit); s.onerror = no; d.head.appendChild(s);
+  }));
 
-  Promise.all([al('zengin.json'), al('banka.json')]).then(([z, b]) => { if (z && typeof z === 'object') kur(z, b || {}); });
+  kilitAl().then((K) => Promise.all([K.jsonAl('zengin.json.kilit'), K.jsonAl('banka.json.kilit')]))
+    .then(([z, b]) => { if (z && typeof z === 'object') kur(z, b || {}); })
+    .catch(() => { /* kilit dosyası yok ya da çözülemedi: blok yok */ });
 
   let katexSoz = null;
   function katexYukle() {

@@ -6,6 +6,11 @@
   const d = document;
   const kok = d.getElementById('sinav');
   if (!kok) return;
+  // 25 Kas: atölye parolalı — banka.json.kilit ortak/kilit-ortak.js ile çözülür (anahtar Defterler kilidiyle ortak).
+  const KILIT_JS = new URL('kilit-ortak.js', d.currentScript ? d.currentScript.src : location.href).href;
+  const kilitAl = () => (window.akKilit ? Promise.resolve(window.akKilit) : new Promise((ok, no) => {
+    const s = d.createElement('script'); s.src = KILIT_JS; s.onload = () => ok(window.akKilit); s.onerror = no; d.head.appendChild(s);
+  }));
 
   const KANAL_SIRA = ['test', 'dy', 'sayisal', 'yorum', 'fark', 'terim', 'bosluk', 'esle', 'sirala'];
   const KANAL_AD = { test: 'Mini test', dy: 'Doğru / Yanlış', sayisal: 'Sayısal', yorum: 'Sonucu yorumla', fark: 'Kavram farkı', terim: 'Formül terimi', bosluk: 'Boşluk doldur', esle: 'Eşleştir', sirala: 'Sırala' };
@@ -171,8 +176,9 @@
   const S = { mod: 'pratik', kanal: 'hepsi', konu: 'hepsi', zorluk: 0, liste: [], i: 0, oturum: { d: 0, y: 0 }, deneme: null, atlas: { f: null, t: null }, ayar: { n: 20, sure: 30 } };
 
   kok.innerHTML = '<p class="sv-yukle">Sorular hazırlanıyor…</p>';
-  fetch(kok.dataset.banka || '../banka.json', { cache: 'no-cache' })
-    .then((r) => { if (!r.ok) throw new Error('banka ' + r.status); return r.json(); })
+  kilitAl()
+    .then((K) => K.jsonAl((kok.dataset.banka || '../banka.json') + '.kilit', { iste: true, ad: 'Sınav atölyesi', geri: '../../', geriAd: 'Soru çözümlerine dön' }))
+    .then((b) => { if (!b) throw new Error('banka açılamadı'); return b; })
     .then(basla)
     .catch((e) => { kok.innerHTML = '<p class="sv-hata-m">Soru bankası açılamadı. Sayfayı yenile ya da biraz sonra yeniden dene.</p>'; if (window.console) console.warn(e); });
 
