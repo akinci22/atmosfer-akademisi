@@ -533,3 +533,19 @@ table.hs-kt{width:100%;font-size:15px;font-variant-numeric:tabular-nums}
   .cekmece.ck-dar .ck-dar-sekme{display:inline;color:var(--acc);font-weight:600;margin-left:.2em}
   .cekmece.ck-dar #ck-baslik::after{content:"▴";position:absolute;right:18px;top:50%;transform:translateY(-50%);color:var(--ikincil);font-size:14px}
 }
+/* kavram ağı */
+.ag-gir{margin:4px 0 10px}
+.ag-kap{position:static}
+.ag-svg{display:block;width:100%;height:auto;max-height:70svh}
+.ag-k{fill:none;stroke:var(--cizgi);stroke-width:1.6;transition:opacity .2s}
+.ag-k.on{stroke:var(--acc);stroke-width:3}
+.ag-k.sonuk,.ag-d.sonuk{opacity:.25}
+.ag-d{cursor:pointer;outline:none;transition:opacity .2s}
+.ag-vur{fill:transparent}
+.ag-n{stroke:var(--zemin);stroke-width:2}
+.ag-d text{font:600 13px Inter,system-ui,sans-serif;fill:var(--yazi)}
+.ag-d.on text{fill:var(--acc)}
+.ag-d.on .ag-n,.ag-d:focus-visible .ag-n{stroke:var(--yazi);stroke-width:3}
+.ag-alt{min-height:1.6em;font-weight:600;margin:.5em 0}
+.ag-lejant{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:14px;color:var(--ikincil)}
+.ag-lejant i{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-1px}

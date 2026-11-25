@@ -152,7 +152,7 @@
       const kel = [...tr.keys()].sort((a, b) => b.length - a.length).map((e) => e.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
       ipRx = { rx: new RegExp(`(?<![\\p{L}\\p{N}])(${kel.join('|')})(?![\\p{L}\\p{N}])`, 'giu'), tr };
     }
-    const w = document.createTreeWalker(kok, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.parentElement.closest('svg,button,code,pre,.en-ip,summary,.dizin,.takip,a,.es,.kr,.dil-terim,.ip-kart,.sz-kart,.kendin,.hs,.dg,.tk-bas,.tk-denk,.soru-ek') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
+    const w = document.createTreeWalker(kok, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.parentElement.closest('svg,button,code,pre,.en-ip,summary,.dizin,.takip,a,.es,.kr,.dil-terim,.ip-kart,.sz-kart,.kendin,.hs,.dg,.tk-bas,.tk-denk,.soru-ek,.ag-lejant') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
     const dugumler = []; while (w.nextNode()) dugumler.push(w.currentNode);
     for (const d of dugumler) {
       const t = d.nodeValue; ipRx.rx.lastIndex = 0;
@@ -427,7 +427,7 @@
     $('#kirinti').innerHTML = [[kac(K.kod), '_atlas'], ...parcalar].map(([ad, kp]) => (kp ? ckBag(kp, ad) : `<span>${ad}</span>`)).join(' <span class="ayrac" aria-hidden="true">›</span> ');
   }
   const siraHTML = (o, orta, s) => `${o ? ckBag(o[0], `‹ <span class="sira-ad">${o[1]}</span>`, 'sira-bag') : '<span class="sira-bos"></span>'}<span class="sira-orta yok">${orta}</span>${s ? ckBag(s[0], `<span class="sira-ad">${s[1]}</span> ›`, 'sira-bag sag') : '<span class="sira-bos"></span>'}`;
-  const ustSekme = (K, sec) => [['_atlas', 'Atlas', 'atlas'], ...(turlar(K).length ? [['_tur', 'Türler', 'tur']] : []), ...(tepkimeler(K).length ? [['_tepkime', 'Tepkimeler', 'tepkime']] : []), ...(donguler(K).length ? [['_dongu', 'Çevrimler', 'dongu']] : []), ...(HS(K).length ? [['_hesap', 'Hesap', 'hesap']] : []), ['_sozluk', `Sözlük (${(K.sozluk || []).length})`, 'sozluk']].map(([kp, ad, id]) => `<button type="button" role="tab" aria-selected="${sec === id}" data-ck="${kp}">${ad}</button>`).join('');
+  const ustSekme = (K, sec) => [['_atlas', 'Atlas', 'atlas'], ...((K.kavramlar || []).length > 1 ? [['_ag', 'Ağ', 'ag']] : []), ...(turlar(K).length ? [['_tur', 'Türler', 'tur']] : []), ...(tepkimeler(K).length ? [['_tepkime', 'Tepkimeler', 'tepkime']] : []), ...(donguler(K).length ? [['_dongu', 'Çevrimler', 'dongu']] : []), ...(HS(K).length ? [['_hesap', 'Hesap', 'hesap']] : []), ['_sozluk', `Sözlük (${(K.sozluk || []).length})`, 'sozluk']].map(([kp, ad, id]) => `<button type="button" role="tab" aria-selected="${sec === id}" data-ck="${kp}">${ad}</button>`).join('');
   function soruCip(K, sid, uzun) {
     const q = K.sorular[sid]; if (!q) return '';
     const simdi = ckDurum && ckDurum.qid === sid, s = simdi ? ' simdi' : '', ac = simdi ? ' aria-current="page"' : '';
@@ -997,9 +997,9 @@
   }
   // atlasın üstünde giriş kutuları (yalnız kimya / hesap verisi olan kitapta)
   function atlasGirisHTML(K) {
-    if (!turlar(K).length && !tepkimeler(K).length && !donguler(K).length && !HS(K).length) return '';
+    if (!turlar(K).length && !tepkimeler(K).length && !donguler(K).length && !HS(K).length) return (K.kavramlar || []).length > 1 ? `<p class="ag-gir">${ckBag('_ag', 'Kavram ağı: bütün kavramlar ve aralarındaki bağlar tek çizimde →', 'soru-bag')}</p>` : '';
     const kutu = (kp, ad, n, alt) => ckBag(kp, `<b>${ad}</b><span class="say">${n}</span><span class="at-alt">${alt}</span>`, 'at-kutu');
-    return `<div class="at-giris">${[turlar(K).length && kutu('_tur', 'Türler', turlar(K).length, 'formül · ad · ömür · tepkimeler'), tepkimeler(K).length && kutu('_tepkime', 'Tepkimeler', tepkimeler(K).length, 'tipe ve aileye göre'), donguler(K).length && kutu('_dongu', 'Çevrimler', donguler(K).length, 'adım adım çizim'), HS(K).length && kutu('_hesap', 'Hesap laboratuvarı', HS(K).length, 'sürgüyle hesapla, kitapla karşılaştır'), (K.sozluk || []).length && kutu('_sozluk', 'Sözlük', K.sozluk.length, 'TR ↔ EN terimler')].filter(Boolean).join('')}</div>`;
+    return `<div class="at-giris">${[turlar(K).length && kutu('_tur', 'Türler', turlar(K).length, 'formül · ad · ömür · tepkimeler'), tepkimeler(K).length && kutu('_tepkime', 'Tepkimeler', tepkimeler(K).length, 'tipe ve aileye göre'), donguler(K).length && kutu('_dongu', 'Çevrimler', donguler(K).length, 'adım adım çizim'), HS(K).length && kutu('_hesap', 'Hesap laboratuvarı', HS(K).length, 'sürgüyle hesapla, kitapla karşılaştır'), (K.kavramlar || []).length > 1 && kutu('_ag', 'Kavram ağı', K.kavramlar.length, 'kavramlar arası bağlar'), (K.sozluk || []).length && kutu('_sozluk', 'Sözlük', K.sozluk.length, 'TR ↔ EN terimler')].filter(Boolean).join('')}</div>`;
   }
   // soru sayfası: «Bu soruda: O₃ · NO» tür çipleri + «Hesapla» düğmeleri (çekmeceyi açar; ana sayfa yerinde kalır)
   function soruEkEkle(K, q) {
@@ -1007,6 +1007,47 @@
     if ((!T.length && !H2.length) || !govde) return;
     const taban = `#${K.id}/${q.id}/k/`;
     govde.insertAdjacentHTML('afterend', `<div class="soru-ek">${T.length ? `<p class="soru-ek-sat"><span class="yok">Bu soruda:</span> ${T.map((t) => `<button type="button" class="tur-cip" data-git="${kac(taban + '_tur/' + t.id)}" title="${kac(iki(t.ad).tr)} · ${kac(iki(t.ad).en)}"><span class="f">${kac(t.f)}</span><span class="ad">${kac(iki(t.ad).tr)}</span></button>`).join('')}</p>` : ''}${H2.length ? `<p class="soru-ek-sat"><span class="yok">Hesapla:</span> ${H2.map((h) => { const n = (h.hazir || []).findIndex((z) => z.soru === q.id); return `<button type="button" class="kucuk hs-ac" data-git="${kac(taban + '_hesap/' + h.id + (n >= 0 ? '/' + n : ''))}">${kac(iki(h.ad).tr)}${n >= 0 ? ` · ${kac(q.id)} değerleri` : ''}</button>`; }).join('')}</p>` : ''}</div>`);
+  }
+  /* --- kavram ağı (_ag, beş kitap): düğüm = kavram (bölüm rengi), çizgi = «bag»; dokun → kavram; imleç / odak → komşular parlar --- */
+  const AG = new Map(), AG_RENK = ['--es0', '--es1', '--es2', '--es3', '--es4', '--es5', '--tur', '--yesil', '--acc'];
+  function agYerlesim(K) {
+    if (AG.has(K.id)) return AG.get(K.id);
+    // bölüm halkası: kavramlar atlas sırasıyla çember üstünde (bölümler arasında bir boşluk), etiketler dışa doğru
+    const L = K.kavramlar || [], n = L.length, W = 660, H = 660, R = 196, bolIds = [...new Set(L.map((k) => k.bolum))];
+    const ix = new Map(L.map((k, i) => [k.id, i])), yuva = n + bolIds.length;
+    let b0 = null, kay = 0;
+    const P = L.map((k, i) => { if (k.bolum !== b0) { if (b0 !== null) kay++; b0 = k.bolum; } const a = -Math.PI / 2 + (2 * Math.PI * (i + kay)) / yuva; return { x: W / 2 + R * Math.cos(a), y: H / 2 + R * Math.sin(a), a }; });
+    const E = [], g = new Set();
+    L.forEach((k, i) => (k.bag || []).forEach((x) => { const j = ix.get(x); if (j == null || j === i) return; const a = `${Math.min(i, j)}-${Math.max(i, j)}`; if (!g.has(a)) { g.add(a); E.push([Math.min(i, j), Math.max(i, j)]); } }));
+    const y = { P, E, bolIds, W, H, R }; AG.set(K.id, y); return y;
+  }
+  // etiket: düğümün dışında, yarıçap doğrultusunda; sol yarıda ters çevrilip sağa yaslanır (okunur kalır)
+  const agEtiket = (p, R, W, H, metin) => {
+    const sol = Math.cos(p.a) < 0, d = (p.a * 180) / Math.PI + (sol ? 180 : 0), x = W / 2 + (R + 15) * Math.cos(p.a), y = H / 2 + (R + 15) * Math.sin(p.a);
+    return `<text x="${f1(x)}" y="${f1(y)}" text-anchor="${sol ? 'end' : 'start'}" dominant-baseline="central" transform="rotate(${f1(d)} ${f1(x)} ${f1(y)})">${kac(metin)}</text>`;
+  };
+  function agCk(K, ayni) {
+    const L = K.kavramlar || [];
+    kirintiYaz(K, [['Kavram ağı', null]]);
+    $('#ck-baslik').innerHTML = `Kavram ağı<small>${L.length} kavram · çizgi = ilgili kavram · renk = bölüm</small>`;
+    $('#ck-sira').innerHTML = ''; $('#ck-sekme').innerHTML = ustSekme(K, 'ag');
+    if (ayni) return;
+    if (L.length < 2) { ckIc.innerHTML = '<p class="yok">Bu kitabın kavram atlası hazırlanıyor.</p>'; return; }
+    const { P, E, bolIds, W, H, R } = agYerlesim(K), renk = (b) => `var(${AG_RENK[Math.max(0, bolIds.indexOf(b)) % AG_RENK.length]})`;
+    const kisa = (x) => { const t = String(x || '').replace(/\s*\(.*?\)\s*/g, ' ').trim(); return t.length > 17 ? `${t.slice(0, 16).trim()}…` : t; };
+    ckIc.innerHTML = `<p class="ck-not">Bir kavrama dokun: açılır. İmleci getir ya da sekmeyle odakla: bağlı kavramlar parlar.</p><div class="sekil-kap ag-kap" id="ck-sekil"><svg class="ag-svg" viewBox="0 0 ${W} ${H}" role="group" aria-label="Kavram ağı">${E.map(([i, j]) => { const mx = (P[i].x + P[j].x) / 2, my = (P[i].y + P[j].y) / 2, cx = W / 2 + (mx - W / 2) * 0.3, cy = H / 2 + (my - H / 2) * 0.3; return `<path class="ag-k" data-a="${i}" data-b="${j}" d="M${f1(P[i].x)} ${f1(P[i].y)} Q${f1(cx)} ${f1(cy)} ${f1(P[j].x)} ${f1(P[j].y)}"/>`; }).join('')}${L.map((k, i) => `<g class="ag-d" data-i="${i}" data-ck="${kac(k.id)}/tanim" role="link" tabindex="0" aria-label="${kac(`${k.ad} (kavram)`)}"><circle class="ag-vur" cx="${f1(P[i].x)}" cy="${f1(P[i].y)}" r="24"/><circle class="ag-n" cx="${f1(P[i].x)}" cy="${f1(P[i].y)}" r="9" style="fill:${renk(k.bolum)}"/>${agEtiket(P[i], R, W, H, kisa(k.ad))}</g>`).join('')}</svg></div><p class="ag-alt" aria-live="polite"></p><div class="ag-lejant">${bolIds.map((b) => { const bo = K.bolumler.find((x) => x.id === b); return `<span><i style="background:${renk(b)}"></i>${kac(bo ? bolumAd(K, bo) : b)}</span>`; }).join('')}</div>`;
+    buyutDugmesi();
+    const svg = $('.ag-svg', ckIc), alt = $('.ag-alt', ckIc);
+    const yak = (i) => {
+      const s = i == null ? null : new Set([i, ...E.filter(([a, b]) => a === i || b === i).flatMap((x) => x)]);
+      $$('.ag-d', svg).forEach((g) => { const j = +g.dataset.i; g.classList.toggle('on', !!s && s.has(j)); g.classList.toggle('sonuk', !!s && !s.has(j)); });
+      $$('.ag-k', svg).forEach((l) => { const on = !!s && (+l.dataset.a === i || +l.dataset.b === i); l.classList.toggle('on', on); l.classList.toggle('sonuk', !!s && !on); });
+      alt.textContent = i == null ? '' : `${L[i].sembol} · ${L[i].ad} — ${s.size - 1} bağlı kavram`;
+    };
+    svg.addEventListener('pointerover', (e) => { const g = e.target.closest('.ag-d'); if (g) yak(+g.dataset.i); });
+    svg.addEventListener('pointerleave', () => yak(null));
+    svg.addEventListener('focusin', (e) => { const g = e.target.closest('.ag-d'); if (g) yak(+g.dataset.i); });
+    svg.addEventListener('focusout', () => yak(null));
   }
   // klavye: SVG içindeki bağ (düğüm / ok) Enter ya da boşlukla açılır
   document.addEventListener('keydown', (e) => {
@@ -1040,6 +1081,7 @@
     else if (bas === '_tepkime') tepkimeCk(K, kalan[0] || '', ayni);
     else if (bas === '_dongu') donguCk(K, kalan[0] || '', ayni);
     else if (bas === '_hesap') hesapCk(K, kalan.join('/'), ayni);
+    else if (bas === '_ag') agCk(K, ayni);
     else kavramCk(K, bas, kalan[0] || 'tanim', ayni, kalan[1]);
     if (ayni) { $$('[data-soru]', ckIc).forEach((a) => { const on = a.dataset.soru === qid; a.classList.toggle('simdi', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); }); return; }
     krKur(ckIc);
@@ -1115,6 +1157,7 @@
     const ekle = (o) => araDizin.push({ ...o, n: norm(o.n) });
     ekle({ t: 'Atlas', ad: `${K.kod} · kavram atlası`, ck: '_atlas', n: `atlas kavram atlası ${K.kod} ${K.ad}` });
     ekle({ t: 'Sözlük', ad: `Sözlük · ${(K.sozluk || []).length} terim`, ck: '_sozluk', n: 'sözlük glossary terimler tr en' });
+    if ((K.kavramlar || []).length > 1) ekle({ t: 'Atlas', ad: 'Kavram ağı', ck: '_ag', n: 'kavram ağı ag graf bağlar network' });
     K.bolumler.filter((b) => bolumDolu(K, b)).forEach((b) => ekle({ t: 'Bölüm', ad: bolumAd(K, b), ck: `_bol/${b.id}`, n: `${bolumAd(K, b)} ${b.ad}` }));
     (K.kavramlar || []).forEach((k) => ekle({ t: 'Kavram', ad: `${k.sembol} · ${k.ad}`, alt: k.en, ck: `${k.id}/tanim`, n: `${k.ad} ${k.en || ''} ${k.sembol} ${k.id}` }));
     (K.sozluk || []).forEach((s) => ekle({ t: 'Terim', ad: s.en, alt: s.tr, ck: `_sozluk/${s.en}`, n: `${s.en} ${s.tr}` }));
