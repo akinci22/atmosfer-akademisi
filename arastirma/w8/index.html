@@ -69,7 +69,7 @@
 <header class="ust"><div class="ust-ic">
 <a class="geri" href="../" aria-label="Araştırma ana sayfası"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
 <nav class="kirinti" aria-label="Konum"><a href="../../">Akademi</a> <span class="ayr" aria-hidden="true">›</span> <a href="../">Araştırma</a> <span class="ayr" aria-hidden="true">›</span> <span aria-current="page">ING201A W8 · eş zamanlı anlatım</span></nav>
-<a class="ust-dugme" href="../defter/ING201A_W8_PARAGRAF-A_v4.pdf" target="_blank" rel="noopener" aria-label="PDF'i aç"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h11a2 2 0 0 1 2 2v16H8a2 2 0 0 1-2-2z"/><path d="M6 19a2 2 0 0 1 2-2h11"/></svg><span>PDF</span></a>
+<a class="ust-dugme" href="../defterler/#pdf=ING201A_W8_PARAGRAF-A_v4" target="_blank" rel="noopener" aria-label="PDF'i aç"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h11a2 2 0 0 1 2 2v16H8a2 2 0 0 1-2-2z"/><path d="M6 19a2 2 0 0 1 2-2h11"/></svg><span>PDF</span></a>
 </div></header>
 <main class="es" id="ana">
 <div class="es-bas">
@@ -85,7 +85,7 @@
 <ul id="maddeler"></ul>
 <div class="yap" id="yap" hidden></div>
 <div class="kal" id="kal" hidden></div>
-<p class="baglar"><a id="pod" href="../podcast/" hidden></a><a id="pdfs" href="../defter/ING201A_W8_PARAGRAF-A_v4.pdf" target="_blank" rel="noopener">PDF'te bu sayfa ↗</a></p>
+<p class="baglar"><a id="pod" href="../podcast/" hidden></a><a id="pdfs" href="../defterler/#pdf=ING201A_W8_PARAGRAF-A_v4" target="_blank" rel="noopener">PDF'te bu sayfa ↗</a></p>
 <label class="okudum"><input type="checkbox" id="ok"> Okudum</label>
 </article>
 </div>
@@ -131,7 +131,7 @@
     if (x.kal) kal.innerHTML = '<b>Kalıplar</b>' + x.kal.map(function (k) { return '<p><span class="en">' + esc(k[0]) + '</span><span class="tr">' + esc(k[1]) + '</span></p>'; }).join('');
     var pod = $('pod');
     if (bo) { pod.hidden = false; pod.href = '../podcast/#' + bo.pod; pod.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;margin-right:6px"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></svg>Bölüm ' + bo.b + ' podcasti'; } else { pod.hidden = true; }
-    $('pdfs').href = '../defter/ING201A_W8_PARAGRAF-A_v4.pdf#page=' + n;
+    $('pdfs').href = '../defterler/#pdf=ING201A_W8_PARAGRAF-A_v4&s=' + n;
     $('ok').checked = !!ok[n];
     $('onc').disabled = n === 1; $('snr').disabled = n === N;
     Array.prototype.forEach.call(serit.children, function (c) {

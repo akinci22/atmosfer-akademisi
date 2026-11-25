@@ -68,7 +68,7 @@
     el = el || defterli[0];
     if (!el) { dd.hidden = true; return; }
     var p = el.dataset.defter.split(':'), f = DOSYA[p[0]]; if (!f) { dd.hidden = true; return; }
-    dd.href = ORTAK + '../defter/' + f[0] + '#page=' + p[1];
+    dd.href = ORTAK + '../defterler/#pdf=' + f[0] + '&s=' + p[1];
     dd.querySelector('span').textContent = f[1] + ' · s. ' + p[1] + ' ↗';
     dd.setAttribute('aria-label', f[1] + ' defteri, sayfa ' + p[1] + ', yeni sekmede aç');
     dd.dataset.sayfa = p[1]; dd.hidden = false;
