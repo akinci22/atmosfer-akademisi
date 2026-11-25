@@ -263,6 +263,7 @@ body.ck-surukle{user-select:none;cursor:col-resize}
 .kirinti a{display:inline-flex;align-items:center;min-height:36px;padding:0 4px;border-radius:6px;overflow-wrap:anywhere}
 .kirinti a:hover{text-decoration:underline;background:var(--acc-zemin)}
 .kirinti .ayrac{color:var(--ikincil)}
+@media (pointer:coarse){.kirinti a{min-height:44px}.kirinti{gap:0 4px}}
 #ck-baslik:focus{outline:none}
 .ck-sira{display:flex;align-items:center;gap:8px;padding:6px 18px 0;font-size:14px}
 .ck-sira:empty{display:none}
