@@ -989,4 +989,373 @@
     d.bas();
     return { dur: () => d.dur() };
   };
+  /* ==== 302E-2 BAŞ (26 Kas): cephe · oklüzyon · yer haritasında cephe analizi · izotak · jet akımı · jet streak ==== */
+  const CR = { soguk: 'var(--acc)', sicak: 'var(--yanlis)', okl: 'var(--es3)' };
+  const ton = (r, p) => `color-mix(in srgb, ${r} ${p}%, transparent)`;
+  /* Cephe çizgisi + sembolleri. pts yürüyüş yönünde; tur: soguk | sicak | okl | durgun; yan: +1 semboller yürüyüşün sağına, −1 soluna.
+     Durgun cephede üçgenler (mavi) «yan» tarafına, yarım daireler (kırmızı) karşı tarafa bakar. bas: bu uzunluktan önce sembol yok. */
+  function cepheCiz(g, pts, tur, o = {}) {
+    const yan = o.yan ?? 1, w = o.w ?? 16, h = o.h ?? 12, kal = o.kal ?? 3.4, bas = o.bas ?? 0;
+    const gg = el('g', { opacity: o.op });
+    const L = [0];
+    for (let i = 1; i < pts.length; i++) L.push(L[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+    const top = L[L.length - 1];
+    const at = (s) => {
+      let i = 1; while (i < L.length - 1 && L[i] < s) i++;
+      const a = pts[i - 1], b = pts[i], d = (L[i] - L[i - 1]) || 1, u = sinir((s - L[i - 1]) / d, 0, 1);
+      return { p: [a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u], t: [(b[0] - a[0]) / d, (b[1] - a[1]) / d] };
+    };
+    const n0 = Math.max(1, Math.round((top - bas) / (o.ara ?? 38))), ad = (top - bas) / n0;
+    if (tur === 'durgun') {
+      for (let j = 0; j < n0; j++) { const q = []; for (let s = bas + j * ad; s < bas + (j + 1) * ad; s += 4) q.push(at(s).p); q.push(at(bas + (j + 1) * ad).p); gg.append(el('path', { d: yol(q), fill: 'none', stroke: j % 2 ? CR.sicak : CR.soguk, 'stroke-width': kal, 'stroke-linecap': 'round' })); }
+      if (bas > 0) gg.append(el('path', { d: yol([pts[0], at(bas).p]), fill: 'none', stroke: CR.soguk, 'stroke-width': kal }));
+    } else gg.append(el('path', { d: yol(pts), fill: 'none', stroke: CR[tur] || CR.soguk, 'stroke-width': kal, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+    for (let j = 0; j < n0; j++) {
+      const { p, t } = at(bas + (j + 0.5) * ad);
+      const tip = tur === 'soguk' ? 'u' : tur === 'sicak' ? 'y' : (j % 2 ? 'y' : 'u');
+      const ny = tur === 'durgun' && tip === 'y' ? -yan : yan;
+      const r = tur === 'durgun' ? (tip === 'u' ? CR.soguk : CR.sicak) : (CR[tur] || CR.soguk);
+      const n = [-t[1] * ny, t[0] * ny];
+      if (tip === 'u') gg.append(el('path', { d: yol([[p[0] - t[0] * w / 2, p[1] - t[1] * w / 2], [p[0] + n[0] * h, p[1] + n[1] * h], [p[0] + t[0] * w / 2, p[1] + t[1] * w / 2]]) + 'Z', fill: r }));
+      else { const q = []; for (let k = 0; k <= 12; k++) { const f = (Math.PI * k) / 12; q.push([p[0] + (w / 2) * (-Math.cos(f) * t[0] + Math.sin(f) * n[0]), p[1] + (w / 2) * (-Math.cos(f) * t[1] + Math.sin(f) * n[1])]); } gg.append(el('path', { d: yol(q) + 'Z', fill: r })); }
+    }
+    g.append(gg); return gg;
+  }
+  /* Basit istasyon: daire + rüzgâr çubuğu (GELDİĞİ yöne) + tüyler (KY: çubuğun saat yönü tarafı; kısa 5, uzun 10 kt). */
+  function istCiz(g, x, y, dd, ff, o = {}) {
+    const gg = el('g', { opacity: o.op });
+    const [ux, uy] = yv(dd), fx = -uy, fy = ux, r = 6.5, uc = r + 34, R = o.r || 'var(--yazi)';
+    gg.append(el('line', { x1: x + ux * r, y1: y + uy * r, x2: x + ux * uc, y2: y + uy * uc, stroke: R, 'stroke-width': 2 }));
+    let k = Math.round(ff / 5) * 5, p = 0;
+    const tuy = (u, boy) => gg.append(el('line', { x1: x + ux * u, y1: y + uy * u, x2: x + ux * (u + 5) + fx * boy, y2: y + uy * (u + 5) + fy * boy, stroke: R, 'stroke-width': 2 }));
+    while (k >= 10) { tuy(uc - p - 5, 12); k -= 10; p += 6; }
+    if (k >= 5) { if (p === 0) p = 6; tuy(uc - p - 5, 7); }
+    gg.append(el('circle', { cx: x, cy: y, r, fill: 'var(--zemin)', stroke: 'var(--yazi)', 'stroke-width': 2 }));
+    g.append(gg); return gg;
+  }
+  /* Hava simgesi (sadeleştirilmiş WMO): sag = sağanak (üçgen + nokta), yag = sürekli yağmur (iki nokta), cis = çisenti (iki virgül) */
+  function havaCiz(g, x, y, tur, o = {}) {
+    const gg = el('g', { opacity: o.op }), R = o.r || 'var(--yazi)';
+    if (tur === 'sag') { gg.append(el('path', { d: `M${x - 6},${y - 3}L${x + 6},${y - 3}L${x},${y + 7}Z`, fill: 'none', stroke: R, 'stroke-width': 2 })); gg.append(el('circle', { cx: x, cy: y - 8, r: 2.4, fill: R })); }
+    else if (tur === 'yag') { gg.append(el('circle', { cx: x - 4.5, cy: y, r: 2.8, fill: R })); gg.append(el('circle', { cx: x + 4.5, cy: y, r: 2.8, fill: R })); }
+    else { for (const dx of [-4.5, 4.5]) { gg.append(el('circle', { cx: x + dx, cy: y - 1, r: 2.4, fill: R })); gg.append(el('path', { d: `M${x + dx + 2.2},${y - 0.5}Q${x + dx + 2},${y + 4} ${x + dx - 1.6},${y + 5.5}`, fill: 'none', stroke: R, 'stroke-width': 1.6 })); } }
+    g.append(gg); return gg;
+  }
+
+  /* ============================== SOĞUK / SICAK CEPHE: düşey kesit ============================== */
+  Sekil.m302_cephe_kesit = function (kap, ayar = {}) {
+    const W = 640, H = 380, Y0 = 318;
+    const svg = svgYap(kap, W, H, 'Soğuk ve sıcak cephenin düşey kesiti');
+    const g = el('g'); svg.append(g);
+    let tur = ayar.tur === 'sicak' ? 'sicak' : 'soguk';
+    const k = kontrol(kap);
+    secenek(k, ['Soğuk cephe', 'Sıcak cephe'], tur === 'sicak' ? 1 : 0, (i) => { tur = i ? 'sicak' : 'soguk'; ciz(); });
+    const not = notKutu(kap);
+    const bulut = (cx, cy, rx, ry) => el('ellipse', { cx, cy, rx, ry, fill: 'var(--yuzey)', stroke: 'var(--ikincil)', 'stroke-width': 1.6 });
+    const yagmur = (x1, x2, yU, yA, ara, renk) => { const gg = el('g', { stroke: renk, 'stroke-width': 1.8, 'stroke-linecap': 'round' }); for (let x = x1; x <= x2; x += ara) gg.append(el('line', { x1: x, y1: yU, x2: x - 7, y2: yA })); return gg; };
+    function ciz() {
+      g.innerHTML = '';
+      ok(g, W - 150, 30, W - 64, 30, 'var(--ikincil)', 2.4); yaz(g, W - 107, 52, 'hareket', { h: 'middle', k: 13, r: 'var(--ikincil)', b: true });
+      if (tur === 'soguk') {
+        const F = [360, Y0], T = [168, 66];
+        g.append(el('path', { d: `M14,${Y0}L${F[0]},${F[1]}L${T[0]},${T[1]}L14,${T[1]}Z`, style: `fill:${ton(CR.soguk, 14)}` }));
+        g.append(el('path', { d: `M${F[0]},${F[1]}L${T[0]},${T[1]}L${W - 14},${T[1]}L${W - 14},${Y0}Z`, style: `fill:${ton(CR.sicak, 9)}` }));
+        g.append(el('line', { x1: F[0], y1: F[1], x2: T[0], y2: T[1], stroke: CR.soguk, 'stroke-width': 4, 'stroke-linecap': 'round' }));
+        const cb = el('g'); [[378, 278, 44, 32], [386, 230, 40, 32], [378, 182, 36, 30], [386, 136, 32, 26]].forEach((e) => cb.append(bulut(...e)));
+        cb.append(el('path', { d: 'M318,112 Q386,88 486,102 L486,112 Q386,106 334,124 Z', fill: 'var(--yuzey)', stroke: 'var(--ikincil)', 'stroke-width': 1.6 }));
+        g.append(cb); yaz(g, 384, 188, 'Cb', { h: 'middle', k: 16, b: true });
+        g.append(yagmur(350, 422, 306, Y0 - 2, 9, CR.soguk));
+        [[206, 262, 28, 16], [118, 280, 22, 13]].forEach((e) => g.append(bulut(...e)));
+        yaz(g, 206, 267, 'Cu', { h: 'middle', k: 13, b: true, r: 'var(--ikincil)' });
+        ok(g, 446, 292, 404, 160, CR.sicak, 2.6);
+        hale(yaz(g, 30, Y0 - 16, 'soğuk, yoğun hava', { k: 14, b: true, r: CR.soguk }));
+        hale(yaz(g, 548, Y0 - 16, 'sıcak, nemli', { h: 'middle', k: 14, b: true, r: CR.sicak }));
+        hale(yaz(g, 196, 158, 'dik yüzey', { h: 'middle', k: 14, b: true, r: CR.soguk }));
+        hale(yaz(g, 196, 176, '≈ 1/50 – 1/100', { h: 'middle', k: 13, r: CR.soguk }));
+        yaz(g, 386, Y0 + 22, 'dar bant: sağanak, oraj, dolu', { h: 'middle', k: 13.5, b: true });
+        yaz(g, 386, Y0 + 42, 'hız ≈ 20–25 kt', { h: 'middle', k: 13, r: 'var(--ikincil)' });
+        cepheCiz(g, [[44, 168], [44, 72]], 'soguk', { yan: 1, ara: 32, w: 13, h: 10, kal: 3 });
+        yaz(g, 60, 64, 'haritada', { k: 12.5, r: 'var(--ikincil)' });
+        not.textContent = 'Soğuk cephe: soğuk hava kama gibi sıcak havanın altına girip onu hızla yukarı iter. Yüzey dik (≈ 1/50 – 1/100), cephe hızlı (20–25 kt). Geçince T ve Td birden düşer, rüzgâr saat yönünde döner (veering), basınç yükselmeye başlar.';
+      } else {
+        const F = [190, Y0], T = [W - 14, 96], yz = (x) => Y0 - (x - F[0]) * ((Y0 - T[1]) / (T[0] - F[0]));
+        g.append(el('path', { d: `M${F[0]},${F[1]}L${T[0]},${T[1]}L${W - 14},${Y0}Z`, style: `fill:${ton(CR.soguk, 14)}` }));
+        g.append(el('path', { d: `M14,${Y0}L${F[0]},${F[1]}L${T[0]},${T[1]}L${T[0]},58L14,58Z`, style: `fill:${ton(CR.sicak, 9)}` }));
+        g.append(el('line', { x1: F[0], y1: F[1], x2: T[0], y2: T[1], stroke: CR.sicak, 'stroke-width': 4, 'stroke-linecap': 'round' }));
+        g.append(bulut(270, yz(270) - 62, 74, 46)); yaz(g, 270, yz(270) - 56, 'Ns', { h: 'middle', k: 16, b: true });
+        g.append(bulut(402, yz(402) - 40, 68, 24)); yaz(g, 402, yz(402) - 35, 'As', { h: 'middle', k: 15, b: true });
+        g.append(bulut(506, yz(506) - 30, 54, 12)); yaz(g, 506, yz(506) - 50, 'Cs', { h: 'middle', k: 14, b: true });
+        const ci = el('g', { fill: 'none', stroke: 'var(--ikincil)', 'stroke-width': 1.8, 'stroke-linecap': 'round' });
+        for (const [x, y] of [[566, 82], [596, 70], [612, 90]]) ci.append(el('path', { d: `M${x - 16},${y + 4} Q${x},${y - 6} ${x + 14},${y - 10}` }));
+        g.append(ci); yaz(g, 580, 108, 'Ci', { h: 'middle', k: 14, b: true });
+        g.append(yagmur(212, 352, 252, Y0 - 2, 10, CR.soguk));
+        ok(g, 100, Y0 - 12, 236, Y0 - 48, CR.sicak, 2.6);
+        hale(yaz(g, 30, 210, 'sıcak hava', { k: 14, b: true, r: CR.sicak }));
+        hale(yaz(g, 30, 228, 'yavaşça tırmanır', { k: 13, r: CR.sicak }));
+        hale(yaz(g, 520, Y0 - 16, 'soğuk hava', { h: 'middle', k: 14, b: true, r: CR.soguk }));
+        hale(yaz(g, 470, Y0 - 70, 'yatık yüzey ≈ 1/150 – 1/300', { h: 'middle', k: 13, b: true, r: CR.sicak }));
+        yaz(g, 300, Y0 + 22, 'geniş, sürekli yağış: cephenin ÖNÜNDE', { h: 'middle', k: 13.5, b: true });
+        yaz(g, 300, Y0 + 42, 'bulut dizisi Ci → Cs → As → Ns · hız ≈ 10–15 kt', { h: 'middle', k: 13, r: 'var(--ikincil)' });
+        cepheCiz(g, [[44, 168], [44, 72]], 'sicak', { yan: 1, ara: 32, w: 13, h: 10, kal: 3 });
+        yaz(g, 60, 64, 'haritada', { k: 12.5, r: 'var(--ikincil)' });
+        not.textContent = 'Sıcak cephe: sıcak hava soğuk havanın üstüne yavaşça tırmanır. Yüzey yatık (≈ 1/150 – 1/300), cephe yavaş (10–15 kt). İlk Ci cepheden yüzlerce km önce görülür; yağış cephenin önünde, sürekli. Geçince T ve Td yükselir, basınç düşüşü durur, rüzgâr saat yönünde döner.';
+      }
+      g.append(el('line', { x1: 10, y1: Y0, x2: W - 10, y2: Y0, stroke: 'var(--ikincil)', 'stroke-width': 2 }));
+    }
+    ciz();
+  };
+
+  /* ============================== OKLÜZYON: soğuk / sıcak tip (iki sıcaklık → tür) ============================== */
+  Sekil.m302_okluzyon = function (kap, ayar = {}) {
+    const W = 640, H = 340, Y0 = 300, G = [320, Y0];
+    const svg = svgYap(kap, W, H, 'Oklüzyon türü: arkadaki ve öndeki havanın sıcaklığı');
+    const g = el('g'); svg.append(g);
+    const k = kontrol(kap);
+    const sb = surgu(k, 'Arkadaki hava', -10, 25, 0.5, ayar.Tb ?? 13.5, (v) => `${tr(v, 1)} °C`);
+    const sa = surgu(k, 'Öndeki hava', -10, 25, 0.5, ayar.Ta ?? 15, (v) => `${tr(v, 1)} °C`);
+    const k2 = kontrol(kap);
+    dugme(k2, 'Örnek 1: 13,5 ve 15', true).addEventListener('click', () => { sb.set(13.5); sa.set(15); ciz(); });
+    dugme(k2, 'Örnek 2: 6 ve 3', true).addEventListener('click', () => { sb.set(6); sa.set(3); ciz(); });
+    const not = notKutu(kap);
+    function ciz() {
+      g.innerHTML = '';
+      const Tb = sb.v, Ta = sa.v, d = Tb - Ta, esit = Math.abs(d) < 0.25, soguk = d < 0;
+      const s = esit ? 0 : soguk ? -1 : 1;
+      const J = [G[0] + s * 96, 186], Lt = [64, 84], Rt = [W - 14, 96];
+      const koyu = ton(CR.soguk, 30), acik = ton(CR.soguk, 12);
+      const solR = esit ? ton(CR.soguk, 20) : soguk ? koyu : acik, sagR = esit ? ton(CR.soguk, 20) : soguk ? acik : koyu;
+      g.append(el('path', { d: `M14,40L${W - 14},40L${Rt[0]},${Rt[1]}L${J[0]},${J[1]}L${Lt[0]},${Lt[1]}L14,${Lt[1] + 4}Z`, style: `fill:${ton(CR.sicak, 10)}` }));
+      g.append(el('path', { d: `M14,${Y0}L${G[0]},${G[1]}L${J[0]},${J[1]}L${Lt[0]},${Lt[1]}L14,${Lt[1] + 4}Z`, style: `fill:${solR}` }));
+      g.append(el('path', { d: `M${G[0]},${G[1]}L${W - 14},${Y0}L${Rt[0]},${Rt[1]}L${J[0]},${J[1]}Z`, style: `fill:${sagR}` }));
+      const cz = (a, b, r, w, kes) => g.append(el('line', { x1: a[0], y1: a[1], x2: b[0], y2: b[1], stroke: r, 'stroke-width': w, 'stroke-linecap': 'round', 'stroke-dasharray': kes ? '9 6' : null }));
+      cz(J, Lt, CR.soguk, 3, true); cz(J, Rt, CR.sicak, 3, true); cz(G, J, CR.okl, 4.4);
+      g.append(el('line', { x1: 10, y1: Y0, x2: W - 10, y2: Y0, stroke: 'var(--ikincil)', 'stroke-width': 2 }));
+      nokta(g, G[0], G[1], 6.5, CR.okl);
+      ok(g, W - 150, 24, W - 64, 24, 'var(--ikincil)', 2.2); yaz(g, W - 107, 18, 'hareket', { h: 'middle', k: 12.5, r: 'var(--ikincil)', b: true });
+      hale(yaz(g, 300, 64, 'sıcak sektörün havası: yerden koparıldı, yukarıda', { h: 'middle', k: 13.5, b: true, r: CR.sicak }));
+      hale(yaz(g, 30, 252, `arkadaki: ${tr(Tb, 1)} °C`, { k: 15, b: true, r: CR.soguk }));
+      hale(yaz(g, 30, 272, esit ? 'eşit' : soguk ? 'en soğuk → altta' : 'daha ılık → üste', { k: 13, r: 'var(--yazi)' }));
+      hale(yaz(g, W - 30, 252, `öndeki: ${tr(Ta, 1)} °C`, { h: 'end', k: 15, b: true, r: CR.soguk }));
+      hale(yaz(g, W - 30, 272, esit ? 'eşit' : soguk ? 'daha ılık → üste' : 'en soğuk → altta', { h: 'end', k: 13, r: 'var(--yazi)' }));
+      hale(yaz(g, G[0], Y0 + 26, 'yerde oklüzyon', { h: 'middle', k: 13, b: true, r: CR.okl }));
+      if (!esit) {
+        const ust = soguk ? [(J[0] + Rt[0]) / 2 + 30, (J[1] + Rt[1]) / 2 - 12] : [(J[0] + Lt[0]) / 2 - 20, (J[1] + Lt[1]) / 2 - 12];
+        hale(yaz(g, ust[0], ust[1], soguk ? 'yukarı sıcak cephe' : 'yukarı soğuk cephe', { h: 'middle', k: 13, b: true, r: soguk ? CR.sicak : CR.soguk }));
+        hale(yaz(g, 320, 150, soguk ? 'SOĞUK OKLÜZYON (cold occlusion)' : 'SICAK OKLÜZYON (warm occlusion)', { h: 'middle', k: 16, b: true, r: CR.okl }));
+      }
+      if (esit) not.textContent = `İki taraf da ${tr(Tb, 1)} °C: eşit, tür ayırt edilemez. Sınav şekillerinde fark açık verilir; birkaç istasyonun ortalamasına bak.`;
+      else if (soguk) not.textContent = `ΔT = T(arka) − T(ön) = ${tr(d, 1)} °C < 0: arkadaki hava daha soğuk → öndekinin altına girer → SOĞUK OKLÜZYON. Yerde soğuk cephe gibi davranır; sıcak cephe yukarıda kalır.`;
+      else not.textContent = `ΔT = T(arka) − T(ön) = +${tr(d, 1)} °C > 0: arkadaki hava daha ılık → öndeki soğuk havanın üstüne tırmanır → SICAK OKLÜZYON. Yerde sıcak cephe gibi davranır; soğuk cephe yukarıda kalır.`;
+    }
+    sb.inp.addEventListener('input', ciz); sa.inp.addEventListener('input', ciz); ciz();
+  };
+
+  /* ============================== YER HARİTASINDA CEPHE ANALİZİ: beş ölçüt ============================== */
+  const CO = {
+    L: [292, 150], aW: 18, aC: 112,
+    // x, y, T, Td, dd, ff (kt), hava, tendans (hPa / 3 sa), bölge
+    ist: [[92, 156, 5, 0, 320, 15, 'sag', 1.2, 'arka'], [152, 262, 6, 1, 310, 20, 'sag', 2.1, 'arka'], [150, 392, 7, 2, 300, 15, 'sag', 1.6, 'arka'],
+      [384, 300, 19, 16, 220, 15, 'cis', -0.4, 'sektor'], [330, 404, 20, 17, 230, 15, 'cis', -0.3, 'sektor'], [478, 330, 18, 15, 220, 10, 'cis', -0.5, 'sektor'],
+      [420, 118, 12, 10, 140, 15, 'yag', -2.4, 'on'], [548, 170, 11, 8, 150, 10, 'yag', -2.0, 'on'], [362, 66, 12, 9, 50, 15, 'yag', -1.8, 'on']],
+  };
+  Sekil.m302_cephe_olcut = function (kap, ayar = {}) {
+    const W = 640, H = 470, [Lx, Ly] = CO.L, sabit = ayar.adim != null, A = sabit ? ayar.adim : 9;
+    const svg = svgYap(kap, W, H, 'Yer haritasında cephe analizi: beş ölçüt');
+    const zem = el('g'), izo = el('g'), cep = el('g'), ist = el('g'), ust = el('g'); svg.append(zem, izo, cep, ist, ust);
+    let kip = 0, cepheAcik = true;
+    const rad = (a) => a / R2D;
+    const uc = (a, L) => [Lx + L * Math.cos(rad(a)), Ly + L * Math.sin(rad(a))];
+    const izobar = (r0) => { const q = []; for (let a = -180; a < 180; a += 2) { const dW = Math.abs(((a - CO.aW + 540) % 360) - 180), dC = Math.abs(((a - CO.aC + 540) % 360) - 180); const r = r0 * (1 + 0.22 * Math.max(0, 1 - dW / 18) + 0.22 * Math.max(0, 1 - dC / 18)); q.push([Lx + r * Math.cos(rad(a)), Ly + r * Math.sin(rad(a))]); } return yol(q) + 'Z'; };
+    const NOT = [
+      'Beş ölçüt birlikte: T ve Td sıçraması, rüzgâr dönmesi, izobar oluğu (V), tendans, bulut ve yağış. Düğmeyle tek tek bak; «Cepheleri gizle» ile önce kendin bul.',
+      'T / Td: sıcak sektör 18–20 / 15–17 °C, sıcak cephenin önü 11–13 / 8–10 °C, soğuk cephenin arkası 5–7 / 0–2 °C. Cephe, sıçramanın olduğu iki istasyonun arasından geçer.',
+      'Rüzgâr: arkada kuzeybatılı (300–320°), sıcak sektörde güneybatılı (220–230°), önde güneydoğulu (140–150°). Cepheyi geçerken yön saat yönünde döner (veering).',
+      'Oluk: izobarlar cephe çizgisinde V biçiminde kırılır, sivri uç yüksek basınca bakar. Cephe hep oluğun dibinde ve L\'ye bağlı.',
+      'Tendans (model yazımı, onda bir hPa / 3 sa): sıcak cephenin önünde −18 … −24 (hızlı düşüş), sıcak sektörde −3 … −5 (hafif), soğuk cephenin arkasında +12 … +21 (yükseliş).',
+      'Hava: önde sürekli yağmur (iki nokta), sıcak sektörde çisenti (iki virgül), arkada sağanak (üçgen + nokta). Sağanak + kuzeybatı rüzgârı + düşük T → soğuk cephenin arkası.',
+    ];
+    let not = null;
+    if (!sabit) {
+      const k = kontrol(kap);
+      secenek(k, ['Hepsi', 'T / Td', 'Rüzgâr', 'Oluk', 'Tendans', 'Hava'], 0, (i) => { kip = i; ciz(); });
+      const k2 = kontrol(kap);
+      const bc = dugme(k2, 'Cepheleri gizle', true);
+      bc.addEventListener('click', () => { cepheAcik = !cepheAcik; bc.textContent = cepheAcik ? 'Cepheleri gizle' : 'Cepheleri göster'; ciz(); });
+      not = notKutu(kap);
+    }
+    function ciz() {
+      [zem, izo, cep, ist, ust].forEach((x) => { x.innerHTML = ''; });
+      const vur = (n) => sabit || kip === 0 || kip === n;
+      kuzey(ust, 616, 12);
+      if (A >= 1 && (sabit || kip === 0 || kip === 1)) zem.append(el('path', { d: `M${Lx},${Ly}L${W},${uc(CO.aW, 366)[1]}L${W},${H}L${uc(CO.aC, 345)[0]},${H}Z`, style: `fill:${ton(CR.sicak, kip === 1 ? 13 : 8)}` }));
+      if (A >= 4) for (const [p, r0] of [[996, 42], [1000, 92], [1004, 142], [1008, 192], [1012, 242]]) {
+        izo.append(el('path', { d: izobar(r0), fill: 'none', stroke: 'var(--ikincil)', 'stroke-width': kip === 3 ? 2.6 : 1.6, opacity: vur(3) ? 1 : 0.4 }));
+        const q = uc(200, r0 * (r0 === 42 ? 1.35 : 1)); hale(yaz(izo, q[0], q[1] + 4, String(p), { h: 'middle', k: 12.5, b: true, r: 'var(--ikincil)', op: vur(3) ? 1 : 0.5 }));
+        if (kip === 3) for (const a of [CO.aW, CO.aC]) { const c = uc(a, r0 * 1.22); izo.append(el('circle', { cx: c[0], cy: c[1], r: 6.5, fill: 'none', stroke: 'var(--tur)', 'stroke-width': 2.4 })); }
+      }
+      const cOp = sabit || kip === 0 ? 1 : 0.75;
+      if ((sabit && A >= 2) || (!sabit && cepheAcik)) cepheCiz(cep, [CO.L, uc(CO.aC, 300)], 'soguk', { yan: -1, bas: 26, op: cOp });
+      if ((sabit && A >= 3) || (!sabit && cepheAcik)) cepheCiz(cep, [CO.L, uc(CO.aW, 320)], 'sicak', { yan: -1, bas: 26, op: cOp });
+      hale(yaz(ust, Lx + 2, Ly + 10, 'L', { h: 'middle', k: 28, b: true }));
+      if (A >= 4) hale(yaz(ust, Lx + 2, Ly + 30, '994', { h: 'middle', k: 13, b: true, r: 'var(--ikincil)' }));
+      for (const [x, y, T, Td, dd, ff, hv, pp, bol] of CO.ist) {
+        const rT = bol === 'sektor' ? CR.sicak : CR.soguk;
+        istCiz(ist, x, y, dd, ff, { op: vur(2) ? 1 : 0.4 });
+        hale(yaz(ist, x - 10, y - 9, String(T), { h: 'end', k: kip === 1 ? 16 : 14, b: true, r: kip === 1 ? rT : 'var(--yazi)', op: vur(1) ? 1 : 0.45 }));
+        hale(yaz(ist, x - 10, y + 21, String(Td), { h: 'end', k: kip === 1 ? 15 : 13, b: kip === 1, r: kip === 1 ? rT : 'var(--ikincil)', op: vur(1) ? 1 : 0.45 }));
+        havaCiz(ist, x - 22, y + 5, hv, { op: vur(5) ? 1 : 0.4, r: kip === 5 ? (hv === 'sag' ? CR.soguk : hv === 'yag' ? 'var(--yesil)' : CR.sicak) : undefined });
+        if (kip === 4 || (sabit && A >= 4)) { const s = `${pp > 0 ? '+' : '−'}${Math.round(Math.abs(pp) * 10)}`; hale(yaz(ist, x + 11, y + 5, s, { k: kip === 4 ? 15 : 12.5, b: true, r: pp > 0 ? 'var(--yesil)' : 'var(--tur)' })); }
+      }
+      if (not) not.textContent = NOT[kip];
+    }
+    ciz();
+  };
+
+  /* ============================== İZOTAK: eksik değerler → jet ekseni → J ============================== */
+  Sekil.m302_izotak = function (kap, ayar = {}) {
+    const W = 640, H = 400, cx = 330, cy0 = 172, ACI = -10, DON = [330, 210];
+    const svg = svgYap(kap, W, H, 'İzotak analizi: değerler, jet ekseni ve çekirdek J');
+    const g = el('g', { transform: `rotate(${ACI} ${DON[0]} ${DON[1]})` }), ust = el('g'); svg.append(g, ust);
+    const sabit = ayar.adim != null;
+    let adim = sabit ? ayar.adim : 0;
+    const DEG = [160, 140, 120, 100, 80, 60], EKSIK = [140, 100, 80];
+    const dN = 13, dS = 39, b0 = 17, a0 = 66, da = 43;   // kuzey kenarda sık, güneyde ≈ 3 kat seyrek
+    const H6 = DEG.map((v, k) => ({ v, a: a0 + k * da, b: b0 + (k * (dN + dS)) / 2, cy: cy0 + (k * (dS - dN)) / 2 }));
+    const kt2ms = (v) => tr(v * 0.5144, 0);
+    let not = null;
+    if (!sabit) {
+      const k = kontrol(kap);
+      secenek(k, ['Soru', 'Değerler', 'Jet ekseni', 'J çekirdeği'], 0, (i) => { adim = i; ciz(); });
+      not = notKutu(kap);
+      svg.addEventListener('pointermove', (ev) => {
+        const p = svgNokta(svg, ev); if (!p || !not) return;
+        const c = Math.cos(-ACI / R2D), s = Math.sin(-ACI / R2D), x = DON[0] + (p.x - DON[0]) * c - (p.y - DON[1]) * s, y = DON[1] + (p.x - DON[0]) * s + (p.y - DON[1]) * c;
+        const ic = H6.findIndex((h) => ((x - cx) / h.a) ** 2 + ((y - h.cy) / h.b) ** 2 <= 1);
+        if (ic === 0) not.textContent = `Bu nokta en içteki halkada: V ≥ 160 kt (≥ ${kt2ms(160)} m/s). Jet çekirdeği.`;
+        else if (ic > 0) not.textContent = `Bu noktada V ≈ ${DEG[ic]}–${DEG[ic - 1]} kt (≈ ${kt2ms(DEG[ic])}–${kt2ms(DEG[ic - 1])} m/s).`;
+        else not.textContent = 'Bu nokta 60 kt halkasının dışında: V < 60 kt (≈ 31 m/s); burada izotak çizilmez.';
+      });
+    }
+    const NOT = ['Soru tipi: 300 hPa izotakları 20 kt aralıkla; üç değer eksik (?). Önce kendin tamamla, sonra «Değerler». Haritanın üstünde gezinince o noktanın hızı yazar.',
+      'Değerler 60 kt\'tan başlar, 20 kt artar: 60 · 80 · 100 · 120 · 140 · 160. Halkalar kuzey (soğuk) kenarda sık, güneyde seyrek (≈ 1/3).',
+      'Jet ekseni: ovallerin UZADIĞI yön boyunca, en hızlı rüzgârın içinden geçen çizgi. Ok akış yönüne (batıdan doğuya).',
+      'J: en içteki kapalı halkanın ortasına küçük daire içinde J. Bu halka jet streak (hız maksimumu), J onun en kuvvetli yeri.'];
+    function ciz() {
+      g.innerHTML = ''; ust.innerHTML = '';
+      kuzey(ust, 26, 10);
+      H6.slice().reverse().forEach((h, i) => {
+        const k = H6.length - 1 - i;
+        g.append(el('ellipse', { cx, cy: h.cy, rx: h.a, ry: h.b, fill: k === 0 && adim >= 3 ? null : 'none', style: k === 0 && adim >= 3 ? `fill:${ton('var(--yesil)', 16)}` : null, stroke: 'var(--yesil)', 'stroke-width': k === 0 ? 2.8 : 2 }));
+        const f = (100 / R2D), lx = cx + h.a * Math.cos(f), ly = h.cy + h.b * Math.sin(f) + 5;
+        const eksik = EKSIK.includes(h.v);
+        const t = yaz(g, lx, ly, adim === 0 && eksik ? '?' : String(h.v), { h: 'middle', k: 13.5, b: true, r: eksik && adim >= 1 ? 'var(--tur)' : 'var(--yesil)' });
+        hale(t);
+      });
+      if (adim >= 2) { ok(g, cx - 300, cy0, cx + 296, cy0, 'var(--yazi)', 4.2); const t = yaz(g, cx - 250, cy0 - 12, 'jet ekseni', { k: 14, b: true }); hale(t); }
+      if (adim >= 3) { g.append(el('circle', { cx, cy: cy0, r: 14, fill: 'var(--zemin)', stroke: 'var(--yazi)', 'stroke-width': 2.6 })); yaz(g, cx, cy0 + 6, 'J', { h: 'middle', k: 17, b: true }); }
+      hale(yaz(ust, W - 16, H - 14, '300 hPa · aralık 20 kt · 1 kt ≈ 0,514 m/s', { h: 'end', k: 12.5, r: 'var(--ikincil)' }));
+      if (not) not.textContent = NOT[adim];
+    }
+    ciz();
+  };
+
+  /* ============================== JET AKIMI ↔ CEPHE: genç dalga · oklüzyonlu sistem ============================== */
+  Sekil.m302_jet_cephe = function (kap, ayar = {}) {
+    const W = 640, H = 400;
+    const svg = svgYap(kap, W, H, 'Jet ekseni ile cephe sistemi');
+    const g = el('g'); svg.append(g);
+    let okl = ayar.okl ? 1 : 0;
+    const k = kontrol(kap);
+    secenek(k, ['Genç dalga', 'Oklüzyonlu sistem'], okl, (i) => { okl = i; ciz(); });
+    const not = notKutu(kap);
+    const egri = (pts) => { let d = `M${pts[0][0]},${pts[0][1]}`; for (let i = 1; i < pts.length - 1; i++) { const m = [(pts[i][0] + pts[i + 1][0]) / 2, (pts[i][1] + pts[i + 1][1]) / 2]; d += ` Q${pts[i][0]},${pts[i][1]} ${m[0]},${m[1]}`; } const s = pts[pts.length - 1]; return d + ` L${s[0]},${s[1]}`; };
+    function ciz() {
+      g.innerHTML = '';
+      kuzey(g, 26, 10);
+      if (!okl) {
+        const L = [300, 190];
+        cepheCiz(g, [L, [430, 222], [580, 236]], 'sicak', { yan: -1, bas: 24 });
+        cepheCiz(g, [L, [238, 280], [166, 372]], 'soguk', { yan: -1, bas: 24 });
+        hale(yaz(g, L[0], L[1] + 10, 'L', { h: 'middle', k: 28, b: true }));
+        hale(yaz(g, 330, 300, 'sıcak sektör', { h: 'middle', k: 13.5, b: true, r: CR.sicak }));
+        g.append(el('path', { d: egri([[60, 300], [150, 250], [250, 150], [400, 120], [600, 140]]), fill: 'none', stroke: 'var(--yesil)', 'stroke-width': 6, 'stroke-linecap': 'round', opacity: 0.85 }));
+        ok(g, 590, 139, 624, 142, 'var(--yesil)', 6);
+        hale(yaz(g, 420, 106, 'jet ekseni (300 hPa)', { h: 'middle', k: 14, b: true, r: 'var(--yesil)' }));
+        not.textContent = 'Genç (oklüzyonsuz) dalga: jet ekseni cephelere PARALEL uzanır, soğuk hava tarafında. Jet ile cephe aynı sıcaklık farkından doğar: biri yerde, öbürü tropopoz altında.';
+      } else {
+        const L = [210, 150], T = [342, 214];
+        cepheCiz(g, [L, [280, 196], T], 'okl', { yan: -1, bas: 24 });
+        cepheCiz(g, [T, [470, 238], [600, 250]], 'sicak', { yan: -1 });
+        cepheCiz(g, [T, [292, 300], [232, 384]], 'soguk', { yan: -1 });
+        hale(yaz(g, L[0], L[1] + 10, 'L', { h: 'middle', k: 28, b: true }));
+        nokta(g, T[0], T[1], 6.5, CR.okl);
+        g.append(el('line', { x1: T[0] + 4, y1: T[1] + 6, x2: T[0] + 16, y2: T[1] + 40, stroke: CR.okl, 'stroke-width': 1.6 })); hale(yaz(g, T[0] + 18, T[1] + 54, 'oklüzyon başlangıç noktası', { k: 13, b: true, r: CR.okl }));
+        g.append(el('path', { d: egri([[130, 330], [230, 290], [300, 240], [384, 188], [470, 176], [600, 186]]), fill: 'none', stroke: 'var(--yesil)', 'stroke-width': 6, 'stroke-linecap': 'round', opacity: 0.85 }));
+        ok(g, 592, 186, 626, 188, 'var(--yesil)', 6);
+        hale(yaz(g, 500, 168, 'jet ekseni', { h: 'middle', k: 14, b: true, r: 'var(--yesil)' }));
+        not.textContent = 'Oklüzyonlu sistem: jet ekseni oklüzyonun başlangıç noktasından geçer; soğuk ve sıcak cepheye paralel uzanır. Alçak merkezi jetin soğuk (kuzey) tarafında kalır: sistem olgunlaşmıştır.';
+      }
+    }
+    ciz();
+  };
+
+  /* ============================== JET STREAK: giriş / çıkış, sol / sağ ============================== */
+  Sekil.m302_jet_streak = function (kap) {
+    const W = 640, H = 380, cx = 320, cy = 196;
+    const svg = svgYap(kap, W, H, 'Jet streak: giriş ve çıkış, sol ve sağ bölgeler');
+    const zem = el('g'), g = el('g'); svg.append(zem, g);
+    let gizli = false; const acik = new Set();
+    const BOL = [
+      { ad: 'sol giriş', x: cx - 160, y: cy - 104, div: false, m: 'Sol giriş (kuzeybatı): girişte hava hızlanır; jeostrofik olmayan akış sola (kuzeye) döner ve hava burada birikir → yukarıda YAKINSAMA → altında çökme, yer basıncı artar.' },
+      { ad: 'sağ giriş', x: cx - 160, y: cy + 110, div: true, m: 'Sağ giriş (güneybatı): hızlanan hava sola (kuzeye) çekilir, buradan hava eksilir → yukarıda IRAKSAMA → altında yükselme, yer basıncı düşer, bulut ve yağış.' },
+      { ad: 'sol çıkış', x: cx + 160, y: cy - 104, div: true, m: 'Sol çıkış (kuzeydoğu): çıkışta hava yavaşlar; jeostrofik olmayan akış sağa (güneye) döner, buradan hava eksilir → yukarıda IRAKSAMA → altında yükselme. Yer alçağının gelişmesine en elverişli yerlerden biri.' },
+      { ad: 'sağ çıkış', x: cx + 160, y: cy + 110, div: false, m: 'Sağ çıkış (güneydoğu): yavaşlayan havanın güneye akışı burada birikir → yukarıda YAKINSAMA → altında çökme.' },
+    ];
+    const k = kontrol(kap);
+    const bg = dugme(k, 'Kendini dene: gizle', true);
+    bg.addEventListener('click', () => { gizli = !gizli; acik.clear(); bg.textContent = gizli ? 'Hepsini göster' : 'Kendini dene: gizle'; ciz(); not.textContent = gizli ? 'Her bölge için önce tahmin et (yukarıda ıraksama mı, yakınsama mı?), sonra bölgeye dokun.' : 'Bir bölgeye dokun: neden ıraksama ya da yakınsama olduğu burada yazar.'; });
+    const not = notKutu(kap);
+    not.textContent = 'Bir bölgeye dokun: neden ıraksama ya da yakınsama olduğu burada yazar.';
+    function ciz() {
+      zem.innerHTML = ''; g.innerHTML = '';
+      kuzey(zem, 26, 10);
+      for (const [a, b] of [[250, 92], [180, 60], [110, 32]]) zem.append(el('ellipse', { cx, cy, rx: a, ry: b, fill: 'none', stroke: 'var(--yesil)', 'stroke-width': 2 }));
+      zem.append(el('line', { x1: cx, y1: 46, x2: cx, y2: H - 28, stroke: 'var(--ikincil)', 'stroke-width': 1.6, 'stroke-dasharray': '6 6' }));
+      ok(zem, 30, cy, W - 26, cy, 'var(--yazi)', 3.6);
+      hale(yaz(zem, cx - 160, 40, 'GİRİŞ · hava hızlanır', { h: 'middle', k: 14, b: true }));
+      hale(yaz(zem, cx + 160, 40, 'ÇIKIŞ · hava yavaşlar', { h: 'middle', k: 14, b: true }));
+      yaz(zem, cx, H - 8, 'Sol / sağ akışa göre (KY, batı akımı): sol = kuzey, sağ = güney · yeşil halkalar izotak', { h: 'middle', k: 12.5, r: 'var(--ikincil)' });
+      ok(zem, cx - 228, cy + 40, cx - 228, cy - 40, 'var(--tur)', 2.6); hale(yaz(zem, cx - 218, cy - 30, 'ageo', { k: 12, r: 'var(--tur)', b: true }));
+      ok(zem, cx + 228, cy - 40, cx + 228, cy + 40, 'var(--tur)', 2.6); hale(yaz(zem, cx + 238, cy + 36, 'ageo', { k: 12, r: 'var(--tur)', b: true }));
+      BOL.forEach((b, i) => {
+        const gg = el('g', { style: 'cursor:pointer' });
+        gg.append(el('rect', { x: b.x - 92, y: b.y - 44, width: 184, height: 76, rx: 12, fill: 'transparent' }));
+        const goster = !gizli || acik.has(i), r = b.div ? 'var(--acc)' : 'var(--tur)';
+        hale(yaz(gg, b.x, b.y - 2, goster ? (b.div ? 'DIV ↑' : 'CONV ↓') : '?', { h: 'middle', k: 20, b: true, r: goster ? r : 'var(--ikincil)' }));
+        hale(yaz(gg, b.x, b.y + 20, goster ? (b.div ? 'yükselme, yağış' : 'çökme, açık') : b.ad, { h: 'middle', k: 13, r: 'var(--yazi)' }));
+        if (goster) hale(yaz(gg, b.x, b.y - 26, b.ad, { h: 'middle', k: 12.5, b: true, r: 'var(--ikincil)' }));
+        gg.addEventListener('click', () => { acik.add(i); not.textContent = b.m; ciz(); });
+        g.append(gg);
+      });
+    }
+    ciz();
+  };
+
+  /* ============================== CEPHE SEMBOLLERİ ============================== */
+  Sekil.m302_cephe_sembol = function (kap, ayar = {}) {
+    const W = 640, H = 330;
+    const svg = svgYap(kap, W, H, 'Cephe sembolleri: soğuk, sıcak, oklüzyon, durgun');
+    const g = el('g'); svg.append(g);
+    const SAT = [['soguk', 'Soğuk cephe', 'mavi · üçgenler sıcak havaya'], ['sicak', 'Sıcak cephe', 'kırmızı · yarım daireler soğuk havaya'],
+      ['okl', 'Oklüzyon', 'mor · ikisi sırayla, aynı yöne'], ['durgun', 'Durgun cephe', 'semboller zıt yönlere · hareket yok']];
+    SAT.forEach(([tur, ad, acik], i) => {
+      const y = 62 + i * 70, op = ayar.sec && ayar.sec !== tur ? 0.38 : 1;
+      cepheCiz(g, [[30, y], [246, y]], tur, { yan: tur === 'durgun' ? 1 : -1, op, ara: 36 });
+      if (tur !== 'durgun') { const a = ok(g, 268, y + 4, 268, y - 24, 'var(--ikincil)', 2.2); a.setAttribute('opacity', op); }
+      yaz(g, 292, y - 4, ad, { k: 17, b: true, op });
+      yaz(g, 292, y + 17, acik, { k: 13.5, r: 'var(--ikincil)', op });
+    });
+    yaz(g, 30, H - 14, 'Semboller cephenin hareket yönüne bakar (durgun cephe hariç).', { k: 12.5, r: 'var(--ikincil)' });
+  };
+  /* ==== 302E-2 SON ==== */
 })();
