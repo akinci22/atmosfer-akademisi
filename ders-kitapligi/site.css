@@ -943,3 +943,76 @@ mark{background:color-mix(in srgb,var(--tur) 24%,transparent);color:inherit;bord
 .ar-yok ul{list-style:none;padding:0;margin:6px 0;display:flex;flex-wrap:wrap;gap:6px}
 .ck-s .a mark,.ck-s .b mark{background:color-mix(in srgb,var(--tur) 28%,transparent)}
 .ar-kapsam .kucuk[aria-pressed=true] .say,.ar-suz .kucuk[aria-pressed=true] .say{color:#fff;opacity:1}
+/* ---------- ISARET (27 Kas): sınava odaklı mini işaretler — simge + kısa etiket, tek görsel dil (app.js isr()) ---------- */
+:root{--isr-k:#b3361b;--isr-k-y:#fff;--isr-k-z:#fff4ec;--isr-sik:#9d1b8f;--isr-sik-z:#fcebf8;--isr-tz:#9a3412;--isr-tz-z:#fff1e8;--isr-ez:#3730a3;--isr-ez-z:#eef0fe;--isr-yz:#6d28d9;--isr-yz-z:#f3edfe;--isr-dn:#0b6b44;--isr-dn-z:#e7f6ee;--isr-ks:#0e6f87;--isr-ks-z:#e5f5f9;--isr-sn:#334155;--isr-sn-z:#eef2f6}
+:root[data-theme=dark]{--isr-k:#ff9a5c;--isr-k-y:#1c0a02;--isr-k-z:#2a1a0f;--isr-sik:#f5b5f9;--isr-sik-z:#3b1740;--isr-tz:#ffc073;--isr-tz-z:#33210c;--isr-ez:#b4bcff;--isr-ez-z:#1f2350;--isr-yz:#cdb8ff;--isr-yz-z:#2a1e48;--isr-dn:#5ad49a;--isr-dn-z:#11261c;--isr-ks:#6fdcf5;--isr-ks-z:#0c2b34;--isr-sn:#c4cdd9;--isr-sn-z:#1d2633}
+.isr{display:inline-flex;align-items:center;gap:5px;margin:0 7px 0 0;padding:1px 9px 1px 6px;border-radius:999px;font-size:12.5px;line-height:20px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;white-space:nowrap;vertical-align:2px;font-style:normal;text-decoration:none;background:var(--isr-sn-z);color:var(--isr-sn)}
+.isr svg{width:15px;height:15px;flex:none;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.isr-kucuk{width:22px;height:22px;padding:0;gap:0;justify-content:center;margin-right:5px;vertical-align:-5px}
+.isr-kesin{background:var(--isr-k);color:var(--isr-k-y)}
+.isr-kesin svg,.isr-kisa svg{fill:currentColor;stroke-width:1.4}
+.isr-sik{background:var(--isr-sik-z);color:var(--isr-sik)}
+.isr-tuzak{background:var(--isr-tz-z);color:var(--isr-tz)}
+.isr-ezber{background:var(--isr-ez-z);color:var(--isr-ez)}
+.isr-yaz{background:var(--isr-yz-z);color:var(--isr-yz)}
+.isr-denetle{background:var(--isr-dn-z);color:var(--isr-dn)}
+.isr-kisa{background:var(--isr-ks-z);color:var(--isr-ks)}
+/* blok vurgusu: kesin = kalın sol şerit + hafif zemin (en güçlü) · tuzak / yaz = ince şerit */
+.isr-k{border-left:5px solid var(--isr-k)!important;background:var(--isr-k-z)!important}
+.isr-blok{border-radius:0 12px 12px 0;padding:8px 14px;margin:12px 0}
+.isr-blok>p:first-child{margin-top:0}.isr-blok>:last-child{margin-bottom:0}
+.isr-tz{border-left:3px solid var(--isr-tz);background:var(--isr-tz-z);border-radius:0 10px 10px 0;padding:6px 12px}
+p.isr-tz,li.isr-tz{margin:.5em 0}
+.isr-y{border-left:3px solid var(--isr-yz)!important}
+.isr-bas{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;margin:.15em 0 .25em!important}
+.isr-neden{font-size:13.5px;line-height:1.4;color:var(--ikincil);font-weight:600;min-width:0}
+.isr-h{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.isr-h .isr{font-size:13.5px;line-height:24px;padding:2px 12px 2px 8px}
+.isr-h .isr svg{width:17px;height:17px}
+.isr-ezf{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:.5em 0;padding:6px 10px;border:1px dashed color-mix(in srgb,var(--isr-ez) 50%,transparent);border-radius:10px;background:var(--zemin)}
+.isr-f{flex:1 1 220px;min-width:0;max-width:100%;overflow-x:auto}
+.isr-f .tex-blok,.isr-f .mj-b{margin:0!important}
+/* adım oynatıcı */
+.oyn-a.isr-k{border-color:color-mix(in srgb,var(--isr-k) 55%,var(--cizgi))}
+.oyn-a.isr-k::before{background:var(--isr-k);color:var(--isr-k-y)}
+.oyn-a.isr-k.simdi{box-shadow:0 0 0 1px var(--isr-k)}
+.oyn-sonuc,.oyn-kontrol{overflow-wrap:anywhere}
+.oyn-dikkat{margin:.45em 0;padding:4px 10px;border-left:3px solid var(--isr-tz);border-radius:0 10px 10px 0;background:var(--isr-tz-z);overflow-wrap:anywhere}
+.oyn-p .ks-y{position:absolute;left:50%;top:2px;width:13px;height:13px;margin-left:-6.5px;fill:var(--isr-k);stroke:none}
+.oyn-p.ks::before{top:20px}
+.ks-dug{display:inline-flex;align-items:center;gap:4px;min-height:44px}
+.ks-dug .isr-kucuk{margin-right:2px}
+.ks-dug[aria-pressed=true]{border-color:var(--isr-k);color:var(--isr-k);background:var(--isr-k-z);font-weight:700}
+.ks-yal .oyn.ks-var .oyn-a:not(.isr-k):not(.ks-ac)>:not(.oyn-ne){display:none}
+.ks-yal .oyn.ks-var .oyn-a:not(.isr-k):not(.ks-ac){opacity:.62;padding-top:2px;padding-bottom:2px;cursor:pointer;margin-bottom:6px}
+.ks-yal .oyn.ks-var .oyn-a:not(.isr-k):not(.ks-ac)::before{top:9px;width:22px;height:22px;font-size:12px}
+.ks-yal .oyn.ks-var .oyn-a:not(.isr-k) .oyn-ne{cursor:pointer}
+/* «İşaretler» açıklaması */
+.isr-lejant{margin:0 0 12px;border:1px solid var(--cizgi);border-radius:12px;background:var(--zemin)}
+.isr-lejant>summary{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;min-height:44px;padding:4px 12px;cursor:pointer;font-size:15px;font-weight:600;color:var(--ikincil)}
+.isr-lej-mini{display:inline-flex;flex-wrap:wrap;gap:0}
+.isr-lej-liste{list-style:none;margin:0;padding:4px 12px 8px;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:6px 18px}
+.isr-lej-liste li{display:flex;align-items:center;gap:4px;font-size:15px;min-width:0;line-height:1.4}
+.isr-lej-dug{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.isr-lejant .isr-lej-dug{padding:0 12px 10px;margin:0}
+/* çekmece _kesin: bölüm bölüm hızlı tekrar */
+.ks-bol{margin:1.3em 0 .45em;font-size:17px}
+.ks-soru{margin:0 0 10px;padding:6px 12px 6px;border-left:5px solid var(--isr-k);background:var(--isr-k-z);border-radius:0 12px 12px 0;min-width:0}
+.ks-soru h4{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin:.25em 0 .3em;font-size:15.5px}
+.ks-soru h4 a{color:var(--yazi);text-decoration:none;min-width:0}
+.ks-liste{list-style:none;margin:0;padding:0}
+.ks-liste li{margin:2px 0 8px;min-width:0}
+.ks-sat{display:flex;gap:8px;align-items:flex-start;min-height:44px;padding:6px 0 2px;color:var(--yazi);text-decoration:none;font-weight:600;line-height:1.4}
+.ks-sat:hover .ks-ne{text-decoration:underline}
+.ks-no{flex:none;display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--isr-k);color:var(--isr-k-y);font-size:12.5px;font-weight:700}
+.ks-ne{min-width:0}
+.ks-islem{display:block;margin:0 0 2px 32px;font-size:14.5px;line-height:1.45;color:var(--ikincil);overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.ks-sonuc{display:flex;align-items:flex-start;gap:2px;margin-left:32px;font-size:14.5px;line-height:1.45;overflow-wrap:anywhere}
+.ks-sonuc .isr-kucuk{width:20px;height:20px;flex:none}
+.ks-kv{margin:0 0 8px;padding:6px 12px;border-radius:0 12px 12px 0}
+.ks-kv .sn-liste{margin:.3em 0 0}
+.ks-kv-bas{display:flex;align-items:center;gap:2px}
+.ks-git{display:inline-flex;align-items:center;gap:2px;min-height:44px}
+.sn-bil.isr-k{border-left-width:5px!important}
+@media(max-width:600px){.isr{font-size:12px;padding:1px 8px 1px 5px}.isr-lej-liste li{font-size:14.5px}.ks-islem,.ks-sonuc{margin-left:0}}
+/* ---------- /ISARET ---------- */

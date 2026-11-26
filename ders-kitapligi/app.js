@@ -76,7 +76,7 @@
         <li><b>Önce kendin çöz:</b> çözüm kapalı gelir; «1. adımı aç» ile tek tek aç, takıldığın adımda dur.</li>
         <li><b>Takıldığın kavrama git:</b> adımın altındaki mavi şeritte «Tanım · Diyagram · Formül · Türetim · Animasyon · Kod» düğmeleri var. Sayfa değişmez: geniş ekranda yanda, telefonda alttan konu paneli açılır; panelin tutamağını sürükleyerek boyunu ayarlarsın, soru üstte görünür kalır.</li>
         <li><b>Ara:</b> üstteki büyüteç ya da <b>/</b> tuşu. Kavram, terim (Türkçe ya da İngilizce), formül, sembol (ΔS, CN), birim (mm/h, hPa) yaz; ekleri ve küçük yazım hatalarını da tanır, eşleşen yeri vurgular.</li>
-        <li><b>Kaybolma:</b> panelin üstünde nerede olduğun yazar; «← Soruya dön» seni soruya, ‹ › bir önceki/sonraki konuya götürür. Adres çubuğundaki bağlantı tam o noktayı gösterir.</li></ol></section>`;
+        <li><b>İşaretler:</b> çözüm adımlarında ve açıklamalarda küçük simgeli etiketler puanın geldiği yeri gösterir: <b>Kesin bil</b> (yıldız), <b>Tuzak</b>, <b>Ezberle</b>, <b>Sınavda yaz</b>, <b>Denetle</b>, <b>Kısa yol</b>; sınav pusulası açıkken <b>Sık çıkar</b>. «Yalnız kesin bil» düğmesi adım oynatıcıda yalnız kesin adımları öne çıkarır; yan paneldeki «Kesin bil» sekmesi bölüm bölüm hızlı tekrar listesidir.</li><li><b>Kaybolma:</b> panelin üstünde nerede olduğun yazar; «← Soruya dön» seni soruya, ‹ › bir önceki/sonraki konuya götürür. Adres çubuğundaki bağlantı tam o noktayı gösterir.</li></ol></section>`;
   }
 
   /* ---------- kitap görünümü ---------- */
@@ -151,14 +151,14 @@
     const R = q.rehber;
     return `<section class="yol" id="yol" aria-labelledby="yol-h"><h2 id="yol-h">Yol haritası ${q.pdf_yol ? `<small class="yok">PDF s. ${q.pdf_yol}</small>` : ''}</h2>
       <p><b>Ne istiyor?</b> ${R.istiyor}</p><p><b>Soru tipi:</b> ${kac(R.tip)}</p>
-      ${R.kalip.length ? `<p class="yol-alt">Soruda bu ifadeyi görünce:</p><ul class="kalip">${R.kalip.map((k) => `<li><span class="en-k" lang="en">${kac(k.en)}</span> → ${kac(k.tr)}${k.ipucu ? ` · <b>${kac(k.ipucu)}</b>` : ''}</li>`).join('')}</ul>` : ''}
+      ${R.kalip.length ? `<p class="yol-alt">Soruda bu ifadeyi görünce:</p><ul class="kalip">${R.kalip.map((k) => `<li><span class="en-k" lang="en">${kac(k.en)}</span> → ${kac(k.tr)}${k.ipucu ? ` · ${isr('kisa', { kucuk: true })}<b>${kac(k.ipucu)}</b>` : ''}</li>`).join('')}</ul>` : ''}
       ${(R.eslesme || []).length ? `<details class="esles"><summary>Sorudan formüle: hangi ifadeden ne anladık?</summary><p class="yol-alt">Soru metnindeki altı çizili ifadelere dokun (bilgisayarda imleci üstüne getir): ne anlaşıldığı ve formülde nereye girdiği açılır.</p><div class="tablo-kap"><table class="esles-t"><thead><tr><th>Sorudaki ifade</th><th>Ne anladık?</th><th>Formülde</th></tr></thead><tbody>${R.eslesme.map((e) => `<tr><td><span class="es-k">${kac(e.ifade)}</span></td><td>${kac(e.anlam)}</td><td><b>${kac(e.sembol)}</b>${e.deger ? ` = ${kac(e.deger)}` : ''}</td></tr>`).join('')}</tbody></table></div></details>` : ''}
       <details><summary>Verilenler ne demek?</summary><ul>${R.veriler.map((v) => `<li><b>${kac(v.ne)}</b> → ${kac(v.anlam)}</li>`).join('')}</ul></details>
       ${R.formul.length ? `<details><summary>Hangi formül, neden?</summary>${R.formul.map((f) => `<p><b>${kac(f.ad)}</b> — ${f.neden}</p>${f.tex}${f.terimler.length ? `<ul class="terim">${f.terimler.map((t) => `<li><b>${kac(t[0])}</b>: ${kac(t[1])}</li>`).join('')}</ul>` : ''}${bagHTML(K, f.kavram ? [f.kavram] : [], q.id)}`).join('')}</details>` : ''}
       ${R.kural ? `<p><b>Kullanılacak bilgi:</b> ${R.kural}</p>` : ''}
       <p class="plan"><b>Plan:</b> ${R.adimlar.map((a, i) => `<a href="#${K.id}/${q.id}/a${i + 1}">${i + 1} · ${kac(a.kisa)}</a>`).join(' → ')}</p>
-      ${R.tuzak ? `<p class="tuzak"><b>Tuzak:</b> ${R.tuzak}</p>` : ''}
-      ${(R.oz || []).length ? `<div class="oz-cozum" id="oz"><h3>Sınav kâğıdına yaz — en kısa çözüm</h3><ol>${R.oz.map((x) => `<li>${x}</li>`).join('')}</ol></div>` : ''}</section>`;
+      ${R.tuzak ? `<p class="tuzak isr-blok isr-tz">${isr('tuzak')}${R.tuzak}</p>` : ''}
+      ${(R.oz || []).length ? `<div class="oz-cozum isr-y" id="oz"><h3>${isr('yaz')}Sınav kâğıdına yaz — en kısa çözüm</h3><ol>${R.oz.map((x) => `<li>${x}</li>`).join('')}</ol></div>` : ''}</section>`;
   }
   function rehberAdim(K, q, a, i) {
     return `<li data-i="${i}" id="a${i + 1}" hidden><p class="adim-bas"><b>${i + 1} · ${kac(a.kisa)}</b></p>
@@ -225,21 +225,21 @@
       <article class="soru-kart" aria-labelledby="soru-h"><div class="soru-ust"><span class="no">${kac(K.kod)} · ${q.id}</span><span class="pdf-etiket">PDF s. ${q.pdf_soru ?? '—'}</span></div>
       <h1 id="soru-h">${kac(q.baslik)}</h1>
       <div class="soru-govde">${q.soru || ''}</div>
-      ${q.ipucu ? `<details class="ipucu"><summary>İpucu</summary>${q.ipucu}</details>` : ''}
+      ${q.ipucu ? `<details class="ipucu"><summary>${isr('kisa')}<span>İpucu</span></summary>${q.ipucu}</details>` : ''}
       ${R ? yolHTML(K, q) : ''}
       <h2 class="coz-h" id="coz-h" style="margin-top:22px">Çözüm <small class="yok" style="font-size:15px;font-weight:500">PDF s. ${q.pdf_cozum ?? '—'} · <span class="coz-say" data-kitap="${n}">${n} adım</span></small></h2>
-      ${cozKipHTML(K, q)}${oynHTML(K, q)}
+      ${cozKipHTML(K, q)}${kesinSay(K) ? isrLejantHTML(K, 'soru') : ''}${oynHTML(K, q)}
       ${q.giris ? `<div id="cozum-giris" hidden>${q.giris}</div>` : ''}
       <ol class="adimlar${R ? ' rehberli' : ''}" id="adimlar">${R ? R.adimlar.map((a, i) => rehberAdim(K, q, a, i)).join('') : (q.adimlar || []).map((a, i) => `<li data-i="${i}" hidden>${a.html}${bagHTML(K, a.kavram, q.id)}</li>`).join('')}</ol>
       <div class="cozum-bas"><button type="button" class="dugme" id="adim-ac">1. adımı aç</button><button type="button" class="dugme ikincil" id="hepsi">Hepsini aç</button><button type="button" class="kucuk" id="kapat" hidden>Çözümü kapat</button></div>
       ${syHTML(K, q)}
-      <div id="cozum-son" hidden>${R ? `<details class="pdf-metin"><summary>PDF'teki çözüm metni (aynı sayılar)</summary>${q.giris || ''}${(q.adimlar || []).map((a) => a.html).join('')}</details>` : ''}${q.oz ? `<div class="oz"><b>Öz:</b> ${q.oz.replace(/^<p>|<\/p>$/g, '')}</div>` : ''}
+      <div id="cozum-son" hidden>${R ? `<details class="pdf-metin"><summary>PDF'teki çözüm metni (aynı sayılar)</summary>${q.giris || ''}${(q.adimlar || []).map((a) => a.html).join('')}</details>` : ''}${q.oz ? ozHTML(q.oz) : ''}
       ${q.kod ? `<details class="kod-kutu"><summary>Bu sonucu hesaplayan Python kodu</summary><pre class="kod">${kac(q.kod).split('\n').map((s, i) => `<span class="sat"><span class="no">${i + 1}</span>${s}</span>`).join('')}</pre></details>` : ''}
       ${(q.kavram || []).length ? `<h3>Bu sorudaki kavramlar</h3>${bagHTML(K, q.kavram, q.id)}` : `<p class="yok">Bu sorunun kavram bağları hazırlanıyor; kitabın bölüm özetine <a href="#${K.id}/bol/${q.bolum}">buradan</a> bakabilirsin.</p>`}</div>
       </article></div></div>`;
     ana.dataset.sayfa = `soru:${q.id}`;
     texDoldur(ana, K);
-    glifDuzelt(ana);
+    glifDuzelt(ana); isrSusle(ana);
     dilSoruEkle(K, q);
     soruEkEkle(K, q);
     if (R && (R.eslesme || []).length) esleIsaretle($('.soru-govde', ana), R.eslesme);
@@ -268,13 +268,13 @@
     document.title = `${bolumAd(K, b)} · ${K.kod}`;
     const kv = (K.kavramlar || []).filter((k) => k.bolum === bid);
     ana.innerHTML = `<div class="kitap-yer"><nav class="dizin" aria-label="Bölümler ve sorular">${dizinHTML(K, 'bol/' + bid)}</nav><div>${takipHTML(K, null)}
-      <h1>${kac(bolumAd(K, b))}</h1>
+      <h1>${kac(bolumAd(K, b))}</h1>${b === K.bolumler[0] && kesinSay(K) ? isrLejantHTML(K, 'bol') : ''}
       ${kv.length ? `<h3>Bu bölümün kavramları</h3>${bagHTML(K, kv.map((k) => k.id), 'bol-' + bid)}` : ''}
-      ${b.ogeler.filter((o) => o.tur !== 'soru').map((o) => `<section class="konu-sayfa"><h3>${kac(o.baslik)}</h3>${o.html}${o.oz ? `<div class="oz"><b>Öz:</b> ${o.oz.replace(/^<p>|<\/p>$/g, '')}</div>` : ''}</section>`).join('')}
+      ${b.ogeler.filter((o) => o.tur !== 'soru').map((o) => `<section class="konu-sayfa"><h3>${kac(o.baslik)}</h3>${o.html}${o.oz ? ozHTML(o.oz) : ''}</section>`).join('')}
       <h3>Bu bölümün soruları</h3><div class="ilgili">${b.ogeler.filter((o) => o.tur === 'soru').map((o) => `<a class="soru-bag" href="#${K.id}/${o.id}">${o.id} · ${kac(K.sorular[o.id]?.baslik)}</a>`).join('')}</div></div></div>`;
     ana.dataset.sayfa = `bol:${bid}`;
     texDoldur(ana, K);
-    glifDuzelt(ana);
+    glifDuzelt(ana); isrSusle(ana);
     $$('.bag button', ana).forEach((bt) => { bt.dataset.git = bt.dataset.git.replace(`/bol-${bid}/`, `/bol/${bid}/`); });
     takipBagla(K);
     sinavSusle(K);
@@ -445,7 +445,7 @@
     for (const kr of D.karsilastir || []) h += karsilastirHTML(kr);
     if (h && govde) govde.insertAdjacentHTML('afterend', h);
     if ((D.kalip || []).length) {
-      const li = D.kalip.map((k) => `<li class="kalip-dil"><span class="en-k" lang="en">${kac(k.en)}</span> → ${kac(k.tr)}${k.ipucu ? ` · <b>${kac(k.ipucu)}</b>` : ''}</li>`).join('');
+      const li = D.kalip.map((k) => `<li class="kalip-dil"><span class="en-k" lang="en">${kac(k.en)}</span> → ${kac(k.tr)}${k.ipucu ? ` · ${isr('kisa', { kucuk: true })}<b>${kac(k.ipucu)}</b>` : ''}</li>`).join('');
       const ul = $('.yol ul.kalip', ana), yol = $('.yol', ana);
       if (ul) ul.insertAdjacentHTML('beforeend', li);
       else if (yol) $('h2', yol).insertAdjacentHTML('afterend', `<p class="yol-alt">Soruda bu ifadeyi görünce:</p><ul class="kalip">${li}</ul>`);
@@ -488,7 +488,7 @@
     $('#kirinti').innerHTML = [[kac(K.kod), '_atlas'], ...parcalar].map(([ad, kp]) => (kp ? ckBag(kp, ad) : `<span>${ad}</span>`)).join(' <span class="ayrac" aria-hidden="true">›</span> ');
   }
   const siraHTML = (o, orta, s) => `${o ? ckBag(o[0], `‹ <span class="sira-ad">${o[1]}</span>`, 'sira-bag') : '<span class="sira-bos"></span>'}<span class="sira-orta yok">${orta}</span>${s ? ckBag(s[0], `<span class="sira-ad">${s[1]}</span> ›`, 'sira-bag sag') : '<span class="sira-bos"></span>'}`;
-  const ustSekme = (K, sec) => [['_atlas', 'Atlas', 'atlas'], ...(snVar(K) ? [['_sinav', 'Sınav', 'sinav']] : []), ...((K.kavramlar || []).length > 1 ? [['_ag', 'Ağ', 'ag']] : []), ...(turlar(K).length ? [['_tur', 'Türler', 'tur']] : []), ...(tepkimeler(K).length ? [['_tepkime', 'Tepkimeler', 'tepkime']] : []), ...(donguler(K).length ? [['_dongu', 'Çevrimler', 'dongu']] : []), ...(HS(K).length ? [['_hesap', 'Hesap', 'hesap']] : []), ...((K.kavramlar || []).length > 1 || czKars(K).length ? [['_kars', 'Karşılaştır', 'kars']] : []), ...(terimVar(K) ? [['_terim', `Terimler (${K.terim.n || (K.terim.terim || []).length})`, 'terim']] : []), ['_sozluk', `Sözlük (${(K.sozluk || []).length})`, 'sozluk']].map(([kp, ad, id]) => `<button type="button" role="tab" aria-selected="${sec === id}" data-ck="${kp}">${ad}</button>`).join('');
+  const ustSekme = (K, sec) => [['_atlas', 'Atlas', 'atlas'], ...(snVar(K) ? [['_sinav', 'Sınav', 'sinav']] : []), ...(kesinSay(K) ? [['_kesin', 'Kesin bil', 'kesin']] : []), ...((K.kavramlar || []).length > 1 ? [['_ag', 'Ağ', 'ag']] : []), ...(turlar(K).length ? [['_tur', 'Türler', 'tur']] : []), ...(tepkimeler(K).length ? [['_tepkime', 'Tepkimeler', 'tepkime']] : []), ...(donguler(K).length ? [['_dongu', 'Çevrimler', 'dongu']] : []), ...(HS(K).length ? [['_hesap', 'Hesap', 'hesap']] : []), ...((K.kavramlar || []).length > 1 || czKars(K).length ? [['_kars', 'Karşılaştır', 'kars']] : []), ...(terimVar(K) ? [['_terim', `Terimler (${K.terim.n || (K.terim.terim || []).length})`, 'terim']] : []), ['_sozluk', `Sözlük (${(K.sozluk || []).length})`, 'sozluk']].map(([kp, ad, id]) => `<button type="button" role="tab" aria-selected="${sec === id}" data-ck="${kp}">${ad}</button>`).join('');
   function soruCip(K, sid, uzun) {
     const q = K.sorular[sid]; if (!q) return '';
     const simdi = ckDurum && ckDurum.qid === sid, s = simdi ? ' simdi' : '', ac = simdi ? ' aria-current="page"' : '';
@@ -596,7 +596,7 @@
     }
     else if (parca === 'diyagram') { ic.innerHTML = `<div class="sekil-kap" id="ck-sekil"></div>${P.html || ''}`; if (window.Sekil[P.sekil]) window.Sekil[P.sekil]($('#ck-sekil'), P.ayar || {}); buyutDugmesi(); }
     else if (parca === 'formul') {
-      ic.innerHTML = `<div class="formul-kap" data-tex="${P.tex}"></div><p class="yok" style="margin:10px 0 0">Bir terime bas: formülde yanar, anlamı aşağıda.</p><div class="terim-list">${(P.terimler || []).map((t, j) => `<button type="button" aria-pressed="false" data-t="${j}">${kac(t.sembol)}</button>`).join('')}</div><div class="terim-kart" id="terim-kart" hidden></div>${P.html || ''}`;
+      ic.innerHTML = `<p class="isr-bas">${isr('kesin')}<span class="isr-neden">ana formül</span>${X && snN(X.olasilik) === 3 ? isr('ezber') : ''}</p><div class="formul-kap isr-k" data-tex="${P.tex}"></div><p class="yok" style="margin:10px 0 0">Bir terime bas: formülde yanar, anlamı aşağıda.</p><div class="terim-list">${(P.terimler || []).map((t, j) => `<button type="button" aria-pressed="false" data-t="${j}">${kac(t.sembol)}</button>`).join('')}</div><div class="terim-kart" id="terim-kart" hidden></div>${P.html || ''}`;
       texDoldur(ic, K);
       const sec = (j) => {
         const t = P.terimler[j];
@@ -1074,7 +1074,7 @@
   function atlasGirisHTML(K) {
     const kutu = (kp, ad, n, alt, sinif = '') => ckBag(kp, `<b>${ad}</b><span class="say">${n}</span><span class="at-alt">${alt}</span>`, `at-kutu${sinif}`);
     const sn = (snVar(K) ? kutu('_sinav', 'Sınav pusulası', SN[K.id].d === 'acik' ? 'açık' : 'kilitli', SN[K.id].d === 'acik' ? 'strateji · olasılık · son gün' : 'parolayla açılır', ' sn-kutu') : '')
-      + (czKars(K).length ? kutu('_kars', 'Karşılaştırmalar', czKars(K).length, 'karıştırılan kavramlar yan yana') : '');
+      + (czKars(K).length ? kutu('_kars', 'Karşılaştırmalar', czKars(K).length, 'karıştırılan kavramlar yan yana') : '') + (kesinSay(K) ? kutu('_kesin', 'Kesin bil', kesinSay(K).adim, 'kesin adımlar · hızlı tekrar', ' ks-kutu') : '');
     if (!turlar(K).length && !tepkimeler(K).length && !donguler(K).length && !HS(K).length) {
       if (sn) return `<div class="at-giris">${sn}${(K.kavramlar || []).length > 1 ? kutu('_ag', 'Kavram ağı', K.kavramlar.length, 'kavramlar arası bağlar') : ''}${(K.sozluk || []).length ? kutu('_sozluk', 'Sözlük', K.sozluk.length, 'TR ↔ EN terimler') : ''}</div>`;
       return (K.kavramlar || []).length > 1 ? `<p class="ag-gir">${ckBag('_ag', 'Kavram ağı: bütün kavramlar ve aralarındaki bağlar tek çizimde →', 'soru-bag')}</p>` : '';
@@ -1227,15 +1227,15 @@
     const B = (V.bolum || {})[b.id]; if (!B) return '';
     const n = snN(B.olasilik), azAsil = (B.az || []).length || (B.asil || []).length;
     const isl = typeof B.islev === 'string' ? B.islev.trim() : ''; // olasılık yerine işlev (ör. «Sınav öncesi son tekrar»)
-    return `<details class="sn-x sn-serit" data-n="${n}"${isl ? ' data-islev=""' : ''}${kisa ? '' : ' open'}><summary>${isl ? `<span class="sn-islev">${kac(isl)}</span>` : snNokta(n)}<span class="sn-et">${kisa ? `${kac(bolumAd(K, b))} · ` : ''}Sınav pusulası</span>${kisa && B.neden ? `<span class="sn-ozet">${kac(kisalt(B.neden, 90))}</span>` : ''}</summary>
+    return `<details class="sn-x sn-serit" data-n="${n}"${isl ? ' data-islev=""' : ''}${kisa ? '' : ' open'}><summary>${isl ? `<span class="sn-islev">${kac(isl)}</span>` : snNokta(n)}${!isl && n === 3 ? isr('sik', { kucuk: true }) : ''}<span class="sn-et">${kisa ? `${kac(bolumAd(K, b))} · ` : ''}Sınav pusulası</span>${kisa && B.neden ? `<span class="sn-ozet">${kac(kisalt(B.neden, 90))}</span>` : ''}</summary>
       ${B.neden ? `<p class="sn-neden">${kac(B.neden)}</p>` : ''}${(B.odak || []).length ? `<p class="sn-alt">Odak:</p>${snUl(B.odak)}` : ''}
-      ${azAsil ? `<div class="sn-az">${(B.az || []).length ? `<p><b>Az çıkar:</b> ${B.az.map(kac).join(' · ')}</p>` : ''}${(B.asil || []).length ? `<p class="sn-alt">${(B.az || []).length ? 'Asıl bil:' : 'Az çıkar — asıl bil:'}</p>${snUl(B.asil)}` : ''}</div>` : ''}
+      ${azAsil ? `<div class="sn-az">${(B.az || []).length ? `<p><b>Az çıkar:</b> ${B.az.map(kac).join(' · ')}</p>` : ''}${(B.asil || []).length ? `<p class="sn-alt">${isr('kesin', { kucuk: true })}${(B.az || []).length ? 'Asıl bil:' : 'Az çıkar — asıl bil:'}</p>${snUl(B.asil)}` : ''}</div>` : ''}
       ${(B.yol || []).length ? `<div class="sn-cipler"><span class="yok">Çalışma yolu:</span> ${B.yol.map((g) => snCip(K, g)).join('')}</div>` : ''}</details>`;
   }
   function snNotHTML(K, S) {
     const n = snN(S.olasilik), ben = (S.benzer || []).filter((x) => K.sorular[x]), at = (S.atolye || []).filter(Boolean);
-    return `<details class="sn-x sn-not" data-n="${n}" open><summary>${snNokta(n)}<span class="sn-et">Sınav notu</span></summary>
-      ${S.neden ? `<p class="sn-neden">${kac(S.neden)}</p>` : ''}${S.ipucu ? `<p class="sn-ipucu"><b>Sınavda ilk adım:</b> ${kac(S.ipucu)}</p>` : ''}
+    return `<details class="sn-x sn-not" data-n="${n}" open><summary>${snNokta(n)}${n === 3 ? isr('sik') : ''}<span class="sn-et">Sınav notu</span></summary>
+      ${S.neden ? `<p class="sn-neden">${kac(S.neden)}</p>` : ''}${S.ipucu ? `<p class="sn-ipucu">${isr('kisa')}<b>Sınavda ilk adım:</b> ${kac(S.ipucu)}</p>` : ''}
       ${(S.varyant || []).length ? `<p class="sn-alt">Sınavda şöyle de gelebilir:</p>${snUl(S.varyant)}` : ''}
       ${ben.length ? `<div class="sn-cipler"><span class="yok">Benzer:</span> ${ben.map((x) => snCip(K, 'soru:' + x)).join('')}</div>` : ''}
       ${at.length ? `<div class="sn-cipler"><span class="yok">Atölyede dene:</span> ${at.map((x, i) => `<a class="sn-cip" href="../soru-cozum/${kac(K.id)}/calis/#${kac(encodeURIComponent(x))}" target="_blank" rel="noopener">${at.length > 1 ? `Atölye ${i + 1}` : 'Sınav Atölyesi'} ↗</a>`).join('')}</div>` : ''}</details>`;
@@ -1276,7 +1276,7 @@
   function snSoruSusle(K, V, q) {
     if (!q) return;
     const S = (V.soru || {})[q.id], b = K.bolumler.find((x) => x.id === q.bolum), ilk = !!b && bolumSorulari(K, b)[0] === q.id;
-    if (S && S.olasilik) $('.soru-ust', ana)?.insertAdjacentHTML('beforeend', snNokta(S.olasilik, false, 'sn-x sn-rozet'));
+    if (S && S.olasilik) $('.soru-ust', ana)?.insertAdjacentHTML('beforeend', snNokta(S.olasilik, false, 'sn-x sn-rozet') + (snN(S.olasilik) === 3 ? isr('sik', { sinif: 'sn-x' }) : ''));
     if (ilk && (V.bolum || {})[b.id]) $('.soru-kart', ana)?.insertAdjacentHTML('beforebegin', snSeritHTML(K, V, b, true));
     const ak = (V.akis || []).filter((a) => a.yer === `soru:${q.id}` || (ilk && a.yer === `bol:${q.bolum}`));
     const h = ak.map((a) => snAkisHTML(K, a)).join('') + (S ? snNotHTML(K, S) : '');
@@ -1291,15 +1291,15 @@
   // kavram «Sınav» sekmesi
   function sinavKavramHTML(K, k) {
     const X = snKv(K, k.id); if (!X) return '<p class="yok">Bu kavramın sınav notu hazırlanıyor.</p>';
-    let h = `<p class="sn-bas">${snNokta(X.olasilik)}${X.neden ? `<span class="sn-neden">${kac(X.neden)}</span>` : ''}</p>${(SV(K).akis || []).filter((a) => a.yer === `kavram:${k.id}`).map((a) => snAkisHTML(K, a, true)).join('')}`;
+    let h = `<p class="sn-bas">${snNokta(X.olasilik)}${snN(X.olasilik) === 3 ? isr('sik') : ''}${X.neden ? `<span class="sn-neden">${kac(X.neden)}</span>` : ''}</p>${(SV(K).akis || []).filter((a) => a.yer === `kavram:${k.id}`).map((a) => snAkisHTML(K, a, true)).join('')}`;
     if ((X.anlat || []).length) h += `<h3>Anlatım</h3>${snUl(X.anlat)}`;
     for (const kr of X.karsilastir || []) h += karsilastirHTML(kr);
     const hz = (X.kars || []).map((id) => (((K.cozum || {}).kars) || []).find((x) => x.id === id)).filter(Boolean);
     if (hz.length) h += `<h3>Hazır karşılaştırmalar</h3><div class="ilgili">${hz.map((x) => ckBag(`_kars/=${x.id}`, kac(x.baslik), 'soru-bag')).join('')}</div>`;
     if ((X.gercek || []).length) h += `<section class="sn-gercek"><h3>Gerçek hayat köşesi</h3>${X.gercek.map((g) => `<div class="sn-g">${g.baslik ? `<b>${kac(g.baslik)}</b>` : ''}<p>${kac(g.metin || '')}</p></div>`).join('')}</section>`;
     if ((X.sorulus || []).length) h += `<h3>Sınavda nasıl sorulur?</h3>${snUl(X.sorulus)}`;
-    if ((X.tuzak || []).length) h += `<h3>Tuzak</h3>${snUl(X.tuzak)}`;
-    if ((X.bil || []).length) h += `<div class="sn-bil"><h3>Asıl bil</h3>${snUl(X.bil)}</div>`;
+    if ((X.tuzak || []).length) h += `<h3 class="isr-h">${isr('tuzak')}</h3>${snUl(X.tuzak)}`;
+    if ((X.bil || []).length) h += `<div class="sn-bil isr-k"><h3 class="isr-h">${isr('kesin')}<span>Asıl bil</span></h3>${snUl(X.bil)}</div>`;
     if ((X.cift || []).length) h += `<h3>TR ↔ EN <small class="yok">sınav kâğıdına</small></h3>${X.cift.map((c) => ciftHTML(c, 'sinav')).join('')}`;
     return h;
   }
@@ -1330,7 +1330,7 @@
     const grup = (bas, L) => ((L || []).length ? `<h4>${bas}</h4>${snUl(L)}` : '');
     const SG = T.son_gun || [];
     ckIc.innerHTML = `<p class="sn-ust"><button type="button" class="kucuk sn-dug sn-ac" aria-pressed="${on}">${PUSULA_SVG}<span>Okuma akışında göster</span></button><span class="yok">${on ? 'Bölüm şeridi, soru rozeti ve sınav notları açık.' : 'Okuma akışındaki işaretler kapalı.'}</span></p>
-      ${(T.ozet || []).length ? `<section class="sn-blok"><h3>Puan nereden gelir?</h3>${snUl(T.ozet)}</section>` : ''}
+      ${(T.ozet || []).length ? `<section class="sn-blok"><h3>Puan nereden gelir?</h3>${snUl(T.ozet)}</section>` : ''}${kesinSay(K) ? `<section class="sn-blok"><h3 class="isr-h">${isr('kesin')}<span>Hızlı tekrar</span></h3><p>${ckBag('_kesin', 'Kesin bil listesi: bölüm bölüm kesin adımlar ve asıl bil maddeleri →', 'soru-bag')}</p></section>` : ''}
       ${['bicim', 'kapsam', 'izin', 'not'].some((a) => (S[a] || []).length) ? `<section class="sn-blok"><h3>${kac(S.ad || 'Sınav')}</h3>${grup('Biçim', S.bicim)}${grup('Kapsam', S.kapsam)}${grup('İzin verilenler', S.izin)}${grup('Not', S.not)}</section>` : ''}
       ${(T.sira || []).length ? `<section class="sn-blok sn-yolu"><h3>Çalışma sırası <span class="say">${T.sira.length} adım</span></h3><ol class="sn-sira">${T.sira.map((x) => `<li>${snCip(K, x.git, true)}${x.neden ? `<span class="sn-sneden">${kac(x.neden)}</span>` : ''}</li>`).join('')}</ol></section>` : ''}
       ${SG.length ? `<section class="sn-blok"><h3>Son gün kontrol listesi <span class="say sn-gun-say">${[...gun].filter((i) => i < SG.length).length} / ${SG.length}</span></h3><ul class="sn-gun">${SG.map((x, i) => `<li><label><input type="checkbox" data-i="${i}"${gun.has(i) ? ' checked' : ''}><span>${kac(x)}</span></label></li>`).join('')}</ul></section>` : ''}
@@ -1384,7 +1384,7 @@
   let cozZorla = '';
   function oynAdimlar(K, q) {
     const C = czSoru(K, q.id);
-    if (C && (C.adim || []).length) return C.adim.map((a) => ({ ne: kac(a.ne || ''), en: a.en ? kac(a.en) : '', islem: kac(a.islem || ''), sonuc: kac(a.sonuc || ''), neden: kac(a.neden || ''), kontrol: kac(a.kontrol || ''), dikkat: kac(a.dikkat || ''), kv: a.kavram ? [a.kavram] : [] }));
+    if (C && (C.adim || []).length) return C.adim.map((a) => ({ ne: kac(a.ne || ''), en: a.en ? kac(a.en) : '', islem: kac(a.islem || ''), sonuc: kac(a.sonuc || ''), neden: kac(a.neden || ''), kontrol: kac(a.kontrol || ''), dikkat: kac(a.dikkat || ''), kesin: a.kesin === true, kn: kac(a.kesin_neden || ''), fx: a.kesin === true ? isrFormul(K, q, a) : '', kv: a.kavram ? [a.kavram] : [] }));
     const R = q.rehber;
     if (R && (R.adimlar || []).length) return R.adimlar.map((a) => ({ bas: kac(a.kisa || ''), ne: a.ne || '', islemH: a.nasil || '', sonuc: a.sonuc || '', neden: a.neden || '', kv: a.kavram ? [a.kavram] : [] }));
     return (q.adimlar || []).map((a) => ({ html: a.html || '', kv: a.kavram || [] }));
@@ -1393,25 +1393,34 @@
   const cozKipHTML = (K, q) => (oynAdimlar(K, q).length ? `<div class="coz-kip" role="group" aria-label="Çözüm görünümü"><button type="button" data-kip="oyn" aria-pressed="false">${IK('<path d="M7 5v14l11-7z"/>')}<span>Adım adım</span></button><button type="button" data-kip="liste" aria-pressed="false">${IK('<path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/>')}<span>Liste</span></button></div>` : '');
   function oynHTML(K, q) {
     const A = oynAdimlar(K, q), n = A.length; if (!n) return '';
-    const li = (a, i) => `<li class="oyn-a" data-i="${i}" hidden>${a.html ? a.html : `<p class="oyn-ne">${a.bas ? `<b>${a.bas}</b> · ` : ''}${a.ne}</p>${a.en ? `<p class="oyn-en" lang="en">${a.en}</p>` : ''}${a.islem ? `<div class="oyn-islem">${a.islem}</div>` : a.islemH ? `<div class="oyn-islem oyn-tex">${a.islemH}</div>` : ''}${a.sonuc ? `<p class="oyn-sonuc"><span class="oyn-et">Ara sonuç</span> <b>${a.sonuc}</b></p>` : ''}${a.neden ? `<details class="oyn-neden"><summary>Neden?</summary><p>${a.neden}</p></details>` : ''}${a.kontrol ? `<p class="oyn-kontrol"><span class="oyn-et">Denetim</span> ${a.kontrol}</p>` : ''}${a.dikkat ? `<p class="oyn-dikkat"><span class="oyn-et">Dikkat</span> ${a.dikkat}</p>` : ''}`}${bagHTML(K, a.kv, q.id)}</li>`;
-    return `<section class="oyn" id="oyn" aria-label="Adım adım çözüm"><div class="oyn-ust"><div class="oyn-cubuk" role="group" aria-label="Adıma git">${A.map((a, i) => `<button type="button" class="oyn-p" data-i="${i}" aria-label="${i + 1}. adım"></button>`).join('')}</div><span class="oyn-say" aria-live="polite"></span></div>
+    const ing = ingDers(K), ksv = A.some((a) => a.kesin);
+    const li = (a, i) => `<li class="oyn-a${a.kesin ? ' isr-k' : ''}" data-i="${i}" hidden>${a.html ? a.html : `${a.kesin ? `<p class="isr-bas">${isr('kesin')}${a.kn ? `<span class="isr-neden">${a.kn}</span>` : ''}</p>` : ''}<p class="oyn-ne">${a.bas ? `<b>${a.bas}</b> · ` : ''}${a.ne}</p>${a.en ? `<p class="oyn-en">${ing ? isr('yaz', a.kesin ? {} : { kucuk: true }) : ''}<span lang="en">${a.en}</span></p>` : ''}${a.fx || ''}${a.islem ? `<div class="oyn-islem">${a.islem}</div>` : a.islemH ? `<div class="oyn-islem oyn-tex">${a.islemH}</div>` : ''}${a.sonuc ? `<p class="oyn-sonuc">${isr('sonuc')}<b>${a.sonuc}</b></p>` : ''}${a.neden ? `<details class="oyn-neden"><summary>Neden?</summary><p>${a.neden}</p></details>` : ''}${a.kontrol ? `<p class="oyn-kontrol">${isr('denetle')}${a.kontrol}</p>` : ''}${a.dikkat ? `<p class="oyn-dikkat">${isr('tuzak')}${a.dikkat}</p>` : ''}`}${bagHTML(K, a.kv, q.id)}</li>`;
+    return `<section class="oyn${ksv ? ' ks-var' : ''}" id="oyn" aria-label="Adım adım çözüm"><div class="oyn-ust"><div class="oyn-cubuk" role="group" aria-label="Adıma git">${A.map((a, i) => `<button type="button" class="oyn-p${a.kesin ? ' ks' : ''}" data-i="${i}" aria-label="${i + 1}. adım${a.kesin ? ' · kesin bil' : ''}">${a.kesin ? KS_YILDIZ : ''}</button>`).join('')}</div><span class="oyn-say" aria-live="polite"></span>${ksv ? `<button type="button" class="kucuk ks-dug" aria-pressed="${ksYal()}" title="Kesin adımlar öne çıksın; öbür adımlar tek satıra iner">${isr('kesin', { kucuk: true })}<span>Yalnız kesin bil</span></button>` : ''}</div>
       <ol class="oyn-liste">${A.map(li).join('')}</ol>
       <div class="oyn-dug"><button type="button" class="kucuk oyn-geri">‹ Önceki</button><button type="button" class="dugme oyn-ileri">1. adımı göster</button><button type="button" class="kucuk oyn-hepsi">Hepsi</button><button type="button" class="kucuk oyn-basa">Baştan</button></div></section>`;
   }
   function oynKur(K, q, listeGoster) {
     const kok = $('#oyn', ana), kip = $('.coz-kip', ana); if (!kok || !kip) return;
     const L = $$('.oyn-a', kok), n = L.length, anah = `${K.id}/${q.id}`;
+    // ISARET: «Yalnız kesin bil» açıkken bütün adımlar görünür (kesin olmayanlar tek satır), ileri / geri kesin adımlar arasında
+    const KS = L.map((li, i) => (li.classList.contains('isr-k') ? i : -1)).filter((i) => i >= 0);
+    const ksKip = () => KS.length > 0 && document.documentElement.classList.contains('ks-yal');
+    const ksSonraki = (m) => KS.find((i) => i > m - 1), ksOnceki = (m) => [...KS].reverse().find((i) => i < m - 1);
     const goster = (m, otele) => {
       m = Math.max(0, Math.min(n, m)); oynAdim[anah] = m;
-      L.forEach((li, i) => { const ac = i < m; if (ac && li.hidden && otele) li.classList.add('yeni'); li.hidden = !ac; li.classList.toggle('simdi', i === m - 1); });
-      $$('.oyn-p', kok).forEach((b, i) => { b.classList.toggle('dolu', i < m); b.setAttribute('aria-current', String(i === m - 1)); });
-      $('.oyn-say', kok).textContent = m ? `Adım ${m} / ${n}` : `${n} adım · önce kendin dene`;
-      const il = $('.oyn-ileri', kok); il.hidden = m >= n; il.textContent = m ? 'Sonraki adım ›' : '1. adımı göster';
-      $('.oyn-geri', kok).hidden = m === 0; $('.oyn-hepsi', kok).hidden = m >= n; $('.oyn-basa', kok).hidden = m === 0;
-      if (ana.dataset.cozkip === 'oyn') { const s = $('#cozum-son', ana); if (s) s.hidden = m < n; }
+      const ks = ksKip();
+      L.forEach((li, i) => { const ac = ks || i < m; if (ac && li.hidden && otele) li.classList.add('yeni'); li.hidden = !ac; li.classList.toggle('simdi', i === m - 1); });
+      $$('.oyn-p', kok).forEach((b, i) => { b.classList.toggle('dolu', ks ? KS.includes(i) : i < m); b.setAttribute('aria-current', String(i === m - 1)); });
+      $('.oyn-say', kok).textContent = ks ? (m && KS.includes(m - 1) ? `Kesin adım ${KS.indexOf(m - 1) + 1} / ${KS.length} · adım ${m} / ${n}` : `${KS.length} kesin adım · ${n} adımın içinde`) : m ? `Adım ${m} / ${n}` : `${n} adım · önce kendin dene`;
+      const il = $('.oyn-ileri', kok);
+      if (ks) { il.hidden = ksSonraki(m) == null; il.textContent = m ? 'Sonraki kesin adım ›' : 'İlk kesin adım ›'; $('.oyn-geri', kok).hidden = ksOnceki(m) == null; $('.oyn-hepsi', kok).hidden = true; }
+      else { il.hidden = m >= n; il.textContent = m ? 'Sonraki adım ›' : '1. adımı göster'; $('.oyn-geri', kok).hidden = m === 0; $('.oyn-hepsi', kok).hidden = m >= n; }
+      $('.oyn-basa', kok).hidden = m === 0;
+      if (ana.dataset.cozkip === 'oyn') { const s = $('#cozum-son', ana); if (s) s.hidden = !ks && m < n; }
       if (otele && m) L[m - 1].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
       if (window.__hudGoster) window.__hudGoster();
     };
+    kok.__yenile = () => goster(oynAdim[anah] || 0, false);
     const kipYaz = (k, kullanici) => {
       ana.dataset.cozkip = k;
       $$('button', kip).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.kip === k)));
@@ -1422,17 +1431,20 @@
     };
     kip.addEventListener('click', (e) => { const b = e.target.closest('button[data-kip]'); if (b) kipYaz(b.dataset.kip, true); });
     kok.addEventListener('click', (e) => {
+      const sli = e.target.closest('.oyn-a'); // süzgeç kipinde tek satıra inmiş adım: başlığına dokun → açılır / kapanır
+      if (sli && ksKip() && !sli.classList.contains('isr-k') && (!sli.classList.contains('ks-ac') || e.target.closest('.oyn-ne')) && !e.target.closest('button, a, summary, input, select, textarea')) { sli.classList.toggle('ks-ac'); return; }
       const b = e.target.closest('button'); if (!b || !kok.contains(b) || b.closest('.bag')) return;
       const m = oynAdim[anah] || 0;
-      if (b.classList.contains('oyn-ileri')) goster(m + 1, true);
-      else if (b.classList.contains('oyn-geri')) goster(m - 1, false);
+      if (b.classList.contains('oyn-ileri')) { if (ksKip()) { const i = ksSonraki(m); if (i != null) goster(i + 1, true); } else goster(m + 1, true); }
+      else if (b.classList.contains('oyn-geri')) { if (ksKip()) { const i = ksOnceki(m); if (i != null) goster(i + 1, true); } else goster(m - 1, false); }
       else if (b.classList.contains('oyn-hepsi')) goster(n, false);
       else if (b.classList.contains('oyn-basa')) goster(0, false);
       else if (b.classList.contains('oyn-p')) goster(+b.dataset.i + 1, true);
     });
     kok.addEventListener('keydown', (e) => {
       if (e.altKey || e.ctrlKey || e.metaKey || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName) || (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft')) return;
-      e.preventDefault(); e.stopPropagation(); goster((oynAdim[anah] || 0) + (e.key === 'ArrowRight' ? 1 : -1), e.key === 'ArrowRight');
+      e.preventDefault(); e.stopPropagation(); const m = oynAdim[anah] || 0, sag = e.key === 'ArrowRight';
+      if (ksKip()) { const i = sag ? ksSonraki(m) : ksOnceki(m); if (i != null) goster(i + 1, true); } else goster(m + (sag ? 1 : -1), sag);
     });
     const t = oku('dk:cozkip');
     kipYaz(cozZorla || (t === 'oyn' || t === 'liste' ? t : czZengin(K, q) ? 'oyn' : 'liste'), false);
@@ -1600,7 +1612,7 @@
     const bolumler = K.bolumler.filter((b) => bolumSorulari(K, b).length);
     ana.innerHTML = `<div class="kitap-yer"><nav class="dizin" aria-label="Bölümler ve sorular">${dizinHTML(K, 'akis')}</nav><div>${takipHTML(K, null)}
       <h1>Kitap akışı <small class="yok">· yalnız başlıklar</small></h1>
-      <p class="ak-not yok">Bir soruya dokun: metni burada açılır. <kbd>j</kbd> <kbd>k</kbd> sonraki / önceki soru, <kbd>o</kbd> aç / kapat.</p>
+      ${kesinSay(K) ? isrLejantHTML(K, 'akis') : ''}<p class="ak-not yok">Bir soruya dokun: metni burada açılır. <kbd>j</kbd> <kbd>k</kbd> sonraki / önceki soru, <kbd>o</kbd> aç / kapat.</p>
       <div class="ak-arac" role="group" aria-label="Katla / aç"><button type="button" class="kucuk" data-ak="ac">Tümünü aç</button><button type="button" class="kucuk" data-ak="kapat">Tümünü kapat</button><button type="button" class="kucuk" data-ak="baslik">Yalnız başlıklar</button>${V ? `<button type="button" class="kucuk sn-yalak" data-ak="yal" aria-pressed="${yal}">${snNokta(3, true)} Yalnız yüksek olasılık</button>` : ''}</div>
       ${kip && V ? snKvListeHTML(K, V) : ''}
       <div class="ak-liste${yal ? ' sn-yalniz' : ''}">${bolumler.map((b) => {
@@ -1696,6 +1708,125 @@
   const GLIF = { '✍': '<path d="M12 20h9"/><path d="M16.4 3.6a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>', '📈': '<path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6"/>', '⚠': '<path d="M12 3 2 20h20Z"/><path d="M12 10v4M12 17h.01"/>', '💎': '<path d="M6 3h12l3 6-9 12L3 9Z"/><path d="M3 9h18"/>', '📌': '<path d="M9 3h6l-1 6 3 3H7l3-3Z"/><path d="M12 12v9"/>', '🎯': '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/>', '✔': '<path d="m5 12 5 5 9-10"/>', '📖': '<path d="M2 5h7a3 3 0 0 1 3 3v12a2 2 0 0 0-2-2H2Z"/><path d="M22 5h-7a3 3 0 0 0-3 3v12a2 2 0 0 1 2-2h8Z"/>', '📋': '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9z"/>', '🧩': '<path d="M4 8h4a2 2 0 1 1 4 0h4v4a2 2 0 1 1 0 4v4H4z"/>', '🔵': '<circle cx="12" cy="12" r="6"/>', '☔': '<path d="M3 12a9 9 0 0 1 18 0Z"/><path d="M12 12v7a2 2 0 0 0 4 0"/>' };
   const GLIF_RX = /(🇬🇧|[✍📈⚠💎📌🎯✔📖📋🧩🔵☔])️?\s?/gu;
 
+  /* ---------- ISARET (27 Kas): sınava odaklı görsel mini işaretler ----------
+     Tek görsel dil: satır içi SVG simge + kısa etiket (emoji yok), .isr .isr-<tür>; blok vurgusu .isr-k (kalın sol şerit + hafif zemin).
+     kesin «Kesin bil» (yıldız): cozum adımında "kesin": true, sınav «Asıl bil», kavramın ana formülü, kitabın «Sınavda yaz» satırı
+     sik «Sık çıkar» (hedef): yalnız sınav pusulası açıkken, olasılık 3 (soru · bölüm · kavram)
+     tuzak «Tuzak» (üçgen): adim.dikkat, sınav tuzak, rehber tuzak, kitabın «Sık hata» satırı
+     ezber «Ezberle» (Σ): kesin adımın formülü (kesin_neden «ana formül: <ad>» → rehber formülü), olasılığı yüksek kavramın formülü
+     yaz «Sınavda yaz» (kalem): kitap öz, İngilizce derslerde adımın en cümlesi, rehberin «Sınav kâğıdına yaz» kutusu
+     denetle «Denetle» (onay): adim.kontrol · kisa «Kısa yol» (şimşek): ipucu, kalıp ipucu, sınavda ilk adım · sonuc «Ara sonuç» (nötr)
+     Süzgeç «Yalnız kesin bil» (dk:kesin → html.ks-yal): oynatıcıda bütün adımlar açılır, kesin olmayanlar tek satıra iner (dokun: açılır),
+     ileri / geri kesin adımlar arasında atlar. Çekmece _kesin: bölüm bölüm kesin adımlar (+ pusula açıksa kavramların «Asıl bil» maddeleri). */
+  const ISR = {
+    kesin: ['Kesin bil', '<path d="M12 3.2l2.7 5.5 6 .9-4.4 4.2 1.1 6L12 17l-5.4 2.8 1.1-6-4.4-4.2 6-.9z"/>'],
+    sik: ['Sık çıkar', '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/>'],
+    tuzak: ['Tuzak', '<path d="M12 3.5 2.5 20h19Z"/><path d="M12 10v4.5M12 17.2h.01"/>'],
+    ezber: ['Ezberle', '<path d="M17.5 5h-11l6 7-6 7h11"/>'],
+    yaz: ['Sınavda yaz', '<path d="M12 20h9"/><path d="M16.4 3.6a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>'],
+    denetle: ['Denetle', '<path d="m5 12.5 4.5 4.5L19 7"/>'],
+    kisa: ['Kısa yol', '<path d="M13 2.5 5 13.5h6l-1 8 8-11h-6z"/>'],
+    sonuc: ['Ara sonuç', '<path d="M5 9.5h14M5 14.5h14"/>'],
+  };
+  const ISR_SIRA = ['kesin', 'sik', 'tuzak', 'ezber', 'yaz', 'denetle', 'kisa'];
+  const ISR_ACIK = { kesin: 'puanın geldiği yer: kesin adım, asıl bilgi, ana formül', sik: 'sınavda çıkma olasılığı yüksek (sınav pusulası açıkken)', tuzak: 'sık yapılan hata', ezber: 'ezberlenecek formül', yaz: 'sınav kâğıdına yazılacak cümle', denetle: 'sonucu denetleme yolu', kisa: 'ipucu, kısa yol, ilk adım' };
+  const KS_YILDIZ = `<svg class="ks-y" viewBox="0 0 24 24" aria-hidden="true">${ISR.kesin[1]}</svg>`;
+  // o.kucuk: yalnız simge (role=img + aria-label) · o.ad: etiket metni · o.neden: başlık (title) · o.sinif: ek sınıf
+  function isr(t, o = {}) {
+    const [ad, d] = ISR[t], et = o.ad || ad, svg = `<svg viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`, s = `isr isr-${t}${o.kucuk ? ' isr-kucuk' : ''}${o.sinif ? ' ' + o.sinif : ''}`;
+    return o.kucuk ? `<span class="${s}" role="img" aria-label="${kac(et)}" title="${kac(o.neden || et)}">${svg}</span>` : `<span class="${s}"${o.neden ? ` title="${kac(o.neden)}"` : ''}>${svg}<span class="isr-ad">${kac(et)}</span></span>`;
+  }
+  const ingDers = (K) => /e$/i.test((K && K.id) || '');
+  const ksYal = () => oku('dk:kesin') === '1';
+  document.documentElement.classList.toggle('ks-yal', ksYal());
+  const KS_SAY = new Map();
+  function kesinSay(K) {
+    if (!K) return null;
+    if (KS_SAY.has(K.id)) return KS_SAY.get(K.id);
+    let adim = 0, soru = 0;
+    for (const s of Object.values(CZ(K).soru || {})) { const n = (s.adim || []).filter((a) => a && a.kesin === true).length; if (n) { adim += n; soru++; } }
+    const r = adim ? { adim, soru } : null; KS_SAY.set(K.id, r); return r;
+  }
+  // kesin adımın «Ezberle» formülü: kesin_neden «ana formül: <ad>» → sorunun rehber formülü; yoksa sorunun kavramının ana formülü
+  function isrFormul(K, q, a) {
+    const m = /^(?:ana )?formül: (.+)$/.exec(a.kesin_neden || ''); if (!m || !q) return '';
+    const ad = m[1].trim(), es = (x) => !!x && (x === ad || x.startsWith(ad));
+    const f = ((q.rehber || {}).formul || []).find((x) => es(x.ad));
+    if (f && f.tex) return `<div class="isr-ezf">${isr('ezber')}<div class="isr-f">${f.tex}</div></div>`;
+    const k = (q.kavram || []).map((id) => kavramBul(K, id)).find((x) => x && es(x.ad) && ((x.parcalar || {}).formul || {}).tex != null);
+    return k ? `<div class="isr-ezf">${isr('ezber')}<div class="isr-f"><div class="tex-blok" data-tex="${k.parcalar.formul.tex}"></div></div></div>` : '';
+  }
+  // kitap öz kutusu → «Sınavda yaz» (öz «Sınavda yaz →» ile başlıyorsa kitabın kendi sınav satırıdır: Kesin bil de)
+  function ozHTML(oz) {
+    let h = String(oz || '').replace(/^<p>|<\/p>$/g, '');
+    const m = /^\s*Sınavda yaz\s*(?:→|:)\s*/i.exec(h); if (m) h = h.slice(m[0].length);
+    return `<div class="oz${m ? ' isr-blok isr-k' : ' isr-y'}">${m ? isr('kesin') : ''}${isr('yaz')}${h}</div>`;
+  }
+  // kitabın kendi metnindeki «Sınavda yaz:» satırı → Kesin bil + Sınavda yaz bloğu; «Sık hata:» → Tuzak (kitap PDF'i değişmez)
+  function isrSusle(kok) {
+    if (!kok) return;
+    for (const s of $$('strong, b', kok)) {
+      if (!s.isConnected || s.closest('.isr, .isr-blok, svg, button, summary, a, .sn-x, .ks-soru')) continue;
+      const t = s.textContent.trim().replace(/:$/, '').toLocaleLowerCase('tr'), yaz = t === 'sınavda yaz', tz = t === 'sık hata';
+      if (!yaz && !tz) continue;
+      const p = s.parentElement; if (!p || (p.tagName !== 'P' && p.tagName !== 'LI')) continue;
+      // etiket satırın başında mı (önünde yalnız boşluk ya da uyarı simgesi)
+      let x = s.previousSibling, bas = true;
+      while (x) { if (x.nodeType === 3 ? x.nodeValue.trim() : !(x.matches && x.matches('svg.glif'))) { bas = false; break; } x = x.previousSibling; }
+      if (!bas) continue;
+      while (s.previousSibling) s.previousSibling.remove();
+      if (tz) { s.insertAdjacentHTML('beforebegin', isr('tuzak')); s.remove(); p.classList.add('isr-tz'); continue; }
+      s.insertAdjacentHTML('beforebegin', isr('kesin') + isr('yaz')); s.remove();
+      if (p.tagName === 'LI') { p.classList.add('isr-blok', 'isr-k', 'isr-yz'); continue; }
+      // yalnız etiketten oluşan satırın altındaki liste / alıntı / paragraf aynı bloğa alınır
+      const bos = !$$('.isr', p).reduce((m, c) => m.replace(c.textContent, ''), p.textContent).trim(), sonra = p.nextElementSibling;
+      const d = document.createElement('div'); d.className = 'isr-blok isr-k isr-yz';
+      p.before(d); d.append(p);
+      if (bos && sonra && (/^(UL|OL|BLOCKQUOTE)$/.test(sonra.tagName) || (sonra.tagName === 'P' && !sonra.querySelector('strong, b')))) d.append(sonra);
+      // düz paragrafta kalmış markdown listesi («\n- madde») maddelere ayrılır
+      if (/\n-\s/.test(p.innerHTML)) { const parca = p.innerHTML.split(/\n-\s+/); p.innerHTML = parca[0]; p.insertAdjacentHTML('afterend', `<ul>${parca.slice(1).map((m) => `<li>${m.trim()}</li>`).join('')}</ul>`); }
+    }
+  }
+  // «İşaretler» açıklaması (açılır; durum dk:isrlej) + «Yalnız kesin bil» süzgeci + _kesin listesi
+  function isrLejantHTML(K, yer) {
+    const nk = kesinSay(K), acik = oku('dk:isrlej') === '1';
+    return `<details class="isr-lejant" data-yer="${yer}"${acik ? ' open' : ''}><summary><span class="isr-lej-bas">İşaretler</span><span class="isr-lej-mini" aria-hidden="true">${ISR_SIRA.map((t) => isr(t, { kucuk: true })).join('')}</span></summary>
+      <ul class="isr-lej-liste">${ISR_SIRA.map((t) => `<li>${isr(t)}<span>${ISR_ACIK[t]}</span></li>`).join('')}</ul>
+      ${nk ? `<p class="isr-lej-dug"><button type="button" class="kucuk ks-dug" aria-pressed="${ksYal()}">${isr('kesin', { kucuk: true })}<span>Yalnız kesin bil</span></button><button type="button" class="kucuk ks-git" data-git="${kac(`#${anaOnEk(K)}/k/_kesin`)}">Kesin bil listesi · ${nk.adim} adım</button></p>` : ''}</details>`;
+  }
+  document.addEventListener('toggle', (e) => { if (e.target.matches && e.target.matches('.isr-lejant')) sakla('dk:isrlej', e.target.open ? '1' : '0'); }, true);
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('.ks-dug'); if (!b) return;
+    const on = !ksYal(); sakla('dk:kesin', on ? '1' : '0');
+    document.documentElement.classList.toggle('ks-yal', on);
+    $$('.ks-dug').forEach((x) => x.setAttribute('aria-pressed', String(on)));
+    const o = $('#oyn', ana);
+    if (on && o && ana.dataset.cozkip === 'liste') $('.coz-kip button[data-kip="oyn"]', ana)?.click(); // süzgeç oynatıcıda çalışır
+    if (o && o.__yenile) o.__yenile();
+  });
+  // çekmece _kesin: bölüm bölüm kesin adımlar (hızlı tekrar); pusula açıksa kavramların «Asıl bil» maddeleri
+  function kesinCk(K, ne, ayni) {
+    const V = SV(K), say = kesinSay(K);
+    kirintiYaz(K, [['Kesin bil', null]]);
+    $('#ck-sira').innerHTML = ''; $('#ck-sekme').innerHTML = ustSekme(K, 'kesin');
+    $('#ck-baslik').innerHTML = `Kesin bil · hızlı tekrar<small>${say ? `${say.adim} kesin adım · ${say.soru} soru` : 'bu kitapta işaretli adım yok'}${V ? ' · pusula açık' : ''}</small>`;
+    if (ayni) return;
+    const sat = (q, a, i) => `<li><a class="ks-sat" href="#${K.id}/${q.id}/o${i + 1}" data-ana="${q.id}/o${i + 1}"><span class="ks-no">${i + 1}</span><span class="ks-ne">${kac(a.ne || '')}${a.kesin_neden ? ` <small class="isr-neden">· ${kac(a.kesin_neden)}</small>` : ''}</span></a>${a.islem ? `<span class="ks-islem">${kac(kisalt(a.islem, 150))}</span>` : ''}${a.sonuc ? `<span class="ks-sonuc">${isr('sonuc', { kucuk: true })}<b>${kac(kisalt(a.sonuc, 110))}</b></span>` : ''}</li>`;
+    let h = `<p class="ck-not">Puanın geldiği yerler, bölüm bölüm: her sorunun kesin adımları (ana formülün yerine konduğu adım ve kâğıda yazılacak sonuç)${V ? ', altında kavramların «Asıl bil» maddeleri' : ''}. Bir adıma dokun: soru o adımda açılır.</p>`;
+    if (say) h += `<p class="isr-lej-dug"><button type="button" class="kucuk ks-dug" aria-pressed="${ksYal()}">${isr('kesin', { kucuk: true })}<span>Oynatıcıda yalnız kesin bil</span></button></p>`;
+    for (const b of K.bolumler) {
+      const qs = bolumSorulari(K, b).map((s) => K.sorular[s]).filter(Boolean);
+      const sq = qs.map((q) => {
+        const A = (czSoru(K, q.id) || {}).adim || [], L = A.map((a, i) => (a && a.kesin === true ? sat(q, a, i) : '')).filter(Boolean); if (!L.length) return '';
+        const S = V && (V.soru || {})[q.id];
+        return `<section class="ks-soru"><h4><a href="#${K.id}/${q.id}" data-soru="${q.id}"><b>${q.id}</b> ${kac(kisalt(q.baslik, 70))}</a>${S && snN(S.olasilik) === 3 ? isr('sik', { kucuk: true }) : ''}</h4><ol class="ks-liste">${L.join('')}</ol></section>`;
+      }).join('');
+      const kv = V ? (K.kavramlar || []).filter((k) => k.bolum === b.id && (((V.kavram || {})[k.id] || {}).bil || []).length).map((k) => `<section class="ks-kv isr-k">${snCip(K, 'kavram:' + k.id, true)}${snUl(V.kavram[k.id].bil)}</section>`).join('') : '';
+      if (sq || kv) h += `<h3 class="ks-bol">${kac(bolumAd(K, b))}</h3>${sq}${kv ? `<p class="sn-alt ks-kv-bas">${isr('kesin', { kucuk: true })}Asıl bil · kavramlar</p>${kv}` : ''}`;
+    }
+    ckIc.innerHTML = h;
+  }
+
   /* ---------- ETK Ö3 (26 Kas): sınav kipi — «Sınava çalış» (kilit açıksa) ----------
      Açınca: kitap akışında olasılık 3 açık, 2 katlı, 1 yalnız «Asıl bil» satırı; her sayfanın üstünde strateji.sira çalışma yolu
      (adım n / N, Önceki / Sonraki, Bitti, ilerleme çubuğu; dk:snyol:<kitap>). Kipten çıkınca katlama durumu eski hâline döner (kip kendi
@@ -1713,7 +1844,7 @@
   function snYolHTML(K, V) {
     const L = (V.strateji || {}).sira || []; if (!L.length) return '';
     const y = snYolOku(K.id), i = Math.max(0, Math.min(y.i, L.length - 1)), x = L[i], bit = L.filter((_, j) => y.b.has(j)).length;
-    return `<section class="sn-x sn-yol" aria-label="Sınav çalışma yolu"><div class="sn-yol-ust"><b>Çalışma yolu</b><span class="say">adım ${i + 1} / ${L.length} · bitti ${bit}</span><button type="button" class="kucuk sn-kipdug" aria-pressed="true">Kipten çık</button></div>
+    return `<section class="sn-x sn-yol" aria-label="Sınav çalışma yolu"><div class="sn-yol-ust"><b>Çalışma yolu</b><span class="say">adım ${i + 1} / ${L.length} · bitti ${bit}</span>${kesinSay(K) ? `<button type="button" class="kucuk ks-git" data-git="${kac(`#${anaOnEk(K)}/k/_kesin`)}">${isr('kesin', { kucuk: true })}Kesin bil listesi</button>` : ''}<button type="button" class="kucuk sn-kipdug" aria-pressed="true">Kipten çık</button></div>
       <div class="sn-ilerle" role="progressbar" aria-label="Biten adımlar" aria-valuemin="0" aria-valuemax="${L.length}" aria-valuenow="${bit}"><i style="width:${Math.round((bit / L.length) * 100)}%"></i></div>
       <div class="sn-yol-adim"><span class="sn-yol-no">${i + 1}</span>${snCip(K, x.git)}${x.neden ? `<span class="sn-sneden">${kac(x.neden)}</span>` : ''}</div>
       <div class="sn-yol-dug"><button type="button" class="kucuk" data-yol="geri"${i ? '' : ' disabled'}>‹ Önceki</button><button type="button" class="kucuk sn-bitti" data-yol="bitti" aria-pressed="${y.b.has(i)}">${y.b.has(i) ? 'Bitti ✓' : 'Bitti olarak işaretle'}</button><button type="button" class="dugme" data-yol="ileri"${i < L.length - 1 ? '' : ' disabled'}>Sonraki ›</button></div></section>`;
@@ -2071,8 +2202,8 @@
       const q = K.sorular[o.soru], A = oynAdimlar(K, q);
       if (o.g === 'adim') {
         const C = czSoru(K, q.id), a = o.oyn && C ? C.adim[o.adim] : null, r = !a ? ((q.rehber || {}).adimlar || [])[o.adim] : null;
-        h += a ? `<p class="oyn-ne">${kac(a.ne)}</p>${a.islem ? `<div class="oyn-islem">${kac(a.islem)}</div>` : ''}${a.sonuc ? `<p class="oyn-sonuc"><span class="oyn-et">Ara sonuç</span> <b>${kac(a.sonuc)}</b></p>` : ''}${a.neden ? `<p><span class="oyn-et">Neden</span> ${kac(a.neden)}</p>` : ''}`
-          : r ? `<p class="oyn-ne"><b>${kac(r.kisa)}</b> · ${r.ne || ''}</p>${r.sonuc ? `<p class="oyn-sonuc"><span class="oyn-et">Ara sonuç</span> <b>${r.sonuc}</b></p>` : ''}` : '';
+        h += a ? `${a.kesin ? `<p class="isr-bas">${isr('kesin')}</p>` : ''}<p class="oyn-ne">${kac(a.ne)}</p>${a.islem ? `<div class="oyn-islem">${kac(a.islem)}</div>` : ''}${a.sonuc ? `<p class="oyn-sonuc">${isr('sonuc')}<b>${kac(a.sonuc)}</b></p>` : ''}${a.neden ? `<p><span class="oyn-et">Neden</span> ${kac(a.neden)}</p>` : ''}`
+          : r ? `<p class="oyn-ne"><b>${kac(r.kisa)}</b> · ${r.ne || ''}</p>${r.sonuc ? `<p class="oyn-sonuc">${isr('sonuc')}<b>${r.sonuc}</b></p>` : ''}` : '';
         h += `<p class="ar-dug">${akDug(`${q.id}/${o.oyn ? 'o' : 'a'}${o.adim + 1}`, 'Bu adımı akışta göster')}</p>`;
       } else {
         h += `<p>${kac(kisalt(duzMetin(q.soru), 300))}</p>`;
@@ -2367,6 +2498,7 @@
     else if (bas === '_kars') karsCk(K, kalan.join('/'), ayni);
     else if (bas === '_ara') araCk(K, kalan.join('/'), ayni);
     else if (bas === '_terim') terimCk(K, kalan.join('/'), ayni);
+    else if (bas === '_kesin') kesinCk(K, kalan.join('/'), ayni);
     else kavramCk(K, bas, kalan[0] || 'tanim', ayni, kalan[1]);
     if (ilk && terimVar(K) && !TV[K.id]) terimYukle(K).then(() => { if (ckDurum && ckDurum.K === K && !/^_terim(\/|$)/.test(ckDurum.kPart)) terimSusle(K); });
     // arama dizini boşta önceden kurulur (ilk aramada bekleme olmasın; telefonda dizin kurmak ~0,1–0,5 sn)
@@ -2374,7 +2506,7 @@
     sepetYazdir();
     if (ayni) { $$('[data-soru]', ckIc).forEach((a) => { const on = a.dataset.soru === qid; a.classList.toggle('simdi', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); }); snYolCk(); return; }
     snYolCk();
-    glifDuzelt(ckIc);
+    glifDuzelt(ckIc); isrSusle(ckIc);
     krKur(ckIc);
     ipucuEkle(ckIc, K);
     ckIc.scrollTop = 0; basUygula(); sekmeOrtala();
