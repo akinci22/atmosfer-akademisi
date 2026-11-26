@@ -1759,7 +1759,7 @@
      Sonuç yoksa en yakın öneriler; «bulunamayan aramalar» yalnız bu cihazda (dk:arayok; içerik tamamlamak için, dışa gönderilmez). */
   const ARA_GRUP = [['terim', 'Terim kartı'], ['kavram', 'Kavram'], ['formul', 'Formül · sembol'], ['soru', 'Soru'], ['adim', 'Çözüm adımı'], ['konu', 'Konu sayfası'], ['parca', 'Kavramın içinde'], ['sozluk', 'Sözlük TR ↔ EN'], ['hesap', 'Hesap aracı'], ['kimya', 'Kimya'], ['kars', 'Karşılaştırma'], ['sinav', 'Sınav notu']];
   const GRUP_AD = Object.fromEntries(ARA_GRUP);
-  const GRUP_ON = { terim: 0.8, kavram: 0.7, sozluk: 0.4, formul: 0.35, soru: 0.3, hesap: 0.25, kimya: 0.25, kars: 0.15, adim: 0, konu: 0.05, sinav: 0, parca: -0.2 };
+  const GRUP_ON = { kavram: 0.8, terim: 0.7, sozluk: 0.4, formul: 0.35, soru: 0.3, hesap: 0.25, kimya: 0.25, kars: 0.15, adim: 0, konu: 0.05, sinav: 0, parca: -0.2 };
   const ALAN_W = [3, 2, 1];
   const ARD = new Map();
   let arSon = null, arCapraz = false, arZaman = 0, arTur = '', arYokZaman = 0;
@@ -2624,6 +2624,7 @@
     if (!o || !ckDurum) return;
     if (String(o.ck || '').startsWith('_ara/')) { araKapat(); location.hash = `#${ckDurum.onEk}/k/${o.ck}`; return; }
     araInp.value = ''; araKapat();
+    if (ckMod() === 'alt') araInp.blur(); // telefonda sonuç seçilince klavye kapansın
     if (o.ck) location.hash = `#${ckDurum.onEk}/k/${o.ck}`;
     else if (o.ana || o.soru) anaGit(`#${ckDurum.K.id}/${o.ana || o.soru}`, true);
   }
