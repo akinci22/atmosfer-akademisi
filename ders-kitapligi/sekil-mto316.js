@@ -944,7 +944,7 @@
     yaz(g, 280, 202, '↓ alt havza hidrografı', { h: 'middle', k: 13, b: true, r: 'var(--ikincil)' });
     kutu(24, 214, 162, 56, 'Reach · routing', 'kanalda ötele', 'oteleme');
     kutu(199, 214, 162, 56, 'Junction', 'kolları topla', 'hidrograf');
-    kutu(374, 214, 162, 56, 'GIS', 'havzayı ayır (HW3)', 'gis-havza');
+    kutu(374, 214, 162, 56, 'GIS', 'havzayı ayır (CBS)', 'gis-havza');
     yaz(g, 280, 292, 'çıkış hidrografı → gözlemle kıyas ↓', { h: 'middle', k: 13, b: true, r: 'var(--ikincil)' });
     kutu(20, 322, 520, 56, 'Kalibrasyon: gözlenen akımla karşılaştır', 'NSE, PBIAS, tepe hatası → parametreyi ayarla', 'kalibrasyon', 'var(--yesil)');
     ok(g, 105, 66, 105, 120, 'var(--tur)', 2.5); ok(g, 186, 150, 197, 150, 'var(--ikincil)', 2); ok(g, 361, 150, 372, 150, 'var(--ikincil)', 2);
@@ -975,7 +975,7 @@
     };
     [sS, sP, sW].forEach((s) => s.inp.addEventListener('input', ciz));
     const k2 = kontrol(kap);
-    dugme(k2, 'HW2 başlangıcı', true).addEventListener('click', () => { sS.set(1.75); sP.set(3083); sW.set(1); ciz(); });
+    dugme(k2, 'Yağış–akış benzetimi başlangıcı', true).addEventListener('click', () => { sS.set(1.75); sP.set(3083); sW.set(1); ciz(); });
     dugme(k2, 'Ayarlanmış', true).addEventListener('click', () => { sS.set(0); sP.set(2942); sW.set(1); ciz(); });
     ciz();
   };
