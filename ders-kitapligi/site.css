@@ -4,7 +4,7 @@
 :root[data-theme=dark]{--zemin:#0e131b;--yuzey:#161d28;--cizgi:#283244;--yazi:#e8edf4;--ikincil:#a5b0c0;--acc:#6ea2ff;--acc-zemin:#16243b;--tur:#ff8a4c;--tur-zemin:#2d1c12;--yesil:#4cc38a;--yesil-zemin:#11261c;--kod:#0a0f16;color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-html{scroll-padding-top:calc(var(--ust-h) + 12px)}
+html{scroll-padding-top:calc(var(--ust-h) + var(--takip-h,0px) + 20px)}
 body{margin:0;background:var(--zemin);color:var(--yazi);font:17px/1.65 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
 @media(min-width:900px){body{font-size:18px}}
 a{color:var(--acc)}
@@ -144,7 +144,7 @@ ol.ispat li.yeni{animation:gel .35s ease}
 .yol .plan a{white-space:nowrap}.yol .tuzak{margin-top:10px}
 .adimlar.rehberli .adim-bas{font-size:1.08em;margin:0 0 4px}.adimlar.rehberli .nasil{overflow-x:auto}
 .adimlar.rehberli .sonuc{margin:4px 0}.adimlar details.neden summary{cursor:pointer;color:var(--acc)}
-.vurgu{outline:3px solid var(--acc);outline-offset:4px;border-radius:8px;scroll-margin-top:190px}
+.vurgu{outline:3px solid var(--acc);outline-offset:4px;border-radius:8px;scroll-margin-top:8px}
 .pdf-metin{margin:14px 0}.pdf-metin summary{cursor:pointer;font-weight:700}
 .en-ip{border-bottom:1.5px dotted currentColor;cursor:help;position:relative}
 .en-ip:hover::after,.en-ip:focus::after,.en-ip.acik::after{content:attr(data-tr);position:absolute;left:0;bottom:calc(100% + 4px);background:#111;color:#fff;padding:3px 8px;border-radius:6px;font-size:14px;font-style:normal;font-weight:500;white-space:nowrap;z-index:30;pointer-events:none}
@@ -217,7 +217,7 @@ html.tam .kitap-yer{display:block}
 html.tam .dizin{position:static;max-height:none;overflow:visible;padding:0}
 html.tam .dizin .ic{display:none}
 html.tam .dizin .ic[open]{display:block;position:fixed;z-index:35;top:0;left:0;bottom:0;width:min(400px,88vw);overflow:auto;background:var(--zemin);border:0;border-right:1px solid var(--cizgi);padding:calc(56px + env(safe-area-inset-top,0px)) 14px 24px}
-html.tam .vurgu{scroll-margin-top:72px}
+html.tam{scroll-padding-top:calc(64px + env(safe-area-inset-top,0px))}html.tam .vurgu{scroll-margin-top:8px}
 @media(min-width:900px){html.tam body{font-size:21px}}
 @media(max-width:640px){.hud .he,.hud .hud-ders{display:none}}
 @media(max-width:480px){.hud-ic{gap:2px}.hud button,.hud a{padding:0 8px;font-size:14px}.hud-ad{font-size:13px}}
@@ -804,3 +804,29 @@ figure.pdf-sekil .kat-sekil{margin-left:8px}
 .hs-sec{min-width:0;text-overflow:ellipsis}
 .hs-g label{overflow-wrap:anywhere}
 @media(max-width:600px){.hs-g-sat .hs-sec{grid-column:1/-1;width:100%}}
+/* ETK-UI-2 (26 Kas): takip çubuğu — masada düğmeler eski sırasıyla tek satırda («⋯» listesi görünmez); telefonda tek satır:
+   ‹ önceki · sonraki › · pusula · «⋯» (Sınava çalış, Strateji, Atlas, PDF, Tam ekran alt alta açılır) */
+.tk-dah,.tk-dah-ic,.sn-yer2{display:contents}
+.tk-dah-dug{display:none}
+.takip .sag .sn-yer>*{order:1}
+.takip .tk-once,.takip .tk-sonra{order:2}
+.takip .tk-dah-ic>.kucuk{order:3}
+.tk-dah-dug .ik{width:1.35em;height:1.35em}
+.tk-dah-dug circle{fill:currentColor}
+@media(max-width:600px){
+.takip .sag{flex-wrap:nowrap;align-items:center;width:100%;margin-left:0;min-width:0}
+.tk-dah{display:block;position:relative;order:4;margin-left:auto;flex:none}
+.tk-dah-dug{display:inline-flex;justify-content:center;min-width:44px;padding:5px 8px}
+.tk-dah.acik .tk-dah-dug{border-color:var(--acc);color:var(--acc);background:var(--acc-zemin)}
+.tk-dah-ic{display:none}
+.tk-dah.acik .tk-dah-ic{display:flex;flex-direction:column;align-items:stretch;gap:2px;position:absolute;z-index:25;right:0;top:calc(100% + 6px);width:max-content;min-width:200px;max-width:calc(100vw - 32px);padding:6px;background:var(--zemin);border:1px solid var(--cizgi);border-radius:12px;box-shadow:0 12px 32px #0003}
+.tk-dah-ic .kucuk{justify-content:flex-start;width:100%;border-color:transparent;font-size:16px}
+.tk-dah-ic .kucuk:hover,.tk-dah-ic .kucuk:focus-visible{border-color:var(--acc)}
+.tk-dah-ic .sn-dug[aria-pressed=true]{border-color:var(--tur)}
+.takip{gap:8px 10px}
+.takip label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+.tk-uzun{display:none}
+}
+/* ETK-UI-2: bölüm şeridinde olasılık yerine işlev (ör. «Sınav öncesi son tekrar») */
+.sn-serit[data-islev]{--sn:var(--yesil)}
+.sn-islev{display:inline-flex;align-items:center;padding:2px 10px;border-radius:999px;background:var(--yesil-zemin);color:var(--yesil);font-size:14px;font-weight:700;line-height:1.5}

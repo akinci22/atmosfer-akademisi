@@ -102,8 +102,44 @@
   function takipHTML(K, q) {
     const sira = soruSirasi(K), i = q ? sira.indexOf(q) : -1;
     return `<div class="takip"><label for="git">PDF sayfası ya da soru</label><input id="git" inputmode="text" placeholder="37 ya da S12" autocomplete="off">
-      <span class="bilgi" id="git-bilgi">${q ? `PDF'te: soru s. <b>${q.pdf_soru ?? '—'}</b> · çözüm s. <b>${q.pdf_cozum ?? '—'}</b>` : `${kac(K.kod)} · ${K.pdf_sayfa} sayfa`}</span>
-      <span class="sag"><span class="sn-yer"></span>${i > 0 ? `<a class="kucuk" href="#${K.id}/${sira[i - 1].id}">‹ ${sira[i - 1].id}</a>` : ''}${i >= 0 && i < sira.length - 1 ? `<a class="kucuk" href="#${K.id}/${sira[i + 1].id}">${sira[i + 1].id} ›</a>` : ''}<button type="button" class="kucuk atlas-dugme" data-git="#${kac(decodeURIComponent(location.hash.slice(1)).split('/k/')[0] || K.id)}/k/_atlas" title="Kavram atlası ve sözlük (yan çekmecede)">Atlas</button><a class="kucuk" href="${kac(K.pdf)}" target="_blank" rel="noopener">PDF ↗</a><button type="button" class="kucuk tam-ac" title="Tam ekran (F)">Tam ekran</button></span></div>`;
+      <span class="bilgi" id="git-bilgi">${q ? `<span class="tk-uzun">PDF'te: </span>soru s. <b>${q.pdf_soru ?? '—'}</b> · çözüm s. <b>${q.pdf_cozum ?? '—'}</b>` : `${kac(K.kod)} · ${K.pdf_sayfa} sayfa`}</span>
+      <span class="sag"><span class="sn-yer"></span>${i > 0 ? `<a class="kucuk tk-once" href="#${K.id}/${sira[i - 1].id}">‹ ${sira[i - 1].id}</a>` : ''}${i >= 0 && i < sira.length - 1 ? `<a class="kucuk tk-sonra" href="#${K.id}/${sira[i + 1].id}">${sira[i + 1].id} ›</a>` : ''}<span class="tk-dah"><button type="button" class="kucuk tk-dah-dug" aria-expanded="false" aria-controls="tk-dah-ic" aria-label="Öbür düğmeler" title="Öbür düğmeler">${IK('<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>')}</button><span class="tk-dah-ic" id="tk-dah-ic"><span class="sn-yer sn-yer2"></span><button type="button" class="kucuk atlas-dugme" data-git="#${kac(decodeURIComponent(location.hash.slice(1)).split('/k/')[0] || K.id)}/k/_atlas" title="Kavram atlası ve sözlük (yan çekmecede)">Atlas</button><a class="kucuk tk-pdf" href="${kac(K.pdf)}" target="_blank" rel="noopener">PDF ↗</a><button type="button" class="kucuk tam-ac" title="Tam ekran (F)">Tam ekran</button></span></span></span></div>`;
+  }
+  /* ---------- ETK-UI-2 (26 Kas): takip çubuğu — telefonda tek satır («⋯» açılır liste) + yapışkan çubuk payı ----------
+     Telefonda (≤ 600 px) çubukta ‹ önceki · sonraki › · pusula · «⋯»; Sınava çalış, Strateji, Atlas, PDF, Tam ekran
+     alt alta açılan listede. Masada liste görünmez (display:contents), düğmeler eski sırasıyla tek satırda.
+     Yapışkan üst çubuk + takip çubuğu yüksekliği --takip-h → html scroll-padding-top: bütün atlama hedefleri
+     (soru, adım, derin bağ, j / k, akış kartı) çubuğun altında kalmaz. */
+  const tkDahKapat = (kok = document) => { $$('.tk-dah.acik', kok).forEach((d) => { d.classList.remove('acik'); $('.tk-dah-dug', d)?.setAttribute('aria-expanded', 'false'); }); };
+  document.addEventListener('click', (e) => {
+    const dug = e.target.closest('.tk-dah-dug');
+    if (dug) { const d = dug.closest('.tk-dah'), ac = !d.classList.contains('acik'); tkDahKapat(); d.classList.toggle('acik', ac); dug.setAttribute('aria-expanded', String(ac)); if (ac) $('.tk-dah-ic button, .tk-dah-ic a', d)?.focus({ preventScroll: true }); return; }
+    if (!e.target.closest('.tk-dah-ic') || e.target.closest('button, a')) tkDahKapat();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    const d = $('.tk-dah.acik'); if (!d) return;
+    e.preventDefault(); e.stopImmediatePropagation(); tkDahKapat(); $('.tk-dah-dug', d)?.focus({ preventScroll: true });
+  }, true);
+  let takipRO = null;
+  function takipOlc() {
+    const t = $('.takip', ana), st = t && t.getClientRects().length ? getComputedStyle(t) : null;
+    document.documentElement.style.setProperty('--takip-h', `${st && st.position === 'sticky' ? Math.ceil(t.getBoundingClientRect().height) : 0}px`);
+  }
+  function takipIzle() {
+    if (takipRO) takipRO.disconnect();
+    const t = $('.takip', ana);
+    if (t && typeof ResizeObserver !== 'undefined') { takipRO = new ResizeObserver(takipOlc); takipRO.observe(t); }
+    takipOlc();
+  }
+  // yapışkan bölgenin alt kenarı (ekran koordinatı): bu çizginin üstündeki her şey çubukların altında kalır
+  const yapisAlt = () => parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+  // derin bağ hedefi: oynatıcıda başlık («Çözüm · PDF s. · n adım») + şimdiki adım aynı ekrana sığıyorsa başlıktan,
+  // sığmıyorsa şimdiki adımdan başlar; ikisi de yapışkan çubuğun altında (scroll-padding-top)
+  function hedefeOtele(hedef, bas) {
+    let el = hedef;
+    if (bas) { const s = $('.oyn-a.simdi', hedef) || hedef; el = s.getBoundingClientRect().bottom - bas.getBoundingClientRect().top <= innerHeight - yapisAlt() - 12 ? bas : s; }
+    el.scrollIntoView({ block: 'start', behavior: 'smooth' });
   }
   function bagHTML(K, idler, qid) {
     const benzersiz = [...new Set(idler || [])].map((id) => kavramBul(K, id)).filter(Boolean);
@@ -190,7 +226,7 @@
       <div class="soru-govde">${q.soru || ''}</div>
       ${q.ipucu ? `<details class="ipucu"><summary>İpucu</summary>${q.ipucu}</details>` : ''}
       ${R ? yolHTML(K, q) : ''}
-      <h2 class="coz-h" style="margin-top:22px">Çözüm <small class="yok" style="font-size:15px;font-weight:500">PDF s. ${q.pdf_cozum ?? '—'} · ${n} adım</small></h2>
+      <h2 class="coz-h" id="coz-h" style="margin-top:22px">Çözüm <small class="yok" style="font-size:15px;font-weight:500">PDF s. ${q.pdf_cozum ?? '—'} · <span class="coz-say" data-kitap="${n}">${n} adım</span></small></h2>
       ${cozKipHTML(K, q)}${oynHTML(K, q)}
       ${q.giris ? `<div id="cozum-giris" hidden>${q.giris}</div>` : ''}
       <ol class="adimlar${R ? ' rehberli' : ''}" id="adimlar">${R ? R.adimlar.map((a, i) => rehberAdim(K, q, a, i)).join('') : (q.adimlar || []).map((a, i) => `<li data-i="${i}" hidden>${a.html}${bagHTML(K, a.kavram, q.id)}</li>`).join('')}</ol>
@@ -243,6 +279,7 @@
     sinavSusle(K);
   }
   function takipBagla(K) {
+    takipIzle();
     const inp = $('#git');
     $('.dizin-ac', ana)?.addEventListener('click', (e) => { const d = e.target.closest('.dizin'); d.classList.toggle('acik'); e.target.setAttribute('aria-expanded', d.classList.contains('acik')); });
     inp.addEventListener('keydown', (e) => {
@@ -1176,7 +1213,8 @@
   function snSeritHTML(K, V, b, kisa) {
     const B = (V.bolum || {})[b.id]; if (!B) return '';
     const n = snN(B.olasilik), azAsil = (B.az || []).length || (B.asil || []).length;
-    return `<details class="sn-x sn-serit" data-n="${n}"${kisa ? '' : ' open'}><summary>${snNokta(n)}<span class="sn-et">${kisa ? `${kac(bolumAd(K, b))} · ` : ''}Sınav pusulası</span>${kisa && B.neden ? `<span class="sn-ozet">${kac(kisalt(B.neden, 90))}</span>` : ''}</summary>
+    const isl = typeof B.islev === 'string' ? B.islev.trim() : ''; // olasılık yerine işlev (ör. «Sınav öncesi son tekrar»)
+    return `<details class="sn-x sn-serit" data-n="${n}"${isl ? ' data-islev=""' : ''}${kisa ? '' : ' open'}><summary>${isl ? `<span class="sn-islev">${kac(isl)}</span>` : snNokta(n)}<span class="sn-et">${kisa ? `${kac(bolumAd(K, b))} · ` : ''}Sınav pusulası</span>${kisa && B.neden ? `<span class="sn-ozet">${kac(kisalt(B.neden, 90))}</span>` : ''}</summary>
       ${B.neden ? `<p class="sn-neden">${kac(B.neden)}</p>` : ''}${(B.odak || []).length ? `<p class="sn-alt">Odak:</p>${snUl(B.odak)}` : ''}
       ${azAsil ? `<div class="sn-az">${(B.az || []).length ? `<p><b>Az çıkar:</b> ${B.az.map(kac).join(' · ')}</p>` : ''}${(B.asil || []).length ? `<p class="sn-alt">${(B.az || []).length ? 'Asıl bil:' : 'Az çıkar — asıl bil:'}</p>${snUl(B.asil)}` : ''}</div>` : ''}
       ${(B.yol || []).length ? `<div class="sn-cipler"><span class="yok">Çalışma yolu:</span> ${B.yol.map((g) => snCip(K, g)).join('')}</div>` : ''}</details>`;
@@ -1193,10 +1231,13 @@
     const [tur, id] = String(ana.dataset.sayfa || '').split(':');
     if (tur === 'akis' && yeniden) { akisGoster(K, '', true); return; } // akış sayfası olasılığa göre yeniden kurulur
     $$('.sn-x', ana).forEach((x) => x.remove());
-    const yer = $('.sn-yer', ana), s = SN[K.id], V = SV(K), ck = `#${anaOnEk(K)}/k/_sinav`;
+    const yer = $('.sn-yer:not(.sn-yer2)', ana), s = SN[K.id], V = SV(K), ck = `#${anaOnEk(K)}/k/_sinav`;
     document.documentElement.classList.toggle('sn-kip', snKip(K));
     if (yer) yer.innerHTML = !snVar(K) ? '' : s.d === 'kilitli' ? `<button type="button" class="kucuk sn-dug" data-git="${kac(ck)}" aria-label="Sınav pusulası · kilitli" title="Sınav pusulası parolayla açılır">${KILIT_SVG}<span class="sn-uzun">Sınav pusulası · kilitli</span><span class="sn-kisa">Sınav</span></button>`
-      : `<button type="button" class="kucuk sn-dug sn-ac" aria-pressed="${!!V}" aria-label="Sınav pusulası" title="Okuma akışındaki sınav işaretleri: aç / kapat">${PUSULA_SVG}<span class="sn-uzun">Sınav pusulası</span><span class="sn-kisa">Pusula</span></button>${V ? `<button type="button" class="kucuk sn-dug sn-kipdug" aria-pressed="${snKip(K)}" title="Sınav kipi: olasılığa göre katlanan akış + çalışma yolu">Sınava çalış</button><button type="button" class="kucuk sn-dug" data-git="${kac(ck)}">Strateji</button>` : ''}`;
+      : `<button type="button" class="kucuk sn-dug sn-ac" aria-pressed="${!!V}" aria-label="Sınav pusulası" title="Okuma akışındaki sınav işaretleri: aç / kapat">${PUSULA_SVG}<span class="sn-uzun">Sınav pusulası</span><span class="sn-kisa">Pusula</span></button>`;
+    // Sınava çalış + Strateji: masada pusulanın yanında, telefonda «⋯» listesinde (ETK-UI-2)
+    const yer2 = $('.sn-yer2', ana);
+    if (yer2) yer2.innerHTML = snVar(K) && s.d !== 'kilitli' && V ? `<button type="button" class="kucuk sn-dug sn-kipdug" aria-pressed="${snKip(K)}" title="Sınav kipi: olasılığa göre katlanan akış + çalışma yolu">Sınava çalış</button><button type="button" class="kucuk sn-dug" data-git="${kac(ck)}">Strateji</button>` : '';
     const d = $('.dizin', ana);
     if (d) { d.classList.toggle('sn-var', !!V); if (!V) d.classList.remove('sn-yalniz'); }
     if (!V) return;
@@ -1361,6 +1402,8 @@
     const kipYaz = (k, kullanici) => {
       ana.dataset.cozkip = k;
       $$('button', kip).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.kip === k)));
+      // başlıktaki adım sayısı görünen çözümünki: oynatıcıda açıklamalı adımlar, listede kitabın adımları
+      const cs = $('.coz-say', ana); if (cs) { const nk = +cs.dataset.kitap || 0; cs.textContent = k === 'oyn' && nk && n !== nk ? `açıklamalı ${n} adım · kitapta ${nk}` : `${k === 'oyn' ? n : nk} adım`; }
       if (k === 'oyn') goster(oynAdim[anah] || 0, false); else listeGoster();
       if (kullanici) sakla('dk:cozkip', k);
     };
@@ -1516,7 +1559,8 @@
   const katYaz = (kid, st) => sakla(`dk:kat:${kid}`, JSON.stringify({ bk: [...st.bk], s: [...st.s] }));
   const katbOku = (kid) => { try { return JSON.parse(oku(`dk:katb:${kid}`) || '{}') || {}; } catch (e) { return {}; } };
   const katbYaz = (kid, tip, v) => { const x = katbOku(kid); x[tip] = v; sakla(`dk:katb:${kid}`, JSON.stringify(x)); };
-  const duzMetin = (h) => String(h || '').replace(/<svg[\s\S]*?<\/svg>/g, ' ').replace(/<figure[\s\S]*?<\/figure>/g, ' ').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
+  const duzMetin = (h) => String(h || '').replace(/<svg[\s\S]*?<\/svg>/g, ' ').replace(/<figure[\s\S]*?<\/figure>/g, ' ').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&').replace(/\s+/g, ' ').replace(/ ([,.;:)\]])/g, '$1').replace(/([(\[]) /g, '$1').trim(); // etiket yerine konan boşluk noktalamadan önce kalmasın («çizgisi , alt» → «çizgisi, alt»)
+  window.__dkMetin = { duz: duzMetin }; // sınama kancası (etk_test: düz metin noktalaması)
   const ozSat = (q) => kisalt(duzMetin(q.oz) || duzMetin(q.rehber && q.rehber.istiyor) || duzMetin(q.soru), 150);
   const asilSatir = (K, V, q) => { const B = (V.bolum || {})[q.bolum] || {}; return ((B.asil || [])[0]) || ((V.soru || {})[q.id] || {}).neden || ozSat(q); };
   function akisGoster(K, hedef, icten) {
@@ -1602,7 +1646,7 @@
   function katHedef() {
     const a = document.activeElement, d = a && a.closest && a.closest('details, [data-katb]');
     if (d && ana.contains(d)) return d;
-    return $$('details.sn-serit, details.sn-not, [data-katb], .sy-blok', ana).find((x) => { const r = x.getBoundingClientRect(); return r.height && r.bottom > 80 && r.top < innerHeight * 0.6; }) || null;
+    return $$('details.sn-serit, details.sn-not, [data-katb], .sy-blok', ana).find((x) => { const r = x.getBoundingClientRect(); return r.height && r.bottom > yapisAlt() && r.top < innerHeight * 0.6; }) || null;
   }
   function katCevir(d) {
     if (d.tagName === 'DETAILS') { d.open = !d.open; return; }
@@ -2096,7 +2140,7 @@
     if (ckDurum && (e.key === '[' || e.key === ']') && !e.metaKey) { const kp = kavramKomsu(e.key === ']' ? 1 : -1); if (kp) { e.preventDefault(); location.hash = `#${ckDurum.onEk}/k/${kp}`; } return; }
     if (e.altKey || e.ctrlKey || e.metaKey) return;
     if (ckDurum && (!ckGenis() || ck.contains(document.activeElement))) return;
-    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { const a = $(`.takip .sag a:${e.key === 'ArrowLeft' ? 'first-of-type' : 'nth-last-of-type(2)'}`); if (a && a.textContent.trim().match(e.key === 'ArrowLeft' ? /^‹/ : /›$/)) anaGit(a.getAttribute('href')); }
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { const a = takipBag(e.key === 'ArrowLeft' ? -1 : 1); if (a) anaGit(a.getAttribute('href')); }
   });
 
   /* ---------- tam ekran: sade okuma, tek ince üst şerit ---------- */
@@ -2106,7 +2150,7 @@
   hud.innerHTML = '<div class="hud-ic"><button type="button" data-k="ic" aria-label="İçindekiler" title="İçindekiler (T)"><svg class="hs" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg><span class="he">İçindekiler</span></button><button type="button" data-k="once" aria-label="Önceki soru" title="Önceki soru"><svg class="hs" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button><span class="hud-ad" aria-live="polite"><span class="hud-ders"></span><span class="hud-kisa"></span></span><button type="button" data-k="sonra" aria-label="Sonraki soru" title="Sonraki soru"><svg class="hs" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button><button type="button" data-k="kalem" aria-pressed="false" aria-label="Kalem" title="Kalem (P)"><svg class="hs" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.4 3.6a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span class="he">Kalem</span></button><a data-k="pdf" target="_blank" rel="noopener" aria-label="PDF" title="PDF"><svg class="hs" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M8.5 13h7M8.5 16.5h4.5"/></svg><span class="he">PDF</span></a><button type="button" data-k="kapat" aria-label="Tam ekranı kapat" title="Kapat (Esc)"><svg class="hs" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg><span class="he">Kapat</span></button></div>';
   document.body.appendChild(hud);
   let tamMi = false, hudZaman = 0;
-  const takipBag = (yon) => { const a = $(`.takip .sag a:${yon < 0 ? 'first-of-type' : 'nth-last-of-type(2)'}`); return a && a.textContent.trim().match(yon < 0 ? /^‹/ : /›$/) ? a : null; };
+  const takipBag = (yon) => $(`.takip .${yon < 0 ? 'tk-once' : 'tk-sonra'}`); // ‹ önceki · sonraki › (telefonda da çubukta)
   function hudYaz() {
     if (!tamMi) return;
     const t = $('#soru-h') || $('main h1'), no = $('.soru-ust .no');
@@ -2114,7 +2158,7 @@
     $('.hud-ders', hud).textContent = ki > 0 ? nt.slice(0, ki).trim() + ' · ' : '';
     $('.hud-kisa', hud).textContent = (ki > 0 ? nt.slice(ki + 1).trim() : nt) + (t ? (nt ? ' · ' : '') + t.textContent : '');
     $('[data-k=once]', hud).disabled = !takipBag(-1); $('[data-k=sonra]', hud).disabled = !takipBag(1);
-    const pdf = $('.takip .sag a[target=_blank]'); const hp = $('[data-k=pdf]', hud); if (pdf) { hp.href = pdf.href; hp.hidden = false; } else hp.hidden = true;
+    const pdf = $('.takip .tk-pdf'); const hp = $('[data-k=pdf]', hud); if (pdf) { hp.href = pdf.href; hp.hidden = false; } else hp.hidden = true;
   }
   // 3 sn sonra sade hap (simgeler + kısa başlık); imleç üste gelince, dokununca ya da klavyeyle açılır
   function hudSadele() {
@@ -2219,7 +2263,7 @@
         if (parca[2] === 'yol' || parca[2] === 'oz') { const y = $('#yol', ana); if (y) katKapa(y, false); }
         if (am || om || parca[2] === 'yol' || parca[2] === 'oz') {
           const hedef = $(am ? `#a${am[1]}` : om ? ($('#oyn .oyn-a.simdi', ana) || $('#oyn', ana) ? '#oyn' : '#adimlar') : parca[2] === 'oz' ? ($('#oz') ? '#oz' : '#yol') : '#yol');
-          if (hedef) { hedef.classList.add('vurgu'); setTimeout(() => hedef.scrollIntoView({ block: 'start', behavior: 'smooth' }), 60); sonSayfa = sayfa; return kPart ? ckGoster(K, kPart, onEk) : cekmeceKapat(); }
+          if (hedef) { hedef.classList.add('vurgu'); setTimeout(() => hedefeOtele(hedef, om && hedef.id === 'oyn' ? $('#coz-h', ana) : null), 60); sonSayfa = sayfa; return kPart ? ckGoster(K, kPart, onEk) : cekmeceKapat(); }
         }
       }
       window.scrollTo({ top: 0 });
