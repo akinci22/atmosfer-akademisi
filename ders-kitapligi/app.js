@@ -74,7 +74,8 @@
       <section class="nasil"><h2>Nasıl kullanılır?</h2><ol>
         <li><b>PDF ile yan yana:</b> kitabı reMarkable'da aç, burada aynı kitabın «Eş zamanlı takip»ine gir. Üstteki kutuya PDF sayfa numarasını (ör. <b>37</b>) ya da soru numarasını (<b>S12</b>) yaz.</li>
         <li><b>Önce kendin çöz:</b> çözüm kapalı gelir; «1. adımı aç» ile tek tek aç, takıldığın adımda dur.</li>
-        <li><b>Takıldığın kavrama git:</b> adımın altındaki mavi şeritte «Tanım · Diyagram · Formül · Türetim · Animasyon · Kod» düğmeleri var. Sayfa değişmez, yandan konu paneli açılır.</li>
+        <li><b>Takıldığın kavrama git:</b> adımın altındaki mavi şeritte «Tanım · Diyagram · Formül · Türetim · Animasyon · Kod» düğmeleri var. Sayfa değişmez: geniş ekranda yanda, telefonda alttan konu paneli açılır; panelin tutamağını sürükleyerek boyunu ayarlarsın, soru üstte görünür kalır.</li>
+        <li><b>Ara:</b> üstteki büyüteç ya da <b>/</b> tuşu. Kavram, terim (Türkçe ya da İngilizce), formül, sembol (ΔS, CN), birim (mm/h, hPa) yaz; ekleri ve küçük yazım hatalarını da tanır, eşleşen yeri vurgular.</li>
         <li><b>Kaybolma:</b> panelin üstünde nerede olduğun yazar; «← Soruya dön» seni soruya, ‹ › bir önceki/sonraki konuya götürür. Adres çubuğundaki bağlantı tam o noktayı gösterir.</li></ol></section>`;
   }
 
@@ -2368,6 +2369,8 @@
     else if (bas === '_terim') terimCk(K, kalan.join('/'), ayni);
     else kavramCk(K, bas, kalan[0] || 'tanim', ayni, kalan[1]);
     if (ilk && terimVar(K) && !TV[K.id]) terimYukle(K).then(() => { if (ckDurum && ckDurum.K === K && !/^_terim(\/|$)/.test(ckDurum.kPart)) terimSusle(K); });
+    // arama dizini boşta önceden kurulur (ilk aramada bekleme olmasın; telefonda dizin kurmak ~0,1–0,5 sn)
+    if (ilk && !ARD.has(K.id) && typeof requestIdleCallback === 'function') requestIdleCallback(() => { try { araDizin2(K); } catch (e) { /* sonra kurulur */ } }, { timeout: 5000 });
     sepetYazdir();
     if (ayni) { $$('[data-soru]', ckIc).forEach((a) => { const on = a.dataset.soru === qid; a.classList.toggle('simdi', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); }); snYolCk(); return; }
     snYolCk();
