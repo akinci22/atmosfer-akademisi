@@ -1563,6 +1563,16 @@
   window.__dkMetin = { duz: duzMetin }; // sınama kancası (etk_test: düz metin noktalaması)
   const ozSat = (q) => kisalt(duzMetin(q.oz) || duzMetin(q.rehber && q.rehber.istiyor) || duzMetin(q.soru), 150);
   const asilSatir = (K, V, q) => { const B = (V.bolum || {})[q.bolum] || {}; return ((B.asil || [])[0]) || ((V.soru || {})[q.id] || {}).neden || ozSat(q); };
+  // ETK-UI-2: sınav kipinde kitap akışının başında kavramların olasılık listesi (yüksek açık, orta katlı);
+  // çipe dokununca kavram çekmecede açılır (sınav notu varsa Sınav sekmesi)
+  function snKvListeHTML(K, V) {
+    const L = (n) => (K.kavramlar || []).filter((k) => snN(((V.kavram || {})[k.id] || {}).olasilik) === n);
+    const y = L(3), o = L(2); if (!y.length && !o.length) return '';
+    const cipler = (A) => `<div class="sn-cipler">${A.map((k) => snCip(K, 'kavram:' + k.id)).join('')}</div>`;
+    return `<section class="sn-kvl" aria-label="Kavramlar: sınav olasılığı"><h2 class="sn-kvl-bas">Kavramlar <span class="say">olasılığa göre · dokun: yan çekmecede açılır</span></h2>
+      ${y.length ? `<div class="sn-kvl-g" data-n="3"><p class="sn-kvl-et">${snNokta(3)} <span class="say">${y.length} kavram</span></p>${cipler(y)}</div>` : ''}
+      ${o.length ? `<details class="sn-kvl-g sn-kvl-orta" data-n="2"><summary>${snNokta(2)} <span class="say">${o.length} kavram</span></summary>${cipler(o)}</details>` : ''}</section>`;
+  }
   function akisGoster(K, hedef, icten) {
     document.title = `Kitap akışı · ${K.kod}`;
     ana.dataset.sayfa = 'akis:'; delete ana.dataset.cozkip;
@@ -1579,6 +1589,7 @@
       <h1>Kitap akışı <small class="yok">· yalnız başlıklar</small></h1>
       <p class="ak-not yok">Bir soruya dokun: metni burada açılır. <kbd>j</kbd> <kbd>k</kbd> sonraki / önceki soru, <kbd>o</kbd> aç / kapat.</p>
       <div class="ak-arac" role="group" aria-label="Katla / aç"><button type="button" class="kucuk" data-ak="ac">Tümünü aç</button><button type="button" class="kucuk" data-ak="kapat">Tümünü kapat</button><button type="button" class="kucuk" data-ak="baslik">Yalnız başlıklar</button>${V ? `<button type="button" class="kucuk sn-yalak" data-ak="yal" aria-pressed="${yal}">${snNokta(3, true)} Yalnız yüksek olasılık</button>` : ''}</div>
+      ${kip && V ? snKvListeHTML(K, V) : ''}
       <div class="ak-liste${yal ? ' sn-yalniz' : ''}">${bolumler.map((b) => {
         const L = bolumSorulari(K, b).map((s) => K.sorular[s]), n = bolN(b);
         const acik = kip ? n !== 1 : !st.bk.has(b.id) || L.some((q) => q.id === hedef);

@@ -830,3 +830,11 @@ figure.pdf-sekil .kat-sekil{margin-left:8px}
 /* ETK-UI-2: bölüm şeridinde olasılık yerine işlev (ör. «Sınav öncesi son tekrar») */
 .sn-serit[data-islev]{--sn:var(--yesil)}
 .sn-islev{display:inline-flex;align-items:center;padding:2px 10px;border-radius:999px;background:var(--yesil-zemin);color:var(--yesil);font-size:14px;font-weight:700;line-height:1.5}
+/* ETK-UI-2: sınav kipinde akışın başında kavram olasılık listesi */
+.sn-kvl{margin:14px 0 20px;padding:6px 16px 10px;border:1px solid color-mix(in srgb,var(--tur) 35%,var(--cizgi));border-radius:14px;background:color-mix(in srgb,var(--tur) 3%,var(--zemin))}
+.sn-kvl-bas{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;margin:.4em 0 .2em;font-size:19px}
+.sn-kvl-et{display:flex;align-items:center;gap:8px;margin:.5em 0 0}
+.sn-kvl-orta>summary{display:flex;align-items:center;gap:8px;min-height:44px;cursor:pointer;list-style:none}
+.sn-kvl-orta>summary::-webkit-details-marker{display:none}
+.sn-kvl-orta>summary::after{content:"";width:.5em;height:.5em;margin-left:4px;border-right:2px solid var(--ikincil);border-bottom:2px solid var(--ikincil);transform:rotate(45deg) translateY(-2px);transition:transform .15s}
+.sn-kvl-orta[open]>summary::after{transform:rotate(-135deg)}
