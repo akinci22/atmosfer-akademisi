@@ -1650,6 +1650,12 @@
       <div class="sn-yol-adim"><span class="sn-yol-no">${i + 1}</span>${snCip(K, x.git)}${x.neden ? `<span class="sn-sneden">${kac(x.neden)}</span>` : ''}</div>
       <div class="sn-yol-dug"><button type="button" class="kucuk" data-yol="geri"${i ? '' : ' disabled'}>‹ Önceki</button><button type="button" class="kucuk sn-bitti" data-yol="bitti" aria-pressed="${y.b.has(i)}">${y.b.has(i) ? 'Bitti ✓' : 'Bitti olarak işaretle'}</button><button type="button" class="dugme" data-yol="ileri"${i < L.length - 1 ? '' : ' disabled'}>Sonraki ›</button></div></section>`;
   }
+  // dar ekranda çekmece ana akışı örter: sınav kipinde çalışma yolu çekmecenin başında da görünür (Bitti / Sonraki ulaşılır kalsın)
+  function snYolCk() {
+    $$('.sn-yol', ckIc).forEach((x) => x.remove());
+    if (!ckDurum || ckGenis() || !snKip(ckDurum.K)) return;
+    const h = snYolHTML(ckDurum.K, SV(ckDurum.K)); if (h) ckIc.insertAdjacentHTML('afterbegin', h.replace('class="sn-x sn-yol"', 'class="sn-yol sn-yol-ck"'));
+  }
   function snKipAyarla(K, on) {
     sakla(`dk:snkip:${K.id}`, on ? '1' : '0');
     document.documentElement.classList.toggle('sn-kip', on);
@@ -1664,7 +1670,7 @@
     const V = SV(simdiK), L = ((V || {}).strateji || {}).sira || []; if (!L.length) return;
     const y = snYolOku(simdiK.id); y.i = Math.max(0, Math.min(y.i, L.length - 1));
     const k = b.dataset.yol;
-    if (k === 'bitti') { if (y.b.has(y.i)) y.b.delete(y.i); else y.b.add(y.i); snYolYaz(simdiK.id, y); sinavSusle(simdiK, false); $('.sn-yol .sn-bitti', ana)?.focus(); return; }
+    if (k === 'bitti') { const ckte = ckIc.contains(b); if (y.b.has(y.i)) y.b.delete(y.i); else y.b.add(y.i); snYolYaz(simdiK.id, y); sinavSusle(simdiK, false); snYolCk(); $('.sn-yol .sn-bitti', ckte ? ckIc : ana)?.focus(); return; }
     y.i = Math.max(0, Math.min(L.length - 1, y.i + (k === 'ileri' ? 1 : -1))); snYolYaz(simdiK.id, y);
     sinavSusle(simdiK, false); snHedefGit(simdiK, L[y.i].git);
   });
@@ -1912,7 +1918,7 @@
   function cekmeceKapat() {
     if (animTutucu && animTutucu.dur) animTutucu.dur(); animTutucu = null;
     ipKapat(); araKapat();
-    ck.hidden = true; perde.hidden = true; ck.setAttribute('aria-hidden', 'true'); ckDurum = null; document.body.classList.remove('ck-acik'); sepetEl.hidden = true;
+    ck.hidden = true; perde.hidden = true; ck.setAttribute('aria-hidden', 'true'); ckDurum = null; document.body.classList.remove('ck-acik'); sepetEl.hidden = true; $$('.sn-yol', ckIc).forEach((x) => x.remove());
   }
   function ckGoster(K, kPart, onEk) {
     const ilk = !ckDurum, ayni = !ilk && ckDurum.K === K && ckDurum.kPart === kPart;
@@ -1939,7 +1945,8 @@
     else if (bas === '_ara') araCk(K, kalan.join('/'), ayni);
     else kavramCk(K, bas, kalan[0] || 'tanim', ayni, kalan[1]);
     sepetYazdir();
-    if (ayni) { $$('[data-soru]', ckIc).forEach((a) => { const on = a.dataset.soru === qid; a.classList.toggle('simdi', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); }); return; }
+    if (ayni) { $$('[data-soru]', ckIc).forEach((a) => { const on = a.dataset.soru === qid; a.classList.toggle('simdi', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); }); snYolCk(); return; }
+    snYolCk();
     glifDuzelt(ckIc);
     krKur(ckIc);
     ipucuEkle(ckIc, K);
