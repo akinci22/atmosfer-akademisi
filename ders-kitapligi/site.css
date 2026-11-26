@@ -549,3 +549,84 @@ table.hs-kt{width:100%;font-size:15px;font-variant-numeric:tabular-nums}
 .ag-alt{min-height:1.6em;font-weight:600;margin:.5em 0}
 .ag-lejant{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:14px;color:var(--ikincil)}
 .ag-lejant i{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+
+/* ---- ETK Ö1 (26 Kas): sınav pusulası — parolalı katman; veri yoksa ya da kilitliyse hiçbiri görünmez ---- */
+.gizli{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+.ik{width:1.1em;height:1.1em;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.kalem-ik{width:1.05em;height:1.05em;vertical-align:-.16em;margin-right:.3em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sn-yer{display:contents}
+.sn-dug{gap:6px}
+.sn-dug[aria-pressed=true]{border-color:var(--tur);background:var(--tur-zemin);color:var(--tur);font-weight:600}
+.sn-n{display:inline-flex;align-items:center;gap:3px;color:var(--ikincil);font-size:13px;font-weight:700;letter-spacing:.02em;white-space:nowrap;vertical-align:middle}
+.sn-n i{display:block;width:.55em;height:.55em;border-radius:50%;background:currentColor;opacity:.22}
+.sn-n b{margin-left:4px;font-weight:700}
+.sn-k3{color:var(--tur)}.sn-k2{color:var(--acc)}
+.sn-k3 i,.sn-k2 i:nth-child(-n+2),.sn-k1 i:first-child{opacity:1}
+.soru-ust .sn-rozet{margin-left:auto}
+.dizin .pdf .sn-n{margin-right:6px}
+.dizin .bl>summary .sn-n{margin-left:auto}
+.dizin.sn-yalniz a.sn-d1,.dizin.sn-yalniz a.sn-d2{display:none}
+.sn-suz{margin:6px 0 4px;gap:6px}
+.sn-suz[aria-pressed=true]{border-color:var(--tur);color:var(--tur);background:var(--tur-zemin)}
+.sn-serit,.sn-not{--sn:var(--ikincil);margin:1em 0 1.2em;padding:4px 14px 8px;border-left:3px solid var(--sn);background:color-mix(in srgb,var(--sn) 7%,var(--zemin));border-radius:0 12px 12px 0}
+.sn-serit[data-n="3"],.sn-not[data-n="3"]{--sn:var(--tur)}.sn-serit[data-n="2"],.sn-not[data-n="2"]{--sn:var(--acc)}
+.sn-serit>summary,.sn-not>summary{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;min-height:44px;cursor:pointer;list-style:none}
+.sn-serit>summary::-webkit-details-marker,.sn-not>summary::-webkit-details-marker{display:none}
+.sn-serit>summary::after,.sn-not>summary::after{content:"";margin-left:auto;width:.5em;height:.5em;border-right:2px solid var(--ikincil);border-bottom:2px solid var(--ikincil);transform:rotate(45deg);transition:transform .15s}
+.sn-serit[open]>summary::after,.sn-not[open]>summary::after{transform:rotate(-135deg)}
+.sn-et{font-weight:700;font-size:14px;letter-spacing:.04em;text-transform:uppercase;color:var(--ikincil)}
+.sn-ozet{flex-basis:100%;font-size:15px;color:var(--ikincil);line-height:1.45;padding-bottom:4px}
+.sn-serit[open] .sn-ozet{display:none}
+.sn-neden{margin:.4em 0}
+.sn-alt{margin:.6em 0 .1em;font-weight:700;font-size:15px}
+.sn-liste{margin:.3em 0;padding-left:1.2em}
+.sn-liste li{margin:.25em 0}
+.sn-az{margin:.6em 0;padding:4px 12px;border-radius:10px;background:var(--yuzey)}
+.sn-az p{margin:.4em 0}
+.sn-ipucu{margin:.5em 0}
+.sn-cipler{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:.5em 0}
+.sn-cipler>.yok{font-size:14px}
+.sn-cip{display:inline-flex;align-items:baseline;gap:6px;min-height:44px;padding:8px 12px;border:1px solid var(--cizgi);border-radius:10px;background:var(--zemin);color:var(--yazi);text-decoration:none;cursor:pointer;font:inherit;font-size:15px;line-height:1.3;text-align:left;overflow-wrap:anywhere}
+.sn-cip b{color:var(--acc)}
+.sn-cip:hover,.sn-cip:focus-visible{border-color:var(--acc)}
+.sn-akis{display:flex;gap:10px;align-items:flex-start;margin:.8em 0;padding:6px 12px;border:1px dashed color-mix(in srgb,var(--tur) 45%,var(--cizgi));border-radius:12px;font-size:16px}
+.sn-akis>.ik{margin-top:.35em;color:var(--tur)}
+.sn-akis p{margin:.2em 0}
+.sn-akis[data-tur=az]{border-color:var(--cizgi)}.sn-akis[data-tur=az]>.ik{color:var(--ikincil)}
+.sn-akis[data-tur=bag]{border-color:color-mix(in srgb,var(--acc) 45%,var(--cizgi))}.sn-akis[data-tur=bag]>.ik{color:var(--acc)}
+.sn-ust{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}
+.sn-ust .yok{font-size:14px}
+.sn-blok{border-top:1px solid var(--cizgi);margin-top:12px}
+.sn-blok h3{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:.7em 0 .3em;font-size:18px}
+.sn-blok h4{margin:.8em 0 .2em;font-size:16px}
+.sn-sira{padding-left:1.4em;margin:.4em 0}
+.sn-sira li{margin:.5em 0}
+.sn-sira.sn-dz{list-style:none;padding:0}
+.sn-sneden{display:block;font-size:14.5px;color:var(--ikincil);margin:.15em 0 0 .2em;line-height:1.45}
+.sn-gun{list-style:none;padding:0;margin:.3em 0}
+.sn-gun li{margin:0}
+.sn-gun label{display:flex;align-items:flex-start;gap:10px;min-height:44px;padding:8px 6px;border-radius:8px;cursor:pointer;line-height:1.45}
+.sn-gun label:hover{background:var(--yuzey)}
+.sn-gun input{width:20px;height:20px;margin:.15em 0 0;flex:none;accent-color:var(--yesil)}
+.sn-gun input:checked+span{color:var(--ikincil);text-decoration:line-through}
+.sn-sec{display:flex;flex-wrap:wrap;gap:6px;margin:.4em 0}
+.sn-sec button{gap:6px}
+.sn-sec button[aria-pressed=true]{border-color:var(--acc);background:var(--acc-zemin);font-weight:600}
+.sn-form{display:grid;gap:10px;max-width:420px}
+.sn-form label{font-weight:600}
+.sn-form input[type=password]{font:inherit;font-size:16px;min-height:44px;padding:8px 12px;border:1px solid var(--cizgi);border-radius:10px;background:var(--zemin);color:var(--yazi)}
+.sn-form input[type=password]:focus{outline:2px solid var(--acc);outline-offset:1px}
+.sn-hat{display:flex;align-items:center;gap:8px;font-weight:400!important;font-size:15px;min-height:44px;cursor:pointer}
+.sn-hat input{width:20px;height:20px}
+.sn-form .dugme{justify-self:start;min-height:44px}
+.sn-hata{color:var(--yanlis);margin:0}
+.sn-bas{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px}
+.sn-gercek{margin:1.2em 0;padding:4px 14px 8px;border-radius:12px;background:var(--yesil-zemin)}
+.sn-gercek h3{margin:.5em 0 .3em}
+.sn-g p{margin:.2em 0 .7em}
+.sn-bil{margin:1.2em 0;padding:2px 14px 6px;border-left:3px solid var(--tur);background:var(--tur-zemin);border-radius:0 12px 12px 0}
+.sn-bil h3{margin:.5em 0 .2em}
+.sn-kutu b{color:var(--tur)!important}
+#ck-baslik .sn-n{margin-left:10px;font-size:14px}
+.at-bol h3 .sn-n{margin-left:auto}
+.ilgili .soru-bag .sn-n{margin-left:4px}
