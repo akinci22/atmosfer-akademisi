@@ -1882,7 +1882,7 @@
     const L = sepetOku(K.id).map((id) => kavramBul(K, id)).filter(Boolean);
     sepetEl.hidden = !L.length;
     if (!L.length) { sepetEl.innerHTML = ''; return; }
-    sepetEl.innerHTML = `<span class="sepet-et">Karşılaştır</span><span class="sepet-l">${L.map((k) => `<span class="sepet-cip"><b>${kac(k.sembol)}</b> ${kac(kisalt(k.ad, 22))}<button type="button" class="sepet-x" data-kv="${kac(k.id)}" aria-label="Sepetten çıkar: ${kac(k.ad)}">×</button></span>`).join('')}</span><span class="sepet-dug">${L.length >= 2 ? ckBag(`_kars/${L.map((k) => k.id).join('~')}`, `Yan yana (${L.length})`, 'dugme sepet-git') : `<span class="yok sepet-not">bir kavram daha seç</span>`}<button type="button" class="kucuk sepet-sil">Temizle</button></span>`;
+    sepetEl.innerHTML = `<span class="sepet-et">Karşılaştır</span><span class="sepet-l">${L.map((k) => `<span class="sepet-cip" title="${kac(k.ad)}"><b>${kac(k.sembol)}</b><span class="sepet-ad">${kac(kisalt(k.ad, 22))}</span><button type="button" class="sepet-x" data-kv="${kac(k.id)}" aria-label="Sepetten çıkar: ${kac(k.ad)}">×</button></span>`).join('')}</span><span class="sepet-dug">${L.length >= 2 ? ckBag(`_kars/${L.map((k) => k.id).join('~')}`, `Yan yana (${L.length})`, 'dugme sepet-git') : `<span class="yok sepet-not">bir kavram daha seç</span>`}<button type="button" class="kucuk sepet-sil">Temizle</button></span>`;
   }
   function sepetEkle(K, id) {
     if (!K || !kavramBul(K, id)) return;

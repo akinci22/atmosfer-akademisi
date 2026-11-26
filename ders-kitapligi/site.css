@@ -799,3 +799,4 @@ figure.pdf-sekil .kat-sekil{margin-left:8px}
 .kz-formul svg.mj{max-width:none}
 .kz-sq{display:flex;flex-wrap:wrap;gap:4px}
 .kz-kv{text-decoration:none;font-weight:700;display:inline-flex;align-items:center;min-height:44px}
+@media(max-width:600px){.sepet{padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px));gap:6px}.sepet-et,.sepet-ad{display:none}.sepet-l{flex:1 1 auto}}
