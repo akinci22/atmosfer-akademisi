@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Ödev ve quiz hazırlığı</title>
-<meta name="description" content="HEC-HMS ödevlerinin ne-neden-ekranda ne tekrarı, haftalık quiz konuları, olası sorular ve tek sayfa formül kartı.">
+<title>HEC-HMS modelleri ve quiz hazırlığı</title>
+<meta name="description" content="HEC-HMS uygulamalarının ne-neden-ekranda ne tekrarı, haftalık quiz konuları, olası sorular ve tek sayfa formül kartı.">
 <meta name="color-scheme" content="light">
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
@@ -98,13 +98,13 @@ footer{color:var(--ink2);font-size:15px;margin-top:80px;padding-top:22px;border-
   <button class="dugme" id="hepsi" type="button">Hepsini aç</button>
 </div></header>
 <div class="izgara">
-  <nav class="toc" aria-label="İçindekiler"><b>İçindekiler</b><a href="#bölüm-a-hec-hms-ödevleri">BÖLÜM A — HEC-HMS Ödevleri</a><a href="#bölüm-b-quiz-konuları-haftalık">BÖLÜM B — Quiz Konuları (haftalık)</a><a href="#bölüm-c-olası-quiz-soruları">BÖLÜM C — Olası Quiz Soruları</a><a href="#bölüm-d-tek-sayfa-özet">BÖLÜM D — Tek Sayfa Özet</a></nav>
+  <nav class="toc" aria-label="İçindekiler"><b>İçindekiler</b><a href="#bölüm-a-hec-hms-ile-model-kurma">BÖLÜM A — HEC-HMS ile model kurma</a><a href="#bölüm-b-quiz-konuları-haftalık">BÖLÜM B — Quiz Konuları (haftalık)</a><a href="#bölüm-c-olası-quiz-soruları">BÖLÜM C — Olası Quiz Soruları</a><a href="#bölüm-d-tek-sayfa-özet">BÖLÜM D — Tek Sayfa Özet</a></nav>
   <main>
     <p class="k">MTO 316 · Hidrometeoroloji · 1.–7. hafta</p>
-    <h1>Ödev ve quiz hazırlığı</h1>
-    <p class="lede">HEC-HMS ödevlerinin ne-neden-ekranda ne tekrarı, haftalık quiz konuları, olası sorular ve tek sayfa formül kartı.</p>
-    <div class="giris"><ul class="mad"><li>Bu not 1.–7. hafta için kısa quiz hazırlığı ve HEC-HMS ödevlerinin birlikte tekrarıdır.</li><li>Türkçe, madde madde; her teknik terimin İngilizcesi ilk geçtiği yerde parantez içinde; her formülün altında terim-birim açıklaması ve en az bir çözülmüş mini örnek vardır.</li><li>Quiz kökü İngilizce gelebileceğinden Bölüm C'deki sorular hem İngilizce hem Türkçe verilmiştir.</li></ul><p>Bilinen slayt hataları, aşağıda doğrusu ile birlikte işlenir: hazne bütçesi örneğinde <strong>1,05 m/yıl</strong> yerine doğru değer <strong>1,150 m/yıl</strong> (dolma süresi ≈ 2,61 yıl); optimum ölçer örneğinde <strong>N ≈ 14</strong> yerine doğru değer <strong>N ≈ 52</strong> (yüzdenin karesi unutulduğu için).</p></div>
-    <section id="bölüm-a-hec-hms-ödevleri"><h2>BÖLÜM A — HEC-HMS Ödevleri</h2><div class="kartlar"><details class="kart" id="hw1-creating-a-new-basin-model"><summary><span class="kb">HW1 — Creating a New Basin Model</span><span aria-hidden="true" class="ok"></span></summary><div class="kg"><p><strong>Havza elemanları (basin elements):</strong></p><ul>
+    <h1>HEC-HMS modelleri ve quiz hazırlığı</h1>
+    <p class="lede">HEC-HMS uygulamalarının ne-neden-ekranda ne tekrarı, haftalık quiz konuları, olası sorular ve tek sayfa formül kartı.</p>
+    <div class="giris"><ul class="mad"><li>Bu not 1.–7. hafta için kısa quiz hazırlığı ve HEC-HMS uygulamalarının birlikte tekrarıdır.</li><li>Türkçe, madde madde; her teknik terimin İngilizcesi ilk geçtiği yerde parantez içinde; her formülün altında terim-birim açıklaması ve en az bir çözülmüş mini örnek vardır.</li><li>Quiz kökü İngilizce gelebileceğinden Bölüm C'deki sorular hem İngilizce hem Türkçe verilmiştir.</li></ul><p>Bilinen slayt hataları, aşağıda doğrusu ile birlikte işlenir: hazne bütçesi örneğinde <strong>1,05 m/yıl</strong> yerine doğru değer <strong>1,150 m/yıl</strong> (dolma süresi ≈ 2,61 yıl); optimum ölçer örneğinde <strong>N ≈ 14</strong> yerine doğru değer <strong>N ≈ 52</strong> (yüzdenin karesi unutulduğu için).</p></div>
+    <section id="bölüm-a-hec-hms-ile-model-kurma"><h2>BÖLÜM A — HEC-HMS ile model kurma</h2><div class="kartlar"><details class="kart" id="havza-modeli-creating-a-new-basin-model"><summary><span class="kb">Havza modeli — Creating a New Basin Model</span><span aria-hidden="true" class="ok"></span></summary><div class="kg"><p><strong>Havza elemanları (basin elements):</strong></p><ul>
 <li>Alt havzalar (subbasins): EB Mahoning Creek 41 mi², Stump Creek 29 mi², Mahoning Creek Local 88 mi²</li>
 <li>Reach: Reach-1 (Lag ile ötelenir)</li>
 <li>Junctionlar: Junction-1 (EB Mahoning + Stump birleşimi), Junction-2 = havza çıkışı (outlet) = Reach-1 çıkışı + Mahoning Creek Local</li>
@@ -128,10 +128,10 @@ footer{color:var(--ink2);font-size:15px;margin-top:80px;padding-top:22px;border-
 <li>Quiz: 'Two-layer linear reservoir — k büyürse ne olur?' → boşalma yavaşlar, hidrografın kuyruğu uzar.</li>
 </ul></div></details><details class="ic"><summary><span>4) Routing — Lag (Reach-1 = 300 dk)</span></summary><div class="ic-g"><ul>
 <li>Ne yapar? Girişi 300 dk (= 5 saat) öteler, tepe büyüklüğü değişmez (no attenuation).</li>
-<li>Neden Lag? Kısa bir kanal parçası için sönümleme ihmal edilebildiğinde en basit seçimdir; HW2'de Reach-1 girişi ile çıkışı aynı yükseklikte ama 5 sa ötelenmiş görünür.</li>
+<li>Neden Lag? Kısa bir kanal parçası için sönümleme ihmal edilebildiğinde en basit seçimdir; Yağış–akış benzetiminde Reach-1 girişi ile çıkışı aynı yükseklikte ama 5 sa ötelenmiş görünür.</li>
 <li>Ekranda ne? Reach editor › Routing: Lag method, Lag (min).</li>
 <li>Quiz: 'Does Lag routing attenuate the peak?' → Hayır, sadece zamanda öteler.</li>
-</ul><p><strong>HW1'in HW2'ye katkısı:</strong> HW1 yalnızca havza modelini (basin model) kurar — henüz yağış/zaman/simülasyon yoktur. HW2 bu basin modeline bir meteorologic model, control specifications ve simulation run ekler.</p></div></details></div></details><details class="kart" id="hw2-creating-a-simple-model"><summary><span class="kb">HW2 — Creating a Simple Model</span><span aria-hidden="true" class="ok"></span></summary><div class="kg"><h4 class="ara-b">1) Meteorologic Model</h4><p><strong>Ne yaptım?</strong></p><ol>
+</ul><p><strong>Havza modelinin benzetime katkısı:</strong> Havza modeli adımı yalnızca havza modelini (basin model) kurar — henüz yağış/zaman/simülasyon yoktur. Yağış–akış benzetimi bu basin modeline bir meteorologic model, control specifications ve simulation run ekler.</p></div></details></div></details><details class="kart" id="yağış-akış-benzetimi-creating-a-simple-model"><summary><span class="kb">Yağış–akış benzetimi — Creating a Simple Model</span><span aria-hidden="true" class="ok"></span></summary><div class="kg"><h4 class="ara-b">1) Meteorologic Model</h4><p><strong>Ne yaptım?</strong></p><ol>
 <li>Time-Series Data Manager › Precipitation Gages → üç ölçer oluşturdum: <strong>DUJP</strong>, <strong>PNXP</strong>, <strong>MFFP</strong>.</li>
 <li>Her ölçer için Data Source = <strong>Single Record HEC-DSS</strong>, DSS dosyası = data/observe.dss; pathname listesinde B-part süzüldü:
    - /ALLEGHENY/DUJP/PRECIP-INC/…/1Hour/OBS/
@@ -176,7 +176,7 @@ footer{color:var(--ink2);font-size:15px;margin-top:80px;padding-top:22px;border-
 <li>'Which three dates/times define a Control Specification?' → Start, End, Time Interval.</li>
 </ul><h4 class="ara-b">3) Simulation Run</h4><p><strong>Ne yaptım?</strong></p><ul>
 <li>Simulation Run = <strong>'May 1996'</strong>.</li>
-<li>Açılan sihirbazda üç bileşen eşleştirildi: <strong>Basin Model</strong> (HW1'de kurulan) + <strong>Meteorologic Model</strong> (May 1996) + <strong>Control Specifications</strong> (May 1996).</li>
+<li>Açılan sihirbazda üç bileşen eşleştirildi: <strong>Basin Model</strong> (havza modelinde kurulan) + <strong>Meteorologic Model</strong> (May 1996) + <strong>Control Specifications</strong> (May 1996).</li>
 <li>Compute butonu.</li>
 </ul><p><strong>Neden bu üçlü?</strong></p><ul>
 <li>HEC-HMS bir simülasyon için <strong>nerede</strong> (basin), <strong>ne zaman ve ne kadar</strong> (meteorologic), <strong>hangi zaman penceresinde ve adımda</strong> (control) sorularının hepsine yanıt ister. Üçünden biri eksikse Compute refuse eder.</li>
@@ -384,7 +384,7 @@ footer{color:var(--ink2);font-size:15px;margin-top:80px;padding-top:22px;border-
 </ul><p><strong>Yeni ölçerlerin dağıtımı</strong></p><ul>
 <li>Havza A alt-bölgelere bölünür (Aj). Eksik sayı ΔN = N − n_mevcut. Her bölgeye ΔN·(Aj/A) oranında yeni ölçer düşer.</li>
 <li>Mini: ΔN = 48; iki bölge 3000 ve 7000 km² → 48·(3/10) = <strong>14 ölçer</strong>, 48·(7/10) = <strong>34 ölçer</strong>.</li>
-</ul><p><strong>İngilizce anahtar terimler:</strong> hyetograph, arithmetic mean, Thiessen polygon, isohyet, WMO gauge density, coefficient of variation Cv, optimum gauge number.</p></div></details></div></details><details class="kart" id="5-hafta-akış-üretimi-ve-model-ödev-haftası"><summary><span class="kb">5. hafta — Akış Üretimi ve Model (ödev haftası)</span><span aria-hidden="true" class="ok"></span></summary><div class="kg"><p><strong>Akış oluşum mekanizmaları</strong></p><ul>
+</ul><p><strong>İngilizce anahtar terimler:</strong> hyetograph, arithmetic mean, Thiessen polygon, isohyet, WMO gauge density, coefficient of variation Cv, optimum gauge number.</p></div></details></div></details><details class="kart" id="5-hafta-akış-üretimi-ve-model-uygulama-haftası"><summary><span class="kb">5. hafta — Akış Üretimi ve Model (uygulama haftası)</span><span aria-hidden="true" class="ok"></span></summary><div class="kg"><p><strong>Akış oluşum mekanizmaları</strong></p><ul>
 <li><strong>Hortonian overland flow (infiltration-excess):</strong> yağış şiddeti &gt; infiltrasyon kapasitesi; fazlası yüzeyde akar. Kurak/yarı-kurak, kentsel, geçirimsiz yüzeyler.</li>
 <li><strong>Dunne (saturation-excess):</strong> zemin doyar, sonraki yağış doymuş yüzeyde akar. Nemli iklim, vadi dibi, orman altı.</li>
 <li><strong>Interflow:</strong> zemin içi, yanal, doyma zonunun üstünde; hidrografa Hortonian'dan geliş, baseflow'dan erken katılır.</li>
@@ -394,7 +394,7 @@ footer{color:var(--ink2);font-size:15px;margin-top:80px;padding-top:22px;border-
 <li>Direct runoff + baseflow = total flow; baseflow ayrılışı için <strong>constant discharge</strong>, <strong>constant slope</strong>, <strong>master depletion curve</strong> gibi grafik yöntemler.</li>
 </ul><p><strong>Model türleri</strong></p><ul>
 <li><strong>Lumped:</strong> tüm havza tek birim; parametreler havza ortalaması (örn. rasyonel yöntem).</li>
-<li><strong>Semi-distributed:</strong> alt havzalara bölünür, her biri lumped — HEC-HMS böyle çalışır (Punxsutawney ödevi).</li>
+<li><strong>Semi-distributed:</strong> alt havzalara bölünür, her biri lumped — HEC-HMS böyle çalışır (Punxsutawney uygulaması).</li>
 <li><strong>Distributed:</strong> grid hücre bazında, her hücre için ayrı parametre (örn. MIKE SHE, VIC). Çok veri ister, en pahalı.</li>
 </ul><p><strong>Rasyonel yöntem (rational method)</strong></p><div class="tex">Q_{p} = \frac{C \, I \, A}{360}
 </div><ul>
@@ -847,5 +847,6 @@ footer{color:var(--ink2);font-size:15px;margin-top:80px;padding-top:22px;border-
   window.__yatay = { tara };
 })();
 </script>
+<script>(function(){var E={"bölüm-a-hec-hms-ödevleri": "bölüm-a-hec-hms-ile-model-kurma", "hw1-creating-a-new-basin-model": "havza-modeli-creating-a-new-basin-model", "hw2-creating-a-simple-model": "yağış-akış-benzetimi-creating-a-simple-model", "5-hafta-akış-üretimi-ve-model-ödev-haftası": "5-hafta-akış-üretimi-ve-model-uygulama-haftası"};function g(){var h;try{h=decodeURIComponent(location.hash.slice(1))}catch(e){return}if(!Object.prototype.hasOwnProperty.call(E,h))return;var y=E[h];history.replaceState(null,'','#'+y);var el=document.getElementById(y);if(el){if(el.tagName==='DETAILS')el.open=true;el.scrollIntoView();}}g();addEventListener('hashchange',g);})();</script>
 </body>
 </html>

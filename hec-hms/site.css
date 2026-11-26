@@ -295,7 +295,7 @@ table.deger { width: 100%; margin-top: 14px; border-collapse: collapse; font-siz
 @media (max-width: 1100px) { .mod-kartlar, .kunye { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 640px) { .mod-kartlar, .kunye { grid-template-columns: 1fr; } }
 
-/* ======================================================================== ödevler: aşama aşama adım kartları, «Bu sayfada» yapışkan çip satırı */
+/* ======================================================================== uygulamalar: aşama aşama adım kartları, «Bu sayfada» yapışkan çip satırı */
 .odevler { padding-bottom: 24px; }
 .bu-sayfada { position: sticky; top: var(--ust-h); z-index: 22; display: flex; align-items: center; gap: 8px; margin: 28px calc(-1 * var(--kenar)) 0; padding: 10px var(--kenar); overflow-x: auto; scrollbar-width: none; background: var(--glass); backdrop-filter: saturate(180%) blur(14px); -webkit-backdrop-filter: saturate(180%) blur(14px); border-bottom: 1px solid var(--line); }
 .bu-sayfada::-webkit-scrollbar { display: none; }
@@ -316,7 +316,7 @@ table.deger { width: 100%; margin-top: 14px; border-collapse: collapse; font-siz
 .od-bar { flex: 0 1 240px; height: 8px; overflow: hidden; border-radius: 4px; background: var(--seg); }
 .od-bar i { display: block; width: 0; height: 100%; background: var(--yesil); transition: width .3s; }
 .od-d { margin-top: 0; }
-/* benzetimi olmayan ödev (HW#3): gerçek ekranlı rehber — geniş kartlar, ekranlar büyük */
+/* benzetimi olmayan anlatım (CBS ile alt havzalar): gerçek ekranlı anlatım — geniş kartlar, ekranlar büyük */
 .od-rozet { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; background: var(--acc-soft); color: var(--acc-ink); font-size: 15px; font-weight: 650; }
 .ekranli .ak-izgara { grid-template-columns: repeat(auto-fill, minmax(min(100%, 520px), 1fr)); }
 .nasil-not { max-width: 95ch; margin-top: 24px; padding: 14px 20px; border-left: 4px solid var(--acc); border-radius: 10px; background: var(--bg2); font-size: 17px; line-height: 1.65; }

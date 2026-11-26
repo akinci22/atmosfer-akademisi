@@ -7,7 +7,7 @@ window.CBS = {
     { id: 'f3', ad: 'Baskı düzeni', uzun: 'Baskı düzenini kur', ozet: 'Kâğıdı aç, dikey yap, ana haritayı 1:10 000 000 ölçekte yerleştir.' },
     { id: 'f4', ad: 'İç harita', uzun: 'Tokyo iç haritası', ozet: 'İkinci harita öğesi, kırmızı çerçeve ve ana haritadaki yeri.' },
     { id: 'f5', ad: 'Öğeler', uzun: 'Izgara ve harita öğeleri', ozet: 'Enlem–boylam ağı, kuzey oku, ölçek çubuğu, başlık, lejant.' },
-    { id: 'f6', ad: 'Dışa aktar', uzun: 'Dışa aktar ve denetle', ozet: 'PNG ve PDF üret, teslimden önce son kez bak.' }
+    { id: 'f6', ad: 'Dışa aktar', uzun: 'Dışa aktar ve denetle', ozet: 'PNG ve PDF üret, dışa aktarmadan önce son kez bak.' }
   ],
   adimlar: [
     /* ---------- F1 ---------- */

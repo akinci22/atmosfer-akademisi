@@ -352,7 +352,7 @@
       var MM = 30;                                   /* çizimde 1 mm = 30 birim */
       k.innerHTML = '<h4>log10("capacity_mw") + 1 <small>kapasiteyi değiştir</small></h4>' +
         '<svg viewBox="0 0 640 240" role="img" aria-label="Kapasiteye göre üçgen boyu: logaritmik ve doğrusal ölçek">' +
-        '<g font-family="system-ui,Arial" font-size="16" fill="#5a6472"><text x="170" y="24" text-anchor="middle">log ölçek (ödevdeki)</text><text x="470" y="24" text-anchor="middle">doğrusal olsaydı</text></g>' +
+        '<g font-family="system-ui,Arial" font-size="16" fill="#5a6472"><text x="170" y="24" text-anchor="middle">log ölçek (bu haritadaki)</text><text x="470" y="24" text-anchor="middle">doğrusal olsaydı</text></g>' +
         '<path d="M320 34v196" stroke="#e3e6eb"/><path d="M20 210h600" stroke="#e3e6eb"/>' +
         '<path class="lg" fill="#2b9348" stroke="#1e6a33" stroke-width="2"/><path class="dg" fill="#c9d0da" stroke="#8a94a3" stroke-width="2"/>' +
         '<g font-family="system-ui,Arial" font-size="19" font-weight="700" fill="#14181f"><text class="tl" x="170" y="232" text-anchor="middle"></text><text class="td" x="470" y="232" text-anchor="middle"></text></g></svg>' +

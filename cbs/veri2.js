@@ -10,7 +10,7 @@ window.CBS = {
     { id: 'f3', ad: 'Temel stil', uzun: 'Kara ve üçgen işaretçi', ozet: 'Katman Biçimlendirme paneli; dolgu, saydam kontur, üçgen, hesaplanan kontur rengi.' },
     { id: 'f4', ad: 'Üç sınıf', uzun: 'Yakıtları üç sınıfa topla', ozet: 'Önce 15 kategori, sonra kurala bağlı üç sınıf: yenilenebilir, yenilenemez, diğer.' },
     { id: 'f5', ad: 'Boyut', uzun: 'Kapasiteyi boyutla göster', ozet: 'Üçgen boyu = log10(kapasite) + 1 mm.' },
-    { id: 'f6', ad: 'Sonuç', uzun: 'Haritayı oku ve teslim et', ozet: 'Paneli kapat, haritaya bak, istersen düzen sayfasıyla dışa aktar.' }
+    { id: 'f6', ad: 'Sonuç', uzun: 'Haritayı oku ve dışa aktar', ozet: 'Paneli kapat, haritaya bak, istersen düzen sayfasıyla dışa aktar.' }
   ],
   adimlar: [
     /* ---------- F1 ---------- */
@@ -138,11 +138,11 @@ window.CBS = {
     { f: 'f6', baslik: 'İstersen: başlık ve lejantla dışa aktar.',
       yol: 'Proje › Yeni Çıktı Yerleşimi… › Öğe Ekle › Harita, Lejant, Etiket › Layout › Resim olarak dışarı aktar…',
       ne: 'A4 yatay sayfaya haritayı, lejantı ve başlığı koyup PNG ya da PDF alıyorum.',
-      nerede: 'Düzen penceresi (Uygulama-1\'deki gibi).',
-      neden: 'Teslimde harita tek başına okunabilsin; lejant renklerin ne demek olduğunu söyler.',
+      nerede: 'Düzen penceresi (Japonya haritasındaki gibi).',
+      neden: 'Dışa aktarılan harita tek başına okunabilsin; lejant renklerin ne demek olduğunu söyler.',
       tablo: [['Sayfa', 'A4 yatay'], ['Lejant', 'yalnız santral katmanı, üç satır'], ['Çıktı', 'PNG 200–300 dpi ya da PDF']],
       img: [{ ad: 'u2-harita', alt: 'Dışa aktarılmış harita: başlık ve lejant', uzun: true }],
-      ipucu: '30 bin üçgen PDF\'i çok büyütür (15 MB civarı). Teslim boyutu sınırlıysa PNG al.' }
+      ipucu: '30 bin üçgen PDF\'i çok büyütür (15 MB civarı). Dosya boyutu sınırlıysa PNG al.' }
   ],
   hatalar: [
     { h: 'CSV eklenince nokta yok, yalnız tablo geldi.', c: 'Geometri Tanımlaması\'nda «Geometri yok» seçili kalmış. Nokta koordinatları + X = longitude + Y = latitude seç.' },

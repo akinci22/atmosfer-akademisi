@@ -1,5 +1,5 @@
 /* HEC-HMS 4.14 benzetimi — gri Swing penceresine benzeyen, durumdan yeniden çizilen arayüz.
-   Her tıklanabilir parçanın data-hd anahtarı var; app.js bu anahtarla keşif açıklamasını ya da ödev adımını eşler.
+   Her tıklanabilir parçanın data-hd anahtarı var; app.js bu anahtarla keşif açıklamasını ya da anlatım adımını eşler.
    Menü, araç ve alan adları programın kendi kaynak dosyasından (hms.jar) alındı. Sonuç grafikleri gerçek koşunun verisi. */
 (function () {
   'use strict';
