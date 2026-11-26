@@ -181,6 +181,7 @@
   function soruGoster(K, q) {
     document.title = `${q.id} · ${q.baslik} · ${K.kod}`;
     sakla(`dk:son:${K.id}`, q.id);
+    delete ana.dataset.cozkip;
     const R = q.rehber, n = R ? R.adimlar.length : (q.adimlar || []).length;
     ana.innerHTML = `<div class="kitap-yer"><nav class="dizin" aria-label="Bölümler ve sorular">${dizinHTML(K, q.id)}</nav><div>
       ${takipHTML(K, q)}
@@ -190,9 +191,11 @@
       ${q.ipucu ? `<details class="ipucu"><summary>İpucu</summary>${q.ipucu}</details>` : ''}
       ${R ? yolHTML(K, q) : ''}
       <h2 class="coz-h" style="margin-top:22px">Çözüm <small class="yok" style="font-size:15px;font-weight:500">PDF s. ${q.pdf_cozum ?? '—'} · ${n} adım</small></h2>
+      ${cozKipHTML(K, q)}${oynHTML(K, q)}
       ${q.giris ? `<div id="cozum-giris" hidden>${q.giris}</div>` : ''}
       <ol class="adimlar${R ? ' rehberli' : ''}" id="adimlar">${R ? R.adimlar.map((a, i) => rehberAdim(K, q, a, i)).join('') : (q.adimlar || []).map((a, i) => `<li data-i="${i}" hidden>${a.html}${bagHTML(K, a.kavram, q.id)}</li>`).join('')}</ol>
       <div class="cozum-bas"><button type="button" class="dugme" id="adim-ac">1. adımı aç</button><button type="button" class="dugme ikincil" id="hepsi">Hepsini aç</button><button type="button" class="kucuk" id="kapat" hidden>Çözümü kapat</button></div>
+      ${syHTML(K, q)}
       <div id="cozum-son" hidden>${R ? `<details class="pdf-metin"><summary>PDF'teki çözüm metni (aynı sayılar)</summary>${q.giris || ''}${(q.adimlar || []).map((a) => a.html).join('')}</details>` : ''}${q.oz ? `<div class="oz"><b>Öz:</b> ${q.oz.replace(/^<p>|<\/p>$/g, '')}</div>` : ''}
       ${q.kod ? `<details class="kod-kutu"><summary>Bu sonucu hesaplayan Python kodu</summary><pre class="kod">${kac(q.kod).split('\n').map((s, i) => `<span class="sat"><span class="no">${i + 1}</span>${s}</span>`).join('')}</pre></details>` : ''}
       ${(q.kavram || []).length ? `<h3>Bu sorudaki kavramlar</h3>${bagHTML(K, q.kavram, q.id)}` : `<p class="yok">Bu sorunun kavram bağları hazırlanıyor; kitabın bölüm özetine <a href="#${K.id}/bol/${q.bolum}">buradan</a> bakabilirsin.</p>`}</div>
@@ -217,6 +220,7 @@
     btn.addEventListener('click', () => { const m = (acikAdim[`${K.id}/${q.id}`] || 0) + 1; goster(m, true); lis[m - 1]?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); });
     $('#hepsi').addEventListener('click', () => goster(n, true));
     $('#kapat').addEventListener('click', () => goster(0, false));
+    oynKur(K, q, () => goster(acikAdim[`${K.id}/${q.id}`] || 0, false));
     takipBagla(K);
     sinavSusle(K);
   }
@@ -434,7 +438,7 @@
     $('#kirinti').innerHTML = [[kac(K.kod), '_atlas'], ...parcalar].map(([ad, kp]) => (kp ? ckBag(kp, ad) : `<span>${ad}</span>`)).join(' <span class="ayrac" aria-hidden="true">›</span> ');
   }
   const siraHTML = (o, orta, s) => `${o ? ckBag(o[0], `‹ <span class="sira-ad">${o[1]}</span>`, 'sira-bag') : '<span class="sira-bos"></span>'}<span class="sira-orta yok">${orta}</span>${s ? ckBag(s[0], `<span class="sira-ad">${s[1]}</span> ›`, 'sira-bag sag') : '<span class="sira-bos"></span>'}`;
-  const ustSekme = (K, sec) => [['_atlas', 'Atlas', 'atlas'], ...(snVar(K) ? [['_sinav', 'Sınav', 'sinav']] : []), ...((K.kavramlar || []).length > 1 ? [['_ag', 'Ağ', 'ag']] : []), ...(turlar(K).length ? [['_tur', 'Türler', 'tur']] : []), ...(tepkimeler(K).length ? [['_tepkime', 'Tepkimeler', 'tepkime']] : []), ...(donguler(K).length ? [['_dongu', 'Çevrimler', 'dongu']] : []), ...(HS(K).length ? [['_hesap', 'Hesap', 'hesap']] : []), ['_sozluk', `Sözlük (${(K.sozluk || []).length})`, 'sozluk']].map(([kp, ad, id]) => `<button type="button" role="tab" aria-selected="${sec === id}" data-ck="${kp}">${ad}</button>`).join('');
+  const ustSekme = (K, sec) => [['_atlas', 'Atlas', 'atlas'], ...(snVar(K) ? [['_sinav', 'Sınav', 'sinav']] : []), ...((K.kavramlar || []).length > 1 ? [['_ag', 'Ağ', 'ag']] : []), ...(turlar(K).length ? [['_tur', 'Türler', 'tur']] : []), ...(tepkimeler(K).length ? [['_tepkime', 'Tepkimeler', 'tepkime']] : []), ...(donguler(K).length ? [['_dongu', 'Çevrimler', 'dongu']] : []), ...(HS(K).length ? [['_hesap', 'Hesap', 'hesap']] : []), ...(czKars(K).length ? [['_kars', 'Karşılaştır', 'kars']] : []), ['_sozluk', `Sözlük (${(K.sozluk || []).length})`, 'sozluk']].map(([kp, ad, id]) => `<button type="button" role="tab" aria-selected="${sec === id}" data-ck="${kp}">${ad}</button>`).join('');
   function soruCip(K, sid, uzun) {
     const q = K.sorular[sid]; if (!q) return '';
     const simdi = ckDurum && ckDurum.qid === sid, s = simdi ? ' simdi' : '', ac = simdi ? ' aria-current="page"' : '';
@@ -537,8 +541,8 @@
     else if (parca === 'kimya') { ic.innerHTML = kimyaKavramHTML(K, k); const d = kavramKimya(K, k.id).dongu[0]; if (d) donguKur(ic, K, d); }
     else if (parca === 'hesap') {
       const L = kavramHesap(K, k.id), h = L.find((x) => x.id === ek) || L[0];
-      ic.innerHTML = `${L.length > 1 ? `<div class="hs-secim" role="group" aria-label="Araç seç"><span class="yok">Araç:</span>${L.map((x) => ckBag(`${k.id}/hesap/${x.id}`, kac(iki(x.ad).tr), `kucuk${x === h ? ' simdi' : ''}`)).join('')}</div>` : ''}${hesapHTML(K, h, true)}<p class="dil-cagri">${ckBag('_hesap', 'Bütün araçlar: Hesap laboratuvarı →', 'soru-bag')}</p>`;
-      hesapKur(ic, h, null);
+      ic.innerHTML = `${L.length > 1 ? `<div class="hs-secim" role="group" aria-label="Araç seç"><span class="yok">Araç:</span>${L.map((x) => ckBag(`${k.id}/hesap/${x.id}`, kac(iki(x.ad).tr), `kucuk${x === h ? ' simdi' : ''}`)).join('')}</div>` : ''}${h.tur === 'eklenti' ? eklentiHTML(K, h, true) : hesapHTML(K, h, true)}<p class="dil-cagri">${ckBag('_hesap', 'Bütün araçlar: Hesap laboratuvarı →', 'soru-bag')}</p>`;
+      if (h.tur === 'eklenti') eklentiKur(ic, K, h); else hesapKur(ic, h, null);
     }
     else if (parca === 'diyagram') { ic.innerHTML = `<div class="sekil-kap" id="ck-sekil"></div>${P.html || ''}`; if (window.Sekil[P.sekil]) window.Sekil[P.sekil]($('#ck-sekil'), P.ayar || {}); buyutDugmesi(); }
     else if (parca === 'formul') {
@@ -711,10 +715,17 @@
       ${kv.length || sq.length ? `<div class="ilgili">${kv.map((k) => ckBag(`${k.id}/tanim`, `${kac(k.sembol)} · ${kac(k.ad)}`, 'soru-bag')).join('')}${sq.map((s) => soruCip(K, s)).join('')}</div>` : ''}
     </section>`;
   }
-  function hesapKur(kok, h, hz) {
+  function hesapKur(kok, h, hz, ovr) {
     const sek = $$('.hs', kok).find((x) => x.dataset.hs === h.id); if (!sek) return;
     const d = hesapDurum(h), G = h.girdi || [];
     if (hz != null) { hazirUygula(h, d, hz); d.son = null; }
+    // ETK Ö5 «Şöyle olsaydı?»: /_hesap/<araç>/<hazır|->/<girdi>=<değer>,… → A = sorunun değerleri, B = değişen değerler (B/A görünür)
+    if (ovr) {
+      if (hz == null) { G.forEach((g) => { d.v[g.id] = girdiVars(g); }); d.hz = -1; }
+      const deg = {};
+      String(ovr).split(',').forEach((p) => { const [g, v] = p.split('='), x = sayiOku(v); if (g && isFinite(x) && G.some((y) => y.id === g)) deg[g] = x; });
+      if (Object.keys(deg).length) { d.A = { ...d.v }; Object.assign(d.v, deg); d.son = Object.keys(deg)[0]; }
+    }
     const kutu = (gid) => $$('.hs-g', sek).find((x) => x.dataset.g === gid);
     let ilk = true;
     function girdiGoster(g, kaynak) {
@@ -769,7 +780,7 @@
     const L = HS(K);
     if (!L.length) return atlasCk(K, ayni);
     $('#ck-sekme').innerHTML = ustSekme(K, ne ? '' : 'hesap');
-    const [id, hz] = String(ne || '').split('/'), h = id ? hesapBul(K, id) : null;
+    const [id, hz, ovr] = String(ne || '').split('/'), h = id ? hesapBul(K, id) : null;
     if (!h) {
       kirintiYaz(K, [['Hesap laboratuvarı', null]]);
       $('#ck-baslik').innerHTML = `Hesap laboratuvarı<small>${L.length} araç · sürgüyle oyna, kitaptaki değerle karşılaştır</small>`;
@@ -777,7 +788,7 @@
       if (ayni) return;
       const bolOf = (x) => { const k = kvSira(K, x.kavram)[0]; return k ? k.bolum : ''; };
       const gruplar = [...K.bolumler.map((b) => [bolumAd(K, b), L.filter((x) => bolOf(x) === b.id)]), ['Genel araçlar', L.filter((x) => !bolOf(x))]].filter(([, l]) => l.length);
-      ckIc.innerHTML = `<p class="ck-not">Bir araca dokun: girdiyi sürgüyle ya da kutuya yazarak değiştir, çıktı anında güncellenir. «Hazır» düğmeleri kitaptaki sorunun değerlerini getirir ve sonucu kitapla karşılaştırır.</p>${gruplar.map(([bas, l]) => `<section class="at-bol"><h3>${kac(bas)} <span class="say">${l.length} araç</span></h3><ul class="kv-liste">${l.map((x) => `<li>${ckBag(`_hesap/${x.id}`, `<span class="ad">${kac(iki(x.ad).tr)}</span><span class="en" lang="en">${kac(iki(x.ad).en)}</span><span class="hs-lf">${semHTML(x.formul || '')}</span>`, 'kv-sat')}</li>`).join('')}</ul></section>`).join('')}`;
+      ckIc.innerHTML = `<p class="ck-not">Bir araca dokun: girdiyi sürgüyle ya da kutuya yazarak değiştir, çıktı anında güncellenir. «Hazır» düğmeleri kitaptaki sorunun değerlerini getirir ve sonucu kitapla karşılaştırır.</p>${gruplar.map(([bas, l]) => `<section class="at-bol"><h3>${kac(bas)} <span class="say">${l.length} araç</span></h3><ul class="kv-liste">${l.map((x) => `<li>${ckBag(`_hesap/${x.id}`, `<span class="ad">${kac(iki(x.ad).tr)}</span><span class="en" lang="en">${kac(iki(x.ad).en)}</span><span class="hs-lf">${x.tur === 'eklenti' ? kac(iki(x.aciklama).tr || 'etkileşimli araç') : semHTML(x.formul || '')}</span>`, 'kv-sat')}</li>`).join('')}</ul></section>`).join('')}`;
       return;
     }
     kirintiYaz(K, [['Hesap laboratuvarı', '_hesap'], [kac(iki(h.ad).tr), null]]);
@@ -785,8 +796,9 @@
     const i = L.indexOf(h), o = L[i - 1], s = L[i + 1];
     $('#ck-sira').innerHTML = siraHTML(o && [`_hesap/${o.id}`, kac(iki(o.ad).tr)], `araç ${i + 1} / ${L.length}`, s && [`_hesap/${s.id}`, kac(iki(s.ad).tr)]);
     if (ayni) return;
+    if (h.tur === 'eklenti') { ckIc.innerHTML = eklentiHTML(K, h, false); eklentiKur(ckIc, K, h); return; }
     ckIc.innerHTML = hesapHTML(K, h, false);
-    hesapKur(ckIc, h, hazirSira(h, hz));
+    hesapKur(ckIc, h, hazirSira(h, hz), ovr);
   }
 
   /* --- kimya gezgini: tür kartı, tepkime kartı, çevrim çizimi (SVG; düğüm = tür, ok = tepkime; adım adım) --- */
@@ -1009,7 +1021,8 @@
   // atlasın üstünde giriş kutuları (yalnız kimya / hesap verisi olan kitapta)
   function atlasGirisHTML(K) {
     const kutu = (kp, ad, n, alt, sinif = '') => ckBag(kp, `<b>${ad}</b><span class="say">${n}</span><span class="at-alt">${alt}</span>`, `at-kutu${sinif}`);
-    const sn = snVar(K) ? kutu('_sinav', 'Sınav pusulası', SN[K.id].d === 'acik' ? 'açık' : 'kilitli', SN[K.id].d === 'acik' ? 'strateji · olasılık · son gün' : 'parolayla açılır', ' sn-kutu') : '';
+    const sn = (snVar(K) ? kutu('_sinav', 'Sınav pusulası', SN[K.id].d === 'acik' ? 'açık' : 'kilitli', SN[K.id].d === 'acik' ? 'strateji · olasılık · son gün' : 'parolayla açılır', ' sn-kutu') : '')
+      + (czKars(K).length ? kutu('_kars', 'Karşılaştırmalar', czKars(K).length, 'karıştırılan kavramlar yan yana') : '');
     if (!turlar(K).length && !tepkimeler(K).length && !donguler(K).length && !HS(K).length) {
       if (sn) return `<div class="at-giris">${sn}${(K.kavramlar || []).length > 1 ? kutu('_ag', 'Kavram ağı', K.kavramlar.length, 'kavramlar arası bağlar') : ''}${(K.sozluk || []).length ? kutu('_sozluk', 'Sözlük', K.sozluk.length, 'TR ↔ EN terimler') : ''}</div>`;
       return (K.kavramlar || []).length > 1 ? `<p class="ag-gir">${ckBag('_ag', 'Kavram ağı: bütün kavramlar ve aralarındaki bağlar tek çizimde →', 'soru-bag')}</p>` : '';
@@ -1173,8 +1186,8 @@
   function sinavSusle(K) {
     $$('.sn-x', ana).forEach((x) => x.remove());
     const yer = $('.sn-yer', ana), s = SN[K.id], V = SV(K), ck = `#${anaOnEk(K)}/k/_sinav`;
-    if (yer) yer.innerHTML = !snVar(K) ? '' : s.d === 'kilitli' ? `<button type="button" class="kucuk sn-dug" data-git="${kac(ck)}" title="Sınav pusulası parolayla açılır">${KILIT_SVG}<span>Sınav pusulası · kilitli</span></button>`
-      : `<button type="button" class="kucuk sn-dug sn-ac" aria-pressed="${!!V}" title="Okuma akışındaki sınav işaretleri: aç / kapat">${PUSULA_SVG}<span>Sınav pusulası</span></button>${V ? `<button type="button" class="kucuk sn-dug" data-git="${kac(ck)}">Strateji</button>` : ''}`;
+    if (yer) yer.innerHTML = !snVar(K) ? '' : s.d === 'kilitli' ? `<button type="button" class="kucuk sn-dug" data-git="${kac(ck)}" aria-label="Sınav pusulası · kilitli" title="Sınav pusulası parolayla açılır">${KILIT_SVG}<span class="sn-uzun">Sınav pusulası · kilitli</span><span class="sn-kisa">Sınav</span></button>`
+      : `<button type="button" class="kucuk sn-dug sn-ac" aria-pressed="${!!V}" aria-label="Sınav pusulası" title="Okuma akışındaki sınav işaretleri: aç / kapat">${PUSULA_SVG}<span class="sn-uzun">Sınav pusulası</span><span class="sn-kisa">Pusula</span></button>${V ? `<button type="button" class="kucuk sn-dug" data-git="${kac(ck)}">Strateji</button>` : ''}`;
     const d = $('.dizin', ana);
     if (d) { d.classList.toggle('sn-var', !!V); if (!V) d.classList.remove('sn-yalniz'); }
     if (!V) return;
@@ -1293,6 +1306,183 @@
     } catch (err) { hata.hidden = false; dg.disabled = false; dg.textContent = 'Aç'; inp.select(); }
   });
 
+  /* ---------- ETK Ö5 (26 Kas): adım adım oynatıcı · «Şöyle olsaydı?» · ayrım · hazır karşılaştırma · eklenti kancası ----------
+     Veri: cozum/<kitap>.json → K.cozum = {soru: {S: {adim, alternatif, ayrim}}, kars: [...]} (tools/ek_birlestir.mjs). Yoksa oynatıcı
+     kitabın kendi adımlarını (rehber / adimlar) gösterir; «Şöyle olsaydı?» ve ayrım bölümü çıkmaz. Görünüm: Adım adım | Liste (dk:cozkip;
+     tercih yoksa cozum verisi olan soruda Adım adım). Çekmece: _kars (liste) · _kars/=<id> (hazır karşılaştırma).
+     Eklenti: hesap aracında "tur": "eklenti" → _hesap/<id> modülü (eklenti/<ad>.js) ve verisini tembel yükler; modül
+     window.DK_EKLENTI['<ad>'] = {ac(kap, {veri, kitap, git})} tanımlar (ac {dur()} döndürürse çekmece değişince çağrılır). */
+  const CZ = (K) => (K && K.cozum && typeof K.cozum === 'object' ? K.cozum : {});
+  const czSoru = (K, sid) => ((CZ(K).soru || {})[sid]) || null;
+  const czKars = (K) => (Array.isArray(CZ(K).kars) ? CZ(K).kars : []);
+  const oynAdim = {};
+  let cozZorla = '';
+  function oynAdimlar(K, q) {
+    const C = czSoru(K, q.id);
+    if (C && (C.adim || []).length) return C.adim.map((a) => ({ ne: kac(a.ne || ''), en: a.en ? kac(a.en) : '', islem: kac(a.islem || ''), sonuc: kac(a.sonuc || ''), neden: kac(a.neden || ''), kontrol: kac(a.kontrol || ''), dikkat: kac(a.dikkat || ''), kv: a.kavram ? [a.kavram] : [] }));
+    const R = q.rehber;
+    if (R && (R.adimlar || []).length) return R.adimlar.map((a) => ({ bas: kac(a.kisa || ''), ne: a.ne || '', islemH: a.nasil || '', sonuc: a.sonuc || '', neden: a.neden || '', kv: a.kavram ? [a.kavram] : [] }));
+    return (q.adimlar || []).map((a) => ({ html: a.html || '', kv: a.kavram || [] }));
+  }
+  const czZengin = (K, q) => !!(czSoru(K, q.id) && (czSoru(K, q.id).adim || []).length);
+  const cozKipHTML = (K, q) => (oynAdimlar(K, q).length ? `<div class="coz-kip" role="group" aria-label="Çözüm görünümü"><button type="button" data-kip="oyn" aria-pressed="false">${IK('<path d="M7 5v14l11-7z"/>')}<span>Adım adım</span></button><button type="button" data-kip="liste" aria-pressed="false">${IK('<path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/>')}<span>Liste</span></button></div>` : '');
+  function oynHTML(K, q) {
+    const A = oynAdimlar(K, q), n = A.length; if (!n) return '';
+    const li = (a, i) => `<li class="oyn-a" data-i="${i}" hidden>${a.html ? a.html : `<p class="oyn-ne">${a.bas ? `<b>${a.bas}</b> · ` : ''}${a.ne}</p>${a.en ? `<p class="oyn-en" lang="en">${a.en}</p>` : ''}${a.islem ? `<div class="oyn-islem">${a.islem}</div>` : a.islemH ? `<div class="oyn-islem oyn-tex">${a.islemH}</div>` : ''}${a.sonuc ? `<p class="oyn-sonuc"><span class="oyn-et">Ara sonuç</span> <b>${a.sonuc}</b></p>` : ''}${a.neden ? `<details class="oyn-neden"><summary>Neden?</summary><p>${a.neden}</p></details>` : ''}${a.kontrol ? `<p class="oyn-kontrol"><span class="oyn-et">Denetim</span> ${a.kontrol}</p>` : ''}${a.dikkat ? `<p class="oyn-dikkat"><span class="oyn-et">Dikkat</span> ${a.dikkat}</p>` : ''}`}${bagHTML(K, a.kv, q.id)}</li>`;
+    return `<section class="oyn" id="oyn" aria-label="Adım adım çözüm"><div class="oyn-ust"><div class="oyn-cubuk" role="group" aria-label="Adıma git">${A.map((a, i) => `<button type="button" class="oyn-p" data-i="${i}" aria-label="${i + 1}. adım"></button>`).join('')}</div><span class="oyn-say" aria-live="polite"></span></div>
+      <ol class="oyn-liste">${A.map(li).join('')}</ol>
+      <div class="oyn-dug"><button type="button" class="kucuk oyn-geri">‹ Önceki</button><button type="button" class="dugme oyn-ileri">1. adımı göster</button><button type="button" class="kucuk oyn-hepsi">Hepsi</button><button type="button" class="kucuk oyn-basa">Baştan</button></div></section>`;
+  }
+  function oynKur(K, q, listeGoster) {
+    const kok = $('#oyn', ana), kip = $('.coz-kip', ana); if (!kok || !kip) return;
+    const L = $$('.oyn-a', kok), n = L.length, anah = `${K.id}/${q.id}`;
+    const goster = (m, otele) => {
+      m = Math.max(0, Math.min(n, m)); oynAdim[anah] = m;
+      L.forEach((li, i) => { const ac = i < m; if (ac && li.hidden && otele) li.classList.add('yeni'); li.hidden = !ac; li.classList.toggle('simdi', i === m - 1); });
+      $$('.oyn-p', kok).forEach((b, i) => { b.classList.toggle('dolu', i < m); b.setAttribute('aria-current', String(i === m - 1)); });
+      $('.oyn-say', kok).textContent = m ? `Adım ${m} / ${n}` : `${n} adım · önce kendin dene`;
+      const il = $('.oyn-ileri', kok); il.hidden = m >= n; il.textContent = m ? 'Sonraki adım ›' : '1. adımı göster';
+      $('.oyn-geri', kok).hidden = m === 0; $('.oyn-hepsi', kok).hidden = m >= n; $('.oyn-basa', kok).hidden = m === 0;
+      if (ana.dataset.cozkip === 'oyn') { const s = $('#cozum-son', ana); if (s) s.hidden = m < n; }
+      if (otele && m) L[m - 1].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      if (window.__hudGoster) window.__hudGoster();
+    };
+    const kipYaz = (k, kullanici) => {
+      ana.dataset.cozkip = k;
+      $$('button', kip).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.kip === k)));
+      if (k === 'oyn') goster(oynAdim[anah] || 0, false); else listeGoster();
+      if (kullanici) sakla('dk:cozkip', k);
+    };
+    kip.addEventListener('click', (e) => { const b = e.target.closest('button[data-kip]'); if (b) kipYaz(b.dataset.kip, true); });
+    kok.addEventListener('click', (e) => {
+      const b = e.target.closest('button'); if (!b || !kok.contains(b) || b.closest('.bag')) return;
+      const m = oynAdim[anah] || 0;
+      if (b.classList.contains('oyn-ileri')) goster(m + 1, true);
+      else if (b.classList.contains('oyn-geri')) goster(m - 1, false);
+      else if (b.classList.contains('oyn-hepsi')) goster(n, false);
+      else if (b.classList.contains('oyn-basa')) goster(0, false);
+      else if (b.classList.contains('oyn-p')) goster(+b.dataset.i + 1, true);
+    });
+    kok.addEventListener('keydown', (e) => {
+      if (e.altKey || e.ctrlKey || e.metaKey || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName) || (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft')) return;
+      e.preventDefault(); e.stopPropagation(); goster((oynAdim[anah] || 0) + (e.key === 'ArrowRight' ? 1 : -1), e.key === 'ArrowRight');
+    });
+    const t = oku('dk:cozkip');
+    kipYaz(cozZorla || (t === 'oyn' || t === 'liste' ? t : czZengin(K, q) ? 'oyn' : 'liste'), false);
+  }
+  // «Şöyle olsaydı?» kartları + ayrım + ilgili hazır karşılaştırmalar (çözüm listesinin altında, katlı)
+  function syHTML(K, q) {
+    const C = czSoru(K, q.id) || {}, A = C.alternatif || [], Y = C.ayrim || [];
+    const kr = czKars(K).filter((x) => (x.kavram || []).some((id) => (q.kavram || []).includes(id)));
+    if (!A.length && !Y.length && !kr.length) return '';
+    return `<section class="sy" aria-label="Şöyle olsaydı ve ayrım">
+      ${A.length ? `<details class="sy-blok sy-alt"><summary><span class="sy-bas">Şöyle olsaydı?</span><span class="say">${A.length} kart · önce tahmin et, sonra aç</span></summary><div class="sy-kartlar">${A.map((x, i) => syKart(K, q, x, i)).join('')}</div></details>` : ''}
+      ${Y.length ? `<details class="sy-blok sy-ay"><summary><span class="sy-bas">Ayrım</span><span class="say">${Y.length} soru · neden bu, öbürü değil?</span></summary>${Y.map((y) => `<details class="ay"><summary>${kac(y.soru)}</summary><p>${kac(y.cevap)}</p>${y.en ? `<p class="oyn-en" lang="en">${kac(y.en)}</p>` : ''}</details>`).join('')}</details>` : ''}
+      ${kr.length ? `<div class="sn-cipler sy-kars"><span class="yok">Karşılaştır:</span> ${kr.map((x) => `<button type="button" class="sn-cip" data-git="${kac(`#${K.id}/${q.id}/k/_kars/=${x.id}`)}">${kac(x.baslik)}</button>`).join('')}</div>` : ''}</section>`;
+  }
+  const HESAP_SVG = IK('<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h1M12 11h1M16 11h0M8 15h1M12 15h1M8 18h1M12 18h4"/>');
+  function syKart(K, q, x, i) {
+    const ne = String(x.ne || '').replace(/^\s*[ŞşSs]öyle olsaydı\s*[:?…]*\s*/u, '');
+    const h = x.hesap && hesapBul(K, x.hesap.id);
+    let hs = '';
+    if (h && h.tur !== 'eklenti') {
+      const hz = (h.hazir || []).findIndex((z) => z.soru === q.id), ovr = Object.entries(x.hesap.deger || {}).filter(([, v]) => isFinite(+v)).map(([g, v]) => `${g}=${+v}`).join(',');
+      hs = `<button type="button" class="kucuk sy-hs" data-git="${kac(`#${K.id}/${q.id}/k/_hesap/${h.id}/${hz >= 0 ? hz : '-'}${ovr ? '/' + ovr : ''}`)}">${HESAP_SVG}<span>Hesapla: ${kac(iki(h.ad).tr)}</span></button>`;
+    }
+    return `<article class="sy-k"><p class="sy-ne"><span class="sy-no">${i + 1}</span>${kac(ne)}</p>${x.en ? `<p class="oyn-en" lang="en">${kac(x.en)}</p>` : ''}<button type="button" class="kucuk sy-ac" aria-expanded="false" data-et="Önce tahmin et · sonucu göster">Önce tahmin et · sonucu göster</button><div class="sy-cevap" hidden><p class="sy-sonuc"><span class="oyn-et">Yeni sonuç</span> <b>${kac(x.sonuc || '')}</b></p>${x.neden ? `<p><span class="oyn-et">Neden</span> ${kac(x.neden)}</p>` : ''}</div>${hs}</article>`;
+  }
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('.sy-ac'); if (!b) return;
+    const c = b.nextElementSibling; if (!c) return;
+    const ac = c.hidden; c.hidden = !ac; b.setAttribute('aria-expanded', String(ac)); b.textContent = ac ? 'Gizle' : (b.dataset.et || 'Göster');
+  });
+  // hazır karşılaştırma: tablo (telefonda satır yığını) · ne zaman hangisi · örnek durumlar · kendini dene
+  const sutunAd = (s) => (typeof s === 'string' ? s : (s && (s.tr || s.en)) || '');
+  // sut: sütun başlığı HTML'i, ad: düz sütun adı (telefonda hücre etiketi), satir: [{ad (HTML), h: [hücre HTML]}]
+  const karsTabloHTML = (sut, ad, satir) => `<div class="kz-kap"><table class="kz-t"><thead><tr><th scope="col"><span class="gizli">Özellik</span></th>${sut.map((s, i) => `<th scope="col" class="kz-s es${i % ES_RENK}">${s}</th>`).join('')}</tr></thead><tbody>${satir.map((r) => `<tr><th scope="row">${r.ad}</th>${sut.map((s, i) => `<td data-b="${kac(ad[i])}">${(r.h || [])[i] ?? ''}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  function karsHazirHTML(K, x) {
+    const S = (x.sutun || []).map(sutunAd);
+    let h = karsTabloHTML(S.map(kac), S, (x.satir || []).map((r) => ({ ad: kac(r.ad), h: S.map((_, i) => `${kac((r.h || [])[i] ?? '')}${(r.en || [])[i] ? `<span class="kz-en" lang="en">${kac(r.en[i])}</span>` : ''}`) })));
+    if ((x.sec || []).length) h += `<h3>Ne zaman hangisi?</h3>${snUl(x.sec)}`;
+    if ((x.ornek || []).length) h += `<h3>Örnek durumlar <small class="yok">· önce sen seç</small></h3><div class="sy-kartlar">${x.ornek.map((o, i) => `<article class="sy-k"><p class="sy-ne"><span class="sy-no">${i + 1}</span>${kac(o.durum || '')}</p><button type="button" class="kucuk sy-ac" aria-expanded="false" data-et="Hangisini seçerdin? · cevabı göster">Hangisini seçerdin? · cevabı göster</button><div class="sy-cevap" hidden><p class="sy-sonuc"><span class="oyn-et">Seçim</span> <b>${kac(o.secim || '')}</b></p>${o.neden ? `<p><span class="oyn-et">Neden</span> ${kac(o.neden)}</p>` : ''}</div></article>`).join('')}</div>`;
+    if ((x.dene || []).length) h += `<div class="kz-dene" data-kz="${kac(x.id)}" data-i="0"><h3>Kendini dene</h3><div class="kz-soru"></div></div>`;
+    const kv = kvSira(K, x.kavram);
+    if (kv.length) h += `<h3>Kavramlar</h3><div class="ilgili">${kv.map((k) => ckBag(`${k.id}/tanim`, `${kac(k.sembol)} · ${kac(k.ad)}`, 'soru-bag')).join('')}</div>`;
+    return h;
+  }
+  function kzDeneYaz(d) {
+    const x = czKars(simdiK).find((y) => y.id === d.dataset.kz); if (!x || !(x.dene || []).length) return;
+    const L = x.dene, i = (+d.dataset.i || 0) % L.length, q = L[i];
+    $('.kz-soru', d).innerHTML = `<p class="kr-s">${i + 1}/${L.length} · ${kac(q.s)}</p><div class="kr-sec">${(q.secenek || []).map((s, j) => `<button type="button" class="kucuk" data-j="${j}">${kac(s)}</button>`).join('')}</div><p class="kr-sonuc" aria-live="polite"></p><button type="button" class="kucuk kz-sonraki" hidden>${L.length > 1 ? 'Sonraki soru ›' : 'Baştan'}</button>`;
+  }
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('.kz-dene button'); if (!b || !simdiK) return;
+    const d = b.closest('.kz-dene'), x = czKars(simdiK).find((y) => y.id === d.dataset.kz); if (!x) return;
+    if (b.classList.contains('kz-sonraki')) { d.dataset.i = (+d.dataset.i || 0) + 1; kzDeneYaz(d); return; }
+    const q = x.dene[(+d.dataset.i || 0) % x.dene.length], ok = +b.dataset.j === +q.c;
+    $$('.kr-sec button', d).forEach((y) => { y.disabled = true; if (+y.dataset.j === +q.c) y.classList.add('dogru'); });
+    if (!ok) b.classList.add('yanlis');
+    const so = $('.kr-sonuc', d); so.className = `kr-sonuc ${ok ? 'dogru' : 'yanlis'}`; so.textContent = `${ok ? 'Doğru.' : `Yanlış — doğrusu: ${(q.secenek || [])[q.c] || ''}.`} ${q.neden || ''}`;
+    $('.kz-sonraki', d).hidden = false;
+  });
+  function karsCk(K, ne, ayni) {
+    const L = czKars(K), x = String(ne || '').startsWith('=') ? L.find((y) => y.id === ne.slice(1)) : null;
+    $('#ck-sekme').innerHTML = ustSekme(K, x ? '' : 'kars');
+    if (x) {
+      kirintiYaz(K, [['Karşılaştırmalar', '_kars'], [kac(kisalt(x.baslik, 40)), null]]);
+      $('#ck-baslik').innerHTML = `${kac(x.baslik)}<small>${(x.sutun || []).length} seçenek yan yana</small>`;
+      const i = L.indexOf(x), o = L[i - 1], s = L[i + 1];
+      $('#ck-sira').innerHTML = siraHTML(o && [`_kars/=${o.id}`, kac(kisalt(o.baslik, 30))], `${i + 1} / ${L.length}`, s && [`_kars/=${s.id}`, kac(kisalt(s.baslik, 30))]);
+      if (ayni) return;
+      ckIc.innerHTML = karsHazirHTML(K, x);
+      $$('.kz-dene', ckIc).forEach(kzDeneYaz);
+      return;
+    }
+    kirintiYaz(K, [['Karşılaştırmalar', null]]);
+    $('#ck-baslik').innerHTML = `Karşılaştırmalar<small>${L.length} hazır karşılaştırma · karıştırılan kavramlar yan yana</small>`;
+    $('#ck-sira').innerHTML = '';
+    if (ayni) return;
+    ckIc.innerHTML = L.length ? `<p class="ck-not">Bir karşılaştırmaya dokun: tablo, ne zaman hangisi, örnek durumlar ve kendini dene.</p><ul class="kv-liste">${L.map((y) => `<li>${ckBag(`_kars/=${y.id}`, `<span class="ad">${kac(y.baslik)}</span><span class="say">${(y.sutun || []).map((s) => kac(sutunAd(s))).join(' · ')}</span>`, 'kv-sat')}</li>`).join('')}</ul>` : '<p class="yok">Bu kitabın hazır karşılaştırmaları hazırlanıyor.</p>';
+  }
+  // eklenti kancası (302E SYNOP çözücü gibi; modülü içerik ajanı yazar)
+  const EKL = {}, EKV = {};
+  function eklentiYukle(h) {
+    const m = String(h.modul || ''), ad = (/^eklenti\/([\w-]+)\.js$/.exec(m) || [])[1];
+    if (!ad) return Promise.reject(new Error('modül yolu geçersiz'));
+    const mp = EKL[m] || (EKL[m] = new Promise((ok, red) => {
+      if (window.DK_EKLENTI && window.DK_EKLENTI[ad]) { ok(); return; }
+      const s = document.createElement('script'); s.src = m; s.onload = () => ok(); s.onerror = () => { delete EKL[m]; red(new Error('modül yüklenemedi')); }; document.head.append(s);
+    }));
+    const v = String(h.veri || '');
+    const vp = !v ? Promise.resolve(null) : EKV[v] || (EKV[v] = fetch(v, { cache: 'no-cache' }).then((r) => { if (!r.ok) throw new Error('veri yüklenemedi'); return r.json(); }).catch((e) => { delete EKV[v]; throw e; }));
+    return Promise.all([mp, vp]).then(([, veri]) => ({ ad, veri }));
+  }
+  function ekGit(K, hedef) {
+    const t = String(hedef || '');
+    if (t.startsWith('#')) { location.hash = t; return; }
+    const i = t.indexOf(':'), tur = t.slice(0, i), id = t.slice(i + 1), on = ckDurum ? ckDurum.onEk : K.id;
+    if (tur === 'soru') anaGit(`#${K.id}/${id}`, true);
+    else if (tur === 'bol') anaGit(`#${K.id}/bol/${id}`, true);
+    else if (tur === 'kavram') location.hash = `#${on}/k/${id}/tanim`;
+    else if (tur === 'sozluk') location.hash = `#${on}/k/_sozluk/${id}`;
+    else if (tur === 'hesap') location.hash = `#${on}/k/_hesap/${id}`;
+  }
+  function eklentiHTML(K, h, baslik) {
+    const ad = iki(h.ad), kv = kvSira(K, h.kavram), sq = (h.soru || []).filter((s) => K.sorular[s]);
+    return `<section class="hs ek" data-hs="${kac(h.id)}" aria-label="Etkileşimli araç: ${kac(ad.tr)}">${baslik ? `<h3 class="hs-bas">${kac(ad.tr)}${ad.en ? ` <small lang="en">${kac(ad.en)}</small>` : ''}</h3>` : ''}${h.aciklama ? ciftHTML(iki(h.aciklama)) : ''}<div class="ek-kap" aria-live="polite"><p class="yok">Yükleniyor…</p></div>${kv.length || sq.length ? `<div class="ilgili">${kv.map((k) => ckBag(`${k.id}/tanim`, `${kac(k.sembol)} · ${kac(k.ad)}`, 'soru-bag')).join('')}${sq.map((s) => soruCip(K, s)).join('')}</div>` : ''}</section>`;
+  }
+  function eklentiKur(kok, K, h) {
+    const kap = $$('.hs.ek', kok).find((x) => x.dataset.hs === h.id)?.querySelector('.ek-kap'); if (!kap) return;
+    eklentiYukle(h).then(({ ad, veri }) => {
+      if (!kap.isConnected) return;
+      const E = window.DK_EKLENTI && window.DK_EKLENTI[ad];
+      if (!E || typeof E.ac !== 'function') throw new Error('eklenti tanımı yok');
+      kap.innerHTML = '';
+      const r = E.ac(kap, { veri, kitap: K.id, git: (hedef) => ekGit(K, hedef) });
+      if (r && typeof r.dur === 'function') animTutucu = r;
+    }).catch((e) => { if (kap.isConnected) kap.innerHTML = `<p class="yok">Bu araç şu an açılamadı (${kac(e.message)}).</p>`; });
+  }
+
   /* --- aç / kapat / yönlendir --- */
   function cekmeceKapat() {
     if (animTutucu && animTutucu.dur) animTutucu.dur(); animTutucu = null;
@@ -1320,6 +1510,7 @@
     else if (bas === '_hesap') hesapCk(K, kalan.join('/'), ayni);
     else if (bas === '_ag') agCk(K, ayni);
     else if (bas === '_sinav') sinavCk(K, kalan.join('/'), ayni);
+    else if (bas === '_kars') karsCk(K, kalan.join('/'), ayni);
     else kavramCk(K, bas, kalan[0] || 'tanim', ayni, kalan[1]);
     if (ayni) { $$('[data-soru]', ckIc).forEach((a) => { const on = a.dataset.soru === qid; a.classList.toggle('simdi', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); }); return; }
     glifDuzelt(ckIc);
@@ -1410,6 +1601,7 @@
     donguler(K).forEach((d) => ekle({ t: 'Çevrim', ad: iki(d.ad).tr, alt: iki(d.ad).en, ck: `_dongu/${d.id}`, n: `${iki(d.ad).tr} ${iki(d.ad).en} ${d.id} çevrim döngü cycle` }));
     if (HS(K).length) ekle({ t: 'Hesap', ad: `Hesap laboratuvarı · ${HS(K).length} araç`, ck: '_hesap', n: 'hesap laboratuvarı hesapla calculator' });
     HS(K).forEach((h) => ekle({ t: 'Hesap', ad: iki(h.ad).tr, alt: h.formul, ck: `_hesap/${h.id}`, n: `${iki(h.ad).tr} ${iki(h.ad).en} ${h.formul || ''} ${h.id}` }));
+    czKars(K).forEach((x) => ekle({ t: 'Karşılaştır', ad: x.baslik, alt: (x.sutun || []).map((s) => (typeof s === 'string' ? s : s.tr || s.en || '')).join(' · '), ck: `_kars/=${x.id}`, n: `${x.baslik} ${(x.sutun || []).map((s) => (typeof s === 'string' ? s : `${s.tr || ''} ${s.en || ''}`)).join(' ')} karşılaştır fark` }));
     soruSirasi(K).forEach((q) => ekle({ t: 'Soru', ad: `${q.id} · ${q.baslik}`, alt: `PDF s. ${q.pdf_soru ?? '—'}`, soru: q.id, n: `${q.id} ${q.baslik}` }));
     return araDizin;
   }
@@ -1572,7 +1764,9 @@
         const sid = parca[1] || oku(`dk:son:${K.id}`);
         const am = /^a(\d+)$/.exec(parca[2] || '');
         if (am) acikAdim[`${K.id}/${sid}`] = +am[1];
+        cozZorla = am ? 'liste' : ''; // #…/S10/a3 → liste görünümünde 3. adım (oynatıcı tercihine bakılmaz)
         soruGoster(K, K.sorular[sid] || soruSirasi(K)[0]);
+        cozZorla = '';
         if (am || parca[2] === 'yol' || parca[2] === 'oz') {
           const hedef = $(am ? `#a${am[1]}` : parca[2] === 'oz' ? ($('#oz') ? '#oz' : '#yol') : '#yol');
           if (hedef) { hedef.classList.add('vurgu'); setTimeout(() => hedef.scrollIntoView({ block: 'start', behavior: 'smooth' }), 60); sonSayfa = sayfa; return kPart ? ckGoster(K, kPart, onEk) : cekmeceKapat(); }
