@@ -1137,3 +1137,10 @@ p.isr-tz,li.isr-tz{margin:.5em 0}
 .sn-tum{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 8px}
 mark.sn-vurgu{background:var(--tur-zemin);color:var(--yazi);box-shadow:inset 0 -2px 0 var(--tur);border-radius:3px;padding:0 2px}
 .sn-vurgu-li{background:var(--tur-zemin);border-radius:8px}
+
+/* ETK4 BALON (27 Kas): gömülü kip (?gomulu=1) — site geneli arama balonunun içi: yalnız çekmece */
+html.dk-gomulu,html.dk-gomulu body{height:100%;overflow:hidden;background:var(--zemin)}
+html.dk-gomulu .ust,html.dk-gomulu #ana,html.dk-gomulu .perde,html.dk-gomulu .ck-tutamak,html.dk-gomulu .ck-ust,html.dk-gomulu .ck-yz-kose,html.dk-gomulu .kalem-panel,html.dk-gomulu #sb-ek{display:none!important}
+html.dk-gomulu .cekmece,html.dk-gomulu .cekmece[hidden]{display:flex!important;position:fixed!important;inset:0!important;width:auto!important;height:auto!important;max-height:none!important;border:0!important;border-radius:0!important;box-shadow:none!important;transform:none!important;padding:0!important;animation:none!important;transition:none!important}
+html.dk-gomulu .kirinti{padding-top:10px}
+html.dk-gomulu .ck-ic{padding:8px 14px 40px}

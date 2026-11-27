@@ -10,6 +10,8 @@
                                · kavram parçaları /k/<kavram>/kimya · /k/<kavram>/hesap[/<araç>]  */
 (function () {
   const $ = (s, k = document) => k.querySelector(s);
+  const GOMULU = (() => { try { return new URLSearchParams(location.search).has('gomulu'); } catch (e) { return false; } })(); // ETK4 BALON: gömülü kip
+  if (GOMULU) document.documentElement.classList.add('dk-gomulu');
   const $$ = (s, k = document) => [...k.querySelectorAll(s)];
   const kac = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const PARCA = [['tanim', 'Tanım'], ['diyagram', 'Diyagram'], ['formul', 'Formül · terimler'], ['ispat', 'Türetim'], ['anim', 'Animasyon'], ['kod', 'Kod']];
@@ -470,7 +472,7 @@
   const yanMq = matchMedia('(max-width:1099.98px) and (min-width:900px), (max-width:1099.98px) and (orientation:landscape) and (min-width:560px)');
   // ETK3 YUZEN: yüzen pencere açıksa kip «yuzen» (alt / yan / geniş kipin üstüne); dk:ckyuz = {acik, dikey, yatay}
   let ckYuz = (() => { try { return !!(JSON.parse(oku('dk:ckyuz') || 'null') || {}).acik; } catch (e) { return false; } })();
-  const ckMod = () => (ckYuz ? 'yuzen' : genisMq.matches ? 'genis' : yanMq.matches ? 'yan' : 'alt');
+  const ckMod = () => (GOMULU ? 'genis' : ckYuz ? 'yuzen' : genisMq.matches ? 'genis' : yanMq.matches ? 'yan' : 'alt');
   const ckSabitSorar = () => ckMod() === 'genis' || ckMod() === 'yan'; // Sabitle düğmesi yalnız yanda; alt panel ve yüzen pencere hep açık kalır
   const ckYanda = () => ckMod() !== 'alt';
   const BOY = [0.35, 0.55, 0.85, 1];
@@ -3033,7 +3035,8 @@
     mkUygula(K);
     ckIc.scrollTop = 0; basUygula(); sekmeOrtala();
     if (ilk && ckMod() === 'alt') altGorunurTut();
-    if (ilk) don.focus({ preventScroll: true });
+    if (GOMULU) { /* odak üst pencerede kalır */ }
+    else if (ilk) don.focus({ preventScroll: true });
     else if (!document.activeElement || document.activeElement === document.body || !document.activeElement.isConnected) $('#ck-baslik').focus({ preventScroll: true });
   }
   // ana sayfaya giden bağ: çekmece açık kalsın mı? (yan yana kipte Sabitle; telefonda alttaki panel hep açık kalır —
@@ -3533,11 +3536,13 @@
     const parca = onEk.split('/');
     const kitapId = parca[0];
     document.body.classList.toggle('kitapta', !!kitapId);
+    if (!kitapId && GOMULU && (window.DK_KATALOG || [])[0]) { location.replace(`#${window.DK_KATALOG[0].id}/k/_ara`); return; }
     if (!kitapId) { cekmeceKapat(); sonSayfa = ''; return kitaplik(); }
     let K;
     try { K = await yukle(kitapId); } catch (e) { ana.innerHTML = `<p>Bu kitap bulunamadı. <a href="#">Kitaplığa dön</a></p>`; return; }
     simdiK = K;
     sinavYukle(K);
+    if (GOMULU) { sonSayfa = onEk; if (!kPart) { location.replace(`#${onEk}/k/_ara`); return; } ckGoster(K, kPart, onEk); gomuluBildir(); return; }
     const sayfa = onEk;
     const ayniSayfa = sayfa === sonSayfa;
     if (!ayniSayfa) { sabitBirak(); sbEkYaz(0); SB.son = null; }
@@ -3565,6 +3570,47 @@
     if (ayniSayfa && (kPart || ckDurum)) sbPanel();
     if (kPart) ckGoster(K, kPart, onEk);
     else cekmeceKapat();
+  }
+  /* ---------- ETK4 BALON (27 Kas): gömülü kip — ders-kitapligi/?gomulu=1#<kitap>/k/<görünüm> ----------
+     Site geneli arama balonu (../ortak/ara-balon.js) bu sayfayı iframe'de açar: yalnız çekmece (arama, kavram, terim, sözlük,
+     mercekler, pusula); üst çubuk, kitap akışı, tutamak yok. Ana sayfaya giden bağ (soru, bölüm, akış, başka alt site) üst
+     pencerede açılır (postMessage {ab:'git'}), çekmece içi bağlar iframe'de kalır. Esc → üst pencere balonu kapatır.
+     Kanca: window.__dkGomulu = { ara(q), git(kitap, kp), kitap(), ilk(), odak(), geri() }. */
+  function gomuluBildir() {
+    if (!GOMULU || window.parent === window || !ckDurum) return;
+    try { window.parent.postMessage({ ab: 'durum', kitap: ckDurum.K.id, kp: ckDurum.kPart, baslik: (($('#ck-baslik') || {}).textContent || '').slice(0, 120) }, location.origin); } catch (e) { /* yok */ }
+  }
+  function gomuluDis(url, yeni) {
+    const u = new URL(url, location.href); u.searchParams.delete('gomulu');
+    if (window.parent !== window) { try { window.parent.postMessage({ ab: 'git', url: u.href, yeni: !!yeni }, location.origin); return; } catch (e) { /* yok */ } }
+    location.href = u.href;
+  }
+  if (GOMULU) {
+    document.addEventListener('click', (e) => {
+      if (e.defaultPrevented || e.button) return;
+      const s = e.target.closest('[data-soru],[data-ana]'), g = e.target.closest('[data-git]'), a = e.target.closest('a[href]');
+      let hedef = null;
+      if (s && ckDurum) hedef = `#${ckDurum.K.id}/${s.dataset.soru || s.dataset.ana}`;
+      else if (g && !String(g.dataset.git).includes('/k/')) hedef = g.dataset.git;
+      else if (a && !s && !g) { const h = a.getAttribute('href') || ''; if (h.startsWith('#')) { if (!h.includes('/k/')) hedef = h; } else if (a.target !== '_blank') hedef = a.href; }
+      if (!hedef) return;
+      e.preventDefault(); e.stopImmediatePropagation();
+      if (hedef.startsWith('#')) { const kp = ckDurum ? ckDurum.kPart : ''; hedef = `${location.pathname}${hedef}${kp && !/^_ara(\/|$)/.test(kp) ? '/k/' + kp : ''}`; }
+      gomuluDis(hedef, e.ctrlKey || e.metaKey);
+    }, true);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); try { window.parent.postMessage({ ab: 'kapat' }, location.origin); } catch (x) { /* yok */ } }
+      else if ((e.key === '/' && !/INPUT|TEXTAREA|SELECT/.test((document.activeElement || {}).tagName)) || ((e.ctrlKey || e.metaKey) && /^k$/i.test(e.key))) { e.preventDefault(); e.stopImmediatePropagation(); try { window.parent.postMessage({ ab: 'odak' }, location.origin); } catch (x) { /* yok */ } }
+    }, true);
+    window.__dkGomulu = {
+      ara: (q) => { const K = simdiK || (window.DK_KATALOG || [])[0]; if (!K) return; const h = `#${K.id}/k/_ara${q ? '/' + q : ''}`; let su = location.hash; try { su = decodeURIComponent(su); } catch (e) { /* bozuk */ } if (su !== h) location.replace(location.href.split('#')[0] + h); }, // mutlak adres: göreli adres çağıran (üst) pencereye göre çözülür
+      git: (kitap, kp) => { location.replace(location.href.split('#')[0] + `#${kitap}/k/${kp}`); },
+      kitap: () => (simdiK ? simdiK.id : null),
+      ilk: () => { const a = $('#ck-ic .ar-sat'); if (a) a.click(); return !!a; },
+      odak: () => { const a = $('#ck-ic .ar-sat'); if (a) a.focus({ preventScroll: false }); return !!a; },
+      geri: () => history.back(),
+    };
+    window.addEventListener('hashchange', () => setTimeout(gomuluBildir, 60));
   }
   window.addEventListener('hashchange', yonlendir);
   yonlendir();
