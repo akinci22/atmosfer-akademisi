@@ -97,7 +97,7 @@
     const tam = document.documentElement.classList.contains('tam');
     const say = Object.keys(K.sorular).length;
     const bl = (anah, ad, adet, ic, simdiBurada) => `<details class="bl" data-bl="${kac(anah)}" ${simdiBurada || blAcik.has(anah) ? 'open' : ''}><summary>${ad}${adet ? ` <span class="say">${adet}</span>` : ''}</summary><div class="bl-ic">${ic}</div></details>`;
-    return `<details class="ic" ${icAcik && !tam ? 'open' : ''}><summary>İçindekiler <span class="say">(${say})</span></summary><div class="dizin-ic"><a href="#${K.id}/akis" class="ak-gir${simdi === 'akis' ? ' simdi' : ''}"><span>Kitap akışı · yalnız başlıklar</span><span class="pdf">›</span></a>${K.bolumler.map((b) => {
+    return `<details class="ic" ${icAcik && !tam ? 'open' : ''}><summary>İçindekiler <span class="say">(${say})</span></summary><div class="dizin-ic"><a href="#${K.id}/akis" class="ak-gir${simdi === 'akis' ? ' simdi' : ''}"><span>Kitap akışı · yalnız başlıklar</span><span class="pdf">›</span></a><a href="#${K.id}/kavram" class="ka-gir${simdi === 'kavram' ? ' simdi' : ''}"><span>Konu atlası · konular, kavramlar, sorular</span><span class="pdf">›</span></a>${K.bolumler.map((b) => {
       const sorular = b.ogeler.filter((o) => o.tur === 'soru').map((o) => K.sorular[o.id]).filter(Boolean);
       const konu = b.ogeler.some((o) => o.tur !== 'soru');
       const burada = simdi === 'bol/' + b.id || sorular.some((q) => q.id === simdi);
@@ -641,7 +641,7 @@
     $('#kirinti').innerHTML = [[kac(K.kod), '_atlas'], ...parcalar].map(([ad, kp]) => (kp ? ckBag(kp, ad) : `<span>${ad}</span>`)).join(' <span class="ayrac" aria-hidden="true">›</span> ');
   }
   const siraHTML = (o, orta, s) => `${o ? ckBag(o[0], `‹ <span class="sira-ad">${o[1]}</span>`, 'sira-bag') : '<span class="sira-bos"></span>'}<span class="sira-orta yok">${orta}</span>${s ? ckBag(s[0], `<span class="sira-ad">${s[1]}</span> ›`, 'sira-bag sag') : '<span class="sira-bos"></span>'}`;
-  const ustSekme = (K, sec) => [['_atlas', 'Atlas', 'atlas'], ...(snVar(K) ? [['_sinav', 'Sınav', 'sinav']] : []), ...(kesinSay(K) ? [['_kesin', 'Kesin bil', 'kesin']] : []), ...((K.kavramlar || []).length > 1 ? [['_ag', 'Ağ', 'ag']] : []), ...(turlar(K).length ? [['_tur', 'Türler', 'tur']] : []), ...(tepkimeler(K).length ? [['_tepkime', 'Tepkimeler', 'tepkime']] : []), ...(donguler(K).length ? [['_dongu', 'Çevrimler', 'dongu']] : []), ...(HS(K).length ? [['_hesap', 'Hesap', 'hesap']] : []), ...((K.kavramlar || []).length > 1 || czKars(K).length ? [['_kars', 'Karşılaştır', 'kars']] : []), ...(terimVar(K) ? [['_terim', `Terimler (${K.terim.n || (K.terim.terim || []).length})`, 'terim']] : []), ['_sozluk', `Sözlük (${(K.sozluk || []).length})`, 'sozluk']].map(([kp, ad, id]) => `<button type="button" role="tab" aria-selected="${sec === id}" data-ck="${kp}">${ad}</button>`).join('');
+  const ustSekme = (K, sec) => [['_atlas', 'Atlas', 'atlas'], ...(snVar(K) ? [[snHedef(K), 'Sınav', 'sinav']] : []), ...(kesinSay(K) ? [['_kesin', 'Kesin bil', 'kesin']] : []), ...((K.kavramlar || []).length > 1 ? [['_ag', 'Ağ', 'ag']] : []), ...(turlar(K).length ? [['_tur', 'Türler', 'tur']] : []), ...(tepkimeler(K).length ? [['_tepkime', 'Tepkimeler', 'tepkime']] : []), ...(donguler(K).length ? [['_dongu', 'Çevrimler', 'dongu']] : []), ...(HS(K).length ? [['_hesap', 'Hesap', 'hesap']] : []), ...((K.kavramlar || []).length > 1 || czKars(K).length ? [['_kars', 'Karşılaştır', 'kars']] : []), ...(terimVar(K) ? [['_terim', `Terimler (${K.terim.n || (K.terim.terim || []).length})`, 'terim']] : []), ['_sozluk', `Sözlük (${(K.sozluk || []).length})`, 'sozluk']].map(([kp, ad, id]) => `<button type="button" role="tab" aria-selected="${sec === id}" data-ck="${kp}">${ad}</button>`).join('');
   function soruCip(K, sid, uzun) {
     const q = K.sorular[sid]; if (!q) return '';
     const simdi = ckDurum && ckDurum.qid === sid, s = simdi ? ' simdi' : '', ac = simdi ? ' aria-current="page"' : '';
@@ -670,6 +670,118 @@
       return `<section class="at-bol"><h3>${ckBag(`_bol/${b.id}`, kac(bolumAd(K, b)))} <span class="say">${kv.length} kavram · ${sq.length} soru</span>${sv && (sv.bolum || {})[b.id] ? snNokta(sv.bolum[b.id].olasilik) : ''}</h3>${kv.length ? `<ul class="kv-liste">${kv.map((k) => kavramSatir(K, k)).join('')}</ul>` : ''}${sq.length ? `<div class="soru-cipler"><span class="yok">Sorular:</span> ${sq.map((s) => soruCip(K, s)).join('')}</div>` : ''}</section>`;
     }).join('')}`;
   }
+  /* ---------- ETK4 ONARIM (27 Kas): Konu atlası tam sayfa · sınava özgü pusula · kavram ağı listesi ----------
+     #<kitap>/kavram (takma ad #<kitap>/atlas): eskiden sessizce ilk soruya düşüyordu → konu (bölüm) → kavramlar → sorular; kavram
+     yan çekmecede (telefonda alt panelde) açılır, sayfa yerinde kalır.
+     Sınav özgüllüğü: çekmecedeki «Sınav» sekmesi bulunulan parçanın pusulasını açar (snHedef): kavram → _sinav/kavram/<id>,
+     terim kartı / sözlük → bağlı üst kavram (terim işaretli: _sinav/kavram/<id>/<terim>), kendi notu olmayan kavram → bölümün notu
+     (_sinav/bol/<bölüm>/<kavram>), konu / bölüm → _sinav/bol/<bölüm>, soru → _sinav/soru/<S>; «Bütün sınav pusulası →» bağı her zaman. */
+  function snHedef(K, kPart) {
+    if (kPart == null) kPart = ckDurum && ckDurum.K === K ? ckDurum.kPart : '';
+    const V = SV(K);
+    if (!V) return '_sinav';
+    const [bas, ...kalan] = String(kPart || '').split('/');
+    if (bas === '_sinav') return kPart || '_sinav';
+    const kv = (kid, vz) => { const k = kavramBul(K, kid); if (!k) return null; if (snKv(K, kid)) return `_sinav/kavram/${kid}${vz ? '/' + vz : ''}`; return k.bolum && (V.bolum || {})[k.bolum] ? `_sinav/bol/${k.bolum}/${kid}` : null; };
+    const terimden = (t) => { for (const x of ((t && t.bag) || {}).kavram || []) { const r = kv(x, t.id); if (r) return r; } return null; };
+    if (bas === '_terim' && kalan[0]) return terimden(terimBul(K, kalan[0])) || '_sinav';
+    if (bas === '_sozluk' && kalan[0]) {
+      const en = enNorm(kalan.join('/').split('~')[0]);
+      const tv = TV[K.id], t = tv ? [...tv.bul.values()].find((x) => enNorm(x.en) === en) : null;
+      const k = (K.kavramlar || []).find((x) => enNorm(x.en) === en);
+      return (t && terimden(t)) || (k && kv(k.id)) || '_sinav';
+    }
+    if (bas === '_bol' && kalan[0]) return (V.bolum || {})[kalan[0]] ? `_sinav/bol/${kalan[0]}` : '_sinav';
+    if (bas === '_konu' && kalan[0]) { const x = ogeBul(K, kalan[0]); return x && (V.bolum || {})[x.b.id] ? `_sinav/bol/${x.b.id}` : '_sinav'; }
+    if (bas === '_soru' && kalan[0]) return (V.soru || {})[kalan[0]] ? `_sinav/soru/${kalan[0]}` : '_sinav';
+    if (bas === '_hesap' && kalan[0]) { const h = hesapBul(K, kalan[0]); return (h && (h.kavram || []).map((x) => kv(x)).find(Boolean)) || '_sinav'; }
+    if (bas && !bas.startsWith('_')) return kv(bas) || '_sinav';
+    return '_sinav';
+  }
+  // metindeki adları işaretle (yalnız düz metin; formül / SVG / düğme içi atlanır)
+  function snVurgula(kok, adlar) {
+    const A = [...new Set((adlar || []).map((x) => String(x || '').trim()).filter((x) => x.length >= 3))].sort((a, b) => b.length - a.length);
+    if (!kok || !A.length) return 0;
+    const kacRx = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const rx = new RegExp(`(${A.map(kacRx).join('|')})`, 'iu');
+    const L = [], yuru = document.createTreeWalker(kok, NodeFilter.SHOW_TEXT);
+    for (let n = yuru.nextNode(); n; n = yuru.nextNode()) { const p = n.parentElement; if (p && !p.closest('svg, mark, button, .tex-blok, .mk-f, .sn-ust-kv') && rx.test(n.data)) L.push(n); }
+    let say = 0;
+    for (const n of L) {
+      const parca = n.data.split(new RegExp(`(${A.map(kacRx).join('|')})`, 'giu'));
+      const f = document.createDocumentFragment();
+      parca.forEach((s, i) => { if (!s) return; if (i % 2) { const m = document.createElement('mark'); m.className = 'sn-vurgu'; m.textContent = s; f.append(m); say++; } else f.append(s); });
+      n.replaceWith(f);
+    }
+    return say;
+  }
+  // _sinav/kavram/<id>[/<terim>] · _sinav/bol/<bölüm>[/<kavram>] · _sinav/soru/<S> → true (çizildi) ya da false (bütün pusula)
+  function snOzelCk(K, ne, ayni) {
+    const V = SV(K); if (!V || !ne) return false;
+    const [tur, id, vz] = String(ne).split('/');
+    const tum = (ek = '') => `<p class="sn-tum">${ek}${ckBag('_sinav', 'Bütün sınav pusulası →', 'soru-bag')}</p>`;
+    if (tur === 'kavram') {
+      const k = kavramBul(K, id), X = k && snKv(K, id); if (!X) return false;
+      const t = vz ? terimBul(K, vz) : null;
+      kirintiYaz(K, [['Sınav pusulası', '_sinav'], [`${kac(k.sembol)} · ${kac(k.ad)}`, null]]);
+      $('#ck-baslik').innerHTML = `Sınav · ${kac(k.ad)}<small>${t ? `${kac(t.tr)} · en yakın üst kavramın notu` : 'yalnız bu kavram'}</small>`;
+      if (ayni) return true;
+      const ust = t ? `<div class="sn-ust-kv"><p><b>${kac(t.tr)}</b>${t.en ? ` <span class="yok" lang="en">${kac(t.en)}</span>` : ''}${(t.tanim || [])[0] ? `: ${kac(t.tanim[0])}` : ''}</p><p class="yok">Bu terimin ayrı sınav notu yok. Aşağıdaki not en yakın üst kavramın (${kac(k.sembol)} · ${kac(k.ad)}); terim geçtiği yerde işaretli.</p><p>${ckBag(`_terim/${t.id}`, 'Terim kartına dön →', 'soru-bag')}</p></div>` : '';
+      ckIc.innerHTML = `${ust}${sinavKavramHTML(K, k)}${tum(ckBag(`${k.id}/tanim`, 'Kavramın tanımı →', 'soru-bag') + ' ')}`;
+      if (t) snVurgula(ckIc, [t.tr, t.kisa, ...(t.es || []).filter((x) => /[a-zçğıöşü]/i.test(x))]);
+      return true;
+    }
+    if (tur === 'bol') {
+      const b = K.bolumler.find((x) => x.id === id); if (!b || !(V.bolum || {})[b.id]) return false;
+      const vk = vz ? kavramBul(K, vz) : null, kv = (K.kavramlar || []).filter((k) => k.bolum === b.id && snKv(K, k.id)), sq = bolumSorulari(K, b).filter((s) => (V.soru || {})[s]);
+      kirintiYaz(K, [['Sınav pusulası', '_sinav'], [kac(bolumAd(K, b)), null]]);
+      $('#ck-baslik').innerHTML = `Sınav · ${kac(bolumAd(K, b))}<small>${vk ? `${kac(vk.ad)} · bölümün notu` : 'yalnız bu bölüm'}</small>`;
+      if (ayni) return true;
+      let h = vk ? `<div class="sn-ust-kv"><p><b>${kac(vk.sembol)} · ${kac(vk.ad)}</b>: bu kavramın ayrı sınav notu yok. Aşağıdaki not en yakın üst başlığın (bölüm); kavram geçtiği yerde işaretli.</p></div>` : '';
+      h += snSeritHTML(K, V, b, false) + (V.akis || []).filter((a) => a.yer === `bol:${b.id}`).map((a) => snAkisHTML(K, a, true)).join('');
+      if (kv.length) h += `<h3>Bu bölümün kavramları</h3><ul class="sn-sira sn-dz">${kv.map((k) => `<li${vk && vk.id === k.id ? ' class="sn-vurgu-li"' : ''}>${ckBag(`_sinav/kavram/${k.id}`, `${snNokta(snKv(K, k.id).olasilik, true)} <b>${kac(k.sembol)}</b> ${kac(k.ad)}`, 'soru-bag')}</li>`).join('')}</ul>`;
+      if (sq.length) h += `<h3>Bu bölümün soruları</h3><ul class="sn-sira sn-dz">${sq.map((s) => `<li>${ckBag(`_sinav/soru/${s}`, `${snNokta(V.soru[s].olasilik, true)} <b>${s}</b> ${kac(kisalt(K.sorular[s].baslik, 60))}`, 'soru-bag')}</li>`).join('')}</ul>`;
+      ckIc.innerHTML = h + tum();
+      if (vk) snVurgula(ckIc, [vk.ad]);
+      return true;
+    }
+    if (tur === 'soru') {
+      const q = K.sorular[id], S = q && (V.soru || {})[id]; if (!S) return false;
+      const b = K.bolumler.find((x) => x.ogeler.some((o) => o.tur === 'soru' && o.id === q.id));
+      kirintiYaz(K, [['Sınav pusulası', '_sinav'], ...(b && (V.bolum || {})[b.id] ? [[kac(bolumAd(K, b)), `_sinav/bol/${b.id}`]] : []), [q.id, null]]);
+      $('#ck-baslik').innerHTML = `Sınav · ${q.id}<small>${kac(kisalt(q.baslik, 60))} · yalnız bu soru</small>`;
+      if (ayni) return true;
+      ckIc.innerHTML = snNotHTML(K, S) + (V.akis || []).filter((a) => a.yer === `soru:${q.id}`).map((a) => snAkisHTML(K, a, true)).join('') + mkKesinAdimlar(K, (x) => x.id === q.id, 8) + tum(soruCip(K, q.id, true) + ' ');
+      return true;
+    }
+    return false;
+  }
+  // Konu atlası tam sayfa
+  function atlasSayfa(K) {
+    const L = K.kavramlar || [], B = K.bolumler.filter((b) => bolumDolu(K, b)), on = `#${K.id}/kavram/k/`;
+    document.title = `Konu atlası · ${K.kod}`;
+    const git = [['_ag', 'Kavram ağı', L.length > 1], ['_sozluk', `Sözlük (${(K.sozluk || []).length})`, (K.sozluk || []).length], ['_terim', 'Terimler', terimVar(K)], ['_kars', 'Karşılaştır', L.length > 1 || czKars(K).length], ['_kesin', 'Kesin bil', kesinSay(K)], ['_sinav', 'Sınav pusulası', snVar(K)], ['_atlas', 'Yan çekmecede atlas', true]].filter((x) => x[2]);
+    const satir = (k) => `<li class="kv-li"><a class="kv-sat" href="${on}${kac(k.id)}/tanim"><span class="sem">${kac(k.sembol)}</span><span class="ad">${kac(k.ad)}</span>${k.en ? `<span class="en" lang="en">${kac(k.en)}</span>` : ''}${rozetHTML(K, k)}</a></li>`;
+    ana.innerHTML = `<div class="kitap-yer"><nav class="dizin" aria-label="Bölümler ve sorular">${dizinHTML(K, 'kavram')}</nav><div class="ka-sayfa">${takipHTML(K, null)}
+      <h1>Konu atlası</h1><p class="ka-alt">${kac(K.kod)} · ${B.length} konu · ${L.length} kavram · ${Object.keys(K.sorular).length} soru</p>
+      <ul class="ka-nasil"><li>Konu adına dokun: konu özeti ve formüller.</li><li>Kavrama dokun: yanda açılır (telefonda altta); bu sayfa yerinde kalır.</li></ul>
+      <nav class="ka-git" aria-label="Atlas görünümleri">${git.map(([kp, ad]) => `<a class="ka-cip" href="${on}${kp}">${ad}</a>`).join('')}</nav>
+      ${B.map((b) => { const kv = L.filter((k) => k.bolum === b.id), sq = bolumSorulari(K, b); return `<section class="at-bol ka-bol" data-bol="${kac(b.id)}"><h2><a href="#${K.id}/bol/${kac(b.id)}">${kac(bolumAd(K, b))}</a> <span class="say">${kv.length} kavram · ${sq.length} soru</span></h2>${kv.length ? `<ul class="kv-liste">${kv.map(satir).join('')}</ul>` : ''}${sq.length ? `<div class="soru-cipler"><span class="yok">Sorular:</span> ${sq.map((s) => soruCip(K, s)).join('')}</div>` : ''}</section>`; }).join('')}
+    </div></div>`;
+    ana.dataset.sayfa = 'kavram';
+    glifDuzelt(ana); isrSusle(ana);
+    takipBagla(K);
+    sinavSusle(K);
+  }
+  // kavram ağı: liste görünümü (telefonda açık ve şeklin önünde; masada katlı, şeklin altında)
+  function agListeHTML(K, L, E, bolIds, renk, kisa, dar) {
+    const komsu = L.map(() => []); E.forEach(([i, j]) => { komsu[i].push(j); komsu[j].push(i); });
+    return `<details class="ag-liste"${dar ? ' open' : ''}><summary>Liste: kavram kavram bağlar</summary>${bolIds.map((bid) => {
+      const b = K.bolumler.find((x) => x.id === bid), I = L.map((k, i) => (k.bolum === bid ? i : -1)).filter((i) => i >= 0);
+      return `<section class="ag-l-bol"><h4><span class="ag-l-nokta" style="background:${renk(bid)}"></span>${kac(b ? bolumAd(K, b) : bid)}</h4><ul>${I.map((i) => `<li>${ckBag(`${L[i].id}/tanim`, `<b>${kac(L[i].sembol)}</b> ${kac(L[i].ad)}`, 'ag-l-ad')}${komsu[i].length ? `<span class="ag-l-bag">${komsu[i].map((j) => ckBag(`${L[j].id}/tanim`, kac(kisa(L[j].ad)), 'ag-l-cip')).join('')}</span>` : ''}</li>`).join('')}</ul></section>`;
+    }).join('')}</details>`;
+  }
+  window.__dkOnarim = { snHedef: (K, kp) => snHedef(K || simdiK, kp), vurgula: snVurgula }; // sınama kancası
   function bolumCk(K, bid, ayni) {
     const b = K.bolumler.find((x) => x.id === bid);
     if (!b) return atlasCk(K, false);
@@ -1269,6 +1381,7 @@
     const { P, E, bolIds, W, H, R } = agYerlesim(K), renk = (b) => `var(${AG_RENK[Math.max(0, bolIds.indexOf(b)) % AG_RENK.length]})`;
     const kisa = (x) => { const t = String(x || '').replace(/\s*\(.*?\)\s*/g, ' ').trim(); return t.length > 17 ? `${t.slice(0, 16).trim()}…` : t; };
     ckIc.innerHTML = `<p class="ck-not">Bir kavrama dokun: açılır. İmleci getir ya da sekmeyle odakla: bağlı kavramlar parlar.</p><div class="sekil-kap ag-kap" id="ck-sekil"><svg class="ag-svg" viewBox="0 0 ${W} ${H}" role="group" aria-label="Kavram ağı">${E.map(([i, j]) => { const mx = (P[i].x + P[j].x) / 2, my = (P[i].y + P[j].y) / 2, cx = W / 2 + (mx - W / 2) * 0.3, cy = H / 2 + (my - H / 2) * 0.3; return `<path class="ag-k" data-a="${i}" data-b="${j}" d="M${f1(P[i].x)} ${f1(P[i].y)} Q${f1(cx)} ${f1(cy)} ${f1(P[j].x)} ${f1(P[j].y)}"/>`; }).join('')}${L.map((k, i) => `<g class="ag-d" data-i="${i}" data-ck="${kac(k.id)}/tanim" role="link" tabindex="0" aria-label="${kac(`${k.ad} (kavram)`)}"><circle class="ag-vur" cx="${f1(P[i].x)}" cy="${f1(P[i].y)}" r="24"/><circle class="ag-n" cx="${f1(P[i].x)}" cy="${f1(P[i].y)}" r="9" style="fill:${renk(k.bolum)}"/>${agEtiket(P[i], R, W, H, kisa(k.ad))}</g>`).join('')}</svg></div><p class="ag-alt" aria-live="polite"></p><div class="ag-lejant">${bolIds.map((b) => { const bo = K.bolumler.find((x) => x.id === b); return `<span><i style="background:${renk(b)}"></i>${kac(bo ? bolumAd(K, bo) : b)}</span>`; }).join('')}</div>`;
+    { const dar = ckMod() !== 'genis', fig = $('#ck-sekil', ckIc), h = agListeHTML(K, L, E, bolIds, renk, kisa, dar); if (dar && fig) fig.insertAdjacentHTML('beforebegin', h); else ckIc.insertAdjacentHTML('beforeend', h); }
     buyutDugmesi();
     const svg = $('.ag-svg', ckIc), alt = $('.ag-alt', ckIc);
     const yak = (i) => {
@@ -1478,6 +1591,7 @@
       return;
     }
     const V = s.v, on = oku('dk:sinav') !== '0', S = V.sinav || {}, T = V.strateji || {};
+    if (snOzelCk(K, ne, ayni)) return;
     $('#ck-baslik').innerHTML = `Sınav pusulası<small>${kac(S.ad || 'Sınav')} · ${kac(K.kod)}</small>`;
     if (ayni) return;
     let gun; try { gun = new Set(JSON.parse(oku(`dk:sngun:${K.id}`) || '[]')); } catch (e) { gun = new Set(); }
@@ -2768,6 +2882,7 @@
       const tv = TV[K.id], F = (tr.formul || []).filter((f) => f && f.tex && f.s != null);
       if (F.length && tv) h += `<div class="isr-ezf">${isr('ezber')}<div class="isr-f">${F.map((f) => tv.svg[f.s] || '').join('')}</div></div>`;
       if ((tr.fark || []).length) h += `<div class="mk-tuzak">${isr('tuzak')}${tr.fark.slice(0, 3).map((f) => `<p><b>${terimAdHTML(K, f.ile)}</b>: ${kac(f.fark)}</p>`).join('')}</div>`;
+      { const kb = (((tr.bag || {}).kavram) || []).map((x) => kavramBul(K, x)).find((x) => x && snKv(K, x.id)), X = kb && snKv(K, kb.id); if (X) { h += `<h4 class="mk-alt">Üst kavram: ${ckBag(`_sinav/kavram/${kb.id}/${tr.id}`, `${kac(kb.sembol)} · ${kac(kb.ad)}`, 'tk-ad')}</h4>`; if ((X.bil || []).length) h += snUl(X.bil.slice(0, 4)); if ((X.tuzak || []).length) h += `<div class="mk-tuzak">${isr('tuzak')}${X.tuzak.slice(0, 2).map((x) => `<p>${kac(x)}</p>`).join('')}</div>`; } } // ETK4: terimin üst kavramının sınav notu
     }
     return h;
   }
@@ -3428,7 +3543,8 @@
     if (!ayniSayfa) { sabitBirak(); sbEkYaz(0); SB.son = null; }
     if (sayfa !== sonSayfa) {
       sonSayfa = sayfa;
-      if (parca[1] === 'bol') bolumGoster(K, parca[2]);
+      if (parca[1] === 'kavram' || parca[1] === 'atlas') atlasSayfa(K);
+      else if (parca[1] === 'bol') bolumGoster(K, parca[2]);
       else if (parca[1] === 'akis') { akisGoster(K, parca[2] || ''); if (parca[2]) { sonSayfa = sayfa; return kPart ? ckGoster(K, kPart, onEk) : cekmeceKapat(); } }
       else {
         const sid = parca[1] || oku(`dk:son:${K.id}`);
