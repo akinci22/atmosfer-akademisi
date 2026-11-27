@@ -104,6 +104,7 @@ html.ab-bol.ab-dar .ab-pencere{border-radius:18px 18px 0 0;box-shadow:0 -10px 40
     }
     addEventListener('resize', () => { balonYerle(false); if (acik) pencereYerle(); }, { passive: true });
     if (window.visualViewport) visualViewport.addEventListener('resize', () => { if (acik) pencereYerle(); }, { passive: true });
+    if (!DK_YEREL) { const bos = window.requestIdleCallback || ((f) => setTimeout(f, 1500)); bos(() => pencereKur(), { timeout: 5000 }); } // pencere iskeleti boşta: ilk açılış takılmasın
   }
 
   // ---------- balon: sürükle → kenara yapış; dokun → aç ----------
