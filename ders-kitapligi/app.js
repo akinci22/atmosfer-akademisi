@@ -138,6 +138,7 @@
   // derin bağ hedefi: oynatıcıda başlık («Çözüm · PDF s. · n adım») + şimdiki adım aynı ekrana sığıyorsa başlıktan,
   // sığmıyorsa şimdiki adımdan başlar; ikisi de yapışkan çubuğun altında (scroll-padding-top)
   function hedefeOtele(hedef, bas) {
+    sabitBirak();
     let el = hedef;
     if (bas) { const s = $('.oyn-a.simdi', hedef) || hedef; el = s.getBoundingClientRect().bottom - bas.getBoundingClientRect().top <= innerHeight - yapisAlt() - altPay() - 12 ? bas : s; }
     el.scrollIntoView({ block: 'start', behavior: 'smooth' });
@@ -254,7 +255,7 @@
       acikAdim[`${K.id}/${q.id}`] = m;
     };
     goster(acikAdim[`${K.id}/${q.id}`] || 0, false);
-    btn.addEventListener('click', () => { const m = (acikAdim[`${K.id}/${q.id}`] || 0) + 1; goster(m, true); lis[m - 1]?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); });
+    btn.addEventListener('click', () => { const m = (acikAdim[`${K.id}/${q.id}`] || 0) + 1; goster(m, true); sbYeniGoster(m === 1 && $('#cozum-giris', ana) ? $('#cozum-giris', ana) : lis[m - 1]); });
     $('#hepsi').addEventListener('click', () => goster(n, true));
     $('#kapat').addEventListener('click', () => goster(0, false));
     oynKur(K, q, () => goster(acikAdim[`${K.id}/${q.id}`] || 0, false));
@@ -301,6 +302,130 @@
       $('#git-bilgi').textContent = 'Sayfa numarası (37) ya da soru numarası (S12) yaz.';
     });
   }
+
+  /* ---------- ETK3 SABIT (27 Kas): okunan yer yerinde kalır ----------
+     Açılır-kapanır bir değişimden hemen önce çapa seçilir (sabitTut): dokunulan denetim (özet, «Katla», kip / oynatıcı / süzgeç
+     düğmesi) ya da — yerinde açılan içerikte (Tümünü göster, Hepsi), alt panel açılıp kapanınca, boyu değişince, tembel içerik
+     gelince — ekrandaki ilk blok. Değişimden sonra ~700 ms boyunca (her kare + ResizeObserver) çapanın ekran konumu korunur: sayfa
+     ya da çekmece içi anında ötelenir, yumuşak gezinme yarışmaz. Belge kısalınca (sayfa sonunda blok kapanınca, panel küçülünce)
+     sona geçici boşluk (#sb-ek) eklenir; kullanıcı gezindikçe kendiliğinden erir. Koruma süresince yerel overflow-anchor kapalı
+     (html.sb-tut); kullanıcı dokunup gezinirse (wheel / touchmove / gezinme tuşu) koruma hemen biter. Yeni gösterilen adımın
+     (oynatıcı, «n. adımı aç», türetim) başı ekranda değilse oraya bilinçli götürülür (260 ms). Yerel çapası olmayan tarayıcıda
+     (Safari) tembel içerik için de son okunan blok korunur (dk:sbjs = 1 sınamada bu yolu zorlar). Ölçüm: tools/sabit_olc.cjs. */
+  const SB = { el: null, y: 0, kab: window, bitis: 0, raf: 0, ro: null, yeni: null, anim: null, yedek: null, son: null, erit: 0, sonGez: 0, sonT: 0 };
+  const sbEk = document.createElement('div'); sbEk.id = 'sb-ek'; sbEk.setAttribute('aria-hidden', 'true'); ana.after(sbEk);
+  const sbEkH = () => parseFloat(sbEk.style.height) || 0;
+  const sbEkYaz = (h) => { sbEk.style.height = h > 0.5 ? `${Math.ceil(h)}px` : ''; };
+  const YEREL_CAPA = (() => { try { return oku('dk:sbjs') !== '1' && !!(window.CSS && CSS.supports && CSS.supports('overflow-anchor', 'auto')); } catch (e) { return false; } })();
+  const SB_BLOK = 'h1,h2,h3,h4,p,li,figure,table,summary,pre,blockquote,dt,dd,.tex-blok,.formul-kap,.oyn-a,.oyn-ust,.oyn-dug,.coz-kip,.cozum-bas,.isr-lejant,.bag,.ak-s,.ak-b';
+  // görünür alanın üst çizgisi: üst şerit + (yapışmışsa) takip çubuğunun alt kenarı; çekmece içinde kutunun üstü
+  function sbUstB(kab) {
+    if (kab !== window) return { y: kab.getBoundingClientRect().top, yap: false };
+    const u = $('#ust'), t = $('.takip', ana); let y = u ? Math.max(0, u.getBoundingClientRect().bottom) : 0, yap = false;
+    if (t && getComputedStyle(t).position === 'sticky') { const r = t.getBoundingClientRect(); if (r.height && r.top <= y + 12) { y = Math.max(y, r.bottom); yap = true; } }
+    return { y, yap };
+  }
+  const sbUst = (kab) => sbUstB(kab).y;
+  const sbAlt = (kab) => (kab === window ? innerHeight - altPay() : kab.getBoundingClientRect().bottom);
+  // kapalı <details> içi (content-visibility) de görünmez sayılır: checkVisibility
+  const sbGorunur = (el) => !!el && el.isConnected && el.getClientRects().length > 0 && (!el.checkVisibility || el.checkVisibility());
+  const sbYapiskan = (el, dur) => { for (let x = el; x && x !== dur && x !== document.body; x = x.parentElement) { const p = getComputedStyle(x).position; if (p === 'sticky' || p === 'fixed') return true; } return false; };
+  // ekrandaki ilk blok: görünür alanda başlayan ilk blok (DOM sırası; genişlik değişince satırları yeniden dizilse de başı yerinde kalır);
+  // yoksa yapışkan çubukların altına uzanan ilk blok. Yapışkan kutuların (takip çubuğu, masadaki dizin) içi sayılmaz.
+  function sbIlkBlok(kab) {
+    const kok = kab === window ? ana : kab, u = sbUst(kab), a = sbAlt(kab), dz = kab === window ? $('.dizin', ana) : null, dzY = !!dz && getComputedStyle(dz).position === 'sticky';
+    let yedek = null;
+    for (const el of kok.querySelectorAll(SB_BLOK)) {
+      if (kab === window && (el.closest('.takip') || (dzY && dz.contains(el)))) continue;
+      const r = el.getBoundingClientRect();
+      if (!(r.height > 0 && r.bottom > u + 1) || (el.checkVisibility && !el.checkVisibility())) continue;
+      if (r.top >= u - 0.5) return r.top < a - 24 || !yedek ? el : yedek;
+      if (!yedek) yedek = el;
+    }
+    return yedek;
+  }
+  function sabitTut(capa, { kab = null, sure = 700, yeni = null, hedefY = null, yumusak = 0 } = {}) {
+    const k = kab || (capa && ckIc.contains(capa) ? ckIc : window);
+    if (capa && (!sbGorunur(capa) || sbYapiskan(capa, k === window ? null : k))) capa = null;
+    const yedek = sbIlkBlok(k), el = capa || yedek;
+    if (!el) return;
+    const y = el.getBoundingClientRect().top, simdi = performance.now();
+    Object.assign(SB, { el, kab: k, y, u0: sbUstB(k), yeni, bitis: simdi + sure, basta: !capa && hedefY == null && (k === window ? scrollY < 1 : k.scrollTop < 1), yedek: yedek && yedek !== el ? { el: yedek, y: yedek.getBoundingClientRect().top } : null, anim: hedefY == null ? null : { t0: simdi, sure: Math.max(1, yumusak), y0: y, y1: hedefY } });
+    document.documentElement.classList.add('sb-tut');
+    if (!SB.ro && typeof ResizeObserver !== 'undefined') { SB.ro = new ResizeObserver(sbBoy); for (const x of [ana, ckIc]) SB.ro.observe(x, { box: 'border-box' }); }
+    if (!SB.raf) SB.raf = requestAnimationFrame(sbKare);
+  }
+  function sabitBirak() { if (SB.raf) cancelAnimationFrame(SB.raf); Object.assign(SB, { raf: 0, el: null, yeni: null, anim: null, yedek: null }); document.documentElement.classList.remove('sb-tut'); }
+  const sbYeniGoster = (el) => { if (SB.el && el) SB.yeni = el; };
+  window.__dkSabit = { durum: () => ({ el: SB.el ? `${SB.el.tagName}.${SB.el.className}` : null, y: SB.y, kab: SB.kab === window ? 'window' : 'ck', ek: sbEkH(), yerel: YEREL_CAPA }), tut: (el, o) => sabitTut(el, o), birak: () => sabitBirak() }; // sınama kancası (tools/sabit_olc.cjs)
+  // panel boyu / açılıp kapanma: koruma sürüyorsa uzat, yoksa ilk blokla başlat (ana akış görünmüyorsa da konum korunur)
+  const sbPanel = (sure = 700) => { if (SB.el && SB.kab === window) SB.bitis = Math.max(SB.bitis, performance.now() + sure); else sabitTut(null, { kab: window, sure }); };
+  function sbOtele(kab, d) {
+    if (kab !== window) { kab.scrollTop += d; return; }
+    const max = document.documentElement.scrollHeight - innerHeight;
+    if (d > 0 && scrollY + d > max + 0.5) sbEkYaz(sbEkH() + (scrollY + d - max) + 1); // belge kısaldı: sona geçici boşluk
+    window.scrollTo({ top: scrollY + d, behavior: 'instant' });
+  }
+  function sbDuzelt() {
+    let el = SB.el; if (!el) return;
+    if (!sbGorunur(el)) { // dokunulan öğe gizlendi / yeniden çizildi → baştaki ilk blok
+      if (SB.yedek && sbGorunur(SB.yedek.el)) { SB.el = el = SB.yedek.el; SB.y = SB.yedek.y; SB.yedek = null; SB.anim = null; } else { sabitBirak(); return; } // (u0 başlangıçtaki kalır)
+    }
+    let hedef = SB.y;
+    if (SB.anim) { const t = Math.min(1, (performance.now() - SB.anim.t0) / SB.anim.sure); hedef = SB.anim.y0 + (SB.anim.y1 - SB.anim.y0) * (1 - (1 - t) ** 3); if (t >= 1) { SB.y = SB.anim.y1; SB.anim = null; } }
+    if (SB.kab === window && SB.u0 && SB.u0.yap && !SB.anim) { const un = sbUstB(window); if (un.yap) hedef += un.y - SB.u0.y; } // yapışık çubuk uzadı / kısaldı: blok çubuğun altında aynı aralıkta kalır
+    const d = el.getBoundingClientRect().top - hedef;
+    if (Math.abs(d) >= 0.5 && !(SB.basta && SB.kab === window && scrollY < 1)) sbOtele(SB.kab, d);
+    const yn = SB.yeni; // yeni gösterilen adımın başı görünür alanda değilse oraya götür (bilinçli)
+    if (yn && !SB.anim && sbGorunur(yn)) {
+      const r = yn.getBoundingClientRect(), u = sbUst(SB.kab), a = sbAlt(SB.kab);
+      SB.yeni = null;
+      if (r.top < u + 4 || r.top > a - 56) Object.assign(SB, { el: yn, y: u + 8, u0: sbUstB(SB.kab), yedek: null, anim: { t0: performance.now(), sure: 260, y0: r.top, y1: u + 8 }, bitis: Math.max(SB.bitis, performance.now() + 500) });
+    }
+  }
+  function sbKare() {
+    SB.raf = 0; if (!SB.el) return;
+    sbDuzelt(); if (!SB.el) return;
+    if (performance.now() < SB.bitis || SB.anim) SB.raf = requestAnimationFrame(sbKare);
+    else { const k = SB.kab; sabitBirak(); if (!YEREL_CAPA && k === window) sbSonYaz(); }
+  }
+  // ResizeObserver: koruma sürerken boyut değişimi aynı karede düzeltilir; yerel çapası olmayan tarayıcıda boşta da son okunan blok korunur
+  function sbBoy() {
+    if (SB.el) { sbDuzelt(); return; }
+    if (YEREL_CAPA || !SB.son || performance.now() - SB.sonGez < 250) return;
+    const { el, y } = SB.son; if (!sbGorunur(el)) { SB.son = null; return; }
+    const d = el.getBoundingClientRect().top - y; if (Math.abs(d) >= 0.5) sbOtele(window, d);
+  }
+  // yeniden çizimde (sınav kipinden çıkış) okunan yer: ilk bloğun imzası (kimlik ya da tür + metin) → çizimden sonra aynı blok aynı yere
+  function sbImza() { const el = sbIlkBlok(window); return el ? { y: el.getBoundingClientRect().top, id: el.id || '', tag: el.tagName, m: (el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 80), sY: scrollY } : { sY: scrollY }; }
+  function sbImzaGit(im) {
+    if (!im) return;
+    let el = im.id ? document.getElementById(im.id) : null;
+    if (!el && im.tag) for (const x of ana.querySelectorAll(im.tag)) if ((x.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 80) === im.m && sbGorunur(x)) { el = x; break; }
+    if (!el) { window.scrollTo({ top: im.sY, behavior: 'instant' }); return; }
+    window.scrollTo({ top: Math.max(0, scrollY + el.getBoundingClientRect().top - im.y), behavior: 'instant' });
+    sabitTut(el, { kab: window, sure: 500 });
+  }
+  function sbSonYaz() { if (SB.el) return; const el = sbIlkBlok(window); SB.son = el ? { el, y: el.getBoundingClientRect().top } : null; }
+  // kullanıcı gezinirse koruma biter (panelde sürükleme / panel içi gezinme ana akışın korumasını bozmaz)
+  const sbKes = (e) => { if (!SB.el) return; const panelde = !!(e.target && e.target.closest && e.target.closest('#cekmece')); if (SB.kab === window ? !panelde : panelde) sabitBirak(); };
+  addEventListener('wheel', sbKes, { passive: true, capture: true });
+  addEventListener('touchmove', sbKes, { passive: true, capture: true });
+  addEventListener('keydown', (e) => { if (/^(PageUp|PageDown|ArrowUp|ArrowDown|Home|End| |j|k)$/.test(e.key) && !/INPUT|TEXTAREA|SELECT/.test((e.target && e.target.tagName) || '')) sbKes(e); }, true);
+  addEventListener('scroll', () => {
+    if (!SB.el && sbEkH() && !SB.erit) SB.erit = requestAnimationFrame(() => { SB.erit = 0; if (SB.el) return; const kalan = document.documentElement.scrollHeight - (scrollY + innerHeight); if (kalan > 0.5) sbEkYaz(sbEkH() - kalan); });
+    if (!YEREL_CAPA && !SB.el) { SB.sonGez = performance.now(); clearTimeout(SB.sonT); SB.sonT = setTimeout(sbSonYaz, 180); }
+  }, { passive: true });
+  // dokunulan denetim: değişimden önce (yakalama evresi) çapa; bağlar (gezinme) ve yapışkan kutular hariç
+  document.addEventListener('click', (e) => {
+    if (e.button) return;
+    const t = e.target && e.target.closest && e.target.closest('summary, button, [role="button"], h2.kat-bas, .oyn-a');
+    if (!t || t.closest('[data-git], [data-ck], [data-soru], [data-ana], a[href], .ck-ust, .kirinti, #ck-sekme, .ck-tutamak')) return;
+    const kab = ana.contains(t) ? window : ckIc.contains(t) ? ckIc : null; if (!kab) return;
+    if (t.matches('.dil-tumu, .oyn-hepsi, #hepsi, [data-ak="ac"]')) sabitTut(null, { kab }); // yerinde açılan içerik: okunan yer (ilk blok)
+    else if (t.matches('#kapat')) sabitTut(t.closest('.cozum-bas'), { kab });
+    else sabitTut(t, { kab });
+  }, true);
 
   /* ---------- konu çekmecesi (DK316: kapanmadan gezinme) ----------
      Çekmece adresi ana sayfanın arkasına eklenir: #<ana sayfa>/k/<çekmece>
@@ -613,7 +738,7 @@
       ic.innerHTML = `${P.html || ''}<ol class="ispat">${P.adimlar.map((a, j) => `<li data-i="${j}" ${j >= ckAdim ? 'hidden' : ''}><div class="tex-blok" data-tex="${a.tex}"></div>${a.html || ''}</li>`).join('')}</ol><div class="kare-gez"><button type="button" class="dugme" id="isp-sonraki">Sonraki adım</button><button type="button" class="dugme ikincil" id="isp-hepsi">Hepsini göster</button><span class="yok" id="isp-say"></span></div>`;
       texDoldur(ic, K);
       const guncel = (yeniLi) => { $$('ol.ispat li', ic).forEach((li, j) => { const ac = j < ckAdim; if (ac && li.hidden && yeniLi) li.classList.add('yeni'); li.hidden = !ac; }); $('#isp-say').textContent = `${Math.min(ckAdim, n)} / ${n}`; $('#isp-sonraki').hidden = $('#isp-hepsi').hidden = ckAdim >= n; };
-      $('#isp-sonraki').addEventListener('click', () => { ckAdim++; guncel(true); $$('ol.ispat li', ic)[ckAdim - 1]?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); });
+      $('#isp-sonraki').addEventListener('click', () => { ckAdim++; guncel(true); sbYeniGoster($$('ol.ispat li', ic)[ckAdim - 1]); });
       $('#isp-hepsi').addEventListener('click', () => { ckAdim = n; guncel(true); });
       guncel(false);
     } else if (parca === 'anim') {
@@ -1182,6 +1307,7 @@
   function snYenile(kid) {
     araDizin = null;
     if (!simdiK || simdiK.id !== kid) return;
+    if (!SB.el) sabitTut(null, { kab: window, sure: 500 });
     sinavSusle(simdiK);
     if (ckDurum && ckDurum.K === simdiK) ckYenile();
   }
@@ -1417,7 +1543,7 @@
       else { il.hidden = m >= n; il.textContent = m ? 'Sonraki adım ›' : '1. adımı göster'; $('.oyn-geri', kok).hidden = m === 0; $('.oyn-hepsi', kok).hidden = m >= n; }
       $('.oyn-basa', kok).hidden = m === 0;
       if (ana.dataset.cozkip === 'oyn') { const s = $('#cozum-son', ana); if (s) s.hidden = !ks && m < n; }
-      if (otele && m) L[m - 1].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      if (otele && m) { if (!SB.el) sabitTut($('.oyn-ileri', kok)); sbYeniGoster(L[m - 1]); }
       if (window.__hudGoster) window.__hudGoster();
     };
     kok.__yenile = () => goster(oynAdim[anah] || 0, false);
@@ -1859,7 +1985,7 @@
     sakla(`dk:snkip:${K.id}`, on ? '1' : '0');
     document.documentElement.classList.toggle('sn-kip', on);
     if (on && !String(ana.dataset.sayfa || '').startsWith('akis')) { anaGit(`#${K.id}/akis`); return; }
-    sonSayfa = ''; yonlendir();
+    const im = sbImza(); sonSayfa = ''; yonlendir().then(() => sbImzaGit(im)); // kipten çıkınca sayfa yeniden çizilir: okunan yer korunur
   }
   document.addEventListener('click', (e) => {
     if (!simdiK) return;
@@ -2510,7 +2636,7 @@
     krKur(ckIc);
     ipucuEkle(ckIc, K);
     ckIc.scrollTop = 0; basUygula(); sekmeOrtala();
-    if (ilk && ckMod() === 'alt') requestAnimationFrame(altGorunurTut);
+    if (ilk && ckMod() === 'alt') altGorunurTut();
     if (ilk) don.focus({ preventScroll: true });
     else if (!document.activeElement || document.activeElement === document.body || !document.activeElement.isConnected) $('#ck-baslik').focus({ preventScroll: true });
   }
@@ -2588,6 +2714,7 @@
   const BOY_AD = ['küçük (%35)', 'orta (%55)', 'büyük (%85)', 'tam ekran'];
   function boyUygula() {
     const kok = document.documentElement;
+    if (ckDurum && ckMod() === 'alt') sbPanel(); // değişimden önce: okunan yer ölçülsün
     kok.style.setProperty('--ck-oran', String(BOY[ckBoy]));
     kok.dataset.ckboy = String(ckBoy);
     if (ckMod() === 'alt') { tutamak.setAttribute('aria-valuenow', String(ckBoy)); tutamak.setAttribute('aria-valuetext', `Panel ${BOY_AD[ckBoy]}`); }
@@ -2661,6 +2788,7 @@
       sur.basladi = true; document.body.classList.add('ck-surukle');
       try { ck.setPointerCapture(e.pointerId); } catch (x) { /* yakalanamadı */ }
     }
+    sbPanel(400);
     document.documentElement.style.setProperty('--ck-oran', String(Math.max(0.12, Math.min(1, (sur.h0 - dy) / innerHeight))));
     sur.iz.push([e.timeStamp, e.clientY]); if (sur.iz.length > 6) sur.iz.shift();
   });
@@ -2688,9 +2816,10 @@
   document.addEventListener('pointerdown', (e) => { if (ana.contains(e.target)) sonDokunus = { el: e.target.closest('button, a, summary, [data-git]') || e.target, t: Date.now() }; }, true);
   function altGorunurTut() {
     const s = sonDokunus; sonDokunus = null;
-    if (!s || Date.now() - s.t > 4000 || !s.el.isConnected || ckMod() !== 'alt') return;
-    const r = s.el.getBoundingClientRect(), sinir = innerHeight * (1 - BOY[ckBoy]) - 16;
-    if (r.height && r.bottom > sinir) window.scrollBy({ top: r.bottom - sinir + 8, behavior: 'smooth' });
+    if (!s || Date.now() - s.t > 1500 || !sbGorunur(s.el) || ckMod() !== 'alt') return;
+    const r = s.el.getBoundingClientRect(), u = sbUst(window), sinir = innerHeight * (1 - BOY[ckBoy]) - 16;
+    if (!r.height || r.top < u - 1 || r.top > innerHeight || r.bottom <= sinir) return; // ekranda değildi ya da zaten panelin üstünde
+    sabitTut(s.el, { kab: window, hedefY: Math.max(u + 8, sinir - r.height - 8), yumusak: 260 });
   }
 
   /* --- süzgeç: yazdıkça süzer (Türkçe harf ve boşluk duyarsız; TR, EN, sembol); ↑ ↓ Enter; Esc temizler --- */
@@ -2906,6 +3035,8 @@
     simdiK = K;
     sinavYukle(K);
     const sayfa = onEk;
+    const ayniSayfa = sayfa === sonSayfa;
+    if (!ayniSayfa) { sabitBirak(); sbEkYaz(0); SB.son = null; }
     if (sayfa !== sonSayfa) {
       sonSayfa = sayfa;
       if (parca[1] === 'bol') bolumGoster(K, parca[2]);
@@ -2926,6 +3057,7 @@
       }
       window.scrollTo({ top: 0 });
     }
+    if (ayniSayfa && (kPart || ckDurum)) sbPanel();
     if (kPart) ckGoster(K, kPart, onEk);
     else cekmeceKapat();
   }

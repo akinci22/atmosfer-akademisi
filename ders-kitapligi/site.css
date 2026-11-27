@@ -740,7 +740,7 @@ kbd{font:600 13px/1 ui-monospace,Consolas,monospace;padding:2px 6px;border:1px s
 h2.kat-bas{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;cursor:pointer}
 .kat-dug{margin-left:auto;display:inline-flex;align-items:center;min-height:44px;padding:0 12px;border:1px solid var(--cizgi);border-radius:999px;background:var(--zemin);color:var(--ikincil);font-size:14px;font-weight:500;cursor:pointer;font-style:normal;letter-spacing:0;text-transform:none}
 .kat-dug:hover,.kat-dug:focus-visible{color:var(--acc);border-color:var(--acc)}
-[data-katb].kapali>:not(h2){display:none!important}
+[data-katb].kapali>:not(h2):not(figcaption){display:none!important}
 figure.pdf-sekil.kapali>img{display:none}
 figure.pdf-sekil .kat-sekil{margin-left:8px}
 .sn-yol{margin:0 0 16px;padding:6px 14px 10px;border:1px solid color-mix(in srgb,var(--tur) 55%,var(--cizgi));border-radius:14px;background:color-mix(in srgb,var(--tur) 5%,var(--zemin))}
@@ -838,6 +838,9 @@ figure.pdf-sekil .kat-sekil{margin-left:8px}
 .sn-kvl-orta>summary::-webkit-details-marker{display:none}
 .sn-kvl-orta>summary::after{content:"";width:.5em;height:.5em;margin-left:4px;border-right:2px solid var(--ikincil);border-bottom:2px solid var(--ikincil);transform:rotate(45deg) translateY(-2px);transition:transform .15s}
 .sn-kvl-orta[open]>summary::after{transform:rotate(-135deg)}
+/* ---- ETK3 SABIT (27 Kas): okunan yer yerinde kalır — koruma sürerken yerel çapa kapalı (JS çapası yarışmasın); sayfa sonu geçici boşluğu ---- */
+html.sb-tut{overflow-anchor:none}
+#sb-ek{display:block;pointer-events:none}
 /* ---- ETK2 DKM (26 Kas): bölünmüş görünüm her ekranda ----
    html[data-ckmod]: genis (≥ 1100 px, yanda) · yan (küçük tablet / yatay telefon: yan yana, --ck-yan) · alt (dikey telefon: alttan panel, boy = --ck-oran × 100dvh)
    Ana akış (sayfa) ve çekmece içi ayrı kayar; çekmece içi kayma sayfaya taşmaz. */
