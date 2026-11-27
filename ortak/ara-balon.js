@@ -30,11 +30,13 @@
   const etkilesimli = (el) => !!(el && el.closest && el.closest('button, a[href], summary, select, [role=button], [role=tab], [role=slider], [role=switch], [role=checkbox], [tabindex]:not([tabindex="-1"]), input, textarea, video, audio'));
 
   // ---------- kitap ipucu (hangi kitabın araması açılsın) ----------
+  const YOL = { 'harita-okulu': 'mto302e', 'sinoptik-brifing': 'mto302e', 'hava-analizi-proje-rehberi': 'mto302e', 'hec-hms': 'mto316', 'hidrometeoroloji-quiz': 'mto316', 'cfd-temelleri': 'mto303e', 'bulut-fizigi-rehberi': 'mto342e' };
   const DERS = { 'mto-351': 'mto316', 'mto-316': 'mto316', 'mto-302': 'mto302e', 'mto-229': 'mto342e', 'mto-303': 'mto303e', 'mto-323': 'mto323' };
   function kitapIpucu() {
     const m = document.querySelector('meta[name="ara-kitap"]'); if (m && m.content) return m.content;
     const r = /(mto(?:302e|303e|316|323|342e))/i.exec(location.pathname + ' ' + location.hash); if (r) return r[1].toLowerCase();
     const s = /#\/ders\/(mto-\d+)/.exec(location.hash); if (s && DERS[s[1]]) return DERS[s[1]];
+    const y = Object.keys(YOL).find((d) => location.pathname.includes('/' + d + '/')); if (y) return YOL[y]; // alt sitenin dersi
     return oku('ab:kitap') || 'mto316';
   }
 

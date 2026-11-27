@@ -1144,3 +1144,11 @@ html.dk-gomulu .ust,html.dk-gomulu #ana,html.dk-gomulu .perde,html.dk-gomulu .ck
 html.dk-gomulu .cekmece,html.dk-gomulu .cekmece[hidden]{display:flex!important;position:fixed!important;inset:0!important;width:auto!important;height:auto!important;max-height:none!important;border:0!important;border-radius:0!important;box-shadow:none!important;transform:none!important;padding:0!important;animation:none!important;transition:none!important}
 html.dk-gomulu .kirinti{padding-top:10px}
 html.dk-gomulu .ck-ic{padding:8px 14px 40px}
+
+/* ETK4 SITE (27 Kas): arama sonuçlarında «Sitede» kümesi */
+.ar-site-l{list-style:none;padding:0;margin:0}
+.ar-site-sat{display:flex;flex-direction:column;gap:2px;min-height:44px;padding:8px 10px;border-radius:10px;text-decoration:none;color:var(--yazi)}
+.ar-site-sat:hover,.ar-site-sat:focus-visible{background:var(--yuzey)}
+.ar-site-sat .ar-t{font-size:12px;font-weight:600;color:var(--acc)}
+.ar-site-sat .a{font-weight:600}
+.ar-site-sat .b{color:var(--ikincil);font-size:14px}

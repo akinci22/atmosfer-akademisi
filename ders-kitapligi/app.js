@@ -2398,6 +2398,40 @@
     const o = x.o;
     return `<li class="ar-o"><button type="button" class="ar-sat" data-i="${i}" aria-expanded="false"><span class="ar-t">${kac(o.tl || GRUP_AD[o.g] || '')}${kid ? ` · ${kac(kid)}` : ''}</span><span class="a">${kesit(o.ad, E, 200)}</span>${o.alt ? `<span class="b">${kesit(o.alt, E, 90)}</span>` : ''}<span class="ar-kesit">${kesitSec(o, E, 170)}</span></button><div class="ar-on" hidden></div></li>`;
   }
+  /* ---------- ETK4 SITE (27 Kas): arama sonuçlarında «Sitede» kümesi ----------
+     ../ortak/ara-dizin.json (tools/ara_dizin.mjs): Akademi öğeleri (ders kartı, ispat, simülasyon, kavram, 3B şekil, canlı hava, araç),
+     alt site çapaları (Harita Okulu, HEC-HMS Okulu, Brifing, CBS …), soru çözümü / sınav atölyesi konu başlıkları, ders notu bölümleri,
+     alt site sayfaları. İlk kitap kümesinin altına en iyi 8 eşleşme; bağ ana pencerede açılır (gömülüde üst pencere). Dosya yoksa küme çıkmaz. */
+  let SITE = null;
+  const SITE_HARF = { 'ç': 'c', 'ğ': 'g', 'ı': 'i', 'ö': 'o', 'ş': 's', 'ü': 'u', 'â': 'a', 'î': 'i', 'û': 'u' };
+  const siteNorm = (s) => String(s || '').toLocaleLowerCase('tr').replace(/[çğıöşüâîû]/g, (c) => SITE_HARF[c]).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+  const siteYukle = () => SITE || (SITE = fetch(new URL('../ortak/ara-dizin.json', location.href).href, { cache: 'force-cache' }).then((r) => (r.ok ? r.json() : null)).then((j) => ((j && j.o) || []).map(([tur, ad, kisa, url]) => ({ tur, ad, kisa, url, n: siteNorm(ad), k: siteNorm(kisa) }))).catch(() => []));
+  function siteBul(L, q) {
+    const qn = siteNorm(q), T = qn.split(' ').filter((x) => x.length >= 2);
+    if (!T.length) return [];
+    const kok = (t) => (t.length > 5 ? t.slice(0, Math.max(4, t.length - 2)) : t); // basit ek budama (yağışın → yağı…)
+    const R = [];
+    for (const x of L) {
+      let p = 0;
+      for (const t of T) { const k = kok(t); if (x.n.includes(t)) p += x.n.startsWith(t) || x.n.includes(' ' + t) ? 3 : 2; else if (x.n.includes(k)) p += 1.5; else if (x.k.includes(k)) p += 0.6; else { p = -1; break; } }
+      if (p > 0) R.push([p + (x.n === qn ? 4 : 0) - x.n.length / 400, x]);
+    }
+    return R.sort((a, b) => b[0] - a[0]).slice(0, 8).map((y) => y[1]);
+  }
+  function siteEkle(q) {
+    const s0 = String(q || '').trim(); if (s0.length < 2) return;
+    siteYukle().then((L) => {
+      if (!arGorunum() || araInp.value.trim() !== s0 || !L || !L.length) return;
+      $$('.ar-site', ckIc).forEach((x) => x.remove());
+      if (arTur) return; // tür süzgeci açıkken yalnız o tür
+      const R = siteBul(L, s0); if (!R.length) return;
+      const kok = new URL('../', location.href).href;
+      const h = `<section class="ar-g ar-site" data-g="_site"><h3 class="ar-h">Sitede <span class="say">${R.length}</span></h3><ul class="ar-l ar-site-l">${R.map((x) => `<li><a class="ar-site-sat" href="${kac(new URL(x.url, kok).href)}"><span class="ar-t">${kac(x.tur)}</span><span class="a">${kac(x.ad)}</span>${x.kisa ? `<span class="b">${kac(x.kisa)}</span>` : ''}</a></li>`).join('')}</ul></section>`;
+      const ilk = $('.ar-g', ckIc);
+      if (ilk) ilk.insertAdjacentHTML('afterend', h); else ckIc.insertAdjacentHTML('beforeend', h);
+    });
+  }
+  window.__dkSite = { yukle: siteYukle, bul: (q) => siteYukle().then((L) => siteBul(L, q)) }; // sınama kancası
   function araTamYaz(K, q) {
     const V = SV(K), ipucu = 'Kavram, terim (TR ya da EN), formül, sembol (ΔS, CN, tc), birim (mm/h, hPa, dBZ), soru (S12) ya da çözüm adımı ara. Türkçe harf ve ek gerekmez; küçük yazım hataları da bulunur.';
     if (!katla(q).trim()) {
@@ -2432,6 +2466,7 @@
     } else if (!arCapraz) h += '<section class="ar-g ar-obur" data-g="obur"><h3 class="ar-h">Öbür kitaplar</h3><button type="button" class="kucuk ar-capraz">Öbür kitaplarda da ara</button></section>';
     arSon = { K, q, L, E };
     ckIc.innerHTML = h;
+    siteEkle(q);
   }
   // sonuç yoksa: yazım düzeltmesi + adı en çok benzeyen kavram / terim / sözlük girdileri
   function arOneri(K, q, A) {
