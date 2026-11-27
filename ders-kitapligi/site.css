@@ -233,9 +233,9 @@ html.tam{scroll-padding-top:calc(64px + env(safe-area-inset-top,0px))}html.tam .
 .perde{display:none!important}
 @media(min-width:1100px){
   .cekmece{width:clamp(360px,var(--ck-gen),60vw)}
-  body.ck-acik main{margin-right:clamp(360px,var(--ck-gen),60vw);max-width:none}
-  body.ck-acik .kitap-yer{grid-template-columns:minmax(0,1fr)!important}
-  body.ck-acik .dizin{display:block;position:static;max-height:none;overflow:visible;padding-right:0}
+  html:not([data-ckmod=yuzen]) body.ck-acik main{margin-right:clamp(360px,var(--ck-gen),60vw);max-width:none}
+  html:not([data-ckmod=yuzen]) body.ck-acik .kitap-yer{grid-template-columns:minmax(0,1fr)!important}
+  html:not([data-ckmod=yuzen]) body.ck-acik .dizin{display:block;position:static;max-height:none;overflow:visible;padding-right:0} /* ETK3 YUZEN: yüzen pencerede ana akış tam genişlik */
 }
 @media(max-width:1099.98px){.cekmece{width:100%;border-left:0;box-shadow:none}.ck-sabit,.ck-tutamak{display:none!important}}
 .ck-tutamak{position:absolute;left:-6px;top:0;bottom:0;width:12px;cursor:col-resize;z-index:3;touch-action:none}
@@ -839,7 +839,7 @@ figure.pdf-sekil .kat-sekil{margin-left:8px}
 .sn-kvl-orta>summary::after{content:"";width:.5em;height:.5em;margin-left:4px;border-right:2px solid var(--ikincil);border-bottom:2px solid var(--ikincil);transform:rotate(45deg) translateY(-2px);transition:transform .15s}
 .sn-kvl-orta[open]>summary::after{transform:rotate(-135deg)}
 /* ---- ETK3 SABIT (27 Kas): okunan yer yerinde kalır — koruma sürerken yerel çapa kapalı (JS çapası yarışmasın); sayfa sonu geçici boşluğu ---- */
-html.sb-tut{overflow-anchor:none}
+html.sb-tut,html.sb-tut .ck-ic{overflow-anchor:none}
 #sb-ek{display:block;pointer-events:none}
 /* ---- ETK2 DKM (26 Kas): bölünmüş görünüm her ekranda ----
    html[data-ckmod]: genis (≥ 1100 px, yanda) · yan (küçük tablet / yatay telefon: yan yana, --ck-yan) · alt (dikey telefon: alttan panel, boy = --ck-oran × 100dvh)
@@ -878,6 +878,23 @@ html[data-ckmod=alt] .cekmece:not([hidden]){animation:ck-cik .26s cubic-bezier(.
 .cekmece.ck-orta .kirinti::-webkit-scrollbar,.cekmece.ck-orta .ck-sekme::-webkit-scrollbar{display:none}
 .cekmece.ck-orta #ck-baslik{font-size:19px;line-height:1.3;padding-top:6px}
 .cekmece.ck-orta .ck-sekme{padding-top:6px;padding-bottom:6px}
+/* ---- ETK3 YUZEN (27 Kas): yüzen pencere (html[data-ckmod=yuzen]) — konum / boy --yz-x/-y/-w/-h (JS, görünür alana sığdırılmış) ---- */
+html[data-ckmod=yuzen] .cekmece{left:var(--yz-x,8px);top:var(--yz-y,40vh);width:var(--yz-w,calc(100vw - 16px));height:var(--yz-h,50vh);right:auto;bottom:auto;max-height:none;border:1px solid var(--cizgi);border-radius:16px;box-shadow:0 18px 50px #0006,0 2px 8px #0002;padding:0;overflow:hidden;z-index:60;transition:none}
+html[data-ckmod=yuzen] .ck-tutamak{display:block!important;position:relative;left:auto;top:auto;bottom:auto;width:100%;height:20px;flex:none;cursor:move;touch-action:none;outline-offset:-3px}
+html[data-ckmod=yuzen] .ck-tutamak::after{left:50%;top:7px;width:46px;height:5px;margin:0 0 0 -23px;border-radius:5px;background:color-mix(in srgb,var(--ikincil) 55%,transparent)}
+html[data-ckmod=yuzen] .ck-ust{padding-top:2px;cursor:move}
+html[data-ckmod=yuzen] .ck-ust,html[data-ckmod=yuzen] #ck-baslik,html[data-ckmod=yan] .ck-ust,html[data-ckmod=yan] #ck-baslik{touch-action:none}
+html[data-ckmod=yuzen] .ck-sabit{display:none!important}
+.ck-ust,#ck-baslik,.ck-tutamak{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.ck-ust input{-webkit-user-select:text;user-select:text}
+.ck-yz{display:inline-flex!important;align-items:center;justify-content:center}
+.ck-yz svg.ik{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ck-yz[aria-pressed=true]{border-color:var(--acc);color:var(--acc)}
+.ck-yz-kose{display:none}
+html[data-ckmod=yuzen] .ck-yz-kose{display:block;position:absolute;right:0;bottom:0;width:34px;height:34px;cursor:nwse-resize;touch-action:none;z-index:4;background:linear-gradient(135deg,transparent 0 52%,var(--ikincil) 52% 57%,transparent 57% 68%,var(--ikincil) 68% 73%,transparent 73%);border-bottom-right-radius:16px}
+@keyframes ck-yz-gir{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+html[data-ckmod=yuzen] .cekmece:not([hidden]){animation:ck-yz-gir .16s ease-out}
+@media (prefers-reduced-motion:reduce){html[data-ckmod=yuzen] .cekmece{animation:none!important}}
 /* ---- ETK2 DKM: terim kartı (_terim/<id>) ---- */
 .mj .tkhl,.mj .tkhl *{fill:var(--tur);stroke:var(--tur);color:var(--tur)}
 .tk-ust{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:14px 0 4px}
