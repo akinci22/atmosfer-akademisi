@@ -332,7 +332,7 @@
   const sbEkH = () => parseFloat(sbEk.style.height) || 0;
   const sbEkYaz = (h) => { sbEk.style.height = h > 0.5 ? `${Math.ceil(h)}px` : ''; };
   const YEREL_CAPA = (() => { try { return oku('dk:sbjs') !== '1' && !!(window.CSS && CSS.supports && CSS.supports('overflow-anchor', 'auto')); } catch (e) { return false; } })();
-  const SB_BLOK = 'h1,h2,h3,h4,p,li,figure,table,summary,pre,blockquote,dt,dd,.tex-blok,.formul-kap,.oyn-a,.oyn-ust,.oyn-dug,.coz-kip,.cozum-bas,.isr-lejant,.bag,.ak-s,.ak-b';
+  const SB_BLOK = 'h1,h2,h3,h4,p,li,figure,table,tr,summary,pre,blockquote,dt,dd,.cift,.tex-blok,.formul-kap,.oyn-a,.oyn-ust,.oyn-dug,.coz-kip,.cozum-bas,.isr-lejant,.bag,.ak-s,.ak-b'; // tablo satırı / TR-EN çifti: uzun tablonun ortasında okurken satır yerinde kalır
   // görünür alanın üst çizgisi: üst şerit + (yapışmışsa) takip çubuğunun alt kenarı; çekmece içinde kutunun üstü
   function sbUstB(kab) {
     if (kab !== window) return { y: kab.getBoundingClientRect().top, yap: false };
