@@ -55,6 +55,10 @@
     kap.before(b); uygula();
   }
   const texDoldur = (kok, K) => $$('[data-tex]', kok).forEach((e) => { const v = K.svg[+e.dataset.tex]; e.innerHTML = (typeof v === 'number' ? K.svg[v] : v) || ''; });
+  // ETK3 MOBIL: geniş formül telefonda kutunun içinde yana gezilmesin — her MathJax SVG'sine doğal genişliği --w yazılır; CSS kutuya sığacak kadar
+  // (en az %72, satır içinde %82) küçültür, daha genişi kutuda yana gezilir. Bütün eklemeler (sayfa, çekmece, kart, mercek, arama) tek gözcüyle.
+  const mjGen = (kok) => { if (!kok || !kok.querySelectorAll) return; const L = kok.matches && kok.matches('svg.mj') ? [kok] : kok.querySelectorAll('svg.mj:not([data-w])'); for (const s of L) { const w = s.getAttribute('width'); if (w && /^[\d.]+ex$/.test(w) && !s.hasAttribute('data-w')) { s.style.setProperty('--w', w); s.setAttribute('data-w', ''); } } };
+  new MutationObserver((M) => { for (const m of M) for (const n of m.addedNodes) if (n.nodeType === 1) mjGen(n); }).observe(document.body, { childList: true, subtree: true });
   const kavramBul = (K, id) => (K.kavramlar || []).find((k) => k.id === id);
 
   /* ---------- kitaplık ---------- */
@@ -123,11 +127,21 @@
     e.preventDefault(); e.stopImmediatePropagation(); tkDahKapat(); $('.tk-dah-dug', d)?.focus({ preventScroll: true });
   }, true);
   let takipRO = null;
+  // ETK3 MOBIL: masada / tablette (çekmece yanda açıkken) takip çubuğu iki satıra taşıyorsa düğmeler «⋯» listesine toplanır (.takip.tk-dar)
+  let tkGen = -1;
+  function takipSigdir(t) {
+    const W = Math.round(t.clientWidth); if (W === tkGen) return; tkGen = W;
+    t.classList.remove('tk-dar'); if (innerWidth <= 600) return;
+    const T = [...t.querySelectorAll('input, a, button, .bilgi')].filter((e) => e.getClientRects().length && !e.closest('.tk-dah-ic')).map((e) => { const r = e.getBoundingClientRect(); return r.top + r.height / 2; }).sort((a, b) => a - b);
+    if (T.some((y, i) => i && y - T[i - 1] > 18)) { t.classList.add('tk-dar'); tkDahKapat(t); }
+  }
   function takipOlc() {
+    const t0 = $('.takip', ana); if (t0 && t0.getClientRects().length) takipSigdir(t0);
     const t = $('.takip', ana), st = t && t.getClientRects().length ? getComputedStyle(t) : null;
     document.documentElement.style.setProperty('--takip-h', `${st && st.position === 'sticky' ? Math.ceil(t.getBoundingClientRect().height) : 0}px`);
   }
   function takipIzle() {
+    tkGen = -1;
     if (takipRO) takipRO.disconnect();
     const t = $('.takip', ana);
     if (t && typeof ResizeObserver !== 'undefined') { takipRO = new ResizeObserver(takipOlc); takipRO.observe(t); }
@@ -2243,7 +2257,7 @@
   window.__dkAra = {
     ara: (kid, q) => { const K = (window.DK || {})[kid]; if (!K) return null; const A = araBul2(K, q); return { n: A.L.length, kismi: A.L.some((x) => x.kismi), es: A.es, duz: A.duz, L: A.L.slice(0, 10).map((x) => ({ g: x.o.g, ad: x.o.ad, ck: x.o.ck || '', ana: x.o.ana || '', p: Math.round(x.p * 100) / 100 })) }; },
     dizin: (kid) => { const K = (window.DK || {})[kid]; if (!K) return null; ARD.delete(kid); const t = performance.now(); const IX = araDizin2(K); return { ms: Math.round(performance.now() - t), belge: IX.D.length, sozcuk: IX.V.length, es: IX.ES.size }; },
-    yukle: (kid) => yukle(kid).then((K) => terimYukle(K)).then(() => true),
+    yukle: (kid) => yukle(kid).then((K) => terimYukle(K).then(() => terimTam(K))).then(() => true),
   };
   // vurgulu kesit: eşleşen sözcükler <mark>; ilk eşleşmenin çevresinden ~uz karakter
   function kesit(s0, E, uz = 170) {
@@ -2322,6 +2336,7 @@
     let h = '';
     if (o.g === 'terim') {
       const t = terimBul(K, o.tid);
+      if (t && TV[K.id] && !TV[K.id].tam) terimTam(K);
       if (t) { const f = (t.formul || []).find((x) => x && x.s != null), tv = TV[K.id]; h += terimKartHTML(K, t, true).replace(/<p class="ar-dug">[\s\S]*$/, ''); if (f && tv) h += `<div class="ar-formul">${tv.svg[f.s] || ''}</div>${f.rol ? `<p class="ar-terim">${kac(f.rol)}</p>` : ''}`; if (t.ornek && t.ornek.metin) h += `<p class="ar-terim"><b>Örnek:</b> ${kac(kisalt(t.ornek.metin, 200))}</p>`; }
       return h + `<p class="ar-dug">${ckDug(o.ck)}</p>`;
     }
@@ -2485,19 +2500,30 @@
   const TV = {};
   const terimVar = (K) => !!(K && K.terim && (K.terim.n || Array.isArray(K.terim.terim)));
   const tvKur = (d) => ({ terim: Array.isArray(d.terim) ? d.terim : [], svg: d.svg || [], bul: new Map((d.terim || []).map((t) => [t.id, t])) });
+  /* ETK3 MOBIL (27 Kas): ilk açılışta hafif dizin (veri/<kitap>.terim-dizin.js ~0,2 MB: ad · kısaltma · tür · eş anlam · tanım · bağ; 316'da tam dosya
+     1,8 MB). Dizinin sürümü ana veriyle (K.terim.v) tutmazsa ya da dosya yoksa tam dosya. Tam dosya (formül, görsel, örnek, fark) terim kartı
+     açılınca, arama kutusuna odaklanınca ve arama ön izlemesinde yüklenir (terimTam); gelince arama dizini tam metinle yeniden kurulur. */
+  const betikYukle = (src) => new Promise((ok) => { const s = document.createElement('script'); s.src = src; s.onload = () => ok(true); s.onerror = () => ok(false); document.head.append(s); });
   function terimYukle(K) {
     if (!terimVar(K)) return Promise.resolve(null);
     if (TV[K.id]) return Promise.resolve(TV[K.id]);
-    if (Array.isArray(K.terim.terim)) { TV[K.id] = tvKur(K.terim); return Promise.resolve(TV[K.id]); }
+    if (Array.isArray(K.terim.terim)) { TV[K.id] = tvKur(K.terim); TV[K.id].tam = true; return Promise.resolve(TV[K.id]); }
     const a = `t:${K.id}`;
     if (!bekleyen[a]) {
-      bekleyen[a] = new Promise((ok) => {
-        const s = document.createElement('script'); s.src = `veri/${K.id}.terim.js?v=${encodeURIComponent(K.terim.v || '')}`;
-        s.onload = () => { const d = (window.DK_TERIM || {})[K.id]; if (d) { TV[K.id] = tvKur(d); ARD.delete(K.id); } ok(TV[K.id] || null); };
-        s.onerror = () => ok(null);
-        document.head.append(s);
+      bekleyen[a] = betikYukle(`veri/${K.id}.terim-dizin.js?v=${encodeURIComponent(K.terim.v || '')}`).then(() => {
+        const d = (window.DK_TERIM_DIZIN || {})[K.id];
+        if (d && d.v === K.terim.v && Array.isArray(d.terim)) { if (!TV[K.id]) { TV[K.id] = tvKur(d); TV[K.id].tam = false; ARD.delete(K.id); } return TV[K.id]; }
+        return terimTam(K);
       });
     }
+    return bekleyen[a];
+  }
+  function terimTam(K) {
+    if (!terimVar(K)) return Promise.resolve(null);
+    if (TV[K.id] && TV[K.id].tam) return Promise.resolve(TV[K.id]);
+    if (Array.isArray(K.terim.terim)) return terimYukle(K);
+    const a = `tt:${K.id}`;
+    if (!bekleyen[a]) bekleyen[a] = betikYukle(`veri/${K.id}.terim.js?v=${encodeURIComponent(K.terim.v || '')}`).then(() => { const d = (window.DK_TERIM || {})[K.id]; if (d) { TV[K.id] = tvKur(d); TV[K.id].tam = true; ARD.delete(K.id); } return TV[K.id] || null; });
     return bekleyen[a];
   }
   const terimler = (K) => (K && TV[K.id] ? TV[K.id].terim : []);
@@ -2602,6 +2628,7 @@
     ckIc.innerHTML = `<article class="tk-kart">${terimKartHTML(K, t)}</article>`;
     texDoldur(ckIc, K);
     terimDiyagramKur(ckIc, K);
+    if (!tv.tam) terimTam(K).then(() => { if (ckDurum && ckDurum.K === K && ckDurum.kPart === `_terim/${ne}`) ckYenile(); });
   }
 
   /* ---------- ETK3 MERCEK-UI (27 Kas): her parçada 4 mercek, yalnız simge ----------
@@ -3255,7 +3282,7 @@
   araInp.addEventListener('focus', () => {
     // telefonda (alttaki panel) klavye açılınca kutu ve sonuçlar görünür kalsın: panel geçici olarak tam boy
     if (ckMod() === 'alt' && ckDurum && ckBoy < 3) { if (ckBoyOnce === null) ckBoyOnce = ckBoy; ckBoy = 3; boyUygula(); }
-    if (ckDurum && terimVar(ckDurum.K) && !TV[ckDurum.K.id]) terimYukle(ckDurum.K).then(() => { if (document.activeElement === araInp && araInp.value) araSuz(); });
+    if (ckDurum && terimVar(ckDurum.K) && !(TV[ckDurum.K.id] && TV[ckDurum.K.id].tam)) terimTam(ckDurum.K).then(() => { if (document.activeElement === araInp && araInp.value) araSuz(); });
     if (araInp.value) araSuz();
   });
   araInp.addEventListener('blur', () => setTimeout(() => {

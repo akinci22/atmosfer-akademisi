@@ -949,6 +949,26 @@ html[data-ckmod=yuzen] .cekmece:not([hidden]){animation:ck-yz-gir .16s ease-out}
 .ck-coz>li{margin:.5em 0}
 .ck-coz>li.isr-k{border-left:3px solid var(--tur);padding-left:8px}
 .ck-coz-islem{font-size:15px;color:var(--ikincil);margin:.2em 0;overflow-wrap:anywhere}
+/* ---- ETK3 MOBIL (27 Kas): formül kutuya sığar (en az %72; satır içi %82), daha genişi kutuda yana gezilir ---- */
+svg.mj-b[data-w]{max-width:100%!important;height:auto!important;min-width:calc(var(--w) * .72)}
+.tex-satir svg.mj-s[data-w]{max-width:100%!important;height:auto!important;min-width:calc(var(--w) * .82)}
+/* ---- ETK3 MOBIL: masada iki satıra taşan takip çubuğu → telefondaki «⋯» listesi ---- */
+.takip.tk-dar .sag{flex-wrap:nowrap;align-items:center;min-width:0}
+.takip.tk-dar .tk-dah{display:block;position:relative;order:4;margin-left:auto;flex:none}
+.takip.tk-dar .tk-dah-dug{display:inline-flex;justify-content:center;min-width:44px;padding:5px 8px}
+.takip.tk-dar .tk-dah.acik .tk-dah-dug{border-color:var(--acc);color:var(--acc);background:var(--acc-zemin)}
+.takip.tk-dar .tk-dah-ic{display:none}
+.takip.tk-dar .tk-dah.acik .tk-dah-ic{display:flex;flex-direction:column;align-items:stretch;gap:2px;position:absolute;z-index:25;right:0;top:calc(100% + 6px);width:max-content;min-width:200px;max-width:calc(100vw - 32px);padding:6px;background:var(--zemin);border:1px solid var(--cizgi);border-radius:12px;box-shadow:0 12px 32px #0003}
+.takip.tk-dar .tk-dah-ic .kucuk{justify-content:flex-start;width:100%;border-color:transparent;font-size:16px}
+.takip.tk-dar .tk-dah-ic .kucuk:hover,.takip.tk-dar .tk-dah-ic .kucuk:focus-visible{border-color:var(--acc)}
+.takip.tk-dar .tk-uzun{display:none}
+.takip.tk-dar .sn-uzun{display:none}.takip.tk-dar .sn-kisa{display:inline}
+.takip.tk-dar label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+/* ---- ETK3 MOBIL: dokunma hedefleri ≥ 44 px (telefon / dokunmatik) ---- */
+@media (pointer:coarse),(max-width:600px){
+.bag button{min-height:44px}
+main details>summary{min-height:44px}
+}
 /* ---- ETK2 DKM: terim kartı (_terim/<id>) ---- */
 .mj .tkhl,.mj .tkhl *{fill:var(--tur);stroke:var(--tur);color:var(--tur)}
 .tk-ust{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:14px 0 4px}
