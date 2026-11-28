@@ -23,7 +23,7 @@
   let UST = true; try { UST = window.self === window.top; } catch (e) { UST = false; }
   const BETIK = document.currentScript;
   const KOK = new URL('..', BETIK && BETIK.src ? BETIK.src : location.href).href;
-  const SURUM = '5a';
+  const SURUM = '6a';
   const oku = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
   const yaz = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* özel pencere */ } };
   const okuJ = (k) => { try { const x = JSON.parse(oku(k) || 'null'); return x && typeof x === 'object' ? x : {}; } catch (e) { return {}; } };
@@ -335,6 +335,7 @@ html.ab-bol.ab-dar .ab-pencere{border-radius:18px 18px 0 0;box-shadow:0 -10px 40
   const IK = {
     ara: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.6-4.6"/></svg>',
     geri: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>',
+    pn: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="7.5" width="13" height="13" rx="2.2"/><path d="M10 3.5h10.5V14"/></svg>',
     bol: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M14 4v16"/></svg>',
     bolSol: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M10 4v16"/></svg>',
     alt: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M3 12.5h18"/></svg>',
@@ -421,7 +422,7 @@ html.ab-bol.ab-dar .ab-pencere{border-radius:18px 18px 0 0;box-shadow:0 -10px 40
     pencere = document.createElement('div');
     pencere.className = 'ab-pencere ab-kapali'; pencere.hidden = true; pencere.id = 'ab-pencere';
     pencere.setAttribute('role', 'dialog'); pencere.setAttribute('aria-label', 'Sitede ara');
-    pencere.innerHTML = `<button type="button" class="ab-tut" aria-haspopup="menu" aria-expanded="false" aria-label="Panel seçenekleri · sürükle: taşı, sağa ya da sola gizle" title="Seçenekler · sürükle: sağa / sola gizle"></button><div class="ab-ust"><button type="button" class="ab-d ab-geri" aria-label="Geri" title="Geri">${IK.geri}</button><input class="ab-girdi" type="search" enterkeyhint="search" autocomplete="off" spellcheck="false" placeholder="Ara: kavram, terim, formül, soru" aria-label="Ara: kavram, terim, formül, soru"><button type="button" class="ab-d ab-kip" aria-label="Bölünmüş görünüm" title="Yüzen ↔ bölünmüş">${IK.bol}</button><a class="ab-d ab-ac" href="${KOK}ders-kitapligi/" aria-label="Ders Kitaplığı'nda aç" title="Ders Kitaplığı'nda aç">${IK.ac}</a><button type="button" class="ab-d ab-kapat" aria-label="Kapat" title="Kapat (Esc)">${IK.x}</button></div><div class="ab-govde"><p class="ab-yuk">Yükleniyor…</p><iframe class="ab-if" title="Ders Kitaplığı: arama ve kavramlar" referrerpolicy="same-origin"></iframe><div class="ab-kalkan"></div></div>` + ['l', 'r', 'b', 'bl', 'br'].map((y) => `<div class="ab-boy" data-y="${y}" aria-hidden="true"></div>`).join('');
+    pencere.innerHTML = `<button type="button" class="ab-tut" aria-haspopup="menu" aria-expanded="false" aria-label="Panel seçenekleri · sürükle: taşı, sağa ya da sola gizle" title="Seçenekler · sürükle: sağa / sola gizle"></button><div class="ab-ust"><button type="button" class="ab-d ab-geri" aria-label="Geri" title="Geri">${IK.geri}</button><input class="ab-girdi" type="search" enterkeyhint="search" autocomplete="off" spellcheck="false" placeholder="Ara: kavram, terim, formül, soru" aria-label="Ara: kavram, terim, formül, soru"><button type="button" class="ab-d ab-kip" aria-label="Bölünmüş görünüm" title="Yüzen ↔ bölünmüş">${IK.bol}</button><button type="button" class="ab-d ab-pn" aria-label="Ayrı pencerede aç" title="Ayrı pencerede aç (panel aramaya devam eder)">${IK.pn}</button><a class="ab-d ab-ac" href="${KOK}ders-kitapligi/" aria-label="Ders Kitaplığı'nda aç" title="Ders Kitaplığı'nda aç">${IK.ac}</a><button type="button" class="ab-d ab-kapat" aria-label="Kapat" title="Kapat (Esc)">${IK.x}</button></div><div class="ab-govde"><p class="ab-yuk">Yükleniyor…</p><iframe class="ab-if" title="Ders Kitaplığı: arama ve kavramlar" referrerpolicy="same-origin"></iframe><div class="ab-kalkan"></div></div>` + ['l', 'r', 'b', 'bl', 'br'].map((y) => `<div class="ab-boy" data-y="${y}" aria-hidden="true"></div>`).join('');
     document.body.appendChild(pencere);
     girdi = pencere.querySelector('.ab-girdi'); ifr = pencere.querySelector('.ab-if'); acBag = pencere.querySelector('.ab-ac'); kipDug = pencere.querySelector('.ab-kip'); yukNot = pencere.querySelector('.ab-yuk'); tutEl = pencere.querySelector('.ab-tut');
     ifr.addEventListener('load', () => { const G = gom(); if (!G) return; ifHazir = true; yukNot.hidden = true; if (bekleyen) { const b = bekleyen; bekleyen = null; if (b.ck) G.git(b.kitap, b.ck); else G.ara(b.q || ''); } });
@@ -434,6 +435,7 @@ html.ab-bol.ab-dar .ab-pencere{border-radius:18px 18px 0 0;box-shadow:0 -10px 40
       else if (e.key === 'Escape') { e.preventDefault(); kapat(); }
     });
     pencere.querySelector('.ab-kapat').addEventListener('click', () => kapat());
+    pencere.querySelector('.ab-pn').addEventListener('click', () => pnAc()); // ETK6 AYRI PENCERE
     pencere.querySelector('.ab-geri').addEventListener('click', () => { const G = gom(); if (G) G.geri(); });
     kipDug.addEventListener('click', () => { D.kip = D.kip === 'bol' ? 'yuzen' : 'bol'; sakla(); kipYaz(); pencereYerle(); });
     acBag.addEventListener('click', () => kapat(true));
@@ -807,8 +809,21 @@ html.ab-bol.ab-dar .ab-pencere{border-radius:18px 18px 0 0;box-shadow:0 -10px 40
     location.hash = o.ck && o.kitap && o.kitap !== kid ? `#${o.kitap}/k/${kp}` : `#${on}/k/${kp}`;
     if (o.odak) setTimeout(() => { const i = document.getElementById('ck-ara'); if (i) { i.focus(); i.select(); } }, 120);
   }
+  // ETK6 AYRI PENCERE: o anki gömülü görünüm ayrı pencerede (ortak/pencere.js, tembel)
+  let pnSoz = null;
+  const pnYukle = () => window.AbPencere ? Promise.resolve(window.AbPencere) : (pnSoz = pnSoz || new Promise((coz) => { const s = document.createElement('script'); s.src = `${KOK}ortak/pencere.js?v=${SURUM}`; s.async = true; s.onload = () => coz(window.AbPencere || null); s.onerror = () => { pnSoz = null; coz(null); }; (document.head || document.documentElement).appendChild(s); }));
+  function pnAc() {
+    const d = sonDurum; if (!d || !d.kitap) return;
+    let ad = ''; try { const h = ifr.contentDocument.getElementById('ck-baslik'); ad = h ? ((h.firstChild && h.firstChild.textContent) || h.textContent) : ''; } catch (e) { /* */ }
+    pnYukle().then((AP) => { if (AP) AP.ac({ anahtar: `ab:${d.kitap}/${d.kp}`, baslik: String(ad || d.kp).trim(), yer: pencere && pencere.getBoundingClientRect().left > innerWidth * 0.35 ? 'sol' : 'sag', url: `${KOK}ders-kitapligi/?gomulu=1&pn=1#${d.kitap}/k/${d.kp}` }); });
+  }
   window.addEventListener('message', (e) => {
-    if (e.origin !== location.origin || !e.data || !e.data.ab || !ifr || e.source !== ifr.contentWindow) return;
+    if (e.origin !== location.origin || !e.data || !e.data.ab) return;
+    if (!ifr || e.source !== ifr.contentWindow) { // ayrı penceredeki gömülü görünümden gelen bağ → bu sayfada aç
+      const f = [...document.querySelectorAll('.abp iframe')].find((x) => x.contentWindow === e.source);
+      if (f && e.data.ab === 'git') { if (e.data.yeni) window.open(e.data.url, '_blank', 'noopener'); else location.href = e.data.url; }
+      return;
+    }
     const d = e.data;
     if (d.ab === 'git') { if (d.yeni) window.open(d.url, '_blank', 'noopener'); else { kapat(true); location.href = d.url; } }
     else if (d.ab === 'durum') { sonDurum = d; if (d.kitap) yaz('ab:kitap', d.kitap); acBag.href = `${KOK}ders-kitapligi/#${d.kitap}/k/${d.kp}`; }

@@ -16,7 +16,9 @@
   const kac = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const PARCA = [['tanim', 'Tanım'], ['diyagram', 'Diyagram'], ['formul', 'Formül · terimler'], ['ispat', 'Türetim'], ['anim', 'Animasyon'], ['kod', 'Kod']];
   const PAD = Object.fromEntries(PARCA);
-  if (!GOMULU && document.getElementById('ck-dah')) document.documentElement.classList.add('etk6-sade'); // ETK6 SADE: çekmece başlığı sade (site.css «ETK6 SADE» bloğu; gömülü kipte araç satırı yok → eski düzen)
+  const PNK = GOMULU && /[?&]pn=1(&|$)/.test(location.search); // ETK6: ayrı pencere içindeki gömülü görünüm
+  if (PNK) document.documentElement.classList.add('etk6-pn');
+  if ((!GOMULU && document.getElementById('ck-dah')) || PNK) document.documentElement.classList.add('etk6-sade'); // eski index.html önbellekteyse sade kip açılmaz // ETK6 SADE: çekmece başlığı sade (site.css «ETK6 SADE» bloğu; gömülü kipte araç satırı yok → eski düzen)
   const sakla = (a, v) => { try { localStorage.setItem(a, v); } catch (e) { /* depolama kapalı */ } };
   const oku = (a) => { try { return localStorage.getItem(a); } catch (e) { return null; } };
   const ana = $('#ana');
@@ -56,6 +58,76 @@
     const uygula = () => { kap.classList.toggle('buyuk', acik); b.textContent = acik ? '⤡ Ekrana sığdır' : '⤢ Şekli büyüt (yazılar okunur)'; b.setAttribute('aria-pressed', String(acik)); };
     b.addEventListener('click', () => { acik = !acik; try { localStorage.setItem('dk:buyut', acik ? '1' : '0'); } catch (e) { /* depolama kapalı */ } uygula(); });
     kap.after(b); uygula(); // ETK6 SADE: düğme şeklin ALTINDA (şekil panelin tepesinden başlar)
+  }
+  /* ---------- ETK6 AYRI PENCERE (28 Kas): diyagram / animasyon / formül bloğunda «ayrı pencerede aç» simgesi → ../ortak/pencere.js
+     (AbPencere) içinde blok AYNI işleyişle yeniden çizilir (DOM taşınmaz), sürgü / seçim durumu aktarılır; kavram değişse de pencere kalır. ---------- */
+  function terimSecKur(kok, P) {
+    const sec = (j) => {
+      const t = P.terimler[j];
+      $$('.terim-list button', kok).forEach((x) => x.setAttribute('aria-pressed', String(+x.dataset.t === j)));
+      $$('.formul-kap .on', kok).forEach((e) => e.classList.remove('on'));
+      $$(`.formul-kap .${CSS.escape(t.id)}`, kok).forEach((e) => e.classList.add('on'));
+      const kk = $('.terim-kart', kok); if (!kk) return; kk.hidden = false;
+      kk.innerHTML = `<b style="font-size:20px">${kac(t.sembol)}</b> — ${kac(t.ad)}<dl><dt>Birim</dt><dd>${kac(t.birim)}</dd><dt>Anlamı</dt><dd>${t.anlam || ''}</dd>${t.tipik ? `<dt>Tipik değer</dt><dd>${kac(t.tipik)}</dd>` : ''}</dl>`;
+    };
+    $$('.terim-list button', kok).forEach((x) => x.addEventListener('click', () => sec(+x.dataset.t)));
+    if ((P.terimler || []).length) sec(0);
+  }
+  let pnSoz = null;
+  const pnYukle = () => window.AbPencere ? Promise.resolve(window.AbPencere) : (pnSoz = pnSoz || new Promise((coz) => { const s = document.createElement('script'); s.src = '../ortak/pencere.js?v=1'; s.async = true; s.onload = () => coz(window.AbPencere || null); s.onerror = () => { pnSoz = null; coz(null); }; document.head.appendChild(s); }));
+  const PN_IK = '<svg class="ik" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="7.5" width="13" height="13" rx="2.2"/><path d="M10 3.5h10.5V14"/></svg>';
+  function pnSimge(kap, ac, ad = 'Ayrı pencerede aç') {
+    if (!kap || $(':scope > .pn-ac', kap)) return;
+    if (kap.matches('[data-tex]')) { // formül kutusu sonradan yeniden doldurulur (texDoldur) → simge kardeşte, ince sarmalayıcıda
+      if (kap.parentElement && kap.parentElement.classList.contains('pn-sar')) kap = kap.parentElement;
+      else { const sr = document.createElement('div'); sr.className = 'pn-sar'; kap.before(sr); sr.appendChild(kap); kap = sr; }
+      if ($(':scope > .pn-ac', kap)) return;
+    }
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'pn-ac'; b.innerHTML = PN_IK; b.setAttribute('aria-label', ad); b.title = ad;
+    b.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); ac(); });
+    kap.classList.add('pn-kap'); kap.appendChild(b);
+  }
+  // sürgü / seçim / onay kutusu durumunu sırasıyla kaynaktan hedefe aktar (iki çizim aynı denetimleri aynı sırayla üretir)
+  function durumAktar(kaynak, hedef) {
+    if (!kaynak || !hedef) return;
+    const A = $$('input, select', kaynak), B = $$('input, select', hedef);
+    A.forEach((a, i) => { const b = B[i]; if (!b || b.type !== a.type || b.tagName !== a.tagName) return; if (a.type === 'checkbox' || a.type === 'radio') { if (b.checked === a.checked) return; b.checked = a.checked; } else { if (b.value === a.value) return; b.value = a.value; } b.dispatchEvent(new Event('input', { bubbles: true })); b.dispatchEvent(new Event('change', { bubbles: true })); });
+    const sa = $$('[aria-pressed=true]', kaynak).map((x) => $$('[aria-pressed]', kaynak).indexOf(x)), sb = $$('[aria-pressed]', hedef);
+    if (sa.length && sb.length && sa.some((i) => sb[i] && sb[i].getAttribute('aria-pressed') !== 'true')) sa.forEach((i) => { if (sb[i] && sb[i].getAttribute('aria-pressed') !== 'true') sb[i].click(); });
+  }
+  function karelerKur(kap, P, j0) {
+    const n = P.kareler.length;
+    const kare = (j) => { kap.innerHTML = `<div class="kare-gez"><button type="button" class="kucuk" data-y="-1" ${j === 0 ? 'disabled' : ''}>‹ Önceki</button><b>${j + 1} / ${n}</b><button type="button" class="dugme" data-y="1" ${j === n - 1 ? 'disabled' : ''}>Sonraki ›</button></div><div class="sekil-kap pn-sekil"></div>${P.kareler[j].html || ''}`; const kk = P.kareler[j]; if (window.Sekil[kk.sekil]) window.Sekil[kk.sekil]($('.pn-sekil', kap), kk.ayar || {}); $$('[data-y]', kap).forEach((b) => { b.onclick = () => kare(j + +b.dataset.y); }); };
+    kare(Math.max(0, Math.min(n - 1, j0 || 0)));
+  }
+  const pnYer = () => { const r = ck.hidden ? null : ck.getBoundingClientRect(); return r && r.left > innerWidth * 0.35 ? 'sol' : 'sag'; }; // pencere yan paneli örtmesin
+  function pnBlok(K, k, parca, kaynak, j) {
+    const P = (k.parcalar || {})[parca]; if (!P) return;
+    pnYukle().then((AP) => {
+      if (!AP) return;
+      AP.ac({
+        anahtar: `dk:${K.id}/${k.id}/${parca}`, baslik: `${k.sembol} · ${k.ad} · ${PAD[parca] || parca}`, yer: pnYer(),
+        ciz: (kap) => {
+          kap.classList.add('pn-govde');
+          if (parca === 'formul') { kap.innerHTML = `<div class="formul-kap" data-tex="${P.tex}"></div><div class="terim-list">${(P.terimler || []).map((t, i) => `<button type="button" aria-pressed="false" data-t="${i}">${kac(t.sembol)}</button>`).join('')}</div><div class="terim-kart" hidden></div>`; texDoldur(kap, K); glifDuzelt(kap); terimSecKur(kap, P); const si = kaynak ? $$('.terim-list button', kaynak).findIndex((b) => b.getAttribute('aria-pressed') === 'true') : -1; if (si > 0 && $$('.terim-list button', kap)[si]) $$('.terim-list button', kap)[si].click(); return null; }
+          if (parca === 'anim' && P.kareler) { karelerKur(kap, P, j); return null; }
+          kap.innerHTML = '<div class="sekil-kap pn-sekil"></div>';
+          const el = $('.pn-sekil', kap); let t = null;
+          if (parca === 'anim' && P.modul && window.Anim[P.modul]) t = window.Anim[P.modul](el, P.ayar || {});
+          else if (window.Sekil[P.sekil]) window.Sekil[P.sekil](el, P.ayar || {});
+          durumAktar(kaynak, kap);
+          return t && t.dur ? { dur: () => t.dur() } : null;
+        },
+      });
+    });
+  }
+  // o anki çekmece görünümü (kavram parçası, terim kartı, mercek …) ayrı pencerede: diyagram / animasyon / formül → temiz blok, gerisi gömülü görünüm
+  function pnGorunum(tam) {
+    if (!ckDurum) return;
+    const { K, kPart } = ckDurum, [bas, p = 'tanim'] = kPart.split('/'), k = !bas.startsWith('_') ? kavramBul(K, bas) : null;
+    if (!tam && k && ['diyagram', 'anim', 'formul'].includes(p) && (k.parcalar || {})[p]) { const kay = p === 'formul' ? $('.formul-kap', ckIc)?.parentElement : $('#ck-sekil'); pnBlok(K, k, p, kay, 0); return; }
+    const ad = (($('#ck-baslik') || {}).firstChild || {}).textContent || kPart;
+    pnYukle().then((AP) => { if (AP) AP.ac({ anahtar: `dk:g:${K.id}/${kPart}`, baslik: String(ad).trim(), yer: pnYer(), url: `${location.pathname}?gomulu=1&pn=1#${K.id}/k/${kPart}` }); });
   }
   const texDoldur = (kok, K) => $$('[data-tex]', kok).forEach((e) => { const v = K.svg[+e.dataset.tex]; e.innerHTML = (typeof v === 'number' ? K.svg[v] : v) || ''; });
   // ETK3 MOBIL: geniş formül telefonda kutunun içinde yana gezilmesin — her MathJax SVG'sine doğal genişliği --w yazılır; CSS kutuya sığacak kadar
@@ -863,20 +935,12 @@
       ic.innerHTML = `${L.length > 1 ? `<div class="hs-secim" role="group" aria-label="Araç seç"><span class="yok">Araç:</span>${L.map((x) => ckBag(`${k.id}/hesap/${x.id}`, kac(iki(x.ad).tr), `kucuk${x === h ? ' simdi' : ''}`)).join('')}</div>` : ''}${h.tur === 'eklenti' ? eklentiHTML(K, h, true) : hesapHTML(K, h, true)}<p class="dil-cagri">${ckBag('_hesap', 'Bütün araçlar: Hesap laboratuvarı →', 'soru-bag')}</p>`;
       if (h.tur === 'eklenti') eklentiKur(ic, K, h); else hesapKur(ic, h, null);
     }
-    else if (parca === 'diyagram') { ic.innerHTML = `<div class="sekil-kap" id="ck-sekil"></div>${P.html || ''}`; if (window.Sekil[P.sekil]) window.Sekil[P.sekil]($('#ck-sekil'), P.ayar || {}); buyutDugmesi(); }
+    else if (parca === 'diyagram') { ic.innerHTML = `<div class="sekil-kap" id="ck-sekil"></div>${P.html || ''}`; if (window.Sekil[P.sekil]) window.Sekil[P.sekil]($('#ck-sekil'), P.ayar || {}); buyutDugmesi(); pnSimge($('#ck-sekil'), () => pnBlok(K, k, 'diyagram', $('#ck-sekil'))); }
     else if (parca === 'formul') {
       ic.innerHTML = `<p class="isr-bas">${isr('kesin')}<span class="isr-neden">ana formül</span>${X && snN(X.olasilik) === 3 ? isr('ezber') : ''}</p><div class="formul-kap isr-k" data-tex="${P.tex}"></div><p class="yok" style="margin:10px 0 0">Bir terime bas: formülde yanar, anlamı aşağıda.</p><div class="terim-list">${(P.terimler || []).map((t, j) => `<button type="button" aria-pressed="false" data-t="${j}">${kac(t.sembol)}</button>`).join('')}</div><div class="terim-kart" id="terim-kart" hidden></div>${P.html || ''}`;
       texDoldur(ic, K);
-      const sec = (j) => {
-        const t = P.terimler[j];
-        $$('.terim-list button', ic).forEach((x) => x.setAttribute('aria-pressed', String(+x.dataset.t === j)));
-        $$('.formul-kap .on', ic).forEach((e) => e.classList.remove('on'));
-        $$(`.formul-kap .${CSS.escape(t.id)}`, ic).forEach((e) => e.classList.add('on'));
-        const kk = $('#terim-kart'); kk.hidden = false;
-        kk.innerHTML = `<b style="font-size:20px">${kac(t.sembol)}</b> — ${kac(t.ad)}<dl><dt>Birim</dt><dd>${kac(t.birim)}</dd><dt>Anlamı</dt><dd>${t.anlam || ''}</dd>${t.tipik ? `<dt>Tipik değer</dt><dd>${kac(t.tipik)}</dd>` : ''}</dl>`;
-      };
-      $$('.terim-list button', ic).forEach((x) => x.addEventListener('click', () => sec(+x.dataset.t)));
-      if ((P.terimler || []).length) sec(0);
+      pnSimge($('.formul-kap', ic), () => pnBlok(K, k, 'formul', ic));
+      terimSecKur(ic, P); // ETK6: ortak terim seçimi (ayrı pencerede de aynı)
     } else if (parca === 'ispat') {
       const n = (P.adimlar || []).length;
       ic.innerHTML = `${P.html || ''}<ol class="ispat">${P.adimlar.map((a, j) => `<li data-i="${j}" ${j >= ckAdim ? 'hidden' : ''}><div class="tex-blok" data-tex="${a.tex}"></div>${a.html || ''}</li>`).join('')}</ol><div class="kare-gez"><button type="button" class="dugme" id="isp-sonraki">Sonraki adım</button><button type="button" class="dugme ikincil" id="isp-hepsi">Hepsini göster</button><span class="yok" id="isp-say"></span></div>`;
@@ -886,10 +950,10 @@
       $('#isp-hepsi').addEventListener('click', () => { ckAdim = n; guncel(true); });
       guncel(false);
     } else if (parca === 'anim') {
-      if (P.modul) { ic.innerHTML = `<div class="sekil-kap" id="ck-sekil"></div>${P.html || ''}`; if (window.Anim[P.modul]) animTutucu = window.Anim[P.modul]($('#ck-sekil'), P.ayar || {}); buyutDugmesi(); }
+      if (P.modul) { ic.innerHTML = `<div class="sekil-kap" id="ck-sekil"></div>${P.html || ''}`; if (window.Anim[P.modul]) animTutucu = window.Anim[P.modul]($('#ck-sekil'), P.ayar || {}); buyutDugmesi(); pnSimge($('#ck-sekil'), () => pnBlok(K, k, 'anim', $('#ck-sekil'))); }
       else if (P.kareler) {
         const n = P.kareler.length;
-        const kare = (j) => { ic.innerHTML = `${P.html || ''}<div class="kare-gez"><button type="button" class="kucuk" id="kr-geri" ${j === 0 ? 'disabled' : ''}>‹ Önceki</button><b>${j + 1} / ${n}</b><button type="button" class="dugme" id="kr-ileri" ${j === n - 1 ? 'disabled' : ''}>Sonraki ›</button></div><div class="sekil-kap" id="ck-sekil"></div>${P.kareler[j].html || ''}`; const kk = P.kareler[j]; if (window.Sekil[kk.sekil]) window.Sekil[kk.sekil]($('#ck-sekil'), kk.ayar || {}); buyutDugmesi(); $('#kr-geri').onclick = () => kare(j - 1); $('#kr-ileri').onclick = () => kare(j + 1); };
+        const kare = (j) => { ic.innerHTML = `${P.html || ''}<div class="kare-gez"><button type="button" class="kucuk" id="kr-geri" ${j === 0 ? 'disabled' : ''}>‹ Önceki</button><b>${j + 1} / ${n}</b><button type="button" class="dugme" id="kr-ileri" ${j === n - 1 ? 'disabled' : ''}>Sonraki ›</button></div><div class="sekil-kap" id="ck-sekil"></div>${P.kareler[j].html || ''}`; const kk = P.kareler[j]; if (window.Sekil[kk.sekil]) window.Sekil[kk.sekil]($('#ck-sekil'), kk.ayar || {}); buyutDugmesi(); pnSimge($('#ck-sekil'), () => pnBlok(K, k, 'anim', null, j)); $('#kr-geri').onclick = () => kare(j - 1); $('#kr-ileri').onclick = () => kare(j + 1); };
         kare(0);
       }
     } else if (parca === 'kod') {
@@ -3443,7 +3507,7 @@
     if (!SADE()) return;
     const sek = $('#ck-sekme'), B = sek ? $$('button, a', sek) : [];
     B.forEach((b) => b.classList.remove('etk6-gizli'));
-    if (B.length > ETK6_GOR) {
+    if (B.length > ETK6_GOR && !PNK) {
       const parca = (b) => { const m = /\/k\/[^_/][^/]*\/([a-z]+)$/.exec(b.dataset.git || ''); return m ? m[1] : null; };
       const L = B.map((b, i) => { const p = parca(b), j = p ? ETK6_ONC.indexOf(p) : -1; return { b, s: j >= 0 ? j : p ? 50 + i : i }; }).sort((x, y) => x.s - y.s);
       const gor = new Set(L.slice(0, ETK6_GOR).map((x) => x.b)), sec = B.find((b) => b.getAttribute('aria-selected') === 'true');
@@ -3480,6 +3544,12 @@
     L.push({ id: 'yuzen', ad: ckMod() === 'yuzen' ? 'Yüzen pencereyi yerine koy' : 'Yüzen pencere', ik: '' });
     if (ckSabitSorar()) L.push({ id: 'sabit', ad: 'Sabitle: soru değişince açık kalsın', ik: '', rol: 'menuitemcheckbox', secili: sabit });
     if ($('#kirinti .etk6-kir-ek')) L.push({ id: 'yol', ad: 'Yolun tamamı (Buradasın)', ik: '' });
+    // ETK6 AYRI PENCERE: o anki öğe ayrı pencerede · açık pencereler (bir bakışta)
+    const [b0, p0 = 'tanim'] = (ckDurum ? ckDurum.kPart : '').split('/'), blok = b0 && !b0.startsWith('_') && ['diyagram', 'anim', 'formul'].includes(p0);
+    L.push('-', { id: 'pn', ad: 'Ayrı pencerede aç', ik: '' });
+    if (blok) L.push({ id: 'pnTam', ad: 'Ayrı pencerede aç: tam görünüm', ik: '' });
+    const AP = window.AbPencere, PL = AP ? AP.liste() : [];
+    if (PL.length) { L.push('-'); PL.forEach((x, i) => L.push({ id: `pw${i}`, ad: `${x.gizli ? 'Kenarda' : 'Açık'} pencere: ${x.baslik}`, ik: '', a: x.anahtar })); }
     return { L, gizli };
   }
   function etk6MenuAc(klavye) {
@@ -3491,12 +3561,15 @@
       else if (id === 'yuzen') $('#ck-yz').click();
       else if (id === 'sabit') sabitBtn.click();
       else if (id === 'yol') $('#kirinti').classList.add('acik');
+      else if (id === 'pn' || id === 'pnTam') pnGorunum(id === 'pnTam');
+      else if (id.startsWith('pw')) { const x = L.find((o) => o.id === id); if (x && window.AbPencere) window.AbPencere.odakla(x.a); }
     };
     if (!A) { etk6Yedek(L, sec); return; }
     if (A.menuAcik()) { A.menuKapat(false); return; }
     A.menu(etk6Dah, L, sec, klavye, { ad: 'Öbür seçenekler', odak: () => !!ckDurum });
   }
   if (etk6Dah) etk6Dah.addEventListener('click', (e) => etk6MenuAc(e.detail === 0)); // önbellekte eski index.html kalmışsa düğme yok
+  const ckPnD = $('#ck-pn'); if (ckPnD) ckPnD.addEventListener('click', () => pnGorunum(false)); // ETK6 AYRI PENCERE: başlık satırındaki mini simge
   window.__etk6 = { sade: SADE, menuAc: etk6MenuAc, ogeler: () => etk6Ogeler().L };
   const BOY_AD = ['küçük (%35)', 'orta (%55)', 'büyük (%85)', 'tam ekran'];
   function boyUygula() {

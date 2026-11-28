@@ -1261,3 +1261,22 @@ html.etk6-sade .cekmece.ck-dar .ck-gezsat{display:none}
 html.etk6-sade .kirinti>a:first-of-type{flex:none}
 html.etk6-sade .cekmece.ck-orta .kirinti:not(.acik){display:none}
 @media (pointer:coarse){html.etk6-sade .kirinti a{min-height:44px;line-height:44px}}
+/* ===== ETK6 AYRI PENCERE (28 Kas): blok köşesinde «ayrı pencerede aç» (masada üzerine gelince, telefonda soluk ama hep) + başlıkta mini simge ===== */
+.pn-kap{position:relative}
+.pn-ac{position:absolute;top:6px;right:6px;z-index:3;display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;padding:0;border:1px solid var(--cizgi);border-radius:9px;background:color-mix(in srgb,var(--zemin) 86%,transparent);color:var(--ikincil);cursor:pointer;transition:opacity .15s,border-color .15s,color .15s}
+.pn-ac .ik{width:18px;height:18px;margin:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;color:inherit}
+.pn-ac:hover,.pn-ac:focus-visible{border-color:var(--acc);color:var(--acc);opacity:1}
+@media (hover:hover) and (pointer:fine){.pn-ac{opacity:0}.pn-kap:hover>.pn-ac,.pn-ac:focus-visible{opacity:1}}
+@media (hover:none),(pointer:coarse){.pn-ac{opacity:.55;width:40px;height:40px}}
+.ck-pn{display:none}
+html.etk6-sade .ck-pn{display:inline-flex;align-items:center;justify-content:center;flex:none;width:38px;height:38px;margin:2px 0 0;padding:0;border:1px solid transparent;border-radius:10px;background:transparent;color:var(--ikincil);cursor:pointer}
+html.etk6-sade .ck-pn .ik{width:19px;height:19px;margin:0;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;color:inherit}
+html.etk6-sade .ck-pn:hover,html.etk6-sade .ck-pn:focus-visible{border-color:var(--cizgi);color:var(--acc)}
+@media (pointer:coarse){html.etk6-sade .ck-pn{width:44px;height:44px}}
+html.etk6-sade .cekmece.ck-dar .ck-pn{display:none}
+.pn-govde .sekil-kap{margin:0}
+.pn-govde .sekil-kap svg{max-height:none;width:100%;height:auto}
+.pn-govde .formul-kap{margin:4px 0 10px}
+html.etk6-pn .ck-pn,html.etk6-pn .pn-ac{display:none!important}
+html.etk6-pn .kirinti{padding-top:6px}
+html.dk-gomulu .pn-ac,html.dk-gomulu .ck-pn{display:none!important}
