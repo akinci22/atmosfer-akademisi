@@ -16,6 +16,7 @@
   const kac = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const PARCA = [['tanim', 'Tanım'], ['diyagram', 'Diyagram'], ['formul', 'Formül · terimler'], ['ispat', 'Türetim'], ['anim', 'Animasyon'], ['kod', 'Kod']];
   const PAD = Object.fromEntries(PARCA);
+  if (!GOMULU && document.getElementById('ck-dah')) document.documentElement.classList.add('etk6-sade'); // ETK6 SADE: çekmece başlığı sade (site.css «ETK6 SADE» bloğu; gömülü kipte araç satırı yok → eski düzen)
   const sakla = (a, v) => { try { localStorage.setItem(a, v); } catch (e) { /* depolama kapalı */ } };
   const oku = (a) => { try { return localStorage.getItem(a); } catch (e) { return null; } };
   const ana = $('#ana');
@@ -54,7 +55,7 @@
     b.type = 'button'; b.className = 'kucuk buyut';
     const uygula = () => { kap.classList.toggle('buyuk', acik); b.textContent = acik ? '⤡ Ekrana sığdır' : '⤢ Şekli büyüt (yazılar okunur)'; b.setAttribute('aria-pressed', String(acik)); };
     b.addEventListener('click', () => { acik = !acik; try { localStorage.setItem('dk:buyut', acik ? '1' : '0'); } catch (e) { /* depolama kapalı */ } uygula(); });
-    kap.before(b); uygula();
+    kap.after(b); uygula(); // ETK6 SADE: düğme şeklin ALTINDA (şekil panelin tepesinden başlar)
   }
   const texDoldur = (kok, K) => $$('[data-tex]', kok).forEach((e) => { const v = K.svg[+e.dataset.tex]; e.innerHTML = (typeof v === 'number' ? K.svg[v] : v) || ''; });
   // ETK3 MOBIL: geniş formül telefonda kutunun içinde yana gezilmesin — her MathJax SVG'sine doğal genişliği --w yazılır; CSS kutuya sığacak kadar
@@ -640,7 +641,8 @@
 
   /* --- çekmece görünümleri --- */
   function kirintiYaz(K, parcalar) {
-    $('#kirinti').innerHTML = [[kac(K.kod), '_atlas'], ...parcalar].map(([ad, kp]) => (kp ? ckBag(kp, ad) : `<span>${ad}</span>`)).join(' <span class="ayrac" aria-hidden="true">›</span> ');
+    // ETK6 SADE: ilk iki halka (kitap › bölüm) görünür; sonrakiler (başlık ve sekmede zaten yazan) .etk6-kir-ek → kırıntıya dokununca açılır
+    $('#kirinti').innerHTML = [[kac(K.kod), '_atlas'], ...parcalar].map(([ad, kp], i) => (i ? `<span class="ayrac${i >= 2 ? ' etk6-kir-ek' : ''}" aria-hidden="true">›</span> ` : '') + (kp ? ckBag(kp, ad, i >= 2 ? 'etk6-kir-ek' : '') : `<span${i >= 2 ? ' class="etk6-kir-ek"' : ''}>${ad}</span>`)).join(' ');
   }
   const siraHTML = (o, orta, s) => `${o ? ckBag(o[0], `‹ <span class="sira-ad">${o[1]}</span>`, 'sira-bag') : '<span class="sira-bos"></span>'}<span class="sira-orta yok">${orta}</span>${s ? ckBag(s[0], `<span class="sira-ad">${s[1]}</span> ›`, 'sira-bag sag') : '<span class="sira-bos"></span>'}`;
   const ustSekme = (K, sec) => [['_atlas', 'Atlas', 'atlas'], ...(snVar(K) ? [[snHedef(K), 'Sınav', 'sinav']] : []), ...(puVar(K) ? [['_pusula', 'Vize pusulası', 'pusula']] : []), ...(kesinSay(K) ? [['_kesin', 'Kesin bil', 'kesin']] : []), ...((K.kavramlar || []).length > 1 ? [['_ag', 'Ağ', 'ag']] : []), ...(turlar(K).length ? [['_tur', 'Türler', 'tur']] : []), ...(tepkimeler(K).length ? [['_tepkime', 'Tepkimeler', 'tepkime']] : []), ...(donguler(K).length ? [['_dongu', 'Çevrimler', 'dongu']] : []), ...(HS(K).length ? [['_hesap', 'Hesap', 'hesap']] : []), ...((K.kavramlar || []).length > 1 || czKars(K).length ? [['_kars', 'Karşılaştır', 'kars']] : []), ...(terimVar(K) ? [['_terim', `Terimler (${K.terim.n || (K.terim.terim || []).length})`, 'terim']] : []), ['_sozluk', `Sözlük (${(K.sozluk || []).length})`, 'sozluk']].map(([kp, ad, id]) => `<button type="button" role="tab" aria-selected="${sec === id}" data-ck="${kp}">${ad}</button>`).join('');
@@ -845,7 +847,7 @@
     const X = snKv(K, k.id);
     $('#ck-baslik').innerHTML = `${kac(k.sembol)} · ${kac(k.ad)}${X ? snNokta(X.olasilik, true) : ''}<small lang="en">${kac(k.en || '')}</small><span class="ck-dar-sekme"> · ${kac(parcaAd)}</span>`;
     const L = K.kavramlar || [], i = L.indexOf(k), o = L[i - 1], s = L[i + 1], kp = (x) => `${x.id}/${parcaVar(K, x, parca) ? parca : 'tanim'}`;
-    $('#ck-sira').innerHTML = siraHTML(o && [kp(o), `${kac(o.sembol)} ${kac(o.ad)}`], `kavram ${i + 1} / ${L.length}`, s && [kp(s), `${kac(s.sembol)} ${kac(s.ad)}`]);
+    $('#ck-sira').innerHTML = siraHTML(o && [kp(o), `${kac(o.sembol)} ${kac(o.ad)}`], `<span class="sira-kv">kavram </span>${i + 1} / ${L.length}`, s && [kp(s), `${kac(s.sembol)} ${kac(s.ad)}`]);
     const parcalar = PARCA.filter(([p]) => k.parcalar && k.parcalar[p]), taban = `#${ckDurum.onEk}/k/${k.id}/`;
     const sekme = ([p, ad]) => `<button type="button" role="tab" aria-selected="${p === parca}" data-git="${kac(taban + p)}">${ad}</button>`;
     $('#ck-sekme').innerHTML = [...parcalar.slice(0, 1), ...(X ? [['sinav', 'Sınav']] : []), ...(D ? [['dil', 'TR ↔ EN']] : []), ...(kimyaVar(K, k.id) ? [['kimya', 'Kimya']] : []), ...(kavramHesap(K, k.id).length ? [['hesap', 'Hesapla']] : []), ...parcalar.slice(1), ['sorular', `Sorular (${k.sorular.length})`]].map(sekme).join('');
@@ -3133,7 +3135,8 @@
     // aramaya odaklanınca geçici tam boy: aramadan başka bir görünüme geçince eski boy
     if (!ayni && ckBoyOnce !== null && !/^_ara(\/|$)/.test(kPart)) { ckBoy = ckBoyOnce; ckBoyOnce = null; boyUygula(); }
     const don = $('#ck-don');
-    don.textContent = qid ? `← ${yonelme(qid)} dön` : /\/bol\//.test(onEk) ? '← Bölüme dön' : '← Kitaba dön';
+    don.textContent = qid ? `← ${qid}` : /\/bol\//.test(onEk) ? '← Bölüme dön' : '← Kitaba dön'; // ETK6 SADE: kısa («← S3»), tam adı aria-label'da
+    if (qid) { don.setAttribute('aria-label', `${yonelme(qid)} dön`); don.title = `${yonelme(qid)} dön`; } else { don.removeAttribute('aria-label'); don.removeAttribute('title'); }
     don.onclick = () => { location.hash = `#${onEk}`; };
     $('#ck-geri').disabled = history.length <= 1;
     sabitYaz();
@@ -3156,6 +3159,7 @@
     else if (bas === '_soru') soruCk(K, kalan[0] || '', ayni);
     else if (bas === '_pusula' && puVar(K)) pusulaCk(K, kalan[0] || '', ayni); // VIZE-316
     else kavramCk(K, bas, kalan[0] || 'tanim', ayni, kalan[1]);
+    etk6Sade();
     if (ilk && terimVar(K) && !TV[K.id]) terimYukle(K).then(() => { if (ckDurum && ckDurum.K === K && !/^_terim(\/|$)/.test(ckDurum.kPart)) terimSusle(K); });
     // arama dizini boşta önceden kurulur (ilk aramada bekleme olmasın; telefonda dizin kurmak ~0,1–0,5 sn)
     if (ilk && !ARD.has(K.id) && typeof requestIdleCallback === 'function') requestIdleCallback(() => { try { araDizin2(K); } catch (e) { /* sonra kurulur */ } }, { timeout: 5000 });
@@ -3431,6 +3435,69 @@
     A.menu(tutamak, ckMenuOgeler(), ckMenuSec, klavye, { ad: 'Çekmece seçenekleri', odak: () => !!ckDurum && !ckGizliMi(), nokta });
     return true;
   }
+  /* ---------- ETK6 SADE (28 Kas): sekmeler en çok 4 + seçili (gerisi «⋯» menüsünde) · «⋯» = seyrek sekmeler, karşılaştır, yüzen pencere,
+     sabitle, yolun tamamı · kırıntıya (bağ dışına) dokun → tamamı. Gizli öğeler DOM'da kalır (menü onların click()'ini çağırır). ---------- */
+  const ETK6_ONC = ['tanim', 'sinav', 'diyagram', 'formul', 'anim', 'hesap', 'dil', 'kimya', 'ispat', 'kod', 'sorular'], ETK6_GOR = 4;
+  const SADE = () => document.documentElement.classList.contains('etk6-sade');
+  function etk6Sade() {
+    if (!SADE()) return;
+    const sek = $('#ck-sekme'), B = sek ? $$('button, a', sek) : [];
+    B.forEach((b) => b.classList.remove('etk6-gizli'));
+    if (B.length > ETK6_GOR) {
+      const parca = (b) => { const m = /\/k\/[^_/][^/]*\/([a-z]+)$/.exec(b.dataset.git || ''); return m ? m[1] : null; };
+      const L = B.map((b, i) => { const p = parca(b), j = p ? ETK6_ONC.indexOf(p) : -1; return { b, s: j >= 0 ? j : p ? 50 + i : i }; }).sort((x, y) => x.s - y.s);
+      const gor = new Set(L.slice(0, ETK6_GOR).map((x) => x.b)), sec = B.find((b) => b.getAttribute('aria-selected') === 'true');
+      if (sec && !gor.has(sec)) { gor.delete(L[ETK6_GOR - 1].b); gor.add(sec); }
+      B.forEach((b) => b.classList.toggle('etk6-gizli', !gor.has(b)));
+    }
+    $$('#ck-sira .sira-bag').forEach((a) => { const t = ($('.sira-ad', a) || {}).textContent; if (t) { a.title = t; a.setAttribute('aria-label', `${a.classList.contains('sag') ? 'Sonraki' : 'Önceki'}: ${t}`); } });
+    const kir = $('#kirinti'); kir.classList.remove('acik'); kir.title = $('.etk6-kir-ek', kir) ? 'Dokun: yolun tamamı' : '';
+  }
+  $('#kirinti').addEventListener('click', (e) => { if (!SADE() || e.target.closest('a')) return; const k = e.currentTarget; if ($('.etk6-kir-ek', k)) k.classList.toggle('acik'); });
+  const etk6Dah = $('#ck-dah');
+  let etk6Mn = null; // kabuk (ortak menü) yüklenmezse yedek menü
+  function etk6YedekKapat() { if (etk6Mn) { etk6Mn.remove(); etk6Mn = null; if (etk6Dah) etk6Dah.setAttribute('aria-expanded', 'false'); } }
+  function etk6Yedek(L, sec) {
+    if (etk6Mn) { etk6YedekKapat(); return; }
+    etk6Mn = document.createElement('div'); etk6Mn.className = 'etk6-mn'; etk6Mn.setAttribute('role', 'menu'); etk6Mn.setAttribute('aria-label', 'Öbür seçenekler');
+    etk6Mn.innerHTML = L.map((x) => (x === '-' ? '<hr>' : `<button type="button" role="menuitem" data-id="${kac(x.id)}">${kac(x.ad)}</button>`)).join('');
+    etk6Mn.addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) sec(b.dataset.id); });
+    document.body.appendChild(etk6Mn);
+    const r = etk6Dah.getBoundingClientRect(), mh = etk6Mn.offsetHeight;
+    etk6Mn.style.top = `${r.bottom + 4 + mh > innerHeight - 8 ? Math.max(8, r.top - mh - 4) : r.bottom + 4}px`;
+    etk6Mn.style.right = `${Math.max(8, document.documentElement.clientWidth - r.right)}px`;
+    etk6Dah.setAttribute('aria-expanded', 'true');
+    const ilk = $('button', etk6Mn); if (ilk) ilk.focus({ preventScroll: true });
+  }
+  document.addEventListener('pointerdown', (e) => { if (etk6Mn && !etk6Mn.contains(e.target) && !etk6Dah.contains(e.target)) etk6YedekKapat(); }, true);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && etk6Mn) { e.preventDefault(); e.stopImmediatePropagation(); etk6YedekKapat(); etk6Dah.focus({ preventScroll: true }); } }, true);
+  function etk6Ogeler() {
+    const L = [], gizli = $$('#ck-sekme .etk6-gizli');
+    gizli.forEach((b, i) => L.push({ id: `sk${i}`, ad: b.textContent.replace(/\s+/g, ' ').trim(), ik: '' }));
+    if (L.length) L.push('-');
+    const kr = $('.kr-ekle-sat .kr-ekle', ckIc);
+    if (kr) L.push({ id: 'kars', ad: kr.getAttribute('aria-pressed') === 'true' ? 'Karşılaştırmadan çıkar' : 'Karşılaştırmaya ekle', ik: '' });
+    L.push({ id: 'yuzen', ad: ckMod() === 'yuzen' ? 'Yüzen pencereyi yerine koy' : 'Yüzen pencere', ik: '' });
+    if (ckSabitSorar()) L.push({ id: 'sabit', ad: 'Sabitle: soru değişince açık kalsın', ik: '', rol: 'menuitemcheckbox', secili: sabit });
+    if ($('#kirinti .etk6-kir-ek')) L.push({ id: 'yol', ad: 'Yolun tamamı (Buradasın)', ik: '' });
+    return { L, gizli };
+  }
+  function etk6MenuAc(klavye) {
+    const { L, gizli } = etk6Ogeler(), A = AO();
+    const sec = (id) => {
+      if (A) A.menuKapat(false); etk6YedekKapat();
+      if (id.startsWith('sk')) { const b = gizli[+id.slice(2)]; if (b) b.click(); }
+      else if (id === 'kars') { const kr = $('.kr-ekle-sat .kr-ekle', ckIc); if (kr) kr.click(); }
+      else if (id === 'yuzen') $('#ck-yz').click();
+      else if (id === 'sabit') sabitBtn.click();
+      else if (id === 'yol') $('#kirinti').classList.add('acik');
+    };
+    if (!A) { etk6Yedek(L, sec); return; }
+    if (A.menuAcik()) { A.menuKapat(false); return; }
+    A.menu(etk6Dah, L, sec, klavye, { ad: 'Öbür seçenekler', odak: () => !!ckDurum });
+  }
+  if (etk6Dah) etk6Dah.addEventListener('click', (e) => etk6MenuAc(e.detail === 0)); // önbellekte eski index.html kalmışsa düğme yok
+  window.__etk6 = { sade: SADE, menuAc: etk6MenuAc, ogeler: () => etk6Ogeler().L };
   const BOY_AD = ['küçük (%35)', 'orta (%55)', 'büyük (%85)', 'tam ekran'];
   function boyUygula() {
     const kok = document.documentElement;

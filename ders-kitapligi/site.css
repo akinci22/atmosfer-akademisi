@@ -1218,3 +1218,46 @@ p.pu-ne{font-size:16px;color:var(--yazi);margin:0 0 14px}
 .pu-d:hover,.pu-d:focus-visible{border-color:var(--acc)}
 .pu-mk{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:12px 0 0}
 .pu-dip{display:flex;flex-wrap:wrap;gap:8px 16px;margin:6px 0 4px}
+/* ===== ETK6 SADE (28 Kas): çekmece başlığı sade — ana içerik (diyagram / formül / metin) panelin üst çeyreğinde başlar.
+   Araç satırı: ← dön · süz · ‹ › · «⋯» (yüzen pencere, sabitle, karşılaştır, seyrek sekmeler); kırıntı tek satır (kitap › bölüm, dokun → tamamı);
+   başlık TR tek satır + EN küçük; sekmeler tek satır (en çok 4 + seçili, gerisi «⋯»'de) ve aynı satırda ince ‹ 12 / 30 ›; sürekli ipucu yazıları yok. ===== */
+.ck-dah{display:none}
+.ck-gezsat{display:contents}
+html.etk6-sade #ck-yz,html.etk6-sade #ck-sabit,html.etk6-sade .ck-et,html.etk6-sade .kr-ekle-sat{display:none!important}
+html.etk6-sade .ck-dah{display:inline-flex;align-items:center;justify-content:center}
+html.etk6-sade .ck-dah[aria-expanded=true]{border-color:var(--acc);color:var(--acc)}
+html.etk6-sade .ck-ust{gap:8px;padding:8px 12px;padding-top:calc(8px + env(safe-area-inset-top,0px))}
+html.etk6-sade .ck-gez{gap:4px}
+html.etk6-sade .ck-gez button{width:38px;min-width:38px;height:38px;padding:0;font-size:20px;line-height:1}
+html.etk6-sade .ck-don{padding:7px 12px;white-space:nowrap}
+html.etk6-sade .ck-ara{flex:1 1 100px;min-width:0}
+html.etk6-sade .kirinti{flex-wrap:nowrap;overflow:hidden;white-space:nowrap;font-size:13px;padding:4px 16px 0;gap:0 2px;cursor:pointer}
+html.etk6-sade .kirinti a{display:inline-block;min-height:28px;line-height:28px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 3px}
+html.etk6-sade .kirinti>a:not(.etk6-kir-ek):nth-of-type(2){flex:0 1 auto;min-width:0}
+html.etk6-sade .kirinti>.etk6-kir-ek{display:none}
+html.etk6-sade .kirinti.acik{flex-wrap:wrap;white-space:normal}
+html.etk6-sade .kirinti.acik>.etk6-kir-ek{display:inline-block}
+html.etk6-sade #ck-baslik{font-size:19px;line-height:1.3;padding:2px 16px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.etk6-sade #ck-baslik small{font-size:13px;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.etk6-sade .ck-bas-sat>#ck-baslik{flex:1 1 140px}
+html.etk6-sade .ck-mercek{padding:0 10px 0 4px}
+html.etk6-sade .ck-gezsat{display:flex;align-items:center;gap:6px;padding:6px 10px 6px 16px;border-bottom:1px solid var(--cizgi)}
+html.etk6-sade .ck-gezsat>.ck-sekme{flex:1 1 auto;min-width:0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;border-bottom:0;padding:0}
+html.etk6-sade .ck-gezsat>.ck-sekme::-webkit-scrollbar{display:none}
+html.etk6-sade .ck-sekme button{min-height:36px;padding:4px 12px;font-size:14px}
+html.etk6-sade .ck-sekme button.etk6-gizli,html.etk6-sade .ck-sekme a.etk6-gizli{display:none}
+html.etk6-sade .ck-gezsat>.ck-sira{flex:none;gap:2px;padding:0;font-size:13px}
+html.etk6-sade .cekmece.ck-orta .ck-gezsat>#ck-sira:not(:empty){display:flex!important}
+html.etk6-sade .sira-ad{display:none}
+html.etk6-sade .sira-bag{max-width:none;min-height:36px;padding:0 9px;font-size:18px;border-color:transparent;background:transparent}
+html.etk6-sade .sira-orta{flex:none;font-size:13px}
+html.etk6-sade .cekmece.ck-dar .ck-gezsat{display:none}
+@media (pointer:coarse){html.etk6-sade .ck-gez button,html.etk6-sade .ck-don{min-height:44px;height:44px}html.etk6-sade .ck-gez button{width:44px;min-width:44px}html.etk6-sade .ck-sekme button{min-height:44px}html.etk6-sade .sira-bag{min-height:44px;min-width:40px;justify-content:center}html.etk6-sade .kirinti a{min-height:34px;line-height:34px}}
+@media (max-width:640px){html.etk6-sade .sira-kv{display:none}html.etk6-sade .ck-ust{padding:6px 10px;gap:6px}}
+.etk6-mn{position:fixed;z-index:60;min-width:200px;max-width:min(320px,92vw);max-height:70vh;overflow:auto;padding:4px;background:var(--zemin);border:1px solid var(--cizgi);border-radius:12px;box-shadow:0 14px 36px #0003}
+.etk6-mn button{display:block;width:100%;min-height:44px;padding:0 12px;border:0;border-radius:8px;background:transparent;color:var(--yazi);font:inherit;text-align:left;cursor:pointer}
+.etk6-mn button:hover,.etk6-mn button:focus-visible{background:var(--acc-zemin)}
+.etk6-mn hr{border:0;border-top:1px solid var(--cizgi);margin:4px 6px}
+html.etk6-sade .kirinti>a:first-of-type{flex:none}
+html.etk6-sade .cekmece.ck-orta .kirinti:not(.acik){display:none}
+@media (pointer:coarse){html.etk6-sade .kirinti a{min-height:44px;line-height:44px}}
