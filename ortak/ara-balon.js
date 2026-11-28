@@ -129,7 +129,9 @@ ${SB_INCE}{scrollbar-width:auto}
     if (!UST) { try { P.AraBalon.uzun({ devral: true }); } catch (e) { /* üst yok */ } return; }
     dolumBitir();
     if (DK_YEREL) {
-      if (document.body.classList.contains('ck-acik')) { const h = location.hash; if (h.includes('/k/')) location.hash = h.split('/k/')[0]; }
+      const KD = window.__dkKenar; // çekmece kenara gizliyse basılı tut geri getirir (paneldeki gibi)
+      if (KD && KD.gizli()) KD.getir(true);
+      else if (document.body.classList.contains('ck-acik')) { const h = location.hash; if (h.includes('/k/')) location.hash = h.split('/k/')[0]; }
       else dkYerel({ odak: true });
       return;
     }
@@ -502,10 +504,10 @@ html.ab-bol.ab-dar .ab-pencere{border-radius:18px 18px 0 0;box-shadow:0 -10px 40
     if (iz.length < 2) return 0; const s = iz[iz.length - 1]; let i = iz.length - 2; while (i > 0 && s[2] - iz[i][2] < 100) i--;
     const a = iz[i], dt = Math.max(8, s[2] - a[2]); return (s[0] - a[0]) / dt;
   }
-  function gizlemeYonu(t, px, dx, v) {
-    const W = genis();
+  function gizlemeYonu(t, px, dx, v, dy) { // dy verilirse fırlatma yalnız yatay ağırlıklı harekette sayılır (dikey taşıma gizlemesin)
+    const W = genis(), yan = dy == null || Math.abs(dx) > Math.abs(dy);
     if (t.eksen === 'x') { if (dx > 44 || (v > 0.32 && dx > 14)) return 'sag'; if (dx < -44 || (v < -0.32 && dx < -14)) return 'sol'; return null; }
-    if (t.eksen === 'serbest') { if (px > W - 64 || (v > 0.42 && dx > 24)) return 'sag'; if (px < 64 || (v < -0.42 && dx < -24)) return 'sol'; return null; }
+    if (t.eksen === 'serbest') { if (px > W - 64 || (yan && v > 0.42 && dx > 24)) return 'sag'; if (px < 64 || (yan && v < -0.42 && dx < -24)) return 'sol'; return null; }
     return null;
   }
   function ipucuGoster(yon) {
@@ -571,65 +573,93 @@ html.ab-bol.ab-dar .ab-pencere{border-radius:18px 18px 0 0;box-shadow:0 -10px 40
     const W = genis(), x = parseFloat(pencere.style.left) || 0, w = parseFloat(pencere.style.width) || pencere.offsetWidth;
     return yon === 'sag' ? Math.round(W - x + 16) : Math.round(-(x + w + 16));
   }
+  // ORTAK kenar denetimi (ETK5-B): öğe kenara kayar, kenarda yalnız ince dikey hap kalır (44 px dokunma alanı); hapa dokun / içeri
+  // sürükle → yaylı geri; hapı yukarı-aşağı sürükle → yeri. Arama paneli ve Ders Kitaplığı çekmecesi aynı işlevi kullanır (__abOrtak.kenar).
+  // o: { el() kayan öğe, tx(yon) öteleme px, yer() {top, h} (hap öğenin dikey ortasında), getir(odak) geri gelme isteği, ad, title, kimlik, odakIcinde() }
+  function kenarYap(o) {
+    let yon = null, k = null, oy = false, onceAH = null;
+    function hapKur() {
+      if (k) return;
+      kur();
+      k = document.createElement('button'); k.type = 'button'; k.className = 'ab-kulak'; k.hidden = true;
+      k.setAttribute('aria-label', o.ad); if (o.kimlik) k.setAttribute('aria-controls', o.kimlik); k.title = o.title || o.ad;
+      document.body.appendChild(k);
+      let s = null, sonSur = 0;
+      k.addEventListener('click', () => { if (Date.now() - sonSur < 350) return; o.getir(true); });
+      k.addEventListener('pointerdown', (e) => { if (e.button || !yon) return; s = { x0: e.clientX, y0: e.clientY, oyn: false, eksen: null, tx: o.tx(yon), ky: parseFloat(k.dataset.y) || 0, iz: [[e.clientX, e.clientY, e.timeStamp]] }; try { k.setPointerCapture(e.pointerId); } catch (x) { /* yok */ } });
+      k.addEventListener('pointermove', (e) => {
+        if (!s || !yon) return;
+        const el = o.el(), dx = e.clientX - s.x0, dy = e.clientY - s.y0, ice = yon === 'sag' ? -dx : dx;
+        s.iz.push([e.clientX, e.clientY, e.timeStamp]); if (s.iz.length > 8) s.iz.shift();
+        if (!s.oyn) { if (Math.hypot(dx, dy) < 7) return; s.oyn = true; s.eksen = Math.abs(dy) > Math.abs(dx) * 1.2 ? 'y' : 'x'; k.classList.add('ab-cekiliyor'); el.style.transition = 'none'; }
+        if (s.eksen === 'y') { const y = Math.round(sinir(s.ky + dy, 8, innerHeight - 128)); k.dataset.y = String(y); k.style.transform = `translate3d(${k.dataset.x}px,${y}px,0)`; return; }
+        const n = Math.max(0, ice), tx = yon === 'sag' ? s.tx - n : s.tx + n;
+        el.style.transform = `translate3d(${Math.round(tx)}px,0,0)`;
+      });
+      const bit = (e) => {
+        if (!s) return; const t = s; s = null; k.classList.remove('ab-cekiliyor');
+        if (!t.oyn || !yon) return;
+        sonSur = Date.now();
+        if (t.eksen === 'y') { oy = true; return; }
+        const dx = e.clientX - t.x0, ice = yon === 'sag' ? -dx : dx, v = hiz(t.iz) * (yon === 'sag' ? -1 : 1);
+        if (e.type !== 'pointercancel' && (ice > 56 || (v > 0.3 && ice > 12))) o.getir(false);
+        else { const el = o.el(); gecis(el, azHareket() ? 'none' : `transform .26s ${AKIS}`); el.style.transform = `translate3d(${o.tx(yon)}px,0,0)`; }
+      };
+      k.addEventListener('pointerup', bit); k.addEventListener('pointercancel', bit);
+    }
+    function yerle() {
+      if (!yon || !k) return;
+      const H = innerHeight, r = o.yer();
+      const y = oy ? sinir(parseFloat(k.dataset.y) || 0, 8, H - 128) : Math.round(sinir(r.top + r.h / 2 - 60, 8, H - 128));
+      const x = yon === 'sag' ? innerWidth - 44 : 0; // gerçek kenar (görünmez gezinme çubuğu şeridinin üstü)
+      k.dataset.x = String(x); k.dataset.y = String(y); k.dataset.yon = yon;
+      k.style.transform = `translate3d(${x}px,${y}px,0)`;
+      o.el().style.transform = `translate3d(${o.tx(yon)}px,0,0)`;
+    }
+    function gizle(y) {
+      hapKur();
+      const el = o.el(), odakIcinde = el.contains(document.activeElement) || !!(o.odakIcinde && o.odakIcinde());
+      if (!yon) onceAH = el.getAttribute('aria-hidden');
+      yon = y;
+      gecis(el, azHareket() ? 'none' : `transform .28s ${AKIS},opacity .22s ease`, 460);
+      el.style.opacity = '';
+      el.style.transform = `translate3d(${o.tx(y)}px,0,0)`;
+      el.setAttribute('aria-hidden', 'true'); el.inert = true;
+      k.hidden = false; oy = false; yerle();
+      requestAnimationFrame(() => { if (yon) k.classList.add('ab-gor'); });
+      if (odakIcinde) k.focus({ preventScroll: true });
+    }
+    function getir(hemen) { // yaylı geri geliş · hemen: animasyonsuz (kapanırken / kip değişince)
+      if (!yon) return false;
+      yon = null;
+      const el = o.el();
+      if (onceAH == null) el.removeAttribute('aria-hidden'); else el.setAttribute('aria-hidden', onceAH);
+      el.inert = false;
+      if (hemen) { clearTimeout(el._gz); el.style.transition = ''; } else gecis(el, azHareket() ? 'none' : `transform .36s ${YAY},opacity .2s ease`, 480);
+      el.style.transform = ''; el.style.opacity = '';
+      if (k) { k.classList.remove('ab-gor'); if (hemen || azHareket()) k.hidden = true; else { const kk = k; setTimeout(() => { if (!yon) kk.hidden = true; }, 220); } }
+      return true;
+    }
+    return { gizle, getir, yerle, yon: () => yon, hap: () => k };
+  }
+  let KB = null; // arama penceresinin kenar denetimi
   function kulakKur() {
-    if (kulak) return;
-    kulak = document.createElement('button'); kulak.type = 'button'; kulak.className = 'ab-kulak'; kulak.hidden = true;
-    kulak.setAttribute('aria-label', 'Arama panelini geri getir'); kulak.setAttribute('aria-controls', 'ab-pencere'); kulak.title = 'Arama paneli · dokun ya da içeri sürükle';
-    document.body.appendChild(kulak);
-    let s = null, sonSur = 0;
-    kulak.addEventListener('click', () => { if (Date.now() - sonSur < 350) return; kenardanGetir(true); });
-    kulak.addEventListener('pointerdown', (e) => { if (e.button) return; s = { x0: e.clientX, y0: e.clientY, oyn: false, eksen: null, tx: kenarTx(kenarda), ky: parseFloat(kulak.dataset.y) || 0, iz: [[e.clientX, e.clientY, e.timeStamp]] }; try { kulak.setPointerCapture(e.pointerId); } catch (x) { /* yok */ } });
-    kulak.addEventListener('pointermove', (e) => {
-      if (!s || !kenarda) return;
-      const dx = e.clientX - s.x0, dy = e.clientY - s.y0, ice = kenarda === 'sag' ? -dx : dx;
-      s.iz.push([e.clientX, e.clientY, e.timeStamp]); if (s.iz.length > 8) s.iz.shift();
-      if (!s.oyn) { if (Math.hypot(dx, dy) < 7) return; s.oyn = true; s.eksen = Math.abs(dy) > Math.abs(dx) * 1.2 ? 'y' : 'x'; kulak.classList.add('ab-cekiliyor'); pencere.style.transition = 'none'; }
-      if (s.eksen === 'y') { const y = Math.round(sinir(s.ky + dy, 8, innerHeight - 128)); kulak.dataset.y = String(y); kulak.style.transform = `translate3d(${kulak.dataset.x}px,${y}px,0)`; return; }
-      const k = Math.max(0, ice), tx = kenarda === 'sag' ? s.tx - k : s.tx + k;
-      pencere.style.transform = `translate3d(${Math.round(tx)}px,0,0)`;
-    });
-    const bit = (e) => {
-      if (!s) return; const t = s; s = null; kulak.classList.remove('ab-cekiliyor');
-      if (!t.oyn || !kenarda) return;
-      sonSur = Date.now();
-      if (t.eksen === 'y') { kulak.dataset.oy = '1'; return; }
-      const dx = e.clientX - t.x0, ice = kenarda === 'sag' ? -dx : dx, v = hiz(t.iz) * (kenarda === 'sag' ? -1 : 1);
-      if (e.type !== 'pointercancel' && (ice > 56 || (v > 0.3 && ice > 12))) kenardanGetir(false);
-      else { gecis(pencere, azHareket() ? 'none' : `transform .26s ${AKIS}`); pencere.style.transform = `translate3d(${kenarTx(kenarda)}px,0,0)`; }
-    };
-    kulak.addEventListener('pointerup', bit); kulak.addEventListener('pointercancel', bit);
+    if (KB) return;
+    KB = kenarYap({ el: () => pencere, tx: kenarTx, yer: () => ({ top: parseFloat(pencere.style.top) || 0, h: parseFloat(pencere.style.height) || 300 }), getir: (odak) => kenardanGetir(odak), ad: 'Arama panelini geri getir', title: 'Arama paneli · dokun ya da içeri sürükle', kimlik: 'ab-pencere', odakIcinde: () => document.activeElement === ifr });
   }
-  function kenarYerle() {
-    if (!kenarda || !kulak) return;
-    const H = innerHeight, r = { top: parseFloat(pencere.style.top) || 0, h: parseFloat(pencere.style.height) || 300 };
-    const y = kulak.dataset.oy === '1' ? sinir(parseFloat(kulak.dataset.y) || 0, 8, H - 128) : Math.round(sinir(r.top + r.h / 2 - 60, 8, H - 128));
-    const x = kenarda === 'sag' ? innerWidth - 44 : 0; // gerçek kenar (görünmez gezinme çubuğu şeridinin üstü)
-    kulak.dataset.x = String(x); kulak.dataset.y = String(y); kulak.dataset.yon = kenarda;
-    kulak.style.transform = `translate3d(${x}px,${y}px,0)`;
-    pencere.style.transform = `translate3d(${kenarTx(kenarda)}px,0,0)`;
-  }
+  function kenarYerle() { if (kenarda && KB) KB.yerle(); }
   function kenaraGizle(yon) {
     if (!acik || !pencere) return;
     menuKapat(false); kulakKur();
-    const odakIcinde = pencere.contains(document.activeElement) || document.activeElement === ifr;
     kenarda = yon;
-    gecis(pencere, azHareket() ? 'none' : `transform .28s ${AKIS},opacity .22s ease`, 460);
-    pencere.style.opacity = '';
-    pencere.style.transform = `translate3d(${kenarTx(yon)}px,0,0)`;
-    pencere.setAttribute('aria-hidden', 'true'); pencere.inert = true;
     document.documentElement.classList.add('ab-kenarda');
-    kulak.hidden = false; kulak.dataset.oy = ''; kenarYerle();
-    requestAnimationFrame(() => kulak.classList.add('ab-gor'));
-    if (odakIcinde) kulak.focus({ preventScroll: true });
+    KB.gizle(yon); kulak = KB.hap();
   }
   function kenardanGetir(odak) {
     if (!kenarda) return;
     kenarda = null;
-    pencere.removeAttribute('aria-hidden'); pencere.inert = false;
     document.documentElement.classList.remove('ab-kenarda');
-    gecis(pencere, azHareket() ? 'none' : `transform .36s ${YAY},opacity .2s ease`, 480);
-    pencere.style.transform = ''; pencere.style.opacity = '';
-    if (kulak) { kulak.classList.remove('ab-gor'); const k = kulak; setTimeout(() => { if (!kenarda) k.hidden = true; }, azHareket() ? 0 : 220); }
+    KB.getir(false);
     if (odak) girdi.focus({ preventScroll: true });
   }
 
@@ -649,40 +679,60 @@ html.ab-bol.ab-dar .ab-pencere{border-radius:18px 18px 0 0;box-shadow:0 -10px 40
       { id: 'kapat', ad: 'Kapat', ik: IK.x, kisa: 'Esc' },
     ];
   }
-  function menuAc(klavye) {
-    if (!acik || !pencere) return;
+  // ORTAK menü (ETK5-B): capa = açan öğe (altında, sığmazsa üstünde; o.nokta = [x, y] verilirse o noktada) · ogeler = [{id, ad, ik, rol,
+  // secili, kisa} | '-'] · sec(id) seçim · o.odak() = kapanınca odak çapaya dönebilir mi. Ders Kitaplığı çekmecesi de kullanır (__abOrtak.menu).
+  let menuCapa = null, menuSecF = null, menuOdakF = null;
+  function menuGoster(capa, ogeler, sec, klavye, o = {}) {
+    kur();
     if (!menu) {
       menu = document.createElement('div'); menu.className = 'ab-menu ab-kapali'; menu.hidden = true; menu.id = 'ab-menu';
-      menu.setAttribute('role', 'menu'); menu.setAttribute('aria-label', 'Panel seçenekleri');
-      menu.addEventListener('click', (e) => { const b = e.target.closest('.ab-mo'); if (b) menuSec(b.dataset.id); });
+      menu.setAttribute('role', 'menu');
+      menu.addEventListener('click', (e) => { const b = e.target.closest('.ab-mo'); if (b && menuSecF) menuSecF(b.dataset.id); });
       menu.addEventListener('pointermove', (e) => { const b = e.target.closest('.ab-mo'); if (b && e.pointerType === 'mouse' && document.activeElement !== b) b.focus({ preventScroll: true }); });
       document.body.appendChild(menu);
-      document.addEventListener('pointerdown', (e) => { if (menuAcikMi() && !menu.contains(e.target) && e.target !== tutEl) menuKapat(false); }, true);
-      tutEl.setAttribute('aria-controls', 'ab-menu');
+      document.addEventListener('pointerdown', (e) => { if (menuAcikMi() && !menu.contains(e.target) && !(menuCapa && menuCapa.contains(e.target))) menuKapat(false); }, true);
     }
+    if (menuCapa && menuCapa !== capa) menuCapa.setAttribute('aria-expanded', 'false');
+    menuCapa = capa; menuSecF = sec; menuOdakF = o.odak || null;
+    menu.setAttribute('aria-label', o.ad || 'Panel seçenekleri');
+    capa.setAttribute('aria-controls', 'ab-menu'); capa.setAttribute('aria-haspopup', 'menu');
     menu.innerHTML = '';
-    for (const o of menuOgeler()) {
-      if (o === '-') { const a = document.createElement('div'); a.className = 'ab-ma'; a.setAttribute('role', 'separator'); menu.appendChild(a); continue; }
-      const b = document.createElement('button'); b.type = 'button'; b.className = 'ab-mo'; b.dataset.id = o.id; b.tabIndex = -1;
-      b.setAttribute('role', o.rol || 'menuitem'); if (o.rol) b.setAttribute('aria-checked', String(!!o.secili));
-      b.innerHTML = `${o.ik}<span class="ab-mt"></span>${o.kisa ? `<span class="ab-ms">${o.kisa}</span>` : ''}`; b.querySelector('.ab-mt').textContent = o.ad;
+    for (const x of ogeler) {
+      if (x === '-') { const a = document.createElement('div'); a.className = 'ab-ma'; a.setAttribute('role', 'separator'); menu.appendChild(a); continue; }
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'ab-mo'; b.dataset.id = x.id; b.tabIndex = -1;
+      b.setAttribute('role', x.rol || 'menuitem'); if (x.rol) b.setAttribute('aria-checked', String(!!x.secili));
+      b.innerHTML = `${x.ik}<span class="ab-mt"></span>${x.kisa ? `<span class="ab-ms">${x.kisa}</span>` : ''}`; b.querySelector('.ab-mt').textContent = x.ad;
       menu.appendChild(b);
     }
     menu.hidden = false; menu.classList.add('ab-kapali');
-    const tr = tutEl.getBoundingClientRect(), mw = menu.offsetWidth, mh = menu.offsetHeight, W = genis(), H = innerHeight;
-    let x = tr.left + tr.width / 2 - mw / 2, y = tr.bottom + 4;
-    x = sinir(x, 8, W - mw - 8); if (y + mh > H - 8) y = Math.max(8, tr.top - mh - 4);
+    const tr = o.nokta ? { left: o.nokta[0], top: o.nokta[1], bottom: o.nokta[1], width: 0 } : capa.getBoundingClientRect();
+    const mw = menu.offsetWidth, mh = menu.offsetHeight, W = genis(), H = innerHeight;
+    let x = tr.left + tr.width / 2 - mw / 2, y = tr.bottom + 4, ust = null;
+    x = sinir(x, 8, W - mw - 8);
+    if (y + mh > H - 8) { // altta yer yok → üstte; ikisi de yetmezse çapayı örtmeden geniş tarafta (menü kendi içinde kayar)
+      if (tr.top - mh - 4 >= 8) y = tr.top - mh - 4;
+      else {
+        const alt = H - 8 - y, yuk = tr.top - 12;
+        if (Math.max(alt, yuk) < Math.min(mh, 160)) y = Math.max(8, H - mh - 8); // çapa ekranı kaplıyor (yan tutamak): ekrana sığdır
+        else if (yuk > alt) { ust = yuk; y = 8; } else ust = alt;
+      }
+    }
+    menu.style.maxHeight = ust ? Math.round(ust) + 'px' : ''; menu.style.overflowY = ust ? 'auto' : '';
     menu.style.left = Math.round(x) + 'px'; menu.style.top = Math.round(y) + 'px';
     void menu.offsetWidth; menu.classList.remove('ab-kapali');
-    tutEl.setAttribute('aria-expanded', 'true');
+    capa.setAttribute('aria-expanded', 'true');
     if (klavye) { const ilk = menu.querySelector('.ab-mo'); if (ilk) ilk.focus({ preventScroll: true }); }
+  }
+  function menuAc(klavye) {
+    if (!acik || !pencere) return;
+    menuGoster(tutEl, menuOgeler(), menuSec, klavye, { odak: () => acik && !kenarda });
   }
   function menuKapat(odakGeri) {
     if (!menu || menu.hidden) return;
     const icinde = menu.contains(document.activeElement);
-    menu.classList.add('ab-kapali'); tutEl.setAttribute('aria-expanded', 'false');
+    menu.classList.add('ab-kapali'); if (menuCapa) menuCapa.setAttribute('aria-expanded', 'false');
     const m = menu; setTimeout(() => { if (m.classList.contains('ab-kapali')) m.hidden = true; }, azHareket() ? 0 : 160);
-    if ((odakGeri || icinde) && acik && !kenarda) tutEl.focus({ preventScroll: true });
+    if ((odakGeri || icinde) && menuCapa && (!menuOdakF || menuOdakF())) menuCapa.focus({ preventScroll: true });
   }
   function menuTus(e) {
     const L = [...menu.querySelectorAll('.ab-mo')], i = L.indexOf(document.activeElement), k = e.key;
@@ -738,7 +788,7 @@ html.ab-bol.ab-dar .ab-pencere{border-radius:18px 18px 0 0;box-shadow:0 -10px 40
     acik = false; menuKapat(false);
     const icinde = pencere.contains(document.activeElement) || document.activeElement === ifr || (kulak && document.activeElement === kulak);
     const kenardaydi = !!kenarda;
-    if (kenardaydi) { kenarda = null; pencere.removeAttribute('aria-hidden'); pencere.inert = false; document.documentElement.classList.remove('ab-kenarda'); if (kulak) { kulak.classList.remove('ab-gor'); kulak.hidden = true; } }
+    if (kenardaydi) { kenarda = null; document.documentElement.classList.remove('ab-kenarda'); if (KB) KB.getir(true); }
     document.documentElement.classList.remove('ab-acik');
     balon.classList.remove('ab-gizle'); balonYerle(false);
     pencere.style.transform = ''; pencere.style.opacity = '';
@@ -826,5 +876,7 @@ html.ab-bol.ab-dar .ab-pencere{border-radius:18px 18px 0 0;box-shadow:0 -10px 40
     uzun: (o) => { if (o && o.devral) { tutBitir(); tut = { t0: performance.now(), uzun: true }; } uzunEylem(); },
     kip: (on) => kipCevir(on), kenar: (yon) => (yon ? kenaraGizle(yon) : kenardanGetir(true)), menu: () => menuAc(true),
   };
+  // ortak işlevler (ETK5-B): Ders Kitaplığı çekmecesinin tutma çubuğu (ders-kitapligi/src/app.js) aynı menüyü ve kenar hapını kullanır
+  window.__abOrtak = { menu: menuGoster, menuKapat: (odak) => menuKapat(!!odak), menuAcik: menuAcikMi, kenar: kenarYap, hiz, gizlemeYonu, ipucu: ipucuGoster, IK, azHareket };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', kur, { once: true }); else kur();
 })();

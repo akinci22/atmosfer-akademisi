@@ -3026,6 +3026,7 @@
 
   /* --- aç / kapat / yönlendir --- */
   function cekmeceKapat() {
+    if (window.__dkKenar && window.__dkKenar.gizli()) window.__dkKenar.getir(false, true); // ETK5-B: kenardaysa anında geri (sonraki açılışta görünür)
     if (animTutucu && animTutucu.dur) animTutucu.dur(); animTutucu = null;
     ipKapat(); araKapat();
     ck.hidden = true; perde.hidden = true; ck.setAttribute('aria-hidden', 'true'); ckDurum = null; document.body.classList.remove('ck-acik'); sepetEl.hidden = true; $$('.sn-yol', ckIc).forEach((x) => x.remove());
@@ -3301,7 +3302,7 @@
     const v = yzVarsayilan(), r0 = ck.getBoundingClientRect(), h = Math.max(YZ_MIN_H, Math.min(v.h, r0.height || v.h));
     const r = yzSinirla({ x: Math.round(b.x0 - v.w / 2), y: Math.round(b.y0 - 22), w: v.w, h });
     yuzenAyarla(true, { r });
-    yzTas = { id: b.id, x0: b.x0, y0: b.y0, r0: { ...r }, kose: false, basladi: true };
+    yzTas = { id: b.id, x0: b.x0, y0: b.y0, r0: { ...r }, kose: false, basladi: true, tut: false, iz: [] };
     try { ck.setPointerCapture(b.id); } catch (x) { /* yakalanamadı */ }
     tikYut = true; setTimeout(() => { tikYut = false; }, 600);
   }
@@ -3313,7 +3314,7 @@
       if (!kose && !yzHedef(t)) return;
       e.preventDefault();
       const r = ck.getBoundingClientRect();
-      yzTas = { id: e.pointerId, x0: e.clientX, y0: e.clientY, r0: { x: r.left, y: r.top, w: r.width, h: r.height }, kose, basladi: false };
+      yzTas = { id: e.pointerId, x0: e.clientX, y0: e.clientY, r0: { x: r.left, y: r.top, w: r.width, h: r.height }, kose, basladi: false, tut: !kose && !!t.closest('.ck-tutamak'), iz: [[e.clientX, e.clientY, e.timeStamp]] };
       try { ck.setPointerCapture(e.pointerId); } catch (x) { /* yakalanamadı */ }
       return;
     }
@@ -3325,24 +3326,111 @@
     if (yzBas && e.pointerId === yzBas.id && Math.hypot(e.clientX - yzBas.x0, e.clientY - yzBas.y0) > 8) { clearTimeout(yzBas.zam); yzBas = null; }
     const s = yzTas; if (!s || e.pointerId !== s.id) return;
     const dx = e.clientX - s.x0, dy = e.clientY - s.y0;
+    s.iz.push([e.clientX, e.clientY, e.timeStamp]); if (s.iz.length > 8) s.iz.shift();
     if (!s.basladi) { if (Math.hypot(dx, dy) < 6) return; s.basladi = true; }
     document.body.classList.add('ck-surukle');
     yzKonum = s.kose ? { x: s.r0.x, y: s.r0.y, w: s.r0.w + dx, h: s.r0.h + dy } : { ...s.r0, x: s.r0.x + dx, y: s.r0.y + dy };
     yzYaz();
+    const A = s.tut && AO(); if (A) A.ipucu(A.gizlemeYonu({ eksen: 'serbest' }, e.clientX, dx, A.hiz(s.iz), dy)); // ETK5-B: kenara bırak / fırlat → gizle
   });
   const yzBit = (e) => {
     if (yzBas && e.pointerId === yzBas.id) { clearTimeout(yzBas.zam); yzBas = null; }
     const s = yzTas; if (!s || e.pointerId !== s.id) return;
     yzTas = null; document.body.classList.remove('ck-surukle');
-    if (s.basladi) { yzKonum = yzSinirla(yzKonum); yzYaz(); yzSakla(); tikYut = true; setTimeout(() => { tikYut = false; }, 320); if (ckDurum) basUygula(); return; }
-    const t = performance.now(); // taşımadan dokunma: çift dokunuş → yerine yerleştir
-    if (e.type === 'pointerup' && !s.kose && t - yzSonTik < 340 && Math.hypot(e.clientX - yzSonXY[0], e.clientY - yzSonXY[1]) < 24) { yzSonTik = 0; yuzenAyarla(false); return; }
+    const A = AO();
+    if (s.basladi) {
+      const yon = A && s.tut && e.type === 'pointerup' ? A.gizlemeYonu({ eksen: 'serbest' }, e.clientX, e.clientX - s.x0, A.hiz(s.iz), e.clientY - s.y0) : null;
+      if (A && s.tut) A.ipucu(null);
+      tikYut = true; setTimeout(() => { tikYut = false; }, 320);
+      if (yon) { // ETK5-B: eski yerine dönerek kenara gizlenir (geri gelince orada açılır)
+        const r1 = ck.getBoundingClientRect(); yzKonum = { ...s.r0 }; yzYaz(); yzSakla();
+        const r0 = ck.getBoundingClientRect(); ck.style.transition = 'none'; ck.style.transform = `translate3d(${Math.round(r1.left - r0.left)}px,${Math.round(r1.top - r0.top)}px,0)`; void ck.offsetWidth;
+        ckGizle(yon); return;
+      }
+      yzKonum = yzSinirla(yzKonum); yzYaz(); yzSakla(); if (ckDurum) basUygula(); return;
+    }
+    const t = performance.now(); // taşımadan dokunma: çift dokunuş → yerine yerleştir · tutamakta tek dokunuş → seçenek menüsü (ETK5-B)
+    if (e.type === 'pointerup' && !s.kose && t - yzSonTik < 340 && Math.hypot(e.clientX - yzSonXY[0], e.clientY - yzSonXY[1]) < 24) { yzSonTik = 0; ckMenuYut = performance.now(); if (A) A.menuKapat(false); yuzenAyarla(false); return; }
     yzSonTik = t; yzSonXY = [e.clientX, e.clientY];
   };
   ck.addEventListener('pointerup', yzBit); ck.addEventListener('pointercancel', yzBit);
   ck.addEventListener('contextmenu', (e) => { if (yzHedef(e.target)) e.preventDefault(); });
   if (window.visualViewport) { const f = () => { if (ckMod() === 'yuzen') yzYaz(); }; visualViewport.addEventListener('resize', f); visualViewport.addEventListener('scroll', f); }
   window.__dkYuzen = { ayarla: (on) => yuzenAyarla(!!on), konum: () => (yzKonum ? { ...yzKonum } : null), acik: () => ckYuz }; // sınama kancası
+  /* --- ETK5-B (28 Kas): tutma çubuğu = arama paneliyle AYNI davranış (ortak/ara-balon.js window.__abOrtak: menü + kenar hapı) ---
+     Dokun / tıkla / Enter → seçenek menüsü: Yüzen · Sağda / Solda böl (telefonda Alt panel) · alt kipte Büyüt / Küçült (boy durakları) ·
+     Sağa / Sola gizle · Balona küçült · Kapat. Alt ve yüzen kipte tutamağı sağa / sola sürükle ya da fırlat → o kenara gizlenir; kenarda
+     yalnız ince dikey hap (44 px) kalır, dokun / içeri sürükle → yaylı geri gelir (html.ck-kenarda: ana akış payı kalkar, okunan yer korunur).
+     Alt kipte yukarı-aşağı sürükleme boyu değiştirmeye devam eder. «Solda böl» = html[data-ckyon=sol] (dk:ckyon). Kabuk yoksa eski davranış. */
+  const AO = () => window.__abOrtak || null;
+  let ckYon = oku('dk:ckyon') === 'sol' ? 'sol' : 'sag', ckKB = null, ckSonMod = '';
+  const ckYerlesik = () => (genisMq.matches ? 'genis' : yanMq.matches ? 'yan' : 'alt');
+  const ckYonUygula = () => { document.documentElement.dataset.ckyon = ckYon; };
+  ckYonUygula();
+  const ckGizliMi = () => !!(ckKB && ckKB.yon());
+  function ckKenar() {
+    const A = AO(); if (!A) return null;
+    if (!ckKB) ckKB = A.kenar({ el: () => ck, tx: (y) => (y === 'sag' ? Math.round(innerWidth - ck.offsetLeft + 24) : Math.round(-(ck.offsetLeft + ck.offsetWidth + 24))), yer: () => ({ top: ck.offsetTop, h: ck.offsetHeight }), getir: (odak) => ckGetir(odak), ad: 'Çekmeceyi geri getir', title: 'Çekmece · dokun ya da içeri sürükle', kimlik: 'cekmece' });
+    return ckKB;
+  }
+  function ckGizle(yon) {
+    const K = ckKenar(); if (!K || !ckDurum) return;
+    AO().menuKapat(false);
+    sbPanel(); document.documentElement.classList.add('ck-kenarda');
+    K.gizle(yon);
+  }
+  function ckGetir(odak, hemen) {
+    if (!ckGizliMi()) return;
+    const hapOdak = odak && document.activeElement === ckKB.hap();
+    if (ckDurum) sbPanel();
+    document.documentElement.classList.remove('ck-kenarda');
+    ckKB.getir(!!hemen);
+    if (hapOdak && ckDurum) tutamak.focus({ preventScroll: true });
+  }
+  window.__dkKenar = { gizli: ckGizliMi, getir: (odak, hemen) => ckGetir(odak, hemen), gizle: (y) => ckGizle(y) }; // ara-balon (basılı tut) + sınama kancası
+  addEventListener('hashchange', () => { if (ckGizliMi()) ckGetir(false); }); // yeni görünüm istendi → çekmece geri gelir
+  const BOY_KISA = ['%35', '%55', '%85', 'Tam'];
+  const IK_BOY = { buyut: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>', kucult: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>' };
+  function ckMenuOgeler() {
+    const I = AO().IK, m = ckMod(), yz = m === 'yuzen';
+    const L = [{ id: 'yuzen', ad: 'Yüzen pencere', ik: I.yuz, rol: 'menuitemradio', secili: yz }];
+    if (ckYerlesik() === 'alt') L.push({ id: 'alt', ad: 'Alt panel', ik: I.alt, rol: 'menuitemradio', secili: !yz });
+    else L.push({ id: 'bolSag', ad: 'Sağda böl', ik: I.bol, rol: 'menuitemradio', secili: !yz && ckYon !== 'sol' }, { id: 'bolSol', ad: 'Solda böl', ik: I.bolSol, rol: 'menuitemradio', secili: !yz && ckYon === 'sol' });
+    if (m === 'alt') { // boy durakları (eski «tutamağa dokun = bir boy büyüt»)
+      L.push('-');
+      if (ckBoy < 3) L.push({ id: 'buyut', ad: 'Büyüt', ik: IK_BOY.buyut, kisa: BOY_KISA[ckBoy + 1] });
+      if (ckBoy > 0) L.push({ id: 'kucult', ad: 'Küçült', ik: IK_BOY.kucult, kisa: BOY_KISA[ckBoy - 1] });
+    }
+    L.push('-', { id: 'gizSag', ad: 'Sağa gizle', ik: I.gizSag }, { id: 'gizSol', ad: 'Sola gizle', ik: I.gizSol }, '-', { id: 'balon', ad: 'Balona küçült', ik: I.balon }, { id: 'kapat', ad: 'Kapat', ik: I.x, kisa: 'Esc' });
+    return L;
+  }
+  function ckMenuSec(id) {
+    const A = AO(); if (A) A.menuKapat(false);
+    if (id === 'gizSag' || id === 'gizSol') { ckGizle(id === 'gizSag' ? 'sag' : 'sol'); return; }
+    if (id === 'buyut' || id === 'kucult') { boyAyarla(ckBoy + (id === 'buyut' ? 1 : -1), true); tutamak.focus({ preventScroll: true }); return; }
+    ckGetir(false, true);
+    if (id === 'balon' || id === 'kapat') { if (id === 'kapat') araInp.value = ''; kapatAlt(); return; }
+    if (id === 'bolSag' || id === 'bolSol') { const y = id === 'bolSol' ? 'sol' : 'sag'; if (y !== ckYon) { if (ckDurum) sbPanel(); ckYon = y; sakla('dk:ckyon', y === 'sol' ? 'sol' : ''); ckYonUygula(); } }
+    yuzenAyarla(id === 'yuzen');
+    tutamak.focus({ preventScroll: true });
+  }
+  // dokunuş / tık → menü: pointerup'ta değil click'te açılır (dokunmatikte menü parmağın altına açılırsa «hayalet tık» öğeyi seçerdi);
+  // sürükleme / basılı tutma sonrası tık tikYut ile, yüzen pencerede çift dokunuşun ikinci tıkı ckMenuYut ile yutulur
+  // (fareyle yüzen / alt kipte imleç çekmeceye yakalandığından tık hedefi #cekmece olur → basış tutamakta başladıysa o da sayılır)
+  let ckMenuYut = 0, ckTutBas = 0;
+  tutamak.addEventListener('pointerdown', () => { ckTutBas = performance.now(); }, true);
+  ck.addEventListener('click', (e) => {
+    const t = e.target, tut = !!(t.closest && t.closest('.ck-tutamak')) || (t === ck && performance.now() - ckTutBas < 1200);
+    if (!tut || tikYut || performance.now() - ckMenuYut < 450) return;
+    const m = ckMod();
+    ckMenuAc(false, m === 'alt' || m === 'yuzen' ? null : [e.clientX, e.clientY]);
+  });
+  function ckMenuAc(klavye, nokta) { // false: kabuk yok (eski davranış sürer)
+    const A = AO(); if (!A || !ckDurum) return false;
+    if (A.menuAcik()) { A.menuKapat(false); return true; } // açıkken ikinci dokunuş kapatır
+    A.menu(tutamak, ckMenuOgeler(), ckMenuSec, klavye, { ad: 'Çekmece seçenekleri', odak: () => !!ckDurum && !ckGizliMi(), nokta });
+    return true;
+  }
   const BOY_AD = ['küçük (%35)', 'orta (%55)', 'büyük (%85)', 'tam ekran'];
   function boyUygula() {
     const kok = document.documentElement;
@@ -3360,37 +3448,46 @@
   function genUygula() {
     const kok = document.documentElement, m = ckMod();
     kok.dataset.ckmod = m;
+    if (ckGizliMi()) { if (m !== ckSonMod) ckGetir(false, true); else ckKB.yerle(); } // ETK5-B: kip değişince kenardan anında geri
+    ckSonMod = m;
     if (m === 'yuzen') yzYaz();
     if (ckGen) kok.style.setProperty('--ck-gen', `${genSinir(ckGen)}px`); else kok.style.removeProperty('--ck-gen');
     kok.style.setProperty('--ck-yan', `${(ckYan * 100).toFixed(1)}vw`);
     const alt = m === 'alt', yz = m === 'yuzen';
     tutamak.setAttribute('aria-orientation', alt || yz ? 'horizontal' : 'vertical');
-    tutamak.setAttribute('aria-label', yz ? 'Pencereyi taşı: sürükle ya da ok tuşları (Shift + ok: boyut); çift dokun ya da Enter: yerine yerleştir' : alt ? 'Panel boyu: sürükle ya da dokun (↑ ↓ ile de değişir); aşağı atınca kapanır · basılı tut: yüzen pencere' : 'Çekmece genişliği: sürükle ya da ← → (çift tık: varsayılan) · basılı tut: yüzen pencere');
-    tutamak.title = yz ? 'Sürükle: taşı · çift dokun: yerine yerleştir' : alt ? 'Sürükle: panel boyu · dokun: bir boy büyüt · basılı tut: yüzen pencere' : 'Sürükle: genişlik · çift tık: varsayılan · basılı tut: yüzen pencere';
+    tutamak.setAttribute('aria-haspopup', 'menu'); if (!tutamak.hasAttribute('aria-expanded')) tutamak.setAttribute('aria-expanded', 'false');
+    tutamak.setAttribute('aria-label', yz ? 'Pencere seçenekleri: dokun ya da Enter · sürükle ya da ok tuşları: taşı (Shift + ok: boyut) · kenara at: gizle · çift dokun: yerine yerleştir' : alt ? 'Panel seçenekleri: dokun ya da Enter · yukarı-aşağı sürükle ya da ↑ ↓: boy · aşağı atınca kapanır · sağa / sola sürükle: gizle · basılı tut: yüzen pencere' : 'Çekmece genişliği: sürükle ya da ← → (çift tık: varsayılan) · dokun ya da Enter: seçenekler · basılı tut: yüzen pencere');
+    tutamak.title = yz ? 'Dokun: seçenekler · sürükle: taşı · kenara at: gizle · çift dokun: yerine yerleştir' : alt ? 'Dokun: seçenekler · yukarı-aşağı sürükle: boy · sağa / sola sürükle: gizle · basılı tut: yüzen pencere' : 'Sürükle: genişlik · dokun: seçenekler · çift tık: varsayılan · basılı tut: yüzen pencere';
     if (alt) { tutamak.setAttribute('aria-valuemin', '0'); tutamak.setAttribute('aria-valuemax', '3'); } else ['aria-valuemin', 'aria-valuemax', 'aria-valuenow', 'aria-valuetext'].forEach((a) => tutamak.removeAttribute(a));
     boyUygula();
   }
   genUygula();
   addEventListener('resize', genUygula, { passive: true });
   // yanda (genis / yan): sol kenardan sürükle → genişlik
-  tutamak.addEventListener('pointerdown', (e) => { if (ckMod() === 'alt' || ckMod() === 'yuzen') return; e.preventDefault(); tutamak.setPointerCapture(e.pointerId); document.body.classList.add('ck-surukle'); });
+  let yanSur = null; // ETK5-B: yanda kıpırdamadan dokunuş → seçenek menüsü (dokunulan yerde); sürükleme → genişlik
+  tutamak.addEventListener('pointerdown', (e) => { if (ckMod() === 'alt' || ckMod() === 'yuzen') return; e.preventDefault(); tutamak.setPointerCapture(e.pointerId); yanSur = { x0: e.clientX, y0: e.clientY, oyn: false }; });
   tutamak.addEventListener('pointermove', (e) => {
     if (!tutamak.hasPointerCapture(e.pointerId) || ckMod() === 'alt' || ckMod() === 'yuzen') return;
-    const W = document.documentElement.clientWidth, g = W - e.clientX;
+    if (yanSur && !yanSur.oyn) { if (Math.hypot(e.clientX - yanSur.x0, e.clientY - yanSur.y0) < 4) return; yanSur.oyn = true; document.body.classList.add('ck-surukle'); }
+    const W = document.documentElement.clientWidth, g = ckYon === 'sol' ? e.clientX : W - e.clientX;
     if (ckMod() === 'yan') ckYan = yanSinir(g / W); else ckGen = g;
     genUygula();
   });
   const surBit = (e) => {
     if (tutamak.hasPointerCapture(e.pointerId)) tutamak.releasePointerCapture(e.pointerId);
     document.body.classList.remove('ck-surukle');
+    const s = yanSur; yanSur = null;
+    if (s && !s.oyn) return; // dokunuş: menü tutamağın click'inde açılır
+    if (s) { tikYut = true; setTimeout(() => { tikYut = false; }, 320); } // genişlik sürüklemesinden sonraki tık menü açmasın
     if (ckMod() === 'yan') sakla('dk:ckyan', ckYan.toFixed(3)); else if (ckGen) { ckGen = genSinir(ckGen); sakla('dk:ckgen', String(ckGen)); }
   };
   tutamak.addEventListener('pointerup', surBit); tutamak.addEventListener('pointercancel', surBit);
-  tutamak.addEventListener('dblclick', () => { if (ckMod() === 'yuzen') return; if (ckMod() === 'yan') { ckYan = 0.5; sakla('dk:ckyan', ''); } else { ckGen = 0; sakla('dk:ckgen', ''); } genUygula(); });
+  tutamak.addEventListener('dblclick', () => { if (ckMod() === 'yuzen') return; const A = AO(); if (A) A.menuKapat(false); if (ckMod() === 'yan') { ckYan = 0.5; sakla('dk:ckyan', ''); } else { ckGen = 0; sakla('dk:ckgen', ''); } genUygula(); });
   const kapatAlt = () => { if (ckDurum) location.hash = `#${ckDurum.onEk}`; };
   tutamak.addEventListener('keydown', (e) => {
     const m = ckMod(), k = e.key;
-    if (m === 'yuzen') { // ok: taşı · Shift + ok: boyut · Enter / boşluk: yerine yerleştir
+    if ((k === 'Enter' || k === ' ') && !e.repeat && ckMenuAc(true)) { e.preventDefault(); return; } // ETK5-B: Enter / boşluk → seçenek menüsü
+    if (m === 'yuzen') { // ok: taşı · Shift + ok: boyut · (kabuk yoksa) Enter / boşluk: yerine yerleştir
       const ad = 16, dx = k === 'ArrowLeft' ? -ad : k === 'ArrowRight' ? ad : 0, dy = k === 'ArrowUp' ? -ad : k === 'ArrowDown' ? ad : 0;
       if (dx || dy) { e.preventDefault(); const r = yzKonum || yzVarsayilan(); yzKonum = e.shiftKey ? { ...r, w: r.w + dx, h: r.h + dy } : { ...r, x: r.x + dx, y: r.y + dy }; yzKonum = yzSinirla(yzKonum); yzYaz(); yzSakla(); }
       else if (k === 'Enter' || k === ' ') { e.preventDefault(); yuzenAyarla(false); }
@@ -3404,8 +3501,9 @@
     }
     if (k !== 'ArrowLeft' && k !== 'ArrowRight') return;
     e.preventDefault();
-    if (m === 'yan') { ckYan = yanSinir(ckYan + (k === 'ArrowLeft' ? 0.05 : -0.05)); sakla('dk:ckyan', ckYan.toFixed(3)); }
-    else { ckGen = genSinir((ckGen || ck.getBoundingClientRect().width) + (k === 'ArrowLeft' ? 40 : -40)); sakla('dk:ckgen', String(ckGen)); }
+    const buyu = (k === 'ArrowLeft') !== (ckYon === 'sol'); // solda böl: → genişletir
+    if (m === 'yan') { ckYan = yanSinir(ckYan + (buyu ? 0.05 : -0.05)); sakla('dk:ckyan', ckYan.toFixed(3)); }
+    else { ckGen = genSinir((ckGen || ck.getBoundingClientRect().width) + (buyu ? 40 : -40)); sakla('dk:ckgen', String(ckGen)); }
     genUygula();
   });
   // alt kip: tutamaktan ya da başlık şeridinden (düğme / kutu dışı) yukarı-aşağı sürükle → boy; bırakınca en yakın durağa oturur,
@@ -3415,18 +3513,22 @@
     if (ckMod() !== 'alt' || !ckDurum || (e.pointerType === 'mouse' && e.button)) return;
     const t = e.target, tut = !!t.closest('.ck-tutamak');
     if (!tut && (!t.closest('.ck-ust, #ck-baslik') || t.closest('button, a, input, select, textarea, label, .ck-sonuc'))) return;
-    sur = { id: e.pointerId, y0: e.clientY, h0: ck.getBoundingClientRect().height, iz: [[e.timeStamp, e.clientY]], basladi: false, tut };
+    sur = { id: e.pointerId, y0: e.clientY, x0: e.clientX, h0: ck.getBoundingClientRect().height, iz: [[e.timeStamp, e.clientY]], izx: [[e.clientX, e.clientY, e.timeStamp]], basladi: false, eksen: null, tut };
     e.preventDefault(); // yazı seçimi / yerel sürükle-bırak başlamasın (pointercancel)
     if (tut) { try { ck.setPointerCapture(e.pointerId); } catch (x) { /* yakalanamadı */ } }
   });
   ck.addEventListener('pointermove', (e) => {
     if (!sur || e.pointerId !== sur.id) return;
-    const dy = e.clientY - sur.y0;
+    const dy = e.clientY - sur.y0, dx = e.clientX - sur.x0, A = AO();
+    sur.izx.push([e.clientX, e.clientY, e.timeStamp]); if (sur.izx.length > 8) sur.izx.shift();
     if (!sur.basladi) {
-      if (Math.abs(dy) < 7) return;
-      sur.basladi = true; document.body.classList.add('ck-surukle');
+      const yatay = !!A && sur.tut && Math.abs(dx) >= 7 && Math.abs(dx) >= Math.abs(dy) * 0.8; // ETK5-B: tutamağı sağa / sola sürükle → kenara gizle
+      if (!yatay && Math.abs(dy) < 7) return;
+      sur.basladi = true; sur.eksen = yatay ? 'x' : 'y'; document.body.classList.add('ck-surukle');
       try { ck.setPointerCapture(e.pointerId); } catch (x) { /* yakalanamadı */ }
+      if (yatay) ck.style.transition = 'none';
     }
+    if (sur.eksen === 'x') { ck.style.transform = `translate3d(${Math.round(dx)}px,0,0)`; ck.style.opacity = String(1 - Math.min(0.3, Math.abs(dx) / innerWidth)); A.ipucu(A.gizlemeYonu({ eksen: 'x' }, e.clientX, dx, A.hiz(sur.izx))); return; }
     sbPanel(400);
     document.documentElement.style.setProperty('--ck-oran', String(Math.max(0.12, Math.min(1, (sur.h0 - dy) / innerHeight))));
     sur.iz.push([e.timeStamp, e.clientY]); if (sur.iz.length > 6) sur.iz.shift();
@@ -3434,9 +3536,17 @@
   const surAltBit = (e) => {
     if (!sur || e.pointerId !== sur.id) return;
     const s = sur; sur = null;
-    if (!s.basladi) { if (s.tut && e.type === 'pointerup') boyAyarla(ckBoy < 3 ? ckBoy + 1 : 1, true); return; }
+    if (!s.basladi) { if (s.tut && e.type === 'pointerup' && !AO()) boyAyarla(ckBoy < 3 ? ckBoy + 1 : 1, true); return; } // ETK5-B: dokun → menü (tutamağın click'inde; boy durakları menüde) · kabuk yoksa eski davranış
     document.body.classList.remove('ck-surukle');
     tikYut = true; setTimeout(() => { tikYut = false; }, 320);
+    if (s.eksen === 'x') { // ETK5-B: eşik / fırlatma → o kenara gizlen; yoksa yaylı geri
+      const A = AO(), yon = e.type === 'pointercancel' ? null : A.gizlemeYonu({ eksen: 'x' }, e.clientX, e.clientX - s.x0, A.hiz(s.izx));
+      A.ipucu(null);
+      if (yon) { ckGizle(yon); return; }
+      ck.style.transition = A.azHareket() ? 'none' : 'transform .34s cubic-bezier(.22,1.16,.36,1),opacity .2s ease'; ck.style.transform = ''; ck.style.opacity = '';
+      setTimeout(() => { if (!ckGizliMi() && !sur) ck.style.transition = ''; }, 420);
+      return;
+    }
     // atış hızı: son ~100 ms'lik hareket (px/ms; + = aşağı); pencerede tek örnek varsa bir öncekiyle
     const [t1, y1] = s.iz[s.iz.length - 1];
     let j = s.iz.findIndex(([t]) => t >= t1 - 100); if (j >= s.iz.length - 1) j = Math.max(0, s.iz.length - 2);
